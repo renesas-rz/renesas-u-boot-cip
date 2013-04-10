@@ -1,6 +1,7 @@
 /*
  * sh_eth.c - Driver for Renesas ethernet controler.
  *
+ * Copyright (C) 2013  Renesas Electronics Corporation
  * Copyright (C) 2008, 2011 Renesas Solutions Corp.
  * Copyright (c) 2008, 2011 Nobuhiro Iwamatsu
  * Copyright (c) 2007 Carlos Munoz <carlos@kenati.com>
@@ -38,8 +39,15 @@
 # error "Please define CONFIG_SH_ETHER_PHY_ADDR"
 #endif
 #ifdef CONFIG_SH_ETHER_CACHE_WRITEBACK
+#if defined(CONFIG_SH)
 #define flush_cache_wback(addr, len)	\
 			dcache_wback_range((u32)addr, (u32)(addr + len - 1))
+#elif defined(CONFIG_ARM)
+#define flush_cache_wback(addr, len)	\
+			flush_dcache_range((u32)addr, (u32)(addr + len - 1))
+#else
+#error
+#endif
 #else
 #define flush_cache_wback(...)
 #endif
@@ -162,6 +170,7 @@ static int sh_eth_reset(struct sh_eth_dev *eth)
 	udelay(3000);
 	sh_eth_write(eth, sh_eth_read(eth, EDMR) & ~EDMR_SRST, EDMR);
 
+	writel((readw(0xEE70026C) | 0x00000001), 0xEE70026C);
 	return 0;
 #endif
 }
@@ -419,7 +428,7 @@ static int sh_eth_config(struct sh_eth_dev *eth, bd_t *bd)
 		sh_eth_write(eth, GECMR_100B, GECMR);
 #elif defined(CONFIG_CPU_SH7757) || defined(CONFIG_CPU_SH7752)
 		sh_eth_write(eth, 1, RTRATE);
-#elif defined(CONFIG_CPU_SH7724)
+#elif defined(CONFIG_CPU_SH7724) || defined(CONFIG_R8A7790)
 		val = ECMR_RTM;
 #endif
 	} else if (phy->speed == 10) {

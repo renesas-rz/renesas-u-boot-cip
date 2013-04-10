@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2013  Renesas Electronics Corporation
+ *
  * (C) Copyright 2009
  * Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
  *
@@ -77,7 +79,7 @@ static void tmu_timer_stop(unsigned int timer)
 int timer_init(void)
 {
 	bit = (ffs(CONFIG_SYS_TMU_CLK_DIV) >> 1) - 1;
-	writew(readw(&tmu->tcr0) | bit, &tmu->tcr0);
+	writew((readw(&tmu->tcr0) & ~0x7) | bit, &tmu->tcr0);
 
 	tmu_timer_stop(0);
 	tmu_timer_start(0);

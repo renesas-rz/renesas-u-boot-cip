@@ -25,12 +25,16 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(SOC).o
 
-SOBJS = lowlevel_init.o
 COBJS-y += cpu_info.o
 COBJS-y += emac.o
 
+SOBJS-$(CONFIG_R8A7740) = lowlevel_init.o
+SOBJS-$(CONFIG_SH73A0) = lowlevel_init.o
+
 COBJS-$(CONFIG_DISPLAY_BOARDINFO) += board.o
 COBJS-$(CONFIG_GLOBAL_TIMER) += timer.o
+COBJS-$(CONFIG_R8A7790) += cpu_info-r8a7790.o
+COBJS-$(CONFIG_R8A7790) += pfc-r8a7790.o
 COBJS-$(CONFIG_R8A7740) += cpu_info-r8a7740.o
 COBJS-$(CONFIG_R8A7740) += pfc-r8a7740.o
 COBJS-$(CONFIG_SH73A0) += cpu_info-sh73a0.o

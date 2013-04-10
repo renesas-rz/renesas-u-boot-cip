@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2013 Renesas Electronics Corporation
  * Copyright (C) 2009 Freescale Semiconductor, Inc.
  *
  * Author: Mingkai Hu (Mingkai.hu@freescale.com)
@@ -102,6 +103,13 @@ static const struct spansion_spi_flash_params spansion_spi_flash_table[] = {
 		.pages_per_sector = 256,
 		.nr_sectors = 512,
 		.name = "S25FL256S",
+	},
+	{
+		.idcode1 = 0x0220,
+		.idcode2 = 0x4d00,
+		.pages_per_sector = 1024,
+		.nr_sectors = 256,
+		.name = "S25FL512S",
 	},
 };
 
