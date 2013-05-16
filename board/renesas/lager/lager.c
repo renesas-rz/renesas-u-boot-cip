@@ -47,6 +47,9 @@ void s_init(void)
 	writel(0xA5A5A500, &rwdt->rwtcsra);
 	writel(0xA5A5A500, &swdt->swtcsra);
 
+	/* QoS */
+	qos_init();
+
 #if defined(CONFIG_NORFLASH)
 	/* LBSC */
 	writel(0x00000020, &lbsc->cs0ctrl);
