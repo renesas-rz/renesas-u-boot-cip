@@ -29,12 +29,6 @@ lowlevel_init:
 	orr	r4, r4, r4, lsr #6
 	and	r4, r4, #7		/* id 0-3 = ca15.0,1,2,3 */
 
-        /* initialize archtimer for each cluster */
-        tst     r4, #0x3
-        ldreq   r1, =0xe6080000
-        ldreq   r0, [r1, #0x20]
-        mcreq   p15, 0, r0, c14, c0, 0  /* arch timer */
-
 #if 0
 	tst	r4, #4
 	ldreq	r1, =0xf0194000		/* ca15 snoop ctl */
