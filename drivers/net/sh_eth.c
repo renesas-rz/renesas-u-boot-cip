@@ -413,6 +413,12 @@ static int sh_eth_config(struct sh_eth_dev *eth, bd_t *bd)
 		goto err_phy_cfg;
 	}
 	phy = port_info->phydev;
+#if defined(CONFIG_ARCH_R8A7790)
+	ret = phy_read(phy, MDIO_DEVAD_NONE, 0x1e);
+	ret &= ~0xc000;
+	ret |= 0x4000;
+	phy_write(phy, MDIO_DEVAD_NONE, 0x1e, (u16)ret);
+#endif
 	ret = phy_startup(phy);
 	if (ret) {
 		printf(SHETHER_NAME ": phy startup failure\n");
