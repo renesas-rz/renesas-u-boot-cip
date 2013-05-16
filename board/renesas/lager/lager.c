@@ -230,11 +230,11 @@ int board_early_init_f(void)
 	SetGuardREG(GPSR4, 0x34000000, 0x00000000);
 	SetGuardREG(IPSR14, 0x00000FC7, 0x00000481);
 	SetGuardREG(GPSR4,  0x00000000, 0x34000000);
+#endif
 
 	val = readl(MSTPSR7);
 	val &= ~SCIF0_MSTP721;
 	writel(val, SMSTPCR7);
-#endif
 
 	/* ETHER */
 	val = readl(MSTPSR8);
