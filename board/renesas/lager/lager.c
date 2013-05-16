@@ -270,7 +270,7 @@ int board_init(void)
 	gpio_request(GPIO_FN_ETH_MDC, NULL);
 	gpio_request(GPIO_FN_IRQ0, NULL);
 
-	timer_init();
+	sh_timer_init();
 
 	gpio_request(GPIO_GP_5_31, NULL);	/* PHY_RST */
 	gpio_direction_output(GPIO_GP_5_31, 0);

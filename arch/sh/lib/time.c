@@ -35,16 +35,40 @@
 #include <asm/io.h>
 #include <sh_tmu.h>
 
+#if defined(CONFIG_R8A7790)
+
+DECLARE_GLOBAL_DATA_PTR;
+
+#endif
+
 static struct tmu_regs *tmu = (struct tmu_regs *)TMU_BASE;
 
 static u16 bit;
 static unsigned long last_tcnt;
 static unsigned long long overflow_ticks;
 
+#if defined(CONFIG_R8A7790)
+
+unsigned long get_tbclk(void)
+{
+	if (gd->flags & GD_FLG_RELOC)
+		return get_tmu0_clk_rate() >> ((bit + 1) * 2);
+	else {
+		u16 bit;
+
+		bit = (ffs(CONFIG_SYS_TMU_CLK_DIV) >> 1) - 1;
+		return get_tmu0_clk_rate() >> ((bit + 1) * 2);
+	}
+}
+
+#else
+
 unsigned long get_tbclk(void)
 {
 	return get_tmu0_clk_rate() >> ((bit + 1) * 2);
 }
+
+#endif
 
 static inline unsigned long long tick_to_time(unsigned long long tick)
 {
@@ -76,6 +100,30 @@ static void tmu_timer_stop(unsigned int timer)
 	writeb(readb(&tmu->tstr) & ~(1 << timer), &tmu->tstr);
 }
 
+#if defined(CONFIG_R8A7790)
+
+int sh_timer_init(void)
+{
+	bit = (ffs(CONFIG_SYS_TMU_CLK_DIV) >> 1) - 1;
+	writew((readw(&tmu->tcr0) & ~0x7) | bit, &tmu->tcr0);
+
+	tmu_timer_stop(0);
+	tmu_timer_start(0);
+
+	last_tcnt = 0;
+	overflow_ticks = 0;
+
+	return 0;
+}
+
+int timer_init(void)
+{
+	tmu_timer_stop(0);
+	tmu_timer_start(0);
+}
+
+#else
+
 int timer_init(void)
 {
 	bit = (ffs(CONFIG_SYS_TMU_CLK_DIV) >> 1) - 1;
@@ -90,6 +138,27 @@ int timer_init(void)
 	return 0;
 }
 
+#endif
+
+#if defined(CONFIG_R8A7790)
+
+unsigned long long get_ticks(void)
+{
+	unsigned long tcnt = 0 - readl(&tmu->tcnt0);
+
+	if (gd->flags & GD_FLG_RELOC) {
+		if (last_tcnt > tcnt) /* overflow */
+			overflow_ticks++;
+		last_tcnt = tcnt;
+
+		return (overflow_ticks << 32) | tcnt;
+	}
+	else
+		return tcnt;
+}
+
+#else
+
 unsigned long long get_ticks(void)
 {
 	unsigned long tcnt = 0 - readl(&tmu->tcnt0);
@@ -100,6 +169,8 @@ unsigned long long get_ticks(void)
 
 	return (overflow_ticks << 32) | tcnt;
 }
+
+#endif
 
 void __udelay(unsigned long usec)
 {
