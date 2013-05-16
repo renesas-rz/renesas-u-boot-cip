@@ -23,6 +23,7 @@
 #include <asm/processor.h>
 #include <asm/mach-types.h>
 #include <asm/io.h>
+#include <asm/errno.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
 #include <asm/arch/rmobile.h>
@@ -282,6 +283,29 @@ int board_init(void)
 	udelay(1);
 
 	return 0;
+}
+
+int board_eth_init(bd_t *bis)
+{
+	int ret = -ENODEV;
+	u32 val;
+	unsigned char enetaddr[6];
+
+#ifdef CONFIG_SH_ETHER
+	ret = sh_eth_initialize(bis);
+	if (!eth_getenv_enetaddr("ethaddr", enetaddr))
+		return ret;
+
+	/* Set Mac address */
+	val = enetaddr[0] << 24 | enetaddr[1] << 16 |
+	    enetaddr[2] << 8 | enetaddr[3];
+	writel(val, 0xEE7003C0);
+
+	val = enetaddr[4] << 8 | enetaddr[5];
+	writel(val, 0xEE7003C8);
+#endif
+
+	return ret;
 }
 
 int dram_init(void)
