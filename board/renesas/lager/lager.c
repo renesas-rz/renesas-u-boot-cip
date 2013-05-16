@@ -29,66 +29,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-struct pin_db {
-	u32	addr;	/* register address */
-	u32	mask;	/* mask value */
-	u32	val;	/* setting value */
-};
-
-#define	PMMR		0xE6060000
-#define	GPSR1		0xE6060008
-#define	GPSR2		0xE606000C
-#define	GPSR4		0xE6060014
-#define	IPSR6		0xE6060038
-#define	IPSR14		0xE6060058
-#define	PUPR4		0xE6060110
-#define	PUPR5		0xE6060114
-#define	PUPR6		0xE6060118
-
-#define	SetREG(x) \
-	writel((readl((x)->addr) & ~((x)->mask)) | ((x)->val), (x)->addr)
-
-#define	SetGuardREG(x)				\
-{ \
-	u32	val; \
-	val = (readl((x)->addr) & ~((x)->mask)) | ((x)->val); \
-	writel(~val, PMMR); \
-	writel(val, (x)->addr); \
-}
-
-struct pin_db	pin_guard[] = {
-	/* SCIF0 */
-#if defined(CONFIG_NORFLASH)
-	{ GPSR4,  0x34000000, 0x00000000 },	/* TX0, RX0, SCIF_CLK */
-	{ IPSR14, 0x00000FC7, 0x00000481 },
-	{ GPSR4,  0x00000000, 0x34000000 },
- #endif
-	{ GPSR2,  0x00000000, 0x3FFC0000 },	/* ETHER */
-	{ GPSR1,  0x02000000, 0x00000000 },	/* IRQ0 */
-	{ IPSR6,  0x00000007, 0x00000001 },
-	{ GPSR1,  0x00000000, 0x02000000 },
-};
-
-struct pin_db	pin_tbl[] = {
-	{ PUPR4,  0xC0000000, 0x00000000 },
-	{ PUPR5,  0xE0000000, 0x00000000 },
-	{ PUPR6,  0x0000007F, 0x00000000 },
-};
-
-void pin_init(void)
-{
-	struct pin_db	*db;
-
-	for (db = pin_guard; db < &pin_guard[sizeof(pin_guard) /
-			sizeof(struct pin_db)]; db++) {
-		SetGuardREG(db);
-	}
-	for (db = pin_tbl; db < &pin_tbl[sizeof(pin_tbl) /
-			sizeof(struct pin_db)]; db++) {
-		SetREG(db);
-	}
-}
-
 #define s_init_wait(cnt) \
 		({	\
 			volatile u32 i = 0x10000 * cnt;	\
@@ -106,9 +46,6 @@ void s_init(void)
 	/* Watchdog init */
 	writel(0xA5A5A500, &rwdt->rwtcsra);
 	writel(0xA5A5A500, &swdt->swtcsra);
-
-	/* PFC */
-	pin_init();
 
 #if defined(CONFIG_NORFLASH)
 	/* LBSC */
@@ -267,6 +204,18 @@ void s_init(void)
 #define	SMSTPCR8	0xE6150990
 #define ETHER_MSTP813	(1 << 13)
 
+#define	PMMR		0xE6060000
+#define	GPSR4		0xE6060014
+#define	IPSR14		0xE6060058
+
+#define	SetGuardREG(addr, mask, value)		\
+{ \
+	u32	val; \
+	val = (readl(addr) & ~(mask)) | (value);	\
+	writel(~val, PMMR); \
+	writel(val, addr); \
+}
+
 int board_early_init_f(void)
 {
 	u32 val;
@@ -276,10 +225,16 @@ int board_early_init_f(void)
 	val &= ~TMU0_MSTP125;
 	writel(val, SMSTPCR1);
 
+#if defined(CONFIG_NORFLASH)
 	/* SCIF0 */
+	SetGuardREG(GPSR4, 0x34000000, 0x00000000);
+	SetGuardREG(IPSR14, 0x00000FC7, 0x00000481);
+	SetGuardREG(GPSR4,  0x00000000, 0x34000000);
+
 	val = readl(MSTPSR7);
 	val &= ~SCIF0_MSTP721;
 	writel(val, SMSTPCR7);
+#endif
 
 	/* ETHER */
 	val = readl(MSTPSR8);
@@ -289,20 +244,6 @@ int board_early_init_f(void)
 	return 0;
 }
 
-static void ether_init(void)
-{
-	struct r8a7790_gpio *gpio5 = (struct r8a7790_gpio *)GPIO5_BASE;
-
-	writel((readl(&gpio5->posneg) & ~0x80000000), &gpio5->posneg);
-	writel((readl(&gpio5->inoutsel) | 0x80000000), &gpio5->inoutsel);
-
-	writel((readl(&gpio5->outdt) & ~0x80000000), &gpio5->outdt);
-	mdelay(20);
-	writel((readl(&gpio5->outdt) | 0x80000000), &gpio5->outdt);
-	udelay(1);
-}
-
-
 DECLARE_GLOBAL_DATA_PTR;
 int board_init(void)
 {
@@ -311,9 +252,31 @@ int board_init(void)
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = LAGER_SDRAM_BASE + 0x100;
 
+	/* Init PFC controller */
+	r8a7790_pinmux_init();
+
+	/* ETHER Enable */
+	gpio_request(GPIO_FN_ETH_CRS_DV, NULL);
+	gpio_request(GPIO_FN_ETH_RX_ER, NULL);
+	gpio_request(GPIO_FN_ETH_RXD0, NULL);
+	gpio_request(GPIO_FN_ETH_RXD1, NULL);
+	gpio_request(GPIO_FN_ETH_LINK, NULL);
+	gpio_request(GPIO_FN_ETH_REF_CLK, NULL);
+	gpio_request(GPIO_FN_ETH_MDIO, NULL);
+	gpio_request(GPIO_FN_ETH_TXD1, NULL);
+	gpio_request(GPIO_FN_ETH_TX_EN, NULL);
+	gpio_request(GPIO_FN_ETH_MAGIC, NULL);
+	gpio_request(GPIO_FN_ETH_TXD0, NULL);
+	gpio_request(GPIO_FN_ETH_MDC, NULL);
+	gpio_request(GPIO_FN_IRQ0, NULL);
+
 	timer_init();
 
-	ether_init();
+	gpio_request(GPIO_GP_5_31, NULL);	/* PHY_RST */
+	gpio_direction_output(GPIO_GP_5_31, 0);
+	mdelay(20);
+	gpio_set_value(GPIO_GP_5_31, 1);
+	udelay(1);
 
 	return 0;
 }
