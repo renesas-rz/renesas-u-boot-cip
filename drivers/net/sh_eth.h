@@ -58,7 +58,11 @@
 
 /* The size of the tx descriptor is determined by how much padding is used.
    4, 20, or 52 bytes of padding can be used */
+#if defined(CONFIG_ARM)
+#define TX_DESC_PADDING		52
+#else
 #define TX_DESC_PADDING		4
+#endif
 #define TX_DESC_SIZE		(12 + TX_DESC_PADDING)
 
 /* Tx descriptor. We always use 3 bytes of padding */
@@ -66,7 +70,11 @@ struct tx_desc_s {
 	volatile u32 td0;
 	u32 td1;
 	u32 td2;		/* Buffer start */
+#if defined(CONFIG_ARM)
+	u32 padding[13];	/* aligned cache line size */
+#else
 	u32 padding;
+#endif
 };
 
 /* There is no limitation in the number of rx descriptors */
@@ -74,7 +82,13 @@ struct tx_desc_s {
 
 /* The size of the rx descriptor is determined by how much padding is used.
    4, 20, or 52 bytes of padding can be used */
+#if defined(CONFIG_ARM)
+#define RX_DESC_PADDING		52
+#define RX_BUF_ALIGNE_SIZE	64	/* aligned cache line size */
+#else
 #define RX_DESC_PADDING		4
+#define RX_BUF_ALIGNE_SIZE	32
+#endif
 #define RX_DESC_SIZE		(12 + RX_DESC_PADDING)
 
 /* Rx descriptor. We always use 4 bytes of padding */
@@ -82,7 +96,11 @@ struct rx_desc_s {
 	volatile u32 rd0;
 	volatile u32 rd1;
 	u32 rd2;		/* Buffer start */
+#if defined(CONFIG_ARM)
+	u32 padding[13];	/* aligned cache line size */
+#else
 	u32 padding;
+#endif
 };
 
 struct sh_eth_info {
@@ -329,6 +347,7 @@ enum DMAC_M_BIT {
 	EDMR_EL		= 0x40, /* Litte endian */
 #elif defined(SH_ETH_TYPE_ETHER)
 	EDMR_SRST	= 0x01,
+	EMDR_DESC_64	= 0x20, /* Descriptor size is 64byte */
 	EMDR_DESC_R	= 0x30, /* Descriptor reserve size */
 	EDMR_EL		= 0x40, /* Litte endian */
 #else
