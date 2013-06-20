@@ -20,12 +20,22 @@
 #include <common.h>
 #include <asm/io.h>
 
+#define PRR 0xFF000044
+
 u32 rmobile_get_cpu_type(void)
 {
-	return 0;
+	u32 product;
+
+	product = readl(PRR);
+
+	return ((product & 0x00007F00) >> 8);
 }
 
-u32 rmobile_get_cpu_rev(void)
+u32 rmobile_get_cpu_rev_integer(void)
 {
-	return 0;
+	u32 product;
+
+	product = readl(PRR);
+
+	return ((product & 0x000000F0) >> 4);
 }
