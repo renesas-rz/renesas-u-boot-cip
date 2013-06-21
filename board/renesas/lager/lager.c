@@ -320,6 +320,12 @@ const struct rmobile_sysinfo sysinfo = {
 	CONFIG_RMOBILE_BOARD_STRING
 };
 
+void dram_init_banksize(void)
+{
+	gd->bd->bi_dram[0].start = LAGER_SDRAM_BASE;
+	gd->bd->bi_dram[0].size = LAGER_SDRAM_SIZE;
+}
+
 int board_late_init(void)
 {
 	return 0;
