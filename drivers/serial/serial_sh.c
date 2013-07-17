@@ -61,7 +61,7 @@ static struct uart_port sh_sci = {
 static void sh_serial_setbrg(void)
 {
 	DECLARE_GLOBAL_DATA_PTR;
-#if defined(CONFIG_R8A7790)
+#if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791)
 	sci_out(&sh_sci, DL, DL_VALUE(gd->baudrate, CONFIG_SCIF_CLK_FREQ));
 	udelay((1000000 * 2 * 16 / CONFIG_SYS_CLK_FREQ) * 1000 + 1);
 #else
