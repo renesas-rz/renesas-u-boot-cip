@@ -113,12 +113,42 @@ static const struct spansion_spi_flash_params spansion_spi_flash_table[] = {
 	},
 };
 
+static int spi_flash_cmd_write_status_config(struct spi_flash *flash, u8 *srcr)
+{
+	u8 cmd;
+	int ret;
+
+	ret = spi_flash_cmd_write_enable(flash);
+	if (ret < 0) {
+		debug("SF: enabling write failed\n");
+		return ret;
+	}
+
+	cmd = CMD_WRITE_STATUS;
+	ret = spi_flash_cmd_write(flash->spi, &cmd, 1, srcr, 2);
+	if (ret) {
+		debug("SF: fail to write status and config register\n");
+		return ret;
+	}
+
+	ret = spi_flash_cmd_wait_ready(flash, SPI_FLASH_PROG_TIMEOUT);
+	if (ret < 0) {
+		debug("SF: write status register timed out\n");
+		return ret;
+	}
+
+	return 0;
+}
+
 struct spi_flash *spi_flash_probe_spansion(struct spi_slave *spi, u8 *idcode)
 {
 	const struct spansion_spi_flash_params *params;
 	struct spi_flash *flash;
 	unsigned int i;
 	unsigned short jedec, ext_jedec;
+#ifdef CONFIG_SPI_FLASH_QUAD
+	u8 cr, sr, srcr[2];
+#endif
 
 	jedec = idcode[1] << 8 | idcode[2];
 	ext_jedec = idcode[3] << 8 | idcode[4];
@@ -145,12 +175,31 @@ struct spi_flash *spi_flash_probe_spansion(struct spi_slave *spi, u8 *idcode)
 	flash->spi = spi;
 	flash->name = params->name;
 
+#ifdef CONFIG_SPI_FLASH_QUAD
+	flash->write = spi_flash_cmd_write_quad;
+#else
 	flash->write = spi_flash_cmd_write_multi;
+#endif
 	flash->erase = spi_flash_cmd_erase;
+#ifdef CONFIG_SPI_FLASH_QUAD
+	flash->read = spi_flash_cmd_read_quad;
+#else
 	flash->read = spi_flash_cmd_read_fast;
+#endif
 	flash->page_size = 256;
 	flash->sector_size = 256 * params->pages_per_sector;
 	flash->size = flash->sector_size * params->nr_sectors;
+
+#ifdef CONFIG_SPI_FLASH_QUAD
+	/* enable quad transfer */
+	spi_flash_cmd(spi, CMD_READ_STATUS, &sr, 1);
+	spi_flash_cmd(spi, CMD_READ_CONFIG, &cr, 1);
+	cr |= 0x02;
+	srcr[0] = sr;
+	srcr[1] = cr;
+	if (spi_flash_cmd_write_status_config(flash, srcr) < 0)
+		return NULL;
+#endif
 
 	return flash;
 }

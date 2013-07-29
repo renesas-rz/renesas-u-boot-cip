@@ -1,6 +1,7 @@
 /*
  * SPI flash internal definitions
  *
+ * Copyright (C) 2013 Renesas Electronics Corporation
  * Copyright (C) 2008 Atmel Corporation
  */
 
@@ -17,6 +18,7 @@
 
 #define CMD_READ_ARRAY_SLOW		0x03
 #define CMD_READ_ARRAY_FAST		0x0b
+#define CMD_READ_ARRAY_QUAD		0x6b
 
 #define CMD_WRITE_STATUS		0x01
 #define CMD_PAGE_PROGRAM		0x02
@@ -24,6 +26,8 @@
 #define CMD_READ_STATUS			0x05
 #define CMD_WRITE_ENABLE		0x06
 #define CMD_ERASE_4K			0x20
+#define CMD_QUAD4_PAGE_PROGRAM		0x34
+#define CMD_READ_CONFIG			0x35
 #define CMD_ERASE_32K			0x52
 #define CMD_ERASE_64K			0xd8
 #define CMD_ERASE_CHIP			0xc7
@@ -44,6 +48,9 @@ int spi_flash_cmd_read(struct spi_slave *spi, const u8 *cmd,
 int spi_flash_cmd_read_fast(struct spi_flash *flash, u32 offset,
 		size_t len, void *data);
 
+int spi_flash_cmd_read_quad(struct spi_flash *flash, u32 offset,
+		size_t len, void *data);
+
 /*
  * Send a multi-byte command to the device followed by (optional)
  * data. Used for programming the flash array, etc.
@@ -56,6 +63,9 @@ int spi_flash_cmd_write(struct spi_slave *spi, const u8 *cmd, size_t cmd_len,
  * commands as needed per the write size.
  */
 int spi_flash_cmd_write_multi(struct spi_flash *flash, u32 offset,
+		size_t len, const void *buf);
+
+int spi_flash_cmd_write_quad(struct spi_flash *flash, u32 offset,
 		size_t len, const void *buf);
 
 /*
