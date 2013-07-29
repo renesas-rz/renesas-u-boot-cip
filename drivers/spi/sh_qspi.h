@@ -57,11 +57,15 @@ struct sh_qspi_regs {
 struct sh_qspi {
 	struct spi_slave	slave;
 	struct sh_qspi_regs	*regs;
+/*	unsigned char cmd;*/
 };
 
 static inline struct sh_qspi *to_sh_qspi(struct spi_slave *slave)
 {
 	return container_of(slave, struct sh_qspi, slave);
 }
+
+/* SPI COMMAND */
+/*#define CMD_READ_ARRAY_QUAD		0x6b*/
 
 #endif

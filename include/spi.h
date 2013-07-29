@@ -140,6 +140,12 @@ void spi_release_bus(struct spi_slave *slave);
 int  spi_xfer(struct spi_slave *slave, unsigned int bitlen, const void *dout,
 		void *din, unsigned long flags);
 
+#ifdef CONFIG_SPI_FLASH_QUAD
+int  spi_xfer_quad(
+	struct spi_slave *slave, unsigned int cmdlen, const void *cmd,
+	unsigned int datalen, const void *dout, void *din, unsigned long flags);
+#endif
+
 /*-----------------------------------------------------------------------
  * Determine if a SPI chipselect is valid.
  * This function is provided by the board if the low-level SPI driver
