@@ -333,4 +333,10 @@ int board_late_init(void)
 
 void reset_cpu(ulong addr)
 {
+	u8 val;
+
+	i2c_init(0, 0);
+	i2c_read(0x58, 0x13, 1, &val, 1);
+	val |= 0x02;
+	i2c_write(0x58, 0x13, 1, &val, 1);
 }

@@ -188,4 +188,8 @@
 #define CONFIG_SYS_TMU_CLK_DIV	4
 #define CONFIG_SYS_HZ		1000
 
+/* i2c */
+#define CONFIG_RCAR_I2C
+#define CONFIG_RCAR_I2C_BASE	0xE6540000
+
 #endif	/* __LAGER_H */
