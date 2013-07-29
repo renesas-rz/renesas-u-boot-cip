@@ -63,7 +63,7 @@ void qos_init(void)
 
 	/* S3C -QoS */
 	s3c = (struct r8a7790_s3c *)S3C_BASE;
-	writel(0x80FF1D0D, &s3c->s3cadsplcr);
+	writel(0x80000000, &s3c->s3cadsplcr);
 	writel(0x0F0F0505, &s3c->s3crorr);
 	writel(0x0F0F0505, &s3c->s3cworr);
 
