@@ -27,6 +27,7 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
 #include <asm/arch/rmobile.h>
+#include <i2c.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -340,4 +341,10 @@ int board_late_init(void)
 
 void reset_cpu(ulong addr)
 {
+	u8 val;
+
+	i2c_init(CONFIG_SYS_I2C_SPEED, 0);
+	i2c_read(0x58, 0x13, 1, &val, 1);
+	val |= 0x02;
+	i2c_write(0x58, 0x13, 1, &val, 1);
 }
