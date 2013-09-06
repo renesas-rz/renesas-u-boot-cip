@@ -376,19 +376,6 @@ int do_bootm_linux(int flag, int argc, char *argv[], bootm_headers_t *images)
 	}
 
 	boot_prep_linux(images);
-
-	{
-		bd_t	*bd = gd->bd;
-
-		if (argc > 4) {
-			if ((strcmp(argv[2], "-") == 0)
-			    && (strcmp(argv[3], "dtb") == 0)) {
-				bd->bi_boot_params
-					= simple_strtoul(argv[4], NULL, 16);
-			}
-		}
-	}
-
 	boot_jump_linux(images);
 	return 0;
 }
