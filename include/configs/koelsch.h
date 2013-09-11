@@ -191,7 +191,6 @@
 
 /* i2c */
 #define CONFIG_SH_I2C		1
-#define CONFIG_HARD_I2C		1
 #define CONFIG_SYS_I2C_MODULE	1
 #define CONFIG_SYS_I2C_SPEED	400000 /* 400 kHz */
 #define CONFIG_SYS_I2C_SLAVE	0x7F
