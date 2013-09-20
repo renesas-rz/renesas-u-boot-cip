@@ -177,13 +177,11 @@ struct spi_flash *spi_flash_probe_spansion(struct spi_slave *spi, u8 *idcode)
 
 #ifdef CONFIG_SPI_FLASH_QUAD
 	flash->write = spi_flash_cmd_write_quad;
-#else
-	flash->write = spi_flash_cmd_write_multi;
-#endif
-	flash->erase = spi_flash_cmd_erase;
-#ifdef CONFIG_SPI_FLASH_QUAD
+	flash->erase = spi_flash_cmd_erase_quad;
 	flash->read = spi_flash_cmd_read_quad;
 #else
+	flash->write = spi_flash_cmd_write_multi;
+	flash->erase = spi_flash_cmd_erase;
 	flash->read = spi_flash_cmd_read_fast;
 #endif
 	flash->page_size = 256;

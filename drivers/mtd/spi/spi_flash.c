@@ -232,11 +232,11 @@ int spi_flash_cmd_read_fast(struct spi_flash *flash, u32 offset,
 int spi_flash_cmd_read_quad(struct spi_flash *flash, u32 offset,
 		size_t len, void *data)
 {
-	u8 cmd[5];
+	u8 cmd[6];
 
 	cmd[0] = CMD_READ_ARRAY_QUAD;
-	spi_flash_addr(offset, cmd);
-	cmd[4] = 0x00;
+	spi_flash_addr4(offset, cmd);
+	cmd[5] = 0x00;
 
 	return spi_flash_read_common(flash, cmd, sizeof(cmd), data, len);
 }
@@ -320,6 +320,63 @@ int spi_flash_cmd_erase(struct spi_flash *flash, u32 offset, size_t len)
 		if (ret)
 			goto out;
 
+		ret = spi_flash_cmd_write(flash->spi, cmd, sizeof(cmd),
+					  NULL, 0);
+		if (ret)
+			goto out;
+
+		ret = spi_flash_cmd_wait_ready(flash,
+					       SPI_FLASH_PAGE_ERASE_TIMEOUT);
+		if (ret)
+			goto out;
+	}
+
+	debug("SF: Successfully erased %zu bytes @ %#x\n", len, start);
+
+ out:
+	spi_release_bus(flash->spi);
+	return ret;
+}
+
+#define SZ_256K	0x40000
+
+int spi_flash_cmd_erase_quad(struct spi_flash *flash, u32 offset, size_t len)
+{
+	u32 start, end, erase_size;
+	int ret;
+	u8 cmd[5];
+
+	erase_size = flash->sector_size;
+	if (offset % erase_size || len % erase_size) {
+		debug("SF: Erase offset/length not multiple of erase size\n");
+		return -1;
+	}
+
+	ret = spi_claim_bus(flash->spi);
+	if (ret) {
+		debug("SF: Unable to claim SPI bus\n");
+		return ret;
+	}
+
+	if (erase_size == SZ_256K)
+		cmd[0] = CMD_ERASE_256K;
+	else {
+		debug("Q4PP: Unable sector size %d\n", erase_size);
+		return -1;
+	}
+	start = offset;
+	end = start + len;
+
+	while (offset < end) {
+		spi_flash_addr4(offset, cmd);
+
+		debug("SF: erase %2x %2x %2x %2x %2x (%x)\n", cmd[0], cmd[1],
+		      cmd[2], cmd[3], cmd[4], offset);
+
+		ret = spi_flash_cmd_write_enable(flash);
+		if (ret)
+			goto out;
+
 		ret = spi_flash_cmd_write(flash->spi, cmd, sizeof(cmd), NULL, 0);
 		if (ret)
 			goto out;
@@ -327,6 +384,8 @@ int spi_flash_cmd_erase(struct spi_flash *flash, u32 offset, size_t len)
 		ret = spi_flash_cmd_wait_ready(flash, SPI_FLASH_PAGE_ERASE_TIMEOUT);
 		if (ret)
 			goto out;
+
+		offset += erase_size;
 	}
 
 	debug("SF: Successfully erased %zu bytes @ %#x\n", len, start);
