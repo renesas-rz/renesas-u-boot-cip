@@ -75,12 +75,15 @@
 #define DBSC3_0_QOS_W14_BASE	0xE6792E00
 #define DBSC3_0_QOS_W15_BASE	0xE6792F00
 
+#define DBSC3_0_DBADJ2		0xE67900C8
+
 #define CCI_400_MAXOT_1		0xF0091110
 #define CCI_400_MAXOT_2		0xF0092110
 #define CCI_400_QOSCNTL_1	0xF009110C
 #define CCI_400_QOSCNTL_2	0xF009210C
 
 #define	MXI_BASE		0xFE960000
+#define	MXI_QOS_BASE		0xFE960300
 
 #define SYS_AXI_SYX64TO128_BASE	0xFF800300
 #define SYS_AXI_AVB_BASE	0xFF800340
@@ -578,16 +581,28 @@ struct r8a7790_dbsc3_qos {
 	u32 dbthres0;
 	u32 dbthres1;
 	u32 dbthres2;
+	u32 dummy0;	/* 0x24 */
 	u32 dblgqon;
 };
 
 /* MXI(QoS) */
 struct r8a7790_mxi {
-	u32 dummy0[10];	/* 0x00 .. 0x24 */
+	u32 mxsaar0;
+	u32 mxsaar1;
+	u32 dummy0[8];	/* 0x08 .. 0x24 */
 	u32 mxs3cracr;
-	u32 dummy1[5];	/* 0x2C .. 0x3C */
+	u32 dummy1[3];	/* 0x2C .. 0x34 */
+	u32 mxs3cwacr;
+	u32 dummy2;	/* 0x3C */
 	u32 mxrtcr;
 	u32 mxwtcr;
+};
+
+struct r8a7791_mxi_qos {
+	u32 vspdu0;
+	u32 vspdu1;
+	u32 du0;
+	u32 du1;
 };
 
 /* AXI(QoS) */
