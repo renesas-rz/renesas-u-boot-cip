@@ -545,7 +545,7 @@ struct r8a7790_s3c {
 	u32 s3cexclidmsk;
 	u32 s3cadsplcr;
 	u32 s3cmaar;
-	u32 dummy0;	/* 0x10 */
+	u32 s3carcr11;
 	u32 s3crorr;
 	u32 s3cworr;
 	u32 s3carcr22;
@@ -589,16 +589,18 @@ struct r8a7790_dbsc3_qos {
 struct r8a7790_mxi {
 	u32 mxsaar0;
 	u32 mxsaar1;
-	u32 dummy0[8];	/* 0x08 .. 0x24 */
+	u32 dummy0[7];	/* 0x08 .. 0x20 */
+	u32 mxaxiracr;
 	u32 mxs3cracr;
-	u32 dummy1[3];	/* 0x2C .. 0x34 */
+	u32 dummy1[2];	/* 0x2C .. 0x30 */
+	u32 mxaxiwacr;
 	u32 mxs3cwacr;
 	u32 dummy2;	/* 0x3C */
 	u32 mxrtcr;
 	u32 mxwtcr;
 };
 
-struct r8a7791_mxi_qos {
+struct r8a7790_mxi_qos {
 	u32 vspdu0;
 	u32 vspdu1;
 	u32 du0;

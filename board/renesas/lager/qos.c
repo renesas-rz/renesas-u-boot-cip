@@ -24,7 +24,7 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.952 */
+/* QoS version 0.954 */
 
 enum {
 	DBSC3_R00, DBSC3_R01, DBSC3_R02, DBSC3_R03, DBSC3_R04,
@@ -81,7 +81,7 @@ void qos_init(void)
 	struct r8a7790_s3c_qos *s3c_qos;
 	struct r8a7790_dbsc3_qos *qos_addr;
 	struct r8a7790_mxi *mxi;
-	struct r8a7791_mxi_qos *mxi_qos;
+	struct r8a7790_mxi_qos *mxi_qos;
 	struct r8a7790_axi_qos *axi_qos;
 
 	/* DBSC DBADJ2 */
@@ -91,7 +91,7 @@ void qos_init(void)
 	s3c = (struct r8a7790_s3c *)S3C_BASE;
 	writel(0x80FF1C1E, &s3c->s3cadsplcr);
 	writel(0x1F060505, &s3c->s3crorr);
-	writel(0x1F060505, &s3c->s3cworr);
+	writel(0x1F020100, &s3c->s3cworr);
 
 	/* QoS Control Registers */
 	s3c_qos = (struct r8a7790_s3c_qos *)S3C_QOS_CCI0_BASE;
@@ -117,26 +117,28 @@ void qos_init(void)
 	writel(0x2F002F00, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7790_s3c_qos *)S3C_QOS_MXI_BASE;
-	writel(0x00820082, &s3c_qos->s3cqos0);
-	writel(0x1FF00001, &s3c_qos->s3cqos1);
-	writel(0x1FF01FF0, &s3c_qos->s3cqos2);
-	writel(0x2F001FF0, &s3c_qos->s3cqos3);
-	writel(0x2F002F00, &s3c_qos->s3cqos4);
-	writel(0x1FF00001, &s3c_qos->s3cqos5);
-	writel(0x1FF01FF0, &s3c_qos->s3cqos6);
-	writel(0x2F001FF0, &s3c_qos->s3cqos7);
-	writel(0x2F002F00, &s3c_qos->s3cqos8);
+	writel(0x80918099, &s3c_qos->s3cqos0);
+	writel(0x20410010, &s3c_qos->s3cqos1);
+	writel(0x200A2023, &s3c_qos->s3cqos2);
+	writel(0x20502001, &s3c_qos->s3cqos3);
+	writel(0x00002032, &s3c_qos->s3cqos4);
+	writel(0x20410FFF, &s3c_qos->s3cqos5);
+	writel(0x200A2023, &s3c_qos->s3cqos6);
+	writel(0x20502001, &s3c_qos->s3cqos7);
+	writel(0x20142032, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7790_s3c_qos *)S3C_QOS_AXI_BASE;
-	writel(0x00820082, &s3c_qos->s3cqos0);
-	writel(0x1FF00001, &s3c_qos->s3cqos1);
-	writel(0x1FF01FF0, &s3c_qos->s3cqos2);
-	writel(0x2F001FF0, &s3c_qos->s3cqos3);
-	writel(0x2F002F00, &s3c_qos->s3cqos4);
-	writel(0x1FF00001, &s3c_qos->s3cqos5);
-	writel(0x1FF01FF0, &s3c_qos->s3cqos6);
-	writel(0x2F001FF0, &s3c_qos->s3cqos7);
-	writel(0x2F002F00, &s3c_qos->s3cqos8);
+	writel(0x00810089, &s3c_qos->s3cqos0);
+	writel(0x20410001, &s3c_qos->s3cqos1);
+	writel(0x200A2023, &s3c_qos->s3cqos2);
+	writel(0x20502001, &s3c_qos->s3cqos3);
+	writel(0x00002032, &s3c_qos->s3cqos4);
+	writel(0x20410FFF, &s3c_qos->s3cqos5);
+	writel(0x200A2023, &s3c_qos->s3cqos6);
+	writel(0x20502001, &s3c_qos->s3cqos7);
+	writel(0x20142032, &s3c_qos->s3cqos8);
+
+	writel(0x00200808, &s3c->s3carcr11);
 
 	/* DBSC -QoS */
 	/* DBSC0 - Read/Write */
@@ -168,6 +170,8 @@ void qos_init(void)
 	writel(0x02000800, &mxi->mxsaar1);
 	writel(0x00200000, &mxi->mxs3cracr);
 	writel(0x00200000, &mxi->mxs3cwacr);
+	writel(0x00200000, &mxi->mxaxiracr);
+	writel(0x00200000, &mxi->mxaxiwacr);
 
 	/* QoS Control (MXI) */
 	mxi_qos = (struct r8a7790_mxi_qos *)MXI_QOS_BASE;
