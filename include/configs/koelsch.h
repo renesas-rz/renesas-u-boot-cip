@@ -27,6 +27,7 @@
 #define CONFIG_RMOBILE
 #define CONFIG_RMOBILE_BOARD_STRING "Koelsch Board\n"
 #define CONFIG_SH_GPIO_PFC
+#define CONFIG_SYS_THUMB_BUILD
 
 #include <asm/arch/rmobile.h>
 
