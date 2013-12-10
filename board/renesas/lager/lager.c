@@ -340,3 +340,20 @@ void reset_cpu(ulong addr)
 	val |= 0x02;
 	i2c_write(0x58, 0x13, 1, &val, 1);
 }
+
+#define TSTR0	4
+#define TSTR0_STR0	0x1
+
+void arch_preboot_os()
+{
+	u32 val;
+
+	/* stop TMU0 */
+	val = readb(TMU_BASE + TSTR0);
+	val &= ~TSTR0_STR0;
+	writeb(val, TMU_BASE + TSTR0);
+
+	val = readl(MSTPSR1);
+	val |= TMU0_MSTP125;
+	writel(val, SMSTPCR1);
+}
