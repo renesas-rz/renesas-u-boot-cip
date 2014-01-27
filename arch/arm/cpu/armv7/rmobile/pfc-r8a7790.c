@@ -2759,7 +2759,7 @@ static struct pinmux_cfg_reg pinmux_config_regs[] = {
 		FN_SIM0_D_B, 0, 0, 0, 0, 0, 0, 0, }
 	},
 	{ PINMUX_CFG_REG_VAR("IPSR11", 0xE606004C, 32,
-			     2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3) {
+			     2, 3, 3, 2, 4, 3, 2, 2, 2, 2, 2, 1, 4) {
 		/* IP11_31_30 [2] */
 		FN_SSI_SCK0129, FN_CAN_CLK_B, FN_MOUT0, 0,
 		/* IP11_29_27 [3] */
