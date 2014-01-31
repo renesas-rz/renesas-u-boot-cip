@@ -39,6 +39,8 @@ struct ueth_data {
 	/* eth info */
 	struct eth_device eth_dev;		/* used with eth_register */
 	int phy_id;						/* mii phy id */
+	unsigned char phymode;			/* mii */
+	unsigned char ledmode;			/* mii */
 
 	/* usb info */
 	struct usb_device *pusb_dev;	/* this usb_device */

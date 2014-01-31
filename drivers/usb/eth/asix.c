@@ -33,15 +33,27 @@
 #define AX_CMD_WRITE_MII_REG		0x08
 #define AX_CMD_SET_HW_MII		0x0a
 #define AX_CMD_READ_EEPROM		0x0b
+#define AX_CMD_WRITE_EEPROM		0x0c
+#define AX_CMD_WRITE_ENABLE		0x0d
+#define AX_CMD_WRITE_DISABLE		0x0e
 #define AX_CMD_READ_RX_CTL		0x0f
 #define AX_CMD_WRITE_RX_CTL		0x10
 #define AX_CMD_WRITE_IPG0		0x12
+#define AX_CMD_WRITE_IPG1		0x13
 #define AX_CMD_READ_NODE_ID		0x13
-#define AX_CMD_WRITE_NODE_ID	0x14
+#define AX_CMD_WRITE_NODE_ID		0x14
+#define AX_CMD_WRITE_IPG2		0x14
+#define AX_CMD_WRITE_MULTI_FILTER	0x16
+#define AX88172_CMD_READ_NODE_ID	0x19
 #define AX_CMD_READ_PHY_ID		0x19
+#define AX_CMD_READ_MEDIUM_STATUS	0x1a
 #define AX_CMD_WRITE_MEDIUM_MODE	0x1b
+#define AX_CMD_READ_MONITOR_MODE	0x1c
+#define AX_CMD_WRITE_MONITOR_MODE	0x1d
+#define AX_CMD_READ_GPIOS		0x1e
 #define AX_CMD_WRITE_GPIOS		0x1f
 #define AX_CMD_SW_RESET			0x20
+#define AX_CMD_SW_PHY_STATUS		0x21
 #define AX_CMD_SW_PHY_SELECT		0x22
 
 #define AX_SWRESET_CLEAR		0x00
@@ -85,10 +97,25 @@
 #define AX_DEFAULT_RX_CTL	\
 	(AX_RX_CTL_SO | AX_RX_CTL_AB)
 
-/* GPIO 2 toggles */
+/* GPIO 0 .. 2 toggles */
+#define AX_GPIO_GPO0EN		0x01	/* GPIO0 Output enable */
+#define AX_GPIO_GPO_0		0x02	/* GPIO0 Output value */
+#define AX_GPIO_GPO1EN		0x04	/* GPIO1 Output enable */
+#define AX_GPIO_GPO_1		0x08	/* GPIO1 Output value */
 #define AX_GPIO_GPO2EN		0x10	/* GPIO2 Output enable */
 #define AX_GPIO_GPO_2		0x20	/* GPIO2 Output value */
+#define AX_GPIO_RESERVED	0x40	/* Reserved */
 #define AX_GPIO_RSE		0x80	/* Reload serial EEPROM */
+
+#define PHY_MODE_MARVELL	0x0000
+#define MII_MARVELL_LED_CTRL	0x0018
+#define MII_MARVELL_STATUS	0x001b
+#define MII_MARVELL_CTRL	0x0014
+
+#define MARVELL_CTRL_TXDELAY	0x0002
+#define MARVELL_CTRL_RXDELAY	0x0080
+
+#define PHY_MODE_RTL8211CL	0x000C
 
 /* local defines */
 #define ASIX_BASE_NAME "asx"
@@ -106,6 +133,7 @@
 #define FLAG_TYPE_AX88772	(1U << 1)
 #define FLAG_TYPE_AX88772B	(1U << 2)
 #define FLAG_EEPROM_MAC		(1U << 3) /* initial mac address in eeprom */
+#define FLAG_TYPE_AX88178	(1U << 4)
 
 /* local vars */
 static int curr_eth_dev; /* index for name of next device detected */
@@ -407,6 +435,26 @@ static int asix_basic_reset(struct ueth_data *dev)
 	rx_ctl = asix_read_rx_ctl(dev);
 	debug("RX_CTL is 0x%04x setting to 0x0000\n", rx_ctl);
 
+	dev->phy_id = asix_get_phy_addr(dev);
+	if (dev->phy_id < 0)
+		debug("Failed to read phy id\n");
+
+	asix_mdio_write(dev, dev->phy_id, MII_BMCR, BMCR_RESET);
+	asix_mdio_write(dev, dev->phy_id, MII_ADVERTISE,
+			ADVERTISE_ALL | ADVERTISE_CSMA);
+	if (mii_nway_restart(dev) < 0)
+		printf("Faild: mii_nway_restart()\n");
+
+	if (asix_write_medium_mode(dev, AX88772_MEDIUM_DEFAULT) < 0)
+		return -1;
+
+	if (asix_write_cmd(dev, AX_CMD_WRITE_IPG0,
+				AX88772_IPG0_DEFAULT | AX88772_IPG1_DEFAULT,
+				AX88772_IPG2_DEFAULT, 0, NULL) < 0) {
+		debug("Write IPG,IPG1,IPG2 failed\n");
+		return -1;
+	}
+
 	return 0;
 }
 
@@ -425,28 +473,6 @@ static int asix_init(struct eth_device *eth, bd_t *bd)
 	dev->phy_id = asix_get_phy_addr(dev);
 	if (dev->phy_id < 0)
 		debug("Failed to read phy id\n");
-
-	if (asix_sw_reset(dev, AX_SWRESET_PRL) < 0)
-		goto out_err;
-
-	if (asix_sw_reset(dev, AX_SWRESET_IPRL | AX_SWRESET_PRL) < 0)
-		goto out_err;
-
-	asix_mdio_write(dev, dev->phy_id, MII_BMCR, BMCR_RESET);
-	asix_mdio_write(dev, dev->phy_id, MII_ADVERTISE,
-			ADVERTISE_ALL | ADVERTISE_CSMA);
-	mii_nway_restart(dev);
-
-	if (asix_write_medium_mode(dev, AX88772_MEDIUM_DEFAULT) < 0)
-		goto out_err;
-
-	if (asix_write_cmd(dev, AX_CMD_WRITE_IPG0,
-				AX88772_IPG0_DEFAULT | AX88772_IPG1_DEFAULT,
-				AX88772_IPG2_DEFAULT, 0, NULL) < 0) {
-		debug("Write IPG,IPG1,IPG2 failed\n");
-		goto out_err;
-	}
-
 	if (asix_write_rx_ctl(dev, AX_DEFAULT_RX_CTL) < 0)
 		goto out_err;
 
@@ -602,6 +628,8 @@ static const struct asix_dongle const asix_dongles[] = {
 	{ 0x2001, 0x3c05, FLAG_TYPE_AX88772 },
 	/* ASIX 88772B */
 	{ 0x0b95, 0x772b, FLAG_TYPE_AX88772B | FLAG_EEPROM_MAC },
+	/* ASIX 88178 */
+	{ 0x0411, 0x006e, FLAG_TYPE_AX88178 | FLAG_EEPROM_MAC },
 	{ 0x0000, 0x0000, FLAG_NONE }	/* END - Do not remove */
 };
 
@@ -692,6 +720,146 @@ int asix_eth_probe(struct usb_device *dev, unsigned int ifnum,
 	return 1;
 }
 
+/* Get the PHY Identifier from the PHYSID1 & PHYSID2 MII registers */
+static u32 asix_get_phyid(struct ueth_data *dev)
+{
+	int phy_reg;
+	u32 phy_id;
+	int i;
+
+	/* Poll for the rare case the FW or phy isn't ready yet.  */
+	for (i = 0; i < 100; i++) {
+		phy_reg = asix_mdio_read(dev, dev->phy_id, MII_PHYSID1);
+		if (phy_reg != 0 && phy_reg != 0xFFFF)
+			break;
+		mdelay(1);
+	}
+
+	if (phy_reg <= 0 || phy_reg == 0xFFFF)
+		return 0;
+
+	phy_id = (phy_reg & 0xffff) << 16;
+
+	phy_reg = asix_mdio_read(dev, dev->phy_id, MII_PHYSID2);
+	if (phy_reg < 0)
+		return 0;
+
+	phy_id |= (phy_reg & 0xffff);
+
+	return phy_id;
+}
+
+static int marvell_phy_init(struct ueth_data *dev)
+{
+	u16 reg;
+
+	reg = asix_mdio_read(dev, dev->phy_id, MII_MARVELL_STATUS);
+
+	asix_mdio_write(dev, dev->phy_id, MII_MARVELL_CTRL,
+			MARVELL_CTRL_RXDELAY | MARVELL_CTRL_TXDELAY);
+
+	if (dev->ledmode) {
+		reg = asix_mdio_read(dev, dev->phy_id,
+			MII_MARVELL_LED_CTRL);
+
+		reg &= 0xf8ff;
+		reg |= (1 + 0x0100);
+		asix_mdio_write(dev, dev->phy_id,
+			MII_MARVELL_LED_CTRL, reg);
+
+		reg = asix_mdio_read(dev, dev->phy_id,
+			MII_MARVELL_LED_CTRL);
+		reg &= 0xfc0f;
+	}
+
+	return 0;
+}
+
+static int rtl8211cl_phy_init(struct ueth_data *dev)
+{
+	printf("%s : not support rtl8211cl.\n");
+
+	return 0;
+}
+
+static int ax88178_reset(struct ueth_data *dev)
+{
+	int ret;
+	int gpio0 = 0;
+	u32 phyid;
+	u8 status __aligned(ARCH_DMA_MINALIGN);
+	__le16 eeprom __aligned(ARCH_DMA_MINALIGN);
+
+	asix_read_cmd(dev, AX_CMD_READ_GPIOS, 0, 0, 1, &status);
+
+	asix_write_cmd(dev, AX_CMD_WRITE_ENABLE, 0, 0, 0, NULL);
+	asix_read_cmd(dev, AX_CMD_READ_EEPROM, 0x0017, 0, 2, &eeprom);
+	asix_write_cmd(dev, AX_CMD_WRITE_DISABLE, 0, 0, 0, NULL);
+
+	if (eeprom == cpu_to_le16(0xffff)) {
+		dev->phymode = PHY_MODE_MARVELL;
+		dev->ledmode = 0;
+		gpio0 = 1;
+	} else {
+		dev->phymode = le16_to_cpu(eeprom) & 0x7F;
+		dev->ledmode = le16_to_cpu(eeprom) >> 8;
+		gpio0 = (le16_to_cpu(eeprom) & 0x80) ? 0 : 1;
+	}
+
+	/* Power up external GigaPHY through AX88178 GPIO pin */
+	asix_write_gpio(dev, AX_GPIO_RSE | AX_GPIO_GPO_1 | AX_GPIO_GPO1EN, 40);
+	if ((le16_to_cpu(eeprom) >> 8) != 1) {
+		asix_write_gpio(dev, 0x003c, 30);
+		asix_write_gpio(dev, 0x001c, 300);
+		asix_write_gpio(dev, 0x003c, 30);
+	} else {
+		asix_write_gpio(dev, AX_GPIO_GPO1EN, 30);
+		asix_write_gpio(dev, AX_GPIO_GPO1EN | AX_GPIO_GPO_1, 30);
+	}
+
+	/* Read PHYID register *AFTER* powering up PHY */
+	phyid = asix_get_phyid(dev);
+
+	/* Set AX88178 to enable MII/GMII/RGMII interface for external PHY */
+	asix_write_cmd(dev, AX_CMD_SW_PHY_SELECT, 0, 0, 0, NULL);
+
+	ret = asix_sw_reset(dev, 0);
+	if (ret < 0)
+		return ret;
+
+	ret = asix_sw_reset(dev, AX_SWRESET_PRL | AX_SWRESET_IPPD);
+	if (ret < 0)
+		return ret;
+
+	asix_write_rx_ctl(dev, 0);
+
+	if (dev->phymode == PHY_MODE_MARVELL) {
+		marvell_phy_init(dev);
+	} else if (dev->phymode == PHY_MODE_RTL8211CL) {
+		rtl8211cl_phy_init(dev);
+		return -1;
+	}
+
+	asix_mdio_write(dev, dev->phy_id, MII_BMCR,
+			BMCR_RESET | BMCR_ANENABLE);
+	asix_mdio_write(dev, dev->phy_id, MII_ADVERTISE,
+			ADVERTISE_ALL | ADVERTISE_CSMA | ADVERTISE_PAUSE_CAP);
+	asix_mdio_write(dev, dev->phy_id, MII_CTRL1000,
+			ADVERTISE_1000FULL);
+
+	mii_nway_restart(dev);
+
+	ret = asix_write_medium_mode(dev, AX88178_MEDIUM_DEFAULT);
+	if (ret < 0)
+		return ret;
+
+	ret = asix_write_rx_ctl(dev, AX_DEFAULT_RX_CTL);
+	if (ret < 0)
+		return ret;
+
+	return 0;
+}
+
 int asix_eth_get_info(struct usb_device *dev, struct ueth_data *ss,
 				struct eth_device *eth)
 {
@@ -710,7 +878,10 @@ int asix_eth_get_info(struct usb_device *dev, struct ueth_data *ss,
 		eth->write_hwaddr = asix_write_hwaddr;
 	eth->priv = ss;
 
-	if (asix_basic_reset(ss))
+	if (priv->flags & FLAG_TYPE_AX88178) {
+		if (ax88178_reset(ss))
+			return 0;
+	} else if (asix_basic_reset(ss))
 		return 0;
 
 	/* Get the MAC address */
