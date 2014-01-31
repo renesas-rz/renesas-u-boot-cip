@@ -109,20 +109,19 @@ static int mmcif_wait_interrupt_flag(struct sh_mmcif_host *host)
 static void sh_mmcif_clock_control(struct sh_mmcif_host *host, unsigned int clk)
 {
 	int i;
+	unsigned int clkdiv;
 
 	sh_mmcif_bitclr(CLK_ENABLE, &host->regs->ce_clk_ctrl);
 	sh_mmcif_bitclr(CLK_CLEAR, &host->regs->ce_clk_ctrl);
 
 	if (!clk)
 		return;
-	if (clk == CLKDEV_EMMC_DATA) {
-		sh_mmcif_bitset(CLK_PCLK, &host->regs->ce_clk_ctrl);
-	} else {
-		for (i = 1; (unsigned int)host->clk / (1 << i) >= clk; i++)
-			;
-		sh_mmcif_bitset((i - 1) << 16, &host->regs->ce_clk_ctrl);
-	}
-	sh_mmcif_bitset(CLK_ENABLE, &host->regs->ce_clk_ctrl);
+	clkdiv = 0x9;
+	i = CONFIG_SH_MMCIF_FREQ >> (0x9 + 1);
+	for ( ; clkdiv && clk >= (i << 1); clkdiv--)
+		i <<= 1;
+
+	sh_mmcif_bitset((clkdiv << 16) | CLK_ENABLE, &host->regs->ce_clk_ctrl);
 }
 
 static void sh_mmcif_sync_reset(struct sh_mmcif_host *host)

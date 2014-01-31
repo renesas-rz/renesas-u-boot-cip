@@ -13,27 +13,30 @@
 #define _SH_MMCIF_H_
 
 struct sh_mmcif_regs {
-	unsigned long ce_cmd_set;
+	unsigned long ce_cmd_set;	/* 00H */
 	unsigned long reserved;
 	unsigned long ce_arg;
 	unsigned long ce_arg_cmd12;
-	unsigned long ce_cmd_ctrl;
+	unsigned long ce_cmd_ctrl;	/* 10H */
 	unsigned long ce_block_set;
 	unsigned long ce_clk_ctrl;
 	unsigned long ce_buf_acc;
-	unsigned long ce_resp3;
+	unsigned long ce_resp3;		/* 20H */
 	unsigned long ce_resp2;
 	unsigned long ce_resp1;
 	unsigned long ce_resp0;
-	unsigned long ce_resp_cmd12;
+	unsigned long ce_resp_cmd12;	/* 30H */
 	unsigned long ce_data;
-	unsigned long reserved2[2];
-	unsigned long ce_int;
+	unsigned long reserved2;
+	unsigned long ce_boot;
+	unsigned long ce_int;		/* 40H */
 	unsigned long ce_int_mask;
 	unsigned long ce_host_sts1;
 	unsigned long ce_host_sts2;
-	unsigned long reserved3[11];
-	unsigned long ce_version;
+	unsigned long reserved3[8];	/* 50H */
+	unsigned long ce_clk_ctrl2;	/* 70H */
+	unsigned long reserved4[2];	/* 74,78H */
+	unsigned long ce_version;	/* 7CH*/
 };
 
 /* CE_CMD_SET */
