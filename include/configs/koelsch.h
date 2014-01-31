@@ -232,4 +232,9 @@
 #define CONFIG_SH_SDHI_FREQ		100000000
 #define CONFIG_MMC_SH_SDHI_NR_CHANNEL	3
 
+/* USB-ether */
+#define CONFIG_MII
+#define CONFIG_USB_HOST_ETHER   /* Enable USB Ethernet adapters */
+#define CONFIG_USB_ETHER_ASIX   /* Asix, or whatever driver(s) you want */
+
 #endif	/* __KOELSCH_H */
