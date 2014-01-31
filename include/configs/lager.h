@@ -28,6 +28,7 @@
 #define CONFIG_RMOBILE_BOARD_STRING "Lager Board\n"
 #define CONFIG_SH_GPIO_PFC
 #define CONFIG_SYS_THUMB_BUILD
+#define CONFIG_MACH_LAGER
 
 #include <asm/arch/rmobile.h>
 
@@ -44,6 +45,8 @@
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_NFS
 #define CONFIG_CMD_BOOTZ
+#define CONFIG_CMD_USB
+#define CONFIG_CMD_FAT
 
 #if defined(CONFIG_NORFLASH)
 #define	CONFIG_CMD_FLASH
@@ -197,5 +200,15 @@
 /* i2c */
 #define CONFIG_RCAR_I2C
 #define CONFIG_RCAR_I2C_BASE	0xE6540000
+
+/* FS */
+#define CONFIG_DOS_PARTITION
+#define CONFIG_SUPPORT_VFAT
+
+/* USB */
+#define CONFIG_USB_STORAGE
+#define CONFIG_USB_EHCI
+#define CONFIG_USB_EHCI_R8A779x
+#define CONFIG_USB_MAX_CONTROLLER_COUNT        3
 
 #endif	/* __LAGER_H */
