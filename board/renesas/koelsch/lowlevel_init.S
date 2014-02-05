@@ -2,7 +2,7 @@
  * board/renesas/lager/lowlevel_init.S
  *     This file is lager low level initialize.
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -79,11 +79,21 @@ do_lowlevel_init:
 	mrceq	p15, 0, r0, c1, c0, 1	/* actlr */
 	orreq	r0, r0, #(1<<7)
 	mcreq	p15, 0, r0, c1, c0, 1
+
 	/* and set l2 latency */
-	mrceq	p15, 1, r0, c9, c0, 2	/* l2ctlr */
-	orreq	r0, r0, #0x00000800
-	orreq	r0, r0, #0x00000003
-	mcreq	p15, 1, r0, c9, c0, 2
+	mrc	p15, 0, r0, c0, c0, 5		@ r0 = MPIDR
+	and	r0, r0, #0xf00
+	lsr	r0, r0, #8
+	tst	r0, #1				@ only need for cluster 0
+	bne	_exit_init_l2_a15
+
+	mrc	p15, 1, r0, c9, c0, 2		@ r0 = L2CTLR
+	and	r1, r0, #7
+	cmp	r1, #3				@ has already been set up?
+	bicne	r0, r0, #0xe7
+	orrne	r0, r0, #0x83			@ L2CTLR[7:6] + L2CTLR[2:0]
+	mcrne	p15, 1, r0, c9, c0, 2
+_exit_init_l2_a15:
 
 	ldr	r3, =(CONFIG_SYS_INIT_SP_ADDR)
 	sub	sp, r3, #4
