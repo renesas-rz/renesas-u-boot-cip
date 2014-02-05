@@ -2,7 +2,7 @@
  * include/configs/koelsch.h
  *     This file is lager board configuration.
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -48,13 +48,8 @@
 #define CONFIG_CMD_FAT
 #define CONFIG_CMD_MMC
 #define CONFIG_CMD_EXT4
-
-#if defined(CONFIG_NORFLASH)
-#define	CONFIG_CMD_FLASH
-#else
 #define CONFIG_CMD_SF
 #define CONFIG_CMD_SPI
-#endif
 
 #define	CONFIG_CMDLINE_TAG
 #define	CONFIG_SETUP_MEMORY_TAGS
@@ -124,27 +119,6 @@
 #define CONFIG_SYS_GBL_DATA_SIZE	(256)
 #define CONFIG_SYS_BOOTMAPSZ		(8 * 1024 * 1024)
 
-/* FLASH */
-#if defined(CONFIG_NORFLASH)
-#define CONFIG_SYS_TEXT_BASE	0x00000000
-#define CONFIG_SYS_FLASH_CFI
-#define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
-#define	CONFIG_FLASH_CFI_DRIVER
-#define	CONFIG_CFI_FLASH_USE_WEAK_ACCESSORS
-#define	CONFIG_FLASH_SHOW_PROGRESS	45
-#define CONFIG_SYS_FLASH_BASE		0x00000000
-#define	CONFIG_SYS_FLASH_SIZE		0x04000000	/* 64 MB */
-#define CONFIG_SYS_MAX_FLASH_SECT	1024
-#define CONFIG_SYS_MAX_FLASH_BANKS	1
-#define CONFIG_SYS_FLASH_BANKS_LIST	{ (CONFIG_SYS_FLASH_BASE) }
-#define	CONFIG_SYS_FLASH_BANKS_SIZES	{ (CONFIG_SYS_FLASH_SIZE) }
-
-#define CONFIG_SYS_FLASH_ERASE_TOUT	3000
-#define CONFIG_SYS_FLASH_WRITE_TOUT	3000
-#define CONFIG_SYS_FLASH_LOCK_TOUT	3000
-#define CONFIG_SYS_FLASH_UNLOCK_TOUT	3000
-
-#else
 #define CONFIG_SYS_TEXT_BASE	0xE6304000
 #define CONFIG_SPI
 #define CONFIG_SH_QSPI
@@ -153,27 +127,13 @@
 #define CONFIG_SPI_FLASH_QUAD
 #define CONFIG_SYS_NO_FLASH
 #define CONFIG_SH_QSPI_BASE	0xE6B10000
-#endif
 
 /* ENV setting */
-#if defined(CONFIG_NORFLASH)
-#define CONFIG_ENV_IS_IN_FLASH
-#define CONFIG_ENV_OVERWRITE	1
-#define CONFIG_ENV_SECT_SIZE	(256 * 1024)
-#define CONFIG_ENV_ADDR		(CONFIG_SYS_FLASH_BASE + \
-				 CONFIG_SYS_MONITOR_LEN)
-#define CONFIG_ENV_OFFSET	(CONFIG_ENV_ADDR)
-#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
-#define CONFIG_ENV_SIZE_REDUND	(CONFIG_SYS_MONITOR_LEN)
-
-#else
 #define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SECT_SIZE	(256 * 1024)
 #define CONFIG_ENV_ADDR		0xC0000
 #define CONFIG_ENV_OFFSET	(CONFIG_ENV_ADDR)
 #define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
-
-#endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootm_low=0x40e00000\0" \
