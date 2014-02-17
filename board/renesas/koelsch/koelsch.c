@@ -38,16 +38,25 @@ DECLARE_GLOBAL_DATA_PTR;
 				i--;	\
 		})
 
+#define PLL0CR		0xE61500D8
+
 void s_init(void)
 {
 	struct r8a7791_rwdt *rwdt = (struct r8a7791_rwdt *)RWDT_BASE;
 	struct r8a7791_swdt *swdt = (struct r8a7791_swdt *)SWDT_BASE;
 	struct r8a7791_lbsc *lbsc = (struct r8a7791_lbsc *)LBSC_BASE;
 	struct r8a7791_dbsc3 *dbsc3_0 = (struct r8a7791_dbsc3 *)DBSC3_0_BASE;
+	u32 val;
 
 	/* Watchdog init */
 	writel(0xA5A5A500, &rwdt->rwtcsra);
 	writel(0xA5A5A500, &swdt->swtcsra);
+
+	/* cpu frequency setting */
+	val = readl(PLL0CR);
+	val &= ~0x7F000000;
+	val |= 0x4A000000;			/* 1.5GHz */
+	writel(val, PLL0CR);
 
 	/* QoS */
 	qos_init();
