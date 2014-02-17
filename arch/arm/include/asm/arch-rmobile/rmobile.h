@@ -13,6 +13,19 @@
 #else
 #error "SOC Name not defined"
 #endif
+
+#ifdef __KERNEL__
+
+#ifndef __ASSEMBLY__
+
+u32 rmobile_get_cpu_type(void);
+u32 rmobile_get_cpu_rev_integer(void);
+u32 rmobile_get_cpu_rev_fraction(void);
+
+#endif /* __ASSEMBLY__ */
+
+#endif /* __KERNEL__ */
+
 #endif /* CONFIG_RMOBILE */
 
 #endif /* __ASM_ARCH_RMOBILE_H */
