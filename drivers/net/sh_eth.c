@@ -39,8 +39,7 @@
 # error "Please define CONFIG_SH_ETHER_PHY_ADDR"
 #endif
 
-#if !defined(CONFIG_SYS_DCACHE_OFF)
-#ifdef CONFIG_SH_ETHER_CACHE_WRITEBACK
+#if !defined(CONFIG_SYS_DCACHE_OFF) && defined(CONFIG_SH_ETHER_CACHE_WRITEBACK)
 #if defined(CONFIG_SH)
 #define flush_cache_wback(addr, len)	\
 			dcache_wback_range((u32)addr, (u32)(addr + len - 1))
@@ -53,7 +52,8 @@
 #else
 #define flush_cache_wback(...)
 #endif
-#ifdef CONFIG_SH_ETHER_CACHE_INVALIDATE
+
+#if !defined(CONFIG_SYS_DCACHE_OFF) && defined(CONFIG_SH_ETHER_CACHE_INVALIDATE)
 #if defined(CONFIG_ARM)
 #define invalidate_cache(addr, len)			\
 	{						\
@@ -71,7 +71,6 @@
 #endif
 #else
 #define invalidate_cache(...)
-#endif
 #endif
 
 #define TIMEOUT_CNT 1000
