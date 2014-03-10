@@ -2,7 +2,7 @@
  * arch/arm/cpu/armv7/rmobile/cpu_info-r8a7790.c
  *     This file is r8a7790 processor support.
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -37,5 +37,14 @@ u32 rmobile_get_cpu_rev_integer(void)
 
 	product = readl(PRR);
 
-	return ((product & 0x000000F0) >> 4);
+	return (u32)(((product & 0x000000F0) >> 4) + 1);
+}
+
+u32 rmobile_get_cpu_rev_fraction(void)
+{
+	u32 product;
+
+	product = readl(PRR);
+
+	return (u32)(product & 0x0000000F);
 }

@@ -76,8 +76,9 @@ int print_cpuinfo(void)
 		break;
 
 	case 0x45:
-		printf("CPU: Renesas Electronics R8A7790 rev %d\n",
-		       rmobile_get_cpu_rev_integer());
+		printf("CPU: Renesas Electronics R8A7790 rev %d.%d\n",
+		       rmobile_get_cpu_rev_integer(),
+		       rmobile_get_cpu_rev_fraction());
 		break;
 
 	case 0x47:
