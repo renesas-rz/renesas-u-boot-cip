@@ -248,7 +248,7 @@ int fs_read(const char *filename, ulong addr, int offset, int len)
 }
 
 int do_load(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
-		int fstype, int cmdline_base)
+		int fstype)
 {
 	unsigned long addr;
 	const char *addr_str;
@@ -268,7 +268,7 @@ int do_load(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
 		return 1;
 
 	if (argc >= 4) {
-		addr = simple_strtoul(argv[3], NULL, cmdline_base);
+		addr = simple_strtoul(argv[3], NULL, 16);
 	} else {
 		addr_str = getenv("loadaddr");
 		if (addr_str != NULL)
@@ -286,11 +286,11 @@ int do_load(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
 		}
 	}
 	if (argc >= 6)
-		bytes = simple_strtoul(argv[5], NULL, cmdline_base);
+		bytes = simple_strtoul(argv[5], NULL, 16);
 	else
 		bytes = 0;
 	if (argc >= 7)
-		pos = simple_strtoul(argv[6], NULL, cmdline_base);
+		pos = simple_strtoul(argv[6], NULL, 16);
 	else
 		pos = 0;
 

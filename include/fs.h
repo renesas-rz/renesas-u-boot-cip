@@ -58,7 +58,7 @@ int fs_read(const char *filename, ulong addr, int offset, int len);
  * to a specific filesystem type via the fstype parameter.
  */
 int do_load(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
-		int fstype, int cmdline_base);
+		int fstype);
 int do_ls(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
 		int fstype);
 
