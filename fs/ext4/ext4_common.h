@@ -16,19 +16,7 @@
  *
  * ext4write : Based on generic ext4 protocol.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __EXT4_COMMON__
@@ -44,14 +32,12 @@
 
 #define YES		1
 #define NO		0
-#define TRUE		1
-#define FALSE		0
 #define RECOVER	1
 #define SCAN		0
 
 #define S_IFLNK		0120000		/* symbolic link */
 #define BLOCK_NO_ONE		1
-#define SUPERBLOCK_SECTOR	2
+#define SUPERBLOCK_START	(2 * 512)
 #define SUPERBLOCK_SIZE	1024
 #define F_FILE			1
 
