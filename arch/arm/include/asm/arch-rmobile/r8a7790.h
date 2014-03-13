@@ -2,7 +2,7 @@
  * arch/arm/include/asm/arch-rmobile/r8a7790.h
  *     This file is r8a7790 processor definition.
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -626,5 +626,10 @@ struct r8a7790_axi_qos {
 };
 
 #endif
+
+/*
+ * R8A7790 I/O Product Information
+ */
+#define R8A7790_CUT_ES2X		2
 
 #endif /* __ASM_ARCH_R8A7790_H */

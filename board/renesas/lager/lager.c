@@ -30,6 +30,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define PLL0CR		0xE61500D8
+
 #define s_init_wait(cnt) \
 		({	\
 			volatile u32 i = 0x10000 * cnt;	\
@@ -43,10 +45,19 @@ void s_init(void)
 	struct r8a7790_swdt *swdt = (struct r8a7790_swdt *)SWDT_BASE;
 	struct r8a7790_lbsc *lbsc = (struct r8a7790_lbsc *)LBSC_BASE;
 	struct r8a7790_dbsc3 *dbsc3_0 = (struct r8a7790_dbsc3 *)DBSC3_0_BASE;
+	u32 val;
 
 	/* Watchdog init */
 	writel(0xA5A5A500, &rwdt->rwtcsra);
 	writel(0xA5A5A500, &swdt->swtcsra);
+
+	/* cpu frequency setting */
+	if (rmobile_get_cpu_rev_integer() >= R8A7790_CUT_ES2X) {
+		val = readl(PLL0CR);
+		val &= ~0x7F000000;
+		val |= 0x45000000;			/* 1.4GHz */
+		writel(val, PLL0CR);
+	}
 
 	/* QoS */
 	qos_init();
