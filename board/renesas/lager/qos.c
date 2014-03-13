@@ -2,7 +2,7 @@
  * board/renesas/lager/qos.c
  *     This file is lager QoS setting.
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -24,53 +24,52 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.954 */
+/* QoS version 0.955 */
 
 enum {
-	DBSC3_R00, DBSC3_R01, DBSC3_R02, DBSC3_R03, DBSC3_R04,
-	DBSC3_R05, DBSC3_R06, DBSC3_R07, DBSC3_R08, DBSC3_R09,
-	DBSC3_R10, DBSC3_R11, DBSC3_R12, DBSC3_R13, DBSC3_R14,
-	DBSC3_R15,
-	DBSC3_W00, DBSC3_W01, DBSC3_W02, DBSC3_W03, DBSC3_W04,
-	DBSC3_W05, DBSC3_W06, DBSC3_W07, DBSC3_W08, DBSC3_W09,
-	DBSC3_W10, DBSC3_W11, DBSC3_W12, DBSC3_W13, DBSC3_W14,
-	DBSC3_W15,
+	DBSC3_00, DBSC3_01, DBSC3_02, DBSC3_03, DBSC3_04,
+	DBSC3_05, DBSC3_06, DBSC3_07, DBSC3_08, DBSC3_09,
+	DBSC3_10, DBSC3_11, DBSC3_12, DBSC3_13, DBSC3_14,
+	DBSC3_15,
 	DBSC3_NR,
 };
 
-static u32 dbsc3_qos_addr[DBSC3_NR] = {
-	[DBSC3_R00] = DBSC3_0_QOS_R0_BASE,
-	[DBSC3_R01] = DBSC3_0_QOS_R1_BASE,
-	[DBSC3_R02] = DBSC3_0_QOS_R2_BASE,
-	[DBSC3_R03] = DBSC3_0_QOS_R3_BASE,
-	[DBSC3_R04] = DBSC3_0_QOS_R4_BASE,
-	[DBSC3_R05] = DBSC3_0_QOS_R5_BASE,
-	[DBSC3_R06] = DBSC3_0_QOS_R6_BASE,
-	[DBSC3_R07] = DBSC3_0_QOS_R7_BASE,
-	[DBSC3_R08] = DBSC3_0_QOS_R8_BASE,
-	[DBSC3_R09] = DBSC3_0_QOS_R9_BASE,
-	[DBSC3_R10] = DBSC3_0_QOS_R10_BASE,
-	[DBSC3_R11] = DBSC3_0_QOS_R11_BASE,
-	[DBSC3_R12] = DBSC3_0_QOS_R12_BASE,
-	[DBSC3_R13] = DBSC3_0_QOS_R13_BASE,
-	[DBSC3_R14] = DBSC3_0_QOS_R14_BASE,
-	[DBSC3_R15] = DBSC3_0_QOS_R15_BASE,
-	[DBSC3_W00] = DBSC3_0_QOS_W0_BASE,
-	[DBSC3_W01] = DBSC3_0_QOS_W1_BASE,
-	[DBSC3_W02] = DBSC3_0_QOS_W2_BASE,
-	[DBSC3_W03] = DBSC3_0_QOS_W3_BASE,
-	[DBSC3_W04] = DBSC3_0_QOS_W4_BASE,
-	[DBSC3_W05] = DBSC3_0_QOS_W5_BASE,
-	[DBSC3_W06] = DBSC3_0_QOS_W6_BASE,
-	[DBSC3_W07] = DBSC3_0_QOS_W7_BASE,
-	[DBSC3_W08] = DBSC3_0_QOS_W8_BASE,
-	[DBSC3_W09] = DBSC3_0_QOS_W9_BASE,
-	[DBSC3_W10] = DBSC3_0_QOS_W10_BASE,
-	[DBSC3_W11] = DBSC3_0_QOS_W11_BASE,
-	[DBSC3_W12] = DBSC3_0_QOS_W12_BASE,
-	[DBSC3_W13] = DBSC3_0_QOS_W13_BASE,
-	[DBSC3_W14] = DBSC3_0_QOS_W14_BASE,
-	[DBSC3_W15] = DBSC3_0_QOS_W15_BASE,
+static u32 dbsc3_0_r_qos_addr[DBSC3_NR] = {
+	[DBSC3_00] = DBSC3_0_QOS_R0_BASE,
+	[DBSC3_01] = DBSC3_0_QOS_R1_BASE,
+	[DBSC3_02] = DBSC3_0_QOS_R2_BASE,
+	[DBSC3_03] = DBSC3_0_QOS_R3_BASE,
+	[DBSC3_04] = DBSC3_0_QOS_R4_BASE,
+	[DBSC3_05] = DBSC3_0_QOS_R5_BASE,
+	[DBSC3_06] = DBSC3_0_QOS_R6_BASE,
+	[DBSC3_07] = DBSC3_0_QOS_R7_BASE,
+	[DBSC3_08] = DBSC3_0_QOS_R8_BASE,
+	[DBSC3_09] = DBSC3_0_QOS_R9_BASE,
+	[DBSC3_10] = DBSC3_0_QOS_R10_BASE,
+	[DBSC3_11] = DBSC3_0_QOS_R11_BASE,
+	[DBSC3_12] = DBSC3_0_QOS_R12_BASE,
+	[DBSC3_13] = DBSC3_0_QOS_R13_BASE,
+	[DBSC3_14] = DBSC3_0_QOS_R14_BASE,
+	[DBSC3_15] = DBSC3_0_QOS_R15_BASE,
+};
+
+static u32 dbsc3_0_w_qos_addr[DBSC3_NR] = {
+	[DBSC3_00] = DBSC3_0_QOS_W0_BASE,
+	[DBSC3_01] = DBSC3_0_QOS_W1_BASE,
+	[DBSC3_02] = DBSC3_0_QOS_W2_BASE,
+	[DBSC3_03] = DBSC3_0_QOS_W3_BASE,
+	[DBSC3_04] = DBSC3_0_QOS_W4_BASE,
+	[DBSC3_05] = DBSC3_0_QOS_W5_BASE,
+	[DBSC3_06] = DBSC3_0_QOS_W6_BASE,
+	[DBSC3_07] = DBSC3_0_QOS_W7_BASE,
+	[DBSC3_08] = DBSC3_0_QOS_W8_BASE,
+	[DBSC3_09] = DBSC3_0_QOS_W9_BASE,
+	[DBSC3_10] = DBSC3_0_QOS_W10_BASE,
+	[DBSC3_11] = DBSC3_0_QOS_W11_BASE,
+	[DBSC3_12] = DBSC3_0_QOS_W12_BASE,
+	[DBSC3_13] = DBSC3_0_QOS_W13_BASE,
+	[DBSC3_14] = DBSC3_0_QOS_W14_BASE,
+	[DBSC3_15] = DBSC3_0_QOS_W15_BASE,
 };
 
 
@@ -141,9 +140,9 @@ void qos_init(void)
 	writel(0x00200808, &s3c->s3carcr11);
 
 	/* DBSC -QoS */
-	/* DBSC0 - Read/Write */
-	for (i = DBSC3_R00; i < DBSC3_NR; i++) {
-		qos_addr = (struct r8a7790_dbsc3_qos *)dbsc3_qos_addr[i];
+	/* DBSC0 - Read */
+	for (i = DBSC3_00; i < DBSC3_NR; i++) {
+		qos_addr = (struct r8a7790_dbsc3_qos *)dbsc3_0_r_qos_addr[i];
 		writel(0x00000203, &qos_addr->dblgcnt);
 		writel(0x00002064, &qos_addr->dbtmval0);
 		writel(0x00002048, &qos_addr->dbtmval1);
@@ -155,6 +154,22 @@ void qos_init(void)
 		writel(0x00002019, &qos_addr->dbthres2);
 		writel(0x00000000, &qos_addr->dblgqon);
 	}
+
+	/* DBSC0 - Write */
+	for (i = DBSC3_00; i < DBSC3_NR; i++) {
+		qos_addr = (struct r8a7790_dbsc3_qos *)dbsc3_0_w_qos_addr[i];
+		writel(0x00000203, &qos_addr->dblgcnt);
+		writel(0x00002064, &qos_addr->dbtmval0);
+		writel(0x00002048, &qos_addr->dbtmval1);
+		writel(0x00002032, &qos_addr->dbtmval2);
+		writel(0x00002019, &qos_addr->dbtmval3);
+		writel(0x00000001, &qos_addr->dbrqctr);
+		writel(0x00002019, &qos_addr->dbthres0);
+		writel(0x00002019, &qos_addr->dbthres1);
+		writel(0x00002019, &qos_addr->dbthres2);
+		writel(0x00000000, &qos_addr->dblgqon);
+	}
+
 	/* CCI-400 -QoS */
 	writel(0x20001000, CCI_400_MAXOT_1);
 	writel(0x20001000, CCI_400_MAXOT_2);
@@ -487,7 +502,7 @@ void qos_init(void)
 	axi_qos = (struct r8a7790_axi_qos *)MP_AXI_ASDS0_BASE;
 	writel(0x00000001, &axi_qos->qosconf);
 	writel(0x00002014, &axi_qos->qosctset0);
-	writel(0x00000001, &axi_qos->qosreqctr);
+	writel(0x00000040, &axi_qos->qosreqctr);
 	writel(0x00002006, &axi_qos->qosthres0);
 	writel(0x00002001, &axi_qos->qosthres1);
 	writel(0x00000000, &axi_qos->qosthres2);
@@ -496,19 +511,19 @@ void qos_init(void)
 	axi_qos = (struct r8a7790_axi_qos *)MP_AXI_ASDS1_BASE;
 	writel(0x00000001, &axi_qos->qosconf);
 	writel(0x00002014, &axi_qos->qosctset0);
-	writel(0x00000001, &axi_qos->qosreqctr);
+	writel(0x00000040, &axi_qos->qosreqctr);
 	writel(0x00002006, &axi_qos->qosthres0);
 	writel(0x00002001, &axi_qos->qosthres1);
 	writel(0x00000000, &axi_qos->qosthres2);
 	writel(0x00000001, &axi_qos->qosqon);
 
 	axi_qos = (struct r8a7790_axi_qos *)MP_AXI_MLP_BASE;
-	writel(0x00000000, &axi_qos->qosconf);
-	writel(0x00002002, &axi_qos->qosctset0);
-	writel(0x00000001, &axi_qos->qosreqctr);
+	writel(0x00000001, &axi_qos->qosconf);
+	writel(0x00001FF0, &axi_qos->qosctset0);
+	writel(0x00000020, &axi_qos->qosreqctr);
 	writel(0x00002006, &axi_qos->qosthres0);
 	writel(0x00002001, &axi_qos->qosthres1);
-	writel(0x00000000, &axi_qos->qosthres2);
+	writel(0x00002001, &axi_qos->qosthres2);
 	writel(0x00000001, &axi_qos->qosqon);
 
 	axi_qos = (struct r8a7790_axi_qos *)MP_AXI_MMUMP_BASE;
