@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013  Renesas Electronics Corporation
+ * Copyright (C) 2013-2014  Renesas Electronics Corporation
  *
  * (C) Copyright 2009
  * Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
@@ -120,6 +120,8 @@ int timer_init(void)
 {
 	tmu_timer_stop(0);
 	tmu_timer_start(0);
+
+	return 0;
 }
 
 #else
