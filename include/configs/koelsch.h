@@ -1,6 +1,6 @@
 /*
  * include/configs/koelsch.h
- *     This file is lager board configuration.
+ *     This file is koelsch board configuration.
  *
  * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
@@ -84,8 +84,8 @@
 
 /* MEMORY */
 #define KOELSCH_SDRAM_BASE	0x40000000
-#define KOELSCH_SDRAM_SIZE	(2048 * 1024 * 1024)
-#define KOELSCH_UBOOT_SDRAM_SIZE	(512 * 1024 * 1024)
+#define KOELSCH_SDRAM_SIZE	0x80000000
+#define KOELSCH_UBOOT_SDRAM_SIZE	0x20000000
 
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_PROMPT		"=> "
