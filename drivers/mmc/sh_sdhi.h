@@ -3,7 +3,7 @@
  *
  * SD/MMC driver.
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  * Copyright (C) 2008-2009 Renesas Solutions Corp.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -185,7 +185,6 @@ struct sdhi_host {
 
 static unsigned short g_wait_int[CONFIG_MMC_SH_SDHI_NR_CHANNEL];
 static unsigned short g_sd_error[CONFIG_MMC_SH_SDHI_NR_CHANNEL];
-static long g_timeout = 1000;		/* Default (1 = 10ms) */
 
 static inline void sdhi_writew(struct sdhi_host *host, int reg, u16 val)
 {
