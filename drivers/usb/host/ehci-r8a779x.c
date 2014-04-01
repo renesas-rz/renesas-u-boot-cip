@@ -1,7 +1,7 @@
 /*
  *  EHCI HCD (Host Controller Driver) for USB.
  *
- *  Copyright (C) 2013 Renesas Electronics Corporation
+ *  Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2
@@ -39,7 +39,6 @@ static u32 usb_base_address[CONFIG_USB_MAX_CONTROLLER_COUNT] = {
 	0xee0a0000,	/* USB1 */
 #endif
 	0xee0c0000,	/* USB2 */
-	0xee000000	/* USB3 (USB3.0 Host)*/
 };
 
 int ehci_hcd_stop(int index)
