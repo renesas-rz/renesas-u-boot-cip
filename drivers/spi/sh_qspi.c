@@ -2,7 +2,7 @@
  * drivers/spi/sh_qspi.c
  *     SH QSPI driver
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -47,11 +47,6 @@ static unsigned char sh_qspi_readb(unsigned char *reg)
 static unsigned short sh_qspi_readw(unsigned short *reg)
 {
 	return readw(reg);
-}
-
-static unsigned long sh_qspi_readl(unsigned long *reg)
-{
-	return readl(reg);
 }
 
 void spi_init(void)
