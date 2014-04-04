@@ -256,7 +256,6 @@ void qos_init_es1(void)
 	writel(0x0000000C, &mxi_qos->vspdu0);
 	writel(0x0000000C, &mxi_qos->vspdu1);
 	writel(0x0000000D, &mxi_qos->du0);
-	writel(0x0000000D, &mxi_qos->du1);
 
 	/* AXI -QoS */
 	/* Transaction Control (MXI) */
@@ -1550,7 +1549,6 @@ void qos_init_es2(void)
 	writel(0x0000000C, &mxi_qos->vspdu0);
 	writel(0x0000000C, &mxi_qos->vspdu1);
 	writel(0x0000000D, &mxi_qos->du0);
-	writel(0x0000000D, &mxi_qos->du1);
 
 	/* AXI -QoS */
 	/* Transaction Control (MXI) */
