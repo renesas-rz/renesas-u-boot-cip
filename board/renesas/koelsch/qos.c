@@ -24,7 +24,7 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.240 for ES1 and version 0.310 for ES2 */
+/* QoS version 0.240 for ES1 and version 0.320 for ES2 */
 
 enum {
 	DBSC3_00, DBSC3_01, DBSC3_02, DBSC3_03, DBSC3_04,
@@ -1402,7 +1402,7 @@ void qos_init_es1(void)
 #endif
 }
 
-/* QoS version 0.310 for ES2 */
+/* QoS version 0.320 for ES2 */
 
 void qos_init_es2(void)
 {
@@ -1419,7 +1419,7 @@ void qos_init_es2(void)
 
 	/* S3C -QoS */
 	s3c = (struct r8a7791_s3c *)S3C_BASE;
-	writel(0x00FF1B0D, &s3c->s3cadsplcr);
+	writel(0x00FF1B0C, &s3c->s3cadsplcr);
 	writel(0x1F0D0B0A, &s3c->s3crorr);
 	writel(0x1F0D0B09, &s3c->s3cworr);
 	writel(0x00200808, &s3c->s3carcr11);
@@ -1481,7 +1481,7 @@ void qos_init_es2(void)
 		writel(0x00000001, &qos_addr->dbrqctr);
 		writel(0x00002078, &qos_addr->dbthres0);
 		writel(0x0000204B, &qos_addr->dbthres1);
-		writel(0x00001FE7, &qos_addr->dbthres2);
+		writel(0x0000201E, &qos_addr->dbthres2);
 		writel(0x00000001, &qos_addr->dblgqon);
 	}
 
@@ -1489,13 +1489,13 @@ void qos_init_es2(void)
 	for (i = DBSC3_00; i < DBSC3_NR; i++) {
 		qos_addr = (struct r8a7791_dbsc3_qos *)dbsc3_0_w_qos_addr[i];
 		writel(0x00000002, &qos_addr->dblgcnt);
-		writel(0x000020EB, &qos_addr->dbtmval0);
-		writel(0x0000206E, &qos_addr->dbtmval1);
+		writel(0x00002096, &qos_addr->dbtmval0);
+		writel(0x00002064, &qos_addr->dbtmval1);
 		writel(0x00002050, &qos_addr->dbtmval2);
 		writel(0x0000203A, &qos_addr->dbtmval3);
 		writel(0x00000001, &qos_addr->dbrqctr);
 		writel(0x00002078, &qos_addr->dbthres0);
-		writel(0x0000205A, &qos_addr->dbthres1);
+		writel(0x0000204B, &qos_addr->dbthres1);
 		writel(0x0000203C, &qos_addr->dbthres2);
 		writel(0x00000001, &qos_addr->dblgqon);
 	}
@@ -1511,7 +1511,7 @@ void qos_init_es2(void)
 		writel(0x00000001, &qos_addr->dbrqctr);
 		writel(0x00002078, &qos_addr->dbthres0);
 		writel(0x0000204B, &qos_addr->dbthres1);
-		writel(0x00001FE7, &qos_addr->dbthres2);
+		writel(0x0000201E, &qos_addr->dbthres2);
 		writel(0x00000001, &qos_addr->dblgqon);
 	}
 
@@ -1519,13 +1519,13 @@ void qos_init_es2(void)
 	for (i = DBSC3_00; i < DBSC3_NR; i++) {
 		qos_addr = (struct r8a7791_dbsc3_qos *)dbsc3_1_w_qos_addr[i];
 		writel(0x00000002, &qos_addr->dblgcnt);
-		writel(0x000020EB, &qos_addr->dbtmval0);
-		writel(0x0000206E, &qos_addr->dbtmval1);
+		writel(0x00002096, &qos_addr->dbtmval0);
+		writel(0x00002064, &qos_addr->dbtmval1);
 		writel(0x00002050, &qos_addr->dbtmval2);
 		writel(0x0000203A, &qos_addr->dbtmval3);
 		writel(0x00000001, &qos_addr->dbrqctr);
 		writel(0x00002078, &qos_addr->dbthres0);
-		writel(0x0000205A, &qos_addr->dbthres1);
+		writel(0x0000204B, &qos_addr->dbthres1);
 		writel(0x0000203C, &qos_addr->dbthres2);
 		writel(0x00000001, &qos_addr->dblgqon);
 	}
@@ -1548,7 +1548,7 @@ void qos_init_es2(void)
 	mxi_qos = (struct r8a7791_mxi_qos *)MXI_QOS_BASE;
 	writel(0x0000000C, &mxi_qos->vspdu0);
 	writel(0x0000000C, &mxi_qos->vspdu1);
-	writel(0x0000000D, &mxi_qos->du0);
+	writel(0x0000000E, &mxi_qos->du0);
 
 	/* AXI -QoS */
 	/* Transaction Control (MXI) */
