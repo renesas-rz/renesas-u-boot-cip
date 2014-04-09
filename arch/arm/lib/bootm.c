@@ -77,6 +77,7 @@ void arch_lmb_reserve(struct lmb *lmb)
 }
 
 #ifdef CONFIG_OF_LIBFDT
+#if !(defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791))
 static int fixup_memory_node(void *blob)
 {
 	bd_t	*bd = gd->bd;
@@ -91,6 +92,7 @@ static int fixup_memory_node(void *blob)
 
 	return fdt_fixup_memory_banks(blob, start, size, CONFIG_NR_DRAM_BANKS);
 }
+#endif
 #endif
 
 static void announce_and_cleanup(void)
@@ -259,7 +261,9 @@ static int create_fdt(bootm_headers_t *images)
 		return ret;
 
 	fdt_chosen(*of_flat_tree, 1);
+#if !(defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791))
 	fixup_memory_node(*of_flat_tree);
+#endif
 	fdt_fixup_ethernet(*of_flat_tree);
 	fdt_initrd(*of_flat_tree, *initrd_start, *initrd_end, 1);
 #ifdef CONFIG_OF_BOARD_SETUP
