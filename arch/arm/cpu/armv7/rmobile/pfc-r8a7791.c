@@ -2,7 +2,7 @@
  * arch/arm/cpu/armv7/rmobile/pfc-r8a7791.c
  *     This file is r8a7791 processor support - PFC hardware block.
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -3223,7 +3223,7 @@ static struct pinmux_cfg_reg pinmux_config_regs[] = {
 		/* SEL_SCIF3 [2] */
 		FN_SEL_SCIF3_0, FN_SEL_SCIF3_1, FN_SEL_SCIF3_2, FN_SEL_SCIF3_3,
 		/* SEL_IEB [2] */
-		FN_SEL_IEB_0, FN_SEL_IEB_1, FN_SEL_IEB_2,
+		FN_SEL_IEB_0, FN_SEL_IEB_1, FN_SEL_IEB_2, 0,
 		/* SEL_MMC [1] */
 		FN_SEL_MMC_0, FN_SEL_MMC_1,
 		/* SEL_SCIF5 [1] */
