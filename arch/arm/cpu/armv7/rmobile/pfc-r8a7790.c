@@ -2,7 +2,7 @@
  * arch/arm/cpu/armv7/rmobile/pfc-r8a7790.c
  *     This file is r8a7790 processor support - PFC hardware block.
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -2545,8 +2545,7 @@ static struct pinmux_cfg_reg pinmux_config_regs[] = {
 		FN_MSIOF0_SCK_B, 0,
 		/* IP5_23_21 [3] */
 		FN_WE1_N, FN_IERX, FN_CAN1_RX, FN_VI1_G4,
-		FN_VI1_G4_B, FN_VI2_R6, FN_SCIFA0_CTS_N_B,
-		FN_IERX_C, 0,
+		FN_VI1_G4_B, FN_VI2_R6, FN_SCIFA0_CTS_N_B, FN_IERX_C,
 		/* IP5_20_18 [3] */
 		FN_WE0_N, FN_IECLK, FN_CAN_CLK,
 		FN_VI2_VSYNC_N, FN_SCIFA0_TXD_B, FN_VI2_VSYNC_N_B, 0, 0,
