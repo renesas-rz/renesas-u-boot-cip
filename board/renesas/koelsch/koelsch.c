@@ -59,7 +59,9 @@ void s_init(void)
 	writel(val, PLL0CR);
 
 	/* QoS */
+#if !(defined(CONFIG_EXTRAM_BOOT))
 	qos_init();
+#endif
 }
 
 #define	MSTPSR1		0xE6150038
