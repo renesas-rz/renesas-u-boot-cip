@@ -124,6 +124,7 @@ void qos_init_es1(void)
 
 	/* DBSC DBADJ2 */
 	writel(0x20042004, DBSC3_0_DBADJ2);
+	writel(0x20042004, DBSC3_1_DBADJ2);
 
 	/* S3C -QoS */
 	s3c = (struct r8a7791_s3c *)S3C_BASE;
@@ -1416,6 +1417,7 @@ void qos_init_es2(void)
 
 	/* DBSC DBADJ2 */
 	writel(0x20042004, DBSC3_0_DBADJ2);
+	writel(0x20042004, DBSC3_1_DBADJ2);
 
 	/* S3C -QoS */
 	s3c = (struct r8a7791_s3c *)S3C_BASE;
