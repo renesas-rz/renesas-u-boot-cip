@@ -61,6 +61,10 @@ void s_init(void)
 #define	SMSTPCR1	0xE6150134
 #define TMU0_MSTP125	(1 << 25)
 
+#define	MSTPSR3		0xE6150048
+#define	SMSTPCR3	0xE615013C
+#define IIC1_MSTP323	(1 << 23)
+
 #define	MSTPSR7		0xE61501C4
 #define	SMSTPCR7	0xE615014C
 #define SCIF2_MSTP719	(1 << 19)
@@ -78,6 +82,12 @@ int board_early_init_f(void)
 	val &= ~TMU0_MSTP125;
 	writel(val, SMSTPCR1);
 
+	/* IIC1 */
+	val = readl(MSTPSR3);
+	val &= ~IIC1_MSTP323;
+	writel(val, SMSTPCR3);
+
+	/* SCIF2 */
 	val = readl(MSTPSR7);
 	val &= ~SCIF2_MSTP719;
 	writel(val, SMSTPCR7);
@@ -175,6 +185,12 @@ int board_late_init(void)
 
 void reset_cpu(ulong addr)
 {
+	u8 val;
+
+	i2c_init(CONFIG_SYS_I2C_SPEED, 0);
+	i2c_read(0x58, 0x13, 1, &val, 1);
+	val |= 0x02;
+	i2c_write(0x58, 0x13, 1, &val, 1);
 }
 
 #define TSTR0	4
