@@ -64,6 +64,9 @@ void s_init(void)
 #define	MSTPSR3		0xE6150048
 #define	SMSTPCR3	0xE615013C
 #define IIC1_MSTP323	(1 << 23)
+#define MMC0_MSTP315	(1 << 15)
+#define SDHI0_MSTP314	(1 << 14)
+#define SDHI1_MSTP312	(1 << 12)
 
 #define	MSTPSR7		0xE61501C4
 #define	SMSTPCR7	0xE615014C
@@ -96,6 +99,11 @@ int board_early_init_f(void)
 	val = readl(MSTPSR8);
 	val &= ~ETHER_MSTP813;
 	writel(val, SMSTPCR8);
+
+	/* MMC/SD */
+	val = readl(MSTPSR3);
+	val &= ~(MMC0_MSTP315 | SDHI0_MSTP314 | SDHI1_MSTP312);
+	writel(val, SMSTPCR3);
 
 	return 0;
 }
@@ -131,6 +139,20 @@ int board_init(void)
 	mdelay(20);
 	gpio_set_value(GPIO_GP_1_24, 1);
 	udelay(1);
+
+	/* mmc0 */
+	gpio_request(GPIO_GP_4_31, NULL);
+	gpio_set_value(GPIO_GP_4_31, 1);
+	/* sdhi0 */
+	gpio_request(GPIO_GP_2_26, NULL);
+	gpio_request(GPIO_GP_2_29, NULL);
+	gpio_set_value(GPIO_GP_2_26, 1);
+	gpio_set_value(GPIO_GP_2_29, 1);
+	/* sdhi1 */
+	gpio_request(GPIO_GP_4_26, NULL);
+	gpio_request(GPIO_GP_4_29, NULL);
+	gpio_set_value(GPIO_GP_4_26, 1);
+	gpio_set_value(GPIO_GP_4_29, 1);
 
 	/* wait 5ms */
 	udelay(5000);
@@ -181,6 +203,26 @@ void dram_init_banksize(void)
 int board_late_init(void)
 {
 	return 0;
+}
+
+int board_mmc_init(bd_t *bis)
+{
+#ifdef CONFIG_SH_SDHI
+	int ret;
+
+	ret = mmcif_mmc_init();
+	if (ret)
+		return ret;
+
+	/* use SDHI0,1 */
+	ret = sdhi_mmc_init(SDHI0_BASE, 0);
+	if (ret)
+		return ret;
+
+	return sdhi_mmc_init(SDHI1_BASE, 1);
+#else
+	return mmcif_mmc_init();
+#endif
 }
 
 void reset_cpu(ulong addr)
