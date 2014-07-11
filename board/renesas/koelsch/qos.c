@@ -24,7 +24,7 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.240 for ES1 and version 0.320 for ES2 */
+/* QoS version 0.240 for ES1 and version 0.334 for ES2 */
 
 enum {
 	DBSC3_00, DBSC3_01, DBSC3_02, DBSC3_03, DBSC3_04,
@@ -1403,7 +1403,12 @@ void qos_init_es1(void)
 #endif
 }
 
-/* QoS version 0.320 for ES2 */
+/* QoS version 0.334 for ES2 */
+
+#define S3CADSPLCR_LINEAR_ALL				0
+#define S3CADSPLCR_4K_SPLIT_LINEAR_0x7000_0x7800	1
+#define S3CADSPLCR_4K_SPLIT_LINEAR_0x6800_0x7000	0
+#define S3CADSPLCR_4K_SPLIT_ALL				0
 
 void qos_init_es2(void)
 {
@@ -1421,10 +1426,22 @@ void qos_init_es2(void)
 
 	/* S3C -QoS */
 	s3c = (struct r8a7791_s3c *)S3C_BASE;
+#if S3CADSPLCR_LINEAR_ALL
+	writel(0x00000000, &s3c->s3cadsplcr);
+#elif S3CADSPLCR_4K_SPLIT_LINEAR_0x7000_0x7800
+	writel(0x00BF1B0C, &s3c->s3cadsplcr);
+#elif S3CADSPLCR_4K_SPLIT_LINEAR_0x6800_0x7000
+	writel(0x00DF1B0C, &s3c->s3cadsplcr);
+#elif S3CADSPLCR_4K_SPLIT_ALL
 	writel(0x00FF1B0C, &s3c->s3cadsplcr);
-	writel(0x1F0D0B0A, &s3c->s3crorr);
-	writel(0x1F0D0B09, &s3c->s3cworr);
+#else
+#error "S3CADSPLCR_* not defined"
+#endif
+	writel(0x1F0B0908, &s3c->s3crorr);
+	writel(0x1F0C0A08, &s3c->s3cworr);
+#if 0
 	writel(0x00200808, &s3c->s3carcr11);
+#endif
 
 	/* QoS Control Registers */
 	s3c_qos = (struct r8a7791_s3c_qos *)S3C_QOS_CCI0_BASE;
@@ -1450,7 +1467,7 @@ void qos_init_es2(void)
 	writel(0x00002032, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7791_s3c_qos *)S3C_QOS_MXI_BASE;
-	writel(0x80928092, &s3c_qos->s3cqos0);
+	writel(0x00820082, &s3c_qos->s3cqos0);
 	writel(0x20960020, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
 	writel(0x20AA20DC, &s3c_qos->s3cqos3);
@@ -1543,8 +1560,10 @@ void qos_init_es2(void)
 	mxi = (struct r8a7791_mxi *)MXI_BASE;
 	writel(0x00000013, &mxi->mxrtcr);
 	writel(0x00000013, &mxi->mxwtcr);
+#if 0
 	writel(0x00780080, &mxi->mxsaar0);
 	writel(0x02000800, &mxi->mxsaar1);
+#endif
 
 	/* QoS Control (MXI) */
 	mxi_qos = (struct r8a7791_mxi_qos *)MXI_QOS_BASE;
