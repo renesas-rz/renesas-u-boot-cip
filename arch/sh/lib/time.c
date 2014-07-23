@@ -36,7 +36,7 @@
 #include <sh_tmu.h>
 
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -49,7 +49,7 @@ static unsigned long last_tcnt;
 static unsigned long long overflow_ticks;
 
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
 
 unsigned long get_tbclk(void)
 {
@@ -103,7 +103,7 @@ static void tmu_timer_stop(unsigned int timer)
 }
 
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
 
 int sh_timer_init(void)
 {
@@ -146,7 +146,7 @@ int timer_init(void)
 #endif
 
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
 
 unsigned long long get_ticks(void)
 {
