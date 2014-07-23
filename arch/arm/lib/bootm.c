@@ -78,7 +78,7 @@ void arch_lmb_reserve(struct lmb *lmb)
 
 #ifdef CONFIG_OF_LIBFDT
 #if !(defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7794))
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794))
 static int fixup_memory_node(void *blob)
 {
 	bd_t	*bd = gd->bd;
@@ -263,7 +263,7 @@ static int create_fdt(bootm_headers_t *images)
 
 	fdt_chosen(*of_flat_tree, 1);
 #if !(defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7794))
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794))
 	fixup_memory_node(*of_flat_tree);
 #endif
 	fdt_fixup_ethernet(*of_flat_tree);
