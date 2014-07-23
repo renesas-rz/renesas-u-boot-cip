@@ -3,7 +3,7 @@
  *
  * SD/MMC driver.
  *
- * Copyright (C) 2011,2013 Renesas Electronics Corporation
+ * Copyright (C) 2011,2013-2014 Renesas Electronics Corporation
  * Copyright (C) 2008-2009 Renesas Solutions Corp.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -196,7 +196,8 @@ static void sdhi_sync_reset(struct sdhi_host *host)
 #if defined(LAGER_SDRAM_BASE)
 	if (host->ch < 2)
 		sdhi_writew(host, SDHI_HOST_MODE, 1);	/* 16bit access */
-#elif defined(KOELSCH_SDRAM_BASE) || defined(ALT_SDRAM_BASE)
+#elif defined(KOELSCH_SDRAM_BASE) || defined(GOSE_SDRAM_BASE) || \
+	defined(ALT_SDRAM_BASE)
 	if (host->ch == 0)
 		sdhi_writew(host, SDHI_HOST_MODE, 1);	/* 16bit access */
 #else
@@ -666,7 +667,8 @@ int sdhi_mmc_init(unsigned long addr, int ch)
 		host->bus_shift = 1;
 	else
 		host->bus_shift = 0;
-#elif defined(KOELSCH_SDRAM_BASE) || defined(ALT_SDRAM_BASE)
+#elif defined(KOELSCH_SDRAM_BASE) || defined(GOSE_SDRAM_BASE) || \
+	defined(ALT_SDRAM_BASE)
 	if (ch == 0)
 		host->bus_shift = 1;
 	else
