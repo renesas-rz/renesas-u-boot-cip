@@ -69,7 +69,7 @@ void s_init(void)
 #define TMU0_MSTP125	(1 << 25)
 
 #define MSTPSR3		0xE6150048
-#define SMSTPCR3	0xE615011C
+#define SMSTPCR3	0xE615013C
 #define MMC0_MSTP315	(1 << 15)
 #define SDHI0_MSTP314	(1 << 14)
 #define SDHI1_MSTP312	(1 << 12)
