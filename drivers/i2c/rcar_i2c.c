@@ -2,7 +2,7 @@
  * drivers/i2c/rcar_i2c.c
  *     This file is driver of Renesas R-Car I2C.
  *
- * Copyright (C) 2013 Renesas Electronics Corporation
+ * Copyright (C) 2013-2014 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -133,10 +133,10 @@ static u8 i2c_raw_read(struct rcar_i2c *base, u8 id, u8 reg)
 
 	/* set slave address, receive */
 	writel((id << 1) | 1, &base->icmar);
-	/* clear status */
-	writel(0, &base->icmsr);
 	/* start master receive */
 	writel(MCR_MDBS | MCR_MIE | MCR_ESG, &base->icmcr);
+	/* clear status */
+	writel(0, &base->icmsr);
 
 	while ((readl(&base->icmsr) & (MSR_MAT | MSR_MDR))
 		!= (MSR_MAT | MSR_MDR))
