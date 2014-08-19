@@ -157,6 +157,19 @@ int board_init(void)
 	gpio_set_value(GPIO_GP_5_31, 1);
 	udelay(1);
 
+#ifdef CONFIG_SH_MMCIF
+	gpio_request(GPIO_FN_MMC1_D0, NULL);
+	gpio_request(GPIO_FN_MMC1_D1, NULL);
+	gpio_request(GPIO_FN_MMC1_D2, NULL);
+	gpio_request(GPIO_FN_MMC1_D3, NULL);
+	gpio_request(GPIO_FN_MMC1_D4, NULL);
+	gpio_request(GPIO_FN_MMC1_D5, NULL);
+	gpio_request(GPIO_FN_MMC1_D6, NULL);
+	gpio_request(GPIO_FN_MMC1_D7, NULL);
+	gpio_request(GPIO_FN_MMC1_CLK, NULL);
+	gpio_request(GPIO_FN_MMC1_CMD, NULL);
+#endif
+
 	/* need JP3 set to pin-1 side on board. */
 	/* sdhi0 */
 	gpio_request(GPIO_GP_5_24, NULL);
