@@ -279,22 +279,22 @@ int board_late_init(void)
 
 int board_mmc_init(bd_t *bis)
 {
-#ifdef CONFIG_SH_SDHI
-	int ret;
+	int ret = 0;
 
+#ifdef CONFIG_SH_MMCIF
 	ret = mmcif_mmc_init();
-	if (ret)
-		return ret;
+#endif
 
+#ifdef CONFIG_SH_SDHI
 	/* use SDHI0/SDHI2 */
 	ret = sdhi_mmc_init(SDHI0_BASE, 0);
 	if (ret)
 		return ret;
 
-	return sdhi_mmc_init(SDHI2_BASE, 2);
-#else
-	return mmcif_mmc_init();
+	ret = sdhi_mmc_init(SDHI2_BASE, 2);
 #endif
+
+	return ret;
 }
 
 void reset_cpu(ulong addr)
