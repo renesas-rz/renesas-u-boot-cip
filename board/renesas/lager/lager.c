@@ -170,17 +170,34 @@ int board_init(void)
 	gpio_request(GPIO_FN_MMC1_CMD, NULL);
 #endif
 
+#ifdef CONFIG_SH_SDHI
+	gpio_request(GPIO_FN_SD0_DAT0, NULL);
+	gpio_request(GPIO_FN_SD0_DAT1, NULL);
+	gpio_request(GPIO_FN_SD0_DAT2, NULL);
+	gpio_request(GPIO_FN_SD0_DAT3, NULL);
+	gpio_request(GPIO_FN_SD0_CLK, NULL);
+	gpio_request(GPIO_FN_SD0_CMD, NULL);
+	gpio_request(GPIO_FN_SD0_CD, NULL);
+	gpio_request(GPIO_FN_SD2_DAT0, NULL);
+	gpio_request(GPIO_FN_SD2_DAT1, NULL);
+	gpio_request(GPIO_FN_SD2_DAT2, NULL);
+	gpio_request(GPIO_FN_SD2_DAT3, NULL);
+	gpio_request(GPIO_FN_SD2_CLK, NULL);
+	gpio_request(GPIO_FN_SD2_CMD, NULL);
+	gpio_request(GPIO_FN_SD2_CD, NULL);
+#endif
+
 	/* need JP3 set to pin-1 side on board. */
 	/* sdhi0 */
 	gpio_request(GPIO_GP_5_24, NULL);
 	gpio_request(GPIO_GP_5_29, NULL);
-	gpio_set_value(GPIO_GP_5_24, 1);	/* power on */
-	gpio_set_value(GPIO_GP_5_29, 1);	/* 1: 3.3V, 0: 1.8V */
+	gpio_direction_output(GPIO_GP_5_24, 1);	/* power on */
+	gpio_direction_output(GPIO_GP_5_29, 1);	/* 1: 3.3V, 0: 1.8V */
 	/* sdhi2 */
 	gpio_request(GPIO_GP_5_25, NULL);
 	gpio_request(GPIO_GP_5_30, NULL);
-	gpio_set_value(GPIO_GP_5_25, 1);	/* power on */
-	gpio_set_value(GPIO_GP_5_30, 1);	/* 1: 3.3V, 0: 1.8V */
+	gpio_direction_output(GPIO_GP_5_25, 1);	/* power on */
+	gpio_direction_output(GPIO_GP_5_30, 1);	/* 1: 3.3V, 0: 1.8V */
 
 	do {
 		val = readl(0xE6600B0C) & 0xF;
