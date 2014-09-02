@@ -35,6 +35,9 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define PLL0CR		0xE61500D8
 
+#define PLLECR		0xE61500D0
+#define PLL0ST		0x100
+
 #define s_init_wait(cnt) \
 		({	\
 			volatile u32 i = 0x10000 * cnt;	\
@@ -47,6 +50,7 @@ void s_init(void)
 	struct r8a7790_rwdt *rwdt = (struct r8a7790_rwdt *)RWDT_BASE;
 	struct r8a7790_swdt *swdt = (struct r8a7790_swdt *)SWDT_BASE;
 	u32 val;
+	u32 pll0_status;
 
 	/* Watchdog init */
 	writel(0xA5A5A500, &rwdt->rwtcsra);
@@ -58,6 +62,10 @@ void s_init(void)
 		val &= ~0x7F000000;
 		val |= 0x45000000;			/* 1.4GHz */
 		writel(val, PLL0CR);
+
+		do {
+			pll0_status = readl(PLLECR) & PLL0ST;
+		} while (pll0_status == 0x0);
 	}
 
 	/* QoS */
