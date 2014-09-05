@@ -111,6 +111,8 @@ int board_early_init_f(void)
 DECLARE_GLOBAL_DATA_PTR;
 int board_init(void)
 {
+	u32 val;
+
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = ALT_SDRAM_BASE + 0x100;
 
@@ -153,6 +155,15 @@ int board_init(void)
 	gpio_request(GPIO_GP_4_29, NULL);
 	gpio_set_value(GPIO_GP_4_26, 1);
 	gpio_set_value(GPIO_GP_4_29, 1);
+
+	do {
+		val = readl(0xE6600B0C) & 0xF;
+	} while (val != 0x2);
+	writel(0x2, 0xE6600B80);
+	do {
+		val = readl(0xE6600A14) & 0x1;
+	} while (val != 0x0);
+	writel(0x0, 0xE660012C);
 
 	/* wait 5ms */
 	udelay(5000);
