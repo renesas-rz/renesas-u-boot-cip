@@ -124,6 +124,8 @@ int board_early_init_f(void)
 DECLARE_GLOBAL_DATA_PTR;
 int board_init(void)
 {
+	u32 val;
+
 	/* board id for linux */
 	gd->bd->bi_arch_number = MACH_TYPE_LAGER;
 	/* adress of boot parameters */
@@ -166,6 +168,24 @@ int board_init(void)
 	gpio_request(GPIO_GP_5_30, NULL);
 	gpio_set_value(GPIO_GP_5_25, 1);	/* power on */
 	gpio_set_value(GPIO_GP_5_30, 1);	/* 1: 3.3V, 0: 1.8V */
+
+	do {
+		val = readl(0xE6600B0C) & 0xF;
+	} while (val != 0x2);
+	writel(0x2, 0xE6600B80);
+	do {
+		val = readl(0xE6600A14) & 0x1;
+	} while (val != 0x0);
+	writel(0x0, 0xE660012C);
+
+	do {
+		val = readl(0xE6620B0C) & 0xF;
+	} while (val != 0x2);
+	writel(0x2, 0xE6620B80);
+	do {
+		val = readl(0xE6620A14) & 0x1;
+	} while (val != 0x0);
+	writel(0x0, 0xE662012C);
 
 	/* wait 5ms */
 	udelay(5000);
