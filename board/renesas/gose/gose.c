@@ -166,6 +166,15 @@ int board_init(void)
 	gpio_set_value(GPIO_GP_7_19, 1);	/* power on */
 	gpio_set_value(GPIO_GP_2_26, 1);	/* 1: 3.3V, 0: 1.8V */
 
+	do {
+		val = readl(0xE6600B0C) & 0xF;
+	} while (val != 0x2);
+	writel(0x2, 0xE6600B80);
+	do {
+		val = readl(0xE6600A14) & 0x1;
+	} while (val != 0x0);
+	writel(0x0, 0xE660012C);
+
 	/* wait 5ms */
 	udelay(5000);
 
