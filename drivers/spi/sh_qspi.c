@@ -78,8 +78,8 @@ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
 	sh_qspi_writeb(0x00, &ss->regs->spckd);
 	sh_qspi_writeb(0x00, &ss->regs->sslnd);
 	sh_qspi_writeb(0x00, &ss->regs->spnd);
-	sh_qspi_writew(0xe084, &ss->regs->spcmd0);
-	sh_qspi_writew(0x8084, &ss->regs->spcmd0);
+	sh_qspi_writew(0xe083, &ss->regs->spcmd0);
+	sh_qspi_writew(0x8083, &ss->regs->spcmd0);
 	sh_qspi_writeb(0xc0, &ss->regs->spbfcr);
 	sh_qspi_writeb(0x30, &ss->regs->spbfcr);
 	sh_qspi_writeb(0x00, &ss->regs->spscr);
@@ -165,13 +165,13 @@ int sh_qspi_xfer_quad(
 	int ret = 0;
 
 	sh_qspi_writeb(0x08, &ss->regs->spcr);
-	sh_qspi_writew(0xe084, &ss->regs->spcmd0);
-	sh_qspi_writew(0xe084, &ss->regs->spcmd1);
+	sh_qspi_writew(0xe083, &ss->regs->spcmd0);
+	sh_qspi_writew(0xe083, &ss->regs->spcmd1);
 
 	if (dout != NULL)
-		sh_qspi_writew(0xe044, &ss->regs->spcmd2);
+		sh_qspi_writew(0xe043, &ss->regs->spcmd2);
 	else
-		sh_qspi_writew(0xe051, &ss->regs->spcmd2);
+		sh_qspi_writew(0xe053, &ss->regs->spcmd2);
 
 	sh_qspi_writeb(0xc0, &ss->regs->spbfcr);
 	sh_qspi_writeb(0x00, &ss->regs->spbfcr);
@@ -240,7 +240,7 @@ int sh_qspi_xfer_fast(
 
 	if (flags & SPI_XFER_BEGIN) {
 		sh_qspi_writeb(0x08, &ss->regs->spcr);
-		sh_qspi_writew(0xe084, &ss->regs->spcmd0);
+		sh_qspi_writew(0xe083, &ss->regs->spcmd0);
 		sh_qspi_writeb(0xc0, &ss->regs->spbfcr);
 		sh_qspi_writeb(0x00, &ss->regs->spbfcr);
 		sh_qspi_writeb(0x00, &ss->regs->spscr);
