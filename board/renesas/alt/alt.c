@@ -134,6 +134,23 @@ int board_init(void)
 	gpio_request(GPIO_FN_ETH_MDC, NULL);
 	gpio_request(GPIO_FN_IRQ8, NULL);
 
+#ifdef CONFIG_SH_SDHI
+	gpio_request(GPIO_FN_SD0_DATA0, NULL);
+	gpio_request(GPIO_FN_SD0_DATA1, NULL);
+	gpio_request(GPIO_FN_SD0_DATA2, NULL);
+	gpio_request(GPIO_FN_SD0_DATA3, NULL);
+	gpio_request(GPIO_FN_SD0_CLK, NULL);
+	gpio_request(GPIO_FN_SD0_CMD, NULL);
+	gpio_request(GPIO_FN_SD0_CD, NULL);
+	gpio_request(GPIO_FN_SD1_DATA0, NULL);
+	gpio_request(GPIO_FN_SD1_DATA1, NULL);
+	gpio_request(GPIO_FN_SD1_DATA2, NULL);
+	gpio_request(GPIO_FN_SD1_DATA3, NULL);
+	gpio_request(GPIO_FN_SD1_CLK, NULL);
+	gpio_request(GPIO_FN_SD1_CMD, NULL);
+	gpio_request(GPIO_FN_SD1_CD, NULL);
+#endif
+
 	sh_timer_init();
 
 	gpio_request(GPIO_GP_1_24, NULL);	/* PHY_RST */
@@ -148,13 +165,13 @@ int board_init(void)
 	/* sdhi0 */
 	gpio_request(GPIO_GP_2_26, NULL);
 	gpio_request(GPIO_GP_2_29, NULL);
-	gpio_set_value(GPIO_GP_2_26, 1);
-	gpio_set_value(GPIO_GP_2_29, 1);
+	gpio_direction_output(GPIO_GP_2_26, 1);
+	gpio_direction_output(GPIO_GP_2_29, 1);
 	/* sdhi1 */
 	gpio_request(GPIO_GP_4_26, NULL);
 	gpio_request(GPIO_GP_4_29, NULL);
-	gpio_set_value(GPIO_GP_4_26, 1);
-	gpio_set_value(GPIO_GP_4_29, 1);
+	gpio_direction_output(GPIO_GP_4_26, 1);
+	gpio_direction_output(GPIO_GP_4_29, 1);
 
 	do {
 		val = readl(0xE6600B0C) & 0xF;
