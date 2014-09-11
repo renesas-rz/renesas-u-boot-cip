@@ -134,6 +134,23 @@ int board_init(void)
 	gpio_request(GPIO_FN_ETH_MDC, NULL);
 	gpio_request(GPIO_FN_IRQ0, NULL);
 
+#ifdef CONFIG_SH_SDHI
+	gpio_request(GPIO_FN_SD0_DATA0, NULL);
+	gpio_request(GPIO_FN_SD0_DATA1, NULL);
+	gpio_request(GPIO_FN_SD0_DATA2, NULL);
+	gpio_request(GPIO_FN_SD0_DATA3, NULL);
+	gpio_request(GPIO_FN_SD0_CLK, NULL);
+	gpio_request(GPIO_FN_SD0_CMD, NULL);
+	gpio_request(GPIO_FN_SD0_CD, NULL);
+	gpio_request(GPIO_FN_SD2_DATA0, NULL);
+	gpio_request(GPIO_FN_SD2_DATA1, NULL);
+	gpio_request(GPIO_FN_SD2_DATA2, NULL);
+	gpio_request(GPIO_FN_SD2_DATA3, NULL);
+	gpio_request(GPIO_FN_SD2_CLK, NULL);
+	gpio_request(GPIO_FN_SD2_CMD, NULL);
+	gpio_request(GPIO_FN_SD2_CD, NULL);
+#endif
+
 	val = readl(0xe6060114);
 	val &= ~0x37FC0000;
 	writel(val, 0xe6060114);
@@ -153,18 +170,18 @@ int board_init(void)
 	/* sdhi0 */
 	gpio_request(GPIO_GP_7_17, NULL);
 	gpio_request(GPIO_GP_2_12, NULL);
-	gpio_set_value(GPIO_GP_7_17, 1);	/* power on */
-	gpio_set_value(GPIO_GP_2_12, 1);	/* 1: 3.3V, 0: 1.8V */
+	gpio_direction_output(GPIO_GP_7_17, 1);	/* power on */
+	gpio_direction_output(GPIO_GP_2_12, 1);	/* 1: 3.3V, 0: 1.8V */
 	/* sdhi1 */
 	gpio_request(GPIO_GP_7_18, NULL);
 	gpio_request(GPIO_GP_2_13, NULL);
-	gpio_set_value(GPIO_GP_7_18, 1);	/* power on */
-	gpio_set_value(GPIO_GP_2_13, 1);	/* 1: 3.3V, 0: 1.8V */
+	gpio_direction_output(GPIO_GP_7_18, 1);	/* power on */
+	gpio_direction_output(GPIO_GP_2_13, 1);	/* 1: 3.3V, 0: 1.8V */
 	/* sdhi2 */
 	gpio_request(GPIO_GP_7_19, NULL);
 	gpio_request(GPIO_GP_2_26, NULL);
-	gpio_set_value(GPIO_GP_7_19, 1);	/* power on */
-	gpio_set_value(GPIO_GP_2_26, 1);	/* 1: 3.3V, 0: 1.8V */
+	gpio_direction_output(GPIO_GP_7_19, 1);	/* power on */
+	gpio_direction_output(GPIO_GP_2_26, 1);	/* 1: 3.3V, 0: 1.8V */
 
 	do {
 		val = readl(0xE6600B0C) & 0xF;
