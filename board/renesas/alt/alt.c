@@ -76,6 +76,9 @@ void s_init(void)
 #define	SMSTPCR8	0xE6150990
 #define ETHER_MSTP813	(1 << 13)
 
+#define SD1CKCR		0xE6150078
+#define SD1_97500KHZ	0x7
+
 int board_early_init_f(void)
 {
 	u32 val;
@@ -104,6 +107,12 @@ int board_early_init_f(void)
 	val = readl(MSTPSR3);
 	val &= ~(MMC0_MSTP315 | SDHI0_MSTP314 | SDHI1_MSTP312);
 	writel(val, SMSTPCR3);
+
+	/*
+	 * SD0 clock is set to 97.5MHz by default.
+	 * Set SD1 to the 97.5MHz as well.
+	 */
+	writel(SD1_97500KHZ, SD1CKCR);
 
 	return 0;
 }
