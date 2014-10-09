@@ -73,7 +73,7 @@ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
 	sh_qspi_writeb(0x08, &ss->regs->spcr);
 	sh_qspi_writeb(0x00, &ss->regs->sslp);
 	sh_qspi_writeb(0x06, &ss->regs->sppcr);
-	sh_qspi_writeb(0x02, &ss->regs->spbr);
+	sh_qspi_writeb(0x01, &ss->regs->spbr);
 	sh_qspi_writeb(0x00, &ss->regs->spdcr);
 	sh_qspi_writeb(0x00, &ss->regs->spckd);
 	sh_qspi_writeb(0x00, &ss->regs->sslnd);
@@ -171,7 +171,7 @@ int sh_qspi_xfer_quad(
 	if (dout != NULL)
 		sh_qspi_writew(0xe043, &ss->regs->spcmd2);
 	else
-		sh_qspi_writew(0xe053, &ss->regs->spcmd2);
+		sh_qspi_writew(0xe051, &ss->regs->spcmd2);
 
 	sh_qspi_writeb(0xc0, &ss->regs->spbfcr);
 	sh_qspi_writeb(0x00, &ss->regs->spbfcr);
