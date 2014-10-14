@@ -34,7 +34,6 @@
 #error
 #endif
 
-#define SMSTPCR7        0xe615014c
 #define SMSTPCR703      0x08
 
 static u32 usb_base_address[CONFIG_USB_MAX_CONTROLLER_COUNT] = {
