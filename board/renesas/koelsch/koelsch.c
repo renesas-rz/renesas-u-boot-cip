@@ -64,23 +64,15 @@ void s_init(void)
 #endif
 }
 
-#define	MSTPSR1		0xE6150038
-#define	SMSTPCR1	0xE6150134
 #define TMU0_MSTP125	(1 << 25)
 
-#define MSTPSR3		0xE6150048
-#define SMSTPCR3	0xE615013C
 #define MMC0_MSTP315	(1 << 15)
 #define SDHI0_MSTP314	(1 << 14)
 #define SDHI1_MSTP312	(1 << 12)
 #define SDHI2_MSTP311	(1 << 11)
 
-#define	MSTPSR7		0xE61501C4
-#define	SMSTPCR7	0xE615014C
 #define SCIF0_MSTP721	(1 << 21)
 
-#define	MSTPSR8		0xE61509A0
-#define	SMSTPCR8	0xE6150990
 #define ETHER_MSTP813	(1 << 13)
 
 #define SD1CKCR		0xE6150078
@@ -284,19 +276,64 @@ void reset_cpu(ulong addr)
 	i2c_write(0x58, 0x13, 1, &val, 1);
 }
 
+enum {
+	MSTP00, MSTP01, MSTP02, MSTP03, MSTP04, MSTP05,
+	MSTP07, MSTP08, MSTP09, MSTP10, MSTP11,
+	MSTP_NR,
+};
+
+struct mstp_ctl {
+	u32 s_addr;
+	u32 s_dis;
+	u32 s_ena;
+	u32 r_addr;
+	u32 r_dis;
+	u32 r_ena;
+} mstptbl[MSTP_NR] = {
+	[MSTP00] = { SMSTPCR0,  0x00640801, 0x00400001,
+		     RMSTPCR0,  0x00640801, 0x00000000 },
+	[MSTP01] = { SMSTPCR1,  0x9B6C9B5A, 0x00000000,
+		     RMSTPCR1,  0x9B6C9B5A, 0x00000000 },
+	[MSTP02] = { SMSTPCR2,  0x100D21FC, 0x000C2120,
+		     RMSTPCR2,  0x100D21FC, 0x000C0000 },
+	[MSTP03] = { SMSTPCR3,  0xF08CD810, 0x00000000,
+		     RMSTPCR3,  0xF08CD810, 0x00000000 },
+	[MSTP04] = { SMSTPCR4,  0x800001C4, 0x00000180,
+		     RMSTPCR4,  0x800001C4, 0x00000000 },
+	[MSTP05] = { SMSTPCR5,  0x44C00046, 0x00000000,
+		     RMSTPCR5,  0x44C00046, 0x00000000 },
+	[MSTP07] = { SMSTPCR7,  0x05BFE618, 0x00200000,
+		     RMSTPCR7,  0x05BFE618, 0x00000000 },
+	[MSTP08] = { SMSTPCR8,  0x40C0FE85, 0x00000001,
+		     RMSTPCR8,  0x40C0FE85, 0x00000000 },
+	[MSTP09] = { SMSTPCR9,  0xFF979FFF, 0x00021FB0,
+		     RMSTPCR9,  0xFF979FFF, 0x00001FB0 },
+	[MSTP10] = { SMSTPCR10, 0xFFFEFFE0, 0x00000000,
+		     RMSTPCR10, 0xFFFEFFE0, 0x00000000 },
+	[MSTP11] = { SMSTPCR11, 0x000001C0, 0x00000000,
+		     RMSTPCR11, 0x000001C0, 0x00000000 },
+};
+
 #define TSTR0	4
 #define TSTR0_STR0	0x1
 
 void arch_preboot_os()
 {
 	u32 val;
+	int i;
 
 	/* stop TMU0 */
 	val = readb(TMU_BASE + TSTR0);
 	val &= ~TSTR0_STR0;
 	writeb(val, TMU_BASE + TSTR0);
 
-	val = readl(MSTPSR1);
-	val |= TMU0_MSTP125;
-	writel(val, SMSTPCR1);
+	/* stop all module clock*/
+	for (i = MSTP00; i < MSTP_NR; i++) {
+		val = readl(mstptbl[i].s_addr);
+		writel((val | mstptbl[i].s_dis) & ~(mstptbl[i].s_ena),
+		       mstptbl[i].s_addr);
+		val = readl(mstptbl[i].r_addr);
+		writel((val | mstptbl[i].r_dis) & ~(mstptbl[i].r_ena),
+		       mstptbl[i].r_addr);
+	}
 }
