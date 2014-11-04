@@ -63,7 +63,6 @@
 #else
 #define TX_DESC_PADDING		4
 #endif
-#define TX_DESC_SIZE		(12 + TX_DESC_PADDING)
 
 /* Tx descriptor. We always use 3 bytes of padding */
 struct tx_desc_s {
@@ -89,7 +88,6 @@ struct tx_desc_s {
 #define RX_DESC_PADDING		4
 #define RX_BUF_ALIGNE_SIZE	32
 #endif
-#define RX_DESC_SIZE		(12 + RX_DESC_PADDING)
 
 /* Rx descriptor. We always use 4 bytes of padding */
 struct rx_desc_s {
