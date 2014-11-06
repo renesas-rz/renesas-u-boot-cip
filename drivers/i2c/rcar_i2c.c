@@ -33,10 +33,6 @@ struct rcar_i2c {
 	u32 icsar;
 	u32 icmar;
 	u32 icrxdtxd;
-	u32 icccr2;
-	u32 icmpr;
-	u32 ichpr;
-	u32 iclpr;
 };
 
 #define MCR_MDBS	0x80		/* non-fifo mode switch	*/
@@ -184,12 +180,8 @@ void i2c_init(int speed, int slaveaddr)
 	writel(0, &base->icmsr);
 	writel(0, &base->icmar);
 
-	/* Recommended values of bus speed 400kHz by H2 H/W spec. */
-	writel(15, &base->icmpr);
-	writel(135, &base->ichpr);
-	writel(152, &base->iclpr);
-	writel(7, &base->icccr2);
-	writel(6, &base->icccr);
+	/* Recommended values of bus speed 400kHz by GEN2 H/W spec. */
+	writel(3 << 3 | 6, &base->icccr);
 }
 
 /*
