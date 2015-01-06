@@ -2,7 +2,7 @@
  * board/renesas/gose/qos.c
  *     This file is gose QoS setting.
  *
- * Copyright (C) 2014 Renesas Electronics Corporation
+ * Copyright (C) 2014-2015 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -24,7 +24,11 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.20 */
+/* QoS version 0.31 */
+
+#define QOS_PRI_MEDIA	0
+#define QOS_PRI_NORMAL	1
+#define QOS_PRI_GFX	0
 
 enum {
 	DBSC3_00, DBSC3_01, DBSC3_02, DBSC3_03, DBSC3_04,
@@ -88,34 +92,68 @@ void qos_init(void)
 	/* S3C -QoS */
 	s3c = (struct r8a7793_s3c *)S3C_BASE;
 	writel(0x00000000, &s3c->s3cadsplcr);
+#if QOS_PRI_MEDIA
+	writel(0x1F0B0604, &s3c->s3crorr);
+	writel(0x1F0E0705, &s3c->s3cworr);
+#elif QOS_PRI_NORMAL
 	writel(0x1F0B0908, &s3c->s3crorr);
-	writel(0x1F0C0A08, &s3c->s3cworr);
+	writel(0x1F0E0A08, &s3c->s3cworr);
+#elif QOS_PRI_GFX
+	writel(0x1F0B0B0B, &s3c->s3crorr);
+	writel(0x1F0E0C0C, &s3c->s3cworr);
+#else
+#error "QOS_PRI_* not defined"
+#endif
 
 	/* QoS Control Registers */
 	s3c_qos = (struct r8a7793_s3c_qos *)S3C_QOS_CCI0_BASE;
 	writel(0x00890089, &s3c_qos->s3cqos0);
 	writel(0x20960010, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
+#if QOS_PRI_MEDIA
+	writel(0x20AA2300, &s3c_qos->s3cqos3);
+#elif QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos3);
+#elif QOS_PRI_GFX
+	writel(0x20AA2100, &s3c_qos->s3cqos3);
+#endif
 	writel(0x00002032, &s3c_qos->s3cqos4);
 	writel(0x20960010, &s3c_qos->s3cqos5);
 	writel(0x20302030, &s3c_qos->s3cqos6);
+#if QOS_PRI_MEDIA
+	writel(0x20AA2300, &s3c_qos->s3cqos7);
+#elif QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos7);
+#elif QOS_PRI_GFX
+	writel(0x20AA2100, &s3c_qos->s3cqos7);
+#endif
 	writel(0x00002032, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7793_s3c_qos *)S3C_QOS_CCI1_BASE;
 	writel(0x00890089, &s3c_qos->s3cqos0);
 	writel(0x20960010, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
+#if QOS_PRI_MEDIA
+	writel(0x20AA2300, &s3c_qos->s3cqos3);
+#elif QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos3);
+#elif QOS_PRI_GFX
+	writel(0x20AA2100, &s3c_qos->s3cqos3);
+#endif
 	writel(0x00002032, &s3c_qos->s3cqos4);
 	writel(0x20960010, &s3c_qos->s3cqos5);
 	writel(0x20302030, &s3c_qos->s3cqos6);
+#if QOS_PRI_MEDIA
+	writel(0x20AA2300, &s3c_qos->s3cqos7);
+#elif QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos7);
+#elif QOS_PRI_GFX
+	writel(0x20AA2100, &s3c_qos->s3cqos7);
+#endif
 	writel(0x00002032, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7793_s3c_qos *)S3C_QOS_MXI_BASE;
-	writel(0x00820082, &s3c_qos->s3cqos0);
+	writel(0x80928092, &s3c_qos->s3cqos0);
 	writel(0x20960020, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
 	writel(0x20AA20DC, &s3c_qos->s3cqos3);
@@ -126,7 +164,7 @@ void qos_init(void)
 	writel(0x00002032, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7793_s3c_qos *)S3C_QOS_AXI_BASE;
-	writel(0x00820082, &s3c_qos->s3cqos0);
+	writel(0x00828092, &s3c_qos->s3cqos0);
 	writel(0x20960020, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
 	writel(0x20AA20FA, &s3c_qos->s3cqos3);
@@ -177,11 +215,13 @@ void qos_init(void)
 	/* Transaction Control (MXI) */
 	mxi = (struct r8a7793_mxi *)MXI_BASE;
 	writel(0x00000013, &mxi->mxrtcr);
-	writel(0x00000013, &mxi->mxwtcr);
+	writel(0x00000015, &mxi->mxwtcr);
 	writel(0x00200000, &mxi->mxs3cracr);
 	writel(0x00200000, &mxi->mxs3cwacr);
 	writel(0x00200000, &mxi->mxaxiracr);
 	writel(0x00200000, &mxi->mxaxiwacr);
+	writel(0x00780080, &mxi->mxsaar0);
+	writel(0x02000800, &mxi->mxsaar1);
 
 	/* QoS Control (MXI) */
 	mxi_qos = (struct r8a7793_mxi_qos *)MXI_QOS_BASE;
@@ -565,7 +605,7 @@ void qos_init(void)
 
 	/* QoS Register (RT-AXI) */
 	axi_qos = (struct r8a7793_axi_qos *)RT_AXI_SHX_BASE;
-	writel(0x00000000, &axi_qos->qosconf);
+	writel(0x00000001, &axi_qos->qosconf);
 	writel(0x00002053, &axi_qos->qosctset0);
 	writel(0x00002096, &axi_qos->qosctset1);
 	writel(0x00002030, &axi_qos->qosctset2);
