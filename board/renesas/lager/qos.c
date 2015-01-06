@@ -2,7 +2,7 @@
  * board/renesas/lager/qos.c
  *     This file is lager QoS setting.
  *
- * Copyright (C) 2013-2014 Renesas Electronics Corporation
+ * Copyright (C) 2013-2015 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -24,7 +24,11 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.955 for ES1 and version 0.963 for ES2 */
+/* QoS version 0.955 for ES1 and version 0.972 for ES2 */
+
+#define QOS_PRI_MEDIA	0
+#define QOS_PRI_NORMAL	1
+#define QOS_PRI_GFX	0
 
 enum {
 	DBSC3_00, DBSC3_01, DBSC3_02, DBSC3_03, DBSC3_04,
@@ -1158,7 +1162,7 @@ void qos_init_es1(void)
 #endif
 }
 
-/* QoS version 0.963 for ES2 */
+/* QoS version 0.972 for ES2 */
 
 void qos_init_es2(void)
 {
@@ -1176,30 +1180,64 @@ void qos_init_es2(void)
 	/* S3C -QoS */
 	s3c = (struct r8a7790_s3c *)S3C_BASE;
 	writel(0x80000000, &s3c->s3cadsplcr);
+#if QOS_PRI_MEDIA
+	writel(0x1F060302, &s3c->s3crorr);
+	writel(0x07070302, &s3c->s3cworr);
+#elif QOS_PRI_NORMAL
 	writel(0x1F060504, &s3c->s3crorr);
-	writel(0x1F060503, &s3c->s3cworr);
+	writel(0x07070503, &s3c->s3cworr);
+#elif QOS_PRI_GFX
+	writel(0x1F060606, &s3c->s3crorr);
+	writel(0x07070606, &s3c->s3cworr);
+#else
+#error "QOS_PRI_* not defined"
+#endif
 
 	/* QoS Control Registers */
 	s3c_qos = (struct r8a7790_s3c_qos *)S3C_QOS_CCI0_BASE;
 	writel(0x00890089, &s3c_qos->s3cqos0);
 	writel(0x20960010, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
+#if QOS_PRI_MEDIA
+	writel(0x20AA2300, &s3c_qos->s3cqos3);
+#elif QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos3);
+#elif QOS_PRI_GFX
+	writel(0x20AA2100, &s3c_qos->s3cqos3);
+#endif
 	writel(0x00002032, &s3c_qos->s3cqos4);
 	writel(0x20960010, &s3c_qos->s3cqos5);
 	writel(0x20302030, &s3c_qos->s3cqos6);
+#if QOS_PRI_MEDIA
+	writel(0x20AA2300, &s3c_qos->s3cqos7);
+#elif QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos7);
+#elif QOS_PRI_GFX
+	writel(0x20AA2100, &s3c_qos->s3cqos7);
+#endif
 	writel(0x00002032, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7790_s3c_qos *)S3C_QOS_CCI1_BASE;
 	writel(0x00890089, &s3c_qos->s3cqos0);
 	writel(0x20960010, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
+#if QOS_PRI_MEDIA
+	writel(0x20AA2300, &s3c_qos->s3cqos3);
+#elif QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos3);
+#elif QOS_PRI_GFX
+	writel(0x20AA2100, &s3c_qos->s3cqos3);
+#endif
 	writel(0x00002032, &s3c_qos->s3cqos4);
 	writel(0x20960010, &s3c_qos->s3cqos5);
 	writel(0x20302030, &s3c_qos->s3cqos6);
+#if QOS_PRI_MEDIA
+	writel(0x20AA2300, &s3c_qos->s3cqos7);
+#elif QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos7);
+#elif QOS_PRI_GFX
+	writel(0x20AA2100, &s3c_qos->s3cqos7);
+#endif
 	writel(0x00002032, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7790_s3c_qos *)S3C_QOS_MXI_BASE;
@@ -1214,7 +1252,7 @@ void qos_init_es2(void)
 	writel(0x00002032, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7790_s3c_qos *)S3C_QOS_AXI_BASE;
-	writel(0x00820082, &s3c_qos->s3cqos0);
+	writel(0x00828092, &s3c_qos->s3cqos0);
 	writel(0x20960020, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
 	writel(0x20AA20FA, &s3c_qos->s3cqos3);
@@ -1224,7 +1262,7 @@ void qos_init_es2(void)
 	writel(0x20AA20FA, &s3c_qos->s3cqos7);
 	writel(0x00002032, &s3c_qos->s3cqos8);
 
-	writel(0x00200808, &s3c->s3carcr11);
+	writel(0x00310808, &s3c->s3carcr11);
 
 	/* DBSC -QoS */
 	/* DBSC0 - Read */
@@ -1269,7 +1307,7 @@ void qos_init_es2(void)
 	/* Transaction Control (MXI) */
 	mxi = (struct r8a7790_mxi *)MXI_BASE;
 	writel(0x00000013, &mxi->mxrtcr);
-	writel(0x00000013, &mxi->mxwtcr);
+	writel(0x00000015, &mxi->mxwtcr);
 	writel(0x00B800C0, &mxi->mxsaar0);
 	writel(0x02000800, &mxi->mxsaar1);
 #if 0
@@ -1662,7 +1700,7 @@ void qos_init_es2(void)
 
 	/* QoS Register (RT-AXI) */
 	axi_qos = (struct r8a7790_axi_qos *)RT_AXI_SHX_BASE;
-	writel(0x00000000, &axi_qos->qosconf);
+	writel(0x00000001, &axi_qos->qosconf);
 	writel(0x00002053, &axi_qos->qosctset0);
 	writel(0x00002096, &axi_qos->qosctset1);
 	writel(0x00002030, &axi_qos->qosctset2);
