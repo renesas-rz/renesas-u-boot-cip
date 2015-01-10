@@ -24,7 +24,7 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.31 */
+/* QoS version 0.311 */
 
 #define QOS_PRI_MEDIA	0
 #define QOS_PRI_NORMAL	1
@@ -215,7 +215,7 @@ void qos_init(void)
 	/* Transaction Control (MXI) */
 	mxi = (struct r8a7793_mxi *)MXI_BASE;
 	writel(0x00000013, &mxi->mxrtcr);
-	writel(0x00000015, &mxi->mxwtcr);
+	writel(0x00000016, &mxi->mxwtcr);
 	writel(0x00200000, &mxi->mxs3cracr);
 	writel(0x00200000, &mxi->mxs3cwacr);
 	writel(0x00200000, &mxi->mxaxiracr);
