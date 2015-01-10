@@ -24,7 +24,7 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.955 for ES1 and version 0.972 for ES2 */
+/* QoS version 0.955 for ES1 and version 0.973 for ES2 later */
 
 #define QOS_PRI_MEDIA	0
 #define QOS_PRI_NORMAL	1
@@ -1162,7 +1162,7 @@ void qos_init_es1(void)
 #endif
 }
 
-/* QoS version 0.972 for ES2 */
+/* QoS version 0.973 for ES2 later */
 
 void qos_init_es2(void)
 {
@@ -1307,7 +1307,7 @@ void qos_init_es2(void)
 	/* Transaction Control (MXI) */
 	mxi = (struct r8a7790_mxi *)MXI_BASE;
 	writel(0x00000013, &mxi->mxrtcr);
-	writel(0x00000015, &mxi->mxwtcr);
+	writel(0x00000016, &mxi->mxwtcr);
 	writel(0x00B800C0, &mxi->mxsaar0);
 	writel(0x02000800, &mxi->mxsaar1);
 #if 0
