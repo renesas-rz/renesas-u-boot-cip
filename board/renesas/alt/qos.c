@@ -24,7 +24,7 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.31 for ES1 and version 0.32 for ES2 */
+/* QoS version 0.311 for ES1 and version 0.321 for ES2 */
 
 #define QOS_PRI_MEDIA	0
 #define QOS_PRI_NORMAL	1
@@ -76,7 +76,7 @@ static u32 dbsc3_0_w_qos_addr[DBSC3_NR] = {
 	[DBSC3_15] = DBSC3_0_QOS_W15_BASE,
 };
 
-/* QoS version 0.31 for ES1 */
+/* QoS version 0.311 for ES1 */
 
 void qos_init_es1(void)
 {
@@ -216,7 +216,7 @@ void qos_init_es1(void)
 	/* Transaction Control (MXI) */
 	mxi = (struct r8a7794_mxi *)MXI_BASE;
 	writel(0x00000013, &mxi->mxrtcr);
-	writel(0x00000015, &mxi->mxwtcr);
+	writel(0x00000016, &mxi->mxwtcr);
 	writel(0x00780080, &mxi->mxsaar0);
 	writel(0x02000800, &mxi->mxsaar1);
 
@@ -994,7 +994,7 @@ void qos_init_es1(void)
 	writel(0x00000001, &axi_qos->qosqon);
 }
 
-/* QoS version 0.32 for ES2 */
+/* QoS version 0.321 for ES2 */
 
 void qos_init_es2(void)
 {
@@ -1134,7 +1134,7 @@ void qos_init_es2(void)
 	/* Transaction Control (MXI) */
 	mxi = (struct r8a7794_mxi *)MXI_BASE;
 	writel(0x00000013, &mxi->mxrtcr);
-	writel(0x00000015, &mxi->mxwtcr);
+	writel(0x00000016, &mxi->mxwtcr);
 	writel(0x00780080, &mxi->mxsaar0);
 	writel(0x02000800, &mxi->mxsaar1);
 
