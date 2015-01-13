@@ -2,7 +2,7 @@
  * board/renesas/alt/alt.c
  *     This file is alt board support.
  *
- * Copyright (C) 2014 Renesas Electronics Corporation
+ * Copyright (C) 2014-2015 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -121,6 +121,7 @@ int board_init(void)
 	r8a7794_pinmux_init();
 
 	/* ETHER Enable */
+#if !defined(CONFIG_ALT_ETHERB)
 	gpio_request(GPIO_FN_ETH_CRS_DV, NULL);
 	gpio_request(GPIO_FN_ETH_RX_ER, NULL);
 	gpio_request(GPIO_FN_ETH_RXD0, NULL);
@@ -133,6 +134,20 @@ int board_init(void)
 	gpio_request(GPIO_FN_ETH_MAGIC, NULL);
 	gpio_request(GPIO_FN_ETH_TXD0, NULL);
 	gpio_request(GPIO_FN_ETH_MDC, NULL);
+#else
+	gpio_request(GPIO_FN_ETH_CRS_DV_B, NULL);
+	gpio_request(GPIO_FN_ETH_RX_ER_B, NULL);
+	gpio_request(GPIO_FN_ETH_RXD0_B, NULL);
+	gpio_request(GPIO_FN_ETH_RXD1_B, NULL);
+	gpio_request(GPIO_FN_ETH_LINK_B, NULL);
+	gpio_request(GPIO_FN_ETH_REFCLK_B, NULL);
+	gpio_request(GPIO_FN_ETH_MDIO_B, NULL);
+	gpio_request(GPIO_FN_ETH_TXD1_B, NULL);
+	gpio_request(GPIO_FN_ETH_TX_EN_B, NULL);
+	gpio_request(GPIO_FN_ETH_MAGIC_B, NULL);
+	gpio_request(GPIO_FN_ETH_TXD0_B, NULL);
+	gpio_request(GPIO_FN_ETH_MDC_B, NULL);
+#endif
 	gpio_request(GPIO_FN_IRQ8, NULL);
 
 #ifdef CONFIG_SH_SDHI
