@@ -75,6 +75,36 @@ static inline void set_cr(unsigned int val)
 	isb();
 }
 
+#define ID_CA7_MPCORE			0xC07
+#define MIDR_PRIMARY_PART_NUM_BIT	4
+#define MIDR_PRIMARY_PART_NUM_MASK	0x0000FFF0
+
+static inline unsigned int get_midr(void)
+{
+	unsigned int val;
+	asm("mrc p15, 0, %0, c0, c0, 0	@ get MIDR" : "=r" (val) : : "cc");
+	return val;
+}
+
+#define get_midr_primary_part_num() \
+	(get_midr() & MIDR_PRIMARY_PART_NUM_MASK) >> MIDR_PRIMARY_PART_NUM_BIT
+
+#define ACTLR_SMP	(1 << 6)	/* Enables coherent requests to the processor */
+
+static inline unsigned int get_actlr(void)
+{
+	unsigned int val;
+	asm("mrc p15, 0, %0, c1, c0, 1	@ get ACTLR" : "=r" (val) : : "cc");
+	return val;
+}
+
+static inline void set_actlr(unsigned int val)
+{
+	asm volatile("mcr p15, 0, %0, c1, c0, 1 @ set ACTLR"
+	  : : "r" (val) : "cc");
+	isb();
+}
+
 /* options available for data cache on each page */
 enum dcache_option {
 	DCACHE_OFF = 0x12,

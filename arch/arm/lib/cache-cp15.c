@@ -131,6 +131,16 @@ static void cache_enable(uint32_t cache_bit)
 {
 	uint32_t reg;
 
+	/* We need to enable ACTLR.SMP, if we use dcache on CA7. */
+	if (get_midr_primary_part_num() == ID_CA7_MPCORE) {
+		if (cache_bit == CR_C) {
+			reg = get_actlr();
+			cp_delay();
+			if ((reg & ACTLR_SMP) != ACTLR_SMP)
+				set_actlr(reg | ACTLR_SMP);
+		}
+	}
+
 	/* The data cache is not active unless the mmu is enabled too */
 	if ((cache_bit == CR_C) && !mmu_enabled())
 		mmu_setup();
