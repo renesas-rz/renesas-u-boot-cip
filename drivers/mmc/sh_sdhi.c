@@ -3,7 +3,7 @@
  *
  * SD/MMC driver.
  *
- * Copyright (C) 2011,2013-2014 Renesas Electronics Corporation
+ * Copyright (C) 2011,2013-2015 Renesas Electronics Corporation
  * Copyright (C) 2008-2009 Renesas Solutions Corp.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -649,8 +649,10 @@ int sdhi_mmc_init(unsigned long addr, int ch)
 	if (!mmc)
 		return -ENOMEM;
 	host = malloc(sizeof(struct sdhi_host));
-	if (!host)
+	if (!host) {
+		free(mmc);
 		return -ENOMEM;
+	}
 
 	mmc->f_min = CLKDEV_INIT;
 	mmc->f_max = CLKDEV_HS_DATA;
