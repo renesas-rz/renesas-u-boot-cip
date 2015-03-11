@@ -66,6 +66,16 @@
 #define CP15DSB	asm volatile ("mcr     p15, 0, %0, c7, c10, 4" : : "r" (0))
 #define CP15DMB	asm volatile ("mcr     p15, 0, %0, c7, c10, 5" : : "r" (0))
 
+#ifdef __ARM_ARCH_7A__
+#define	ISB	asm volatile ("isb" : : : "memory")
+#define	DSB	asm volatile ("dsb" : : : "memory")
+#define	DMB	asm volatile ("dmb" : : : "memory")
+#else
+#define ISB	CP15ISB
+#define DSB	CP15DSB
+#define DMB	CP15DMB
+#endif
+
 void v7_outer_cache_enable(void);
 void v7_outer_cache_disable(void);
 void v7_outer_cache_flush_all(void);
