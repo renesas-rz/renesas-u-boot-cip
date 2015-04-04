@@ -26,11 +26,6 @@
 
 /* QoS version 0.240 for ES1 and version 0.500 for ES2 later */
 
-#define CONFIG_QOS_PRI_VIN	0
-#define CONFIG_QOS_PRI_MEDIA	0
-#define CONFIG_QOS_PRI_NORMAL	1
-#define CONFIG_QOS_PRI_GFX	0
-
 enum {
 	DBSC3_00, DBSC3_01, DBSC3_02, DBSC3_03, DBSC3_04,
 	DBSC3_05, DBSC3_06, DBSC3_07, DBSC3_08, DBSC3_09,
