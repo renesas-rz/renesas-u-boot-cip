@@ -26,9 +26,9 @@
 
 /* QoS version 0.240 for ES1 and version 0.411 for ES2 later */
 
-#define QOS_PRI_MEDIA	0
-#define QOS_PRI_NORMAL	1
-#define QOS_PRI_GFX	0
+#define CONFIG_QOS_PRI_MEDIA	0
+#define CONFIG_QOS_PRI_NORMAL	1
+#define CONFIG_QOS_PRI_GFX	0
 
 enum {
 	DBSC3_00, DBSC3_01, DBSC3_02, DBSC3_03, DBSC3_04,
@@ -1441,17 +1441,17 @@ void qos_init_es2(void)
 #else
 #error "S3CADSPLCR_* not defined"
 #endif
-#if QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_MEDIA
 	writel(0x1F0B0604, &s3c->s3crorr);
 	writel(0x1F0E0705, &s3c->s3cworr);
-#elif QOS_PRI_NORMAL
+#elif CONFIG_QOS_PRI_NORMAL
 	writel(0x1F0B0908, &s3c->s3crorr);
 	writel(0x1F0E0A08, &s3c->s3cworr);
-#elif QOS_PRI_GFX
+#elif CONFIG_QOS_PRI_GFX
 	writel(0x1F0B0B0B, &s3c->s3crorr);
 	writel(0x1F0E0C0C, &s3c->s3cworr);
 #else
-#error "QOS_PRI_* not defined"
+#error "CONFIG_QOS_PRI_* not defined"
 #endif
 #if 0
 	writel(0x00200808, &s3c->s3carcr11);
@@ -1462,21 +1462,21 @@ void qos_init_es2(void)
 	writel(0x00890089, &s3c_qos->s3cqos0);
 	writel(0x20960010, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
-#if QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_MEDIA
 	writel(0x20AA2300, &s3c_qos->s3cqos3);
-#elif QOS_PRI_NORMAL
+#elif CONFIG_QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos3);
-#elif QOS_PRI_GFX
+#elif CONFIG_QOS_PRI_GFX
 	writel(0x20AA2100, &s3c_qos->s3cqos3);
 #endif
 	writel(0x00002032, &s3c_qos->s3cqos4);
 	writel(0x20960010, &s3c_qos->s3cqos5);
 	writel(0x20302030, &s3c_qos->s3cqos6);
-#if QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_MEDIA
 	writel(0x20AA2300, &s3c_qos->s3cqos7);
-#elif QOS_PRI_NORMAL
+#elif CONFIG_QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos7);
-#elif QOS_PRI_GFX
+#elif CONFIG_QOS_PRI_GFX
 	writel(0x20AA2100, &s3c_qos->s3cqos7);
 #endif
 	writel(0x00002032, &s3c_qos->s3cqos8);
@@ -1485,21 +1485,21 @@ void qos_init_es2(void)
 	writel(0x00890089, &s3c_qos->s3cqos0);
 	writel(0x20960010, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
-#if QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_MEDIA
 	writel(0x20AA2300, &s3c_qos->s3cqos3);
-#elif QOS_PRI_NORMAL
+#elif CONFIG_QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos3);
-#elif QOS_PRI_GFX
+#elif CONFIG_QOS_PRI_GFX
 	writel(0x20AA2100, &s3c_qos->s3cqos3);
 #endif
 	writel(0x00002032, &s3c_qos->s3cqos4);
 	writel(0x20960010, &s3c_qos->s3cqos5);
 	writel(0x20302030, &s3c_qos->s3cqos6);
-#if QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_MEDIA
 	writel(0x20AA2300, &s3c_qos->s3cqos7);
-#elif QOS_PRI_NORMAL
+#elif CONFIG_QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos7);
-#elif QOS_PRI_GFX
+#elif CONFIG_QOS_PRI_GFX
 	writel(0x20AA2100, &s3c_qos->s3cqos7);
 #endif
 	writel(0x00002032, &s3c_qos->s3cqos8);
