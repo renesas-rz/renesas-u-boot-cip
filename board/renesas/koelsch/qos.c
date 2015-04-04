@@ -24,8 +24,9 @@
 #include <asm/io.h>
 #include <asm/arch/rmobile.h>
 
-/* QoS version 0.240 for ES1 and version 0.411 for ES2 later */
+/* QoS version 0.240 for ES1 and version 0.500 for ES2 later */
 
+#define CONFIG_QOS_PRI_VIN	0
 #define CONFIG_QOS_PRI_MEDIA	0
 #define CONFIG_QOS_PRI_NORMAL	1
 #define CONFIG_QOS_PRI_GFX	0
@@ -1407,7 +1408,7 @@ void qos_init_es1(void)
 #endif
 }
 
-/* QoS version 0.411 for ES2 later */
+/* QoS version 0.500 for ES2 later */
 
 #define S3CADSPLCR_LINEAR_ALL				0
 #define S3CADSPLCR_4K_SPLIT_LINEAR_0x7000_0x7800	1
@@ -1427,6 +1428,9 @@ void qos_init_es2(void)
 	/* DBSC DBADJ2 */
 	writel(0x20042004, DBSC3_0_DBADJ2);
 	writel(0x20042004, DBSC3_1_DBADJ2);
+	/* DBSC Calibration Timing */
+	writel(0x05F003C0, DBSC3_0_DBCALTR);
+	writel(0x05F003C0, DBSC3_1_DBCALTR);
 
 	/* S3C -QoS */
 	s3c = (struct r8a7791_s3c *)S3C_BASE;
@@ -1441,7 +1445,10 @@ void qos_init_es2(void)
 #else
 #error "S3CADSPLCR_* not defined"
 #endif
-#if CONFIG_QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_VIN
+	writel(0x1F0E0C0C, &s3c->s3crorr);
+	writel(0x1F0E0C0C, &s3c->s3cworr);
+#elif CONFIG_QOS_PRI_MEDIA
 	writel(0x1F0B0604, &s3c->s3crorr);
 	writel(0x1F0E0705, &s3c->s3cworr);
 #elif CONFIG_QOS_PRI_NORMAL
@@ -1462,7 +1469,9 @@ void qos_init_es2(void)
 	writel(0x00890089, &s3c_qos->s3cqos0);
 	writel(0x20960010, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
-#if CONFIG_QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_VIN
+	writel(0x20AA2100, &s3c_qos->s3cqos3);
+#elif CONFIG_QOS_PRI_MEDIA
 	writel(0x20AA2300, &s3c_qos->s3cqos3);
 #elif CONFIG_QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos3);
@@ -1472,7 +1481,9 @@ void qos_init_es2(void)
 	writel(0x00002032, &s3c_qos->s3cqos4);
 	writel(0x20960010, &s3c_qos->s3cqos5);
 	writel(0x20302030, &s3c_qos->s3cqos6);
-#if CONFIG_QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_VIN
+	writel(0x20AA2100, &s3c_qos->s3cqos7);
+#elif CONFIG_QOS_PRI_MEDIA
 	writel(0x20AA2300, &s3c_qos->s3cqos7);
 #elif CONFIG_QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos7);
@@ -1485,7 +1496,9 @@ void qos_init_es2(void)
 	writel(0x00890089, &s3c_qos->s3cqos0);
 	writel(0x20960010, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
-#if CONFIG_QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_VIN
+	writel(0x20AA2100, &s3c_qos->s3cqos3);
+#elif CONFIG_QOS_PRI_MEDIA
 	writel(0x20AA2300, &s3c_qos->s3cqos3);
 #elif CONFIG_QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos3);
@@ -1495,7 +1508,9 @@ void qos_init_es2(void)
 	writel(0x00002032, &s3c_qos->s3cqos4);
 	writel(0x20960010, &s3c_qos->s3cqos5);
 	writel(0x20302030, &s3c_qos->s3cqos6);
-#if CONFIG_QOS_PRI_MEDIA
+#if CONFIG_QOS_PRI_VIN
+	writel(0x20AA2100, &s3c_qos->s3cqos7);
+#elif CONFIG_QOS_PRI_MEDIA
 	writel(0x20AA2300, &s3c_qos->s3cqos7);
 #elif CONFIG_QOS_PRI_NORMAL
 	writel(0x20AA2200, &s3c_qos->s3cqos7);
@@ -1516,7 +1531,11 @@ void qos_init_es2(void)
 	writel(0x00002032, &s3c_qos->s3cqos8);
 
 	s3c_qos = (struct r8a7791_s3c_qos *)S3C_QOS_AXI_BASE;
+#if CONFIG_QOS_PRI_VIN
+	writel(0x00820082, &s3c_qos->s3cqos0);
+#else
 	writel(0x00828092, &s3c_qos->s3cqos0);
+#endif
 	writel(0x20960020, &s3c_qos->s3cqos1);
 	writel(0x20302030, &s3c_qos->s3cqos2);
 	writel(0x20AA20FA, &s3c_qos->s3cqos3);
@@ -1534,11 +1553,11 @@ void qos_init_es2(void)
 		writel(0x00002096, &qos_addr->dbtmval0);
 		writel(0x00002064, &qos_addr->dbtmval1);
 		writel(0x00002032, &qos_addr->dbtmval2);
-		writel(0x00001FB0, &qos_addr->dbtmval3);
+		writel(0x00002032, &qos_addr->dbtmval3);
 		writel(0x00000001, &qos_addr->dbrqctr);
 		writel(0x00002078, &qos_addr->dbthres0);
 		writel(0x0000204B, &qos_addr->dbthres1);
-		writel(0x0000201E, &qos_addr->dbthres2);
+		writel(0x00000000, &qos_addr->dbthres2);
 		writel(0x00000001, &qos_addr->dblgqon);
 	}
 
@@ -1564,11 +1583,11 @@ void qos_init_es2(void)
 		writel(0x00002096, &qos_addr->dbtmval0);
 		writel(0x00002064, &qos_addr->dbtmval1);
 		writel(0x00002032, &qos_addr->dbtmval2);
-		writel(0x00001FB0, &qos_addr->dbtmval3);
+		writel(0x00002032, &qos_addr->dbtmval3);
 		writel(0x00000001, &qos_addr->dbrqctr);
 		writel(0x00002078, &qos_addr->dbthres0);
 		writel(0x0000204B, &qos_addr->dbthres1);
-		writel(0x0000201E, &qos_addr->dbthres2);
+		writel(0x00000000, &qos_addr->dbthres2);
 		writel(0x00000001, &qos_addr->dblgqon);
 	}
 
@@ -1597,7 +1616,7 @@ void qos_init_es2(void)
 	/* Transaction Control (MXI) */
 	mxi = (struct r8a7791_mxi *)MXI_BASE;
 	writel(0x00000013, &mxi->mxrtcr);
-	writel(0x00000016, &mxi->mxwtcr);
+	writel(0x00000011, &mxi->mxwtcr);
 	writel(0x00780080, &mxi->mxsaar0);
 	writel(0x02000800, &mxi->mxsaar1);
 
@@ -1606,6 +1625,9 @@ void qos_init_es2(void)
 	writel(0x0000000C, &mxi_qos->vspdu0);
 	writel(0x0000000C, &mxi_qos->vspdu1);
 	writel(0x0000000E, &mxi_qos->du0);
+
+	/* QoS Control (MXI VIN) */
+	writel(0x0000000E, MXI_VIN_QOS);
 
 	/* AXI -QoS */
 	/* Transaction Control (MXI) */
@@ -2508,7 +2530,7 @@ void qos_init_es2(void)
 
 	axi_qos = (struct r8a7791_axi_qos *)MEDIA_AXI_VSP1R_BASE;
 	writel(0x00000001, &axi_qos->qosconf);
-	writel(0x000020C8, &axi_qos->qosctset0);
+	writel(0x00002096, &axi_qos->qosctset0);
 	writel(0x00000020, &axi_qos->qosreqctr);
 	writel(0x00002064, &axi_qos->qosthres0);
 	writel(0x00002004, &axi_qos->qosthres1);
