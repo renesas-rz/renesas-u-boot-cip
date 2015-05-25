@@ -177,7 +177,7 @@ int board_init(void)
 
 	/* mmc0 */
 	gpio_request(GPIO_GP_4_31, NULL);
-	gpio_set_value(GPIO_GP_4_31, 1);
+	gpio_direction_output(GPIO_GP_4_31, 1);
 	/* sdhi0 */
 	gpio_request(GPIO_GP_2_26, NULL);
 	gpio_request(GPIO_GP_2_29, NULL);
