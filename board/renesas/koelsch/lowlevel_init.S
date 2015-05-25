@@ -1,8 +1,8 @@
 /*
- * board/renesas/lager/lowlevel_init.S
+ * board/renesas/koelsch/lowlevel_init.S
  *     This file is lager low level initialize.
  *
- * Copyright (C) 2013-2014 Renesas Electronics Corporation
+ * Copyright (C) 2013-2015 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -93,6 +93,12 @@ do_lowlevel_init:
 	bicne	r0, r0, #0xe7
 	orrne	r0, r0, #0x83			@ L2CTLR[7:6] + L2CTLR[2:0]
 	mcrne	p15, 1, r0, c9, c0, 2
+
+	/* and set l2 auxiliary control */
+	mrcne p15, 1, r0, c15, c0, 0		@ r0 = L2ACTLR
+	orrne r0, r0, #(1<<3)			@ L2ACTLR[3]=1
+	mcrne p15, 1, r0, c15, c0, 0
+
 _exit_init_l2_a15:
 
 	ldr	r3, =(CONFIG_SYS_INIT_SP_ADDR)
