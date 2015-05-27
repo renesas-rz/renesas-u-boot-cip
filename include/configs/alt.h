@@ -151,6 +151,8 @@
 	"bootm_low=0x40e00000\0" \
 	"bootm_size=0x100000\0" \
 
+/* network */
+#define CONFIG_NFS_TIMEOUT 10000UL
 /* SH Ether */
 #define	CONFIG_NET_MULTI
 #define CONFIG_SH_ETHER
