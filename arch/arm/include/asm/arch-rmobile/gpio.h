@@ -19,6 +19,12 @@ void r8a7793_pinmux_init(void);
 #elif defined(CONFIG_R8A7794)
 #include "r8a7794-gpio.h"
 void r8a7794_pinmux_init(void);
+#elif defined(CONFIG_R8A7743)
+#include "r8a7743-gpio.h"
+void r8a7743_pinmux_init(void);
+#elif defined(CONFIG_R8A7745)
+#include "r8a7745-gpio.h"
+void r8a7745_pinmux_init(void);
 #endif
 
 #endif /* __ASM_ARCH_GPIO_H */

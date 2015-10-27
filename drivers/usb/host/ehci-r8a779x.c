@@ -30,6 +30,10 @@
 #define PHYS_OFFSET	GOSE_SDRAM_BASE
 #elif defined(ALT_SDRAM_BASE)
 #define PHYS_OFFSET	ALT_SDRAM_BASE
+#elif defined(SKRZG1E_SDRAM_BASE)
+#define PHYS_OFFSET	SKRZG1E_SDRAM_BASE
+#elif defined(SKRZG1M_SDRAM_BASE)
+#define PHYS_OFFSET	SKRZG1M_SDRAM_BASE
 #else
 #error
 #endif

@@ -449,7 +449,8 @@ static int sh_eth_config(struct sh_eth_dev *eth, bd_t *bd)
 	}
 	phy = port_info->phydev;
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
+	defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745)
 	ret = phy_read(phy, MDIO_DEVAD_NONE, 0x1e);
 	ret &= ~0xc000;
 	ret |= 0x4000;
@@ -472,7 +473,7 @@ static int sh_eth_config(struct sh_eth_dev *eth, bd_t *bd)
 		sh_eth_write(eth, 1, RTRATE);
 #elif defined(CONFIG_CPU_SH7724) || defined(CONFIG_R8A7790) || \
 		defined(CONFIG_R8A7791) || defined(CONFIG_R8A7793) || \
-		defined(CONFIG_R8A7794)
+		defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745)
 		val = ECMR_RTM;
 #endif
 	} else if (phy->speed == 10) {
