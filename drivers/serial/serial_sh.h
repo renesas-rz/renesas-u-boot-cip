@@ -559,7 +559,7 @@ SCIF_FNS(SCFER,  0x10, 16)
 SCIF_FNS(SCFCR,  0x18, 16)
 SCIF_FNS(SCFDR,  0x1c, 16)
 SCIF_FNS(SCLSR,  0x24, 16)
-#elif defined(CONFIG_R8A7745) || defined(CONFIG_R8A7743) 
+#elif defined(CONFIG_R8A7745) || defined(CONFIG_R8A7743)
 /*SCIF register offsets and size */
 SCIx_FNS(SCSMR,  0,  0, 0x00, 16, 0,  0, 0x00, 16, 0,  0)
 SCIx_FNS(SCBRR,  0,  0, 0x04,  8, 0,  0, 0x04,  8, 0,  0)

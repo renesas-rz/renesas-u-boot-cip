@@ -26,6 +26,9 @@
 
 int checkboard(void)
 {
+	if (rmobile_get_cpu_type() == 0x47)
 	printf("Board: %s\n", sysinfo.board_string);
+	else
+		printf("Board: %s\n", sysinfo.board_str);
 	return 0;
 }

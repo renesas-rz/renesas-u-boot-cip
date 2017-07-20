@@ -37,6 +37,7 @@ COBJS-$(CONFIG_R8A7790) += cpu_info-r8a7790.o
 COBJS-$(CONFIG_R8A7790) += pfc-r8a7790.o
 COBJS-$(CONFIG_R8A7791) += cpu_info-r8a7791.o
 COBJS-$(CONFIG_R8A7791) += pfc-r8a7791.o
+COBJS-$(CONFIG_IWG20M)	+= pfc-iwg20m.o
 COBJS-$(CONFIG_R8A7793) += cpu_info-r8a7793.o
 COBJS-$(CONFIG_R8A7793) += pfc-r8a7793.o
 COBJS-$(CONFIG_R8A7794) += cpu_info-r8a7794.o
@@ -44,7 +45,9 @@ COBJS-$(CONFIG_R8A7794) += pfc-r8a7794.o
 COBJS-$(CONFIG_R8A7745) += cpu_info-r8a7745.o
 COBJS-$(CONFIG_R8A7745) += pfc-r8a7745.o
 COBJS-$(CONFIG_R8A7743) += cpu_info-r8a7743.o
+ifndef CONFIG_IWG20M
 COBJS-$(CONFIG_R8A7743) += pfc-r8a7743.o
+endif
 COBJS-$(CONFIG_R8A7740) += cpu_info-r8a7740.o
 COBJS-$(CONFIG_R8A7740) += pfc-r8a7740.o
 COBJS-$(CONFIG_SH73A0) += cpu_info-sh73a0.o

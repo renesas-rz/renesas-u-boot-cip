@@ -35,6 +35,11 @@
 #define SDHI1_BASE		0xEE140000
 #define SDHI2_BASE		0xEE160000
 
+#ifdef CONFIG_IWG20M
+#define CA15BAR                 0xE6160020
+#define WDTRSTCR                0xE6160054
+#endif
+
 #define MSTPSR0			0xe6150030
 #define MSTPSR1			0xe6150038
 #define MSTPSR2			0xe6150040

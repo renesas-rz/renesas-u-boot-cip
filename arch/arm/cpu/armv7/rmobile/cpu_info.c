@@ -86,15 +86,25 @@ int print_cpuinfo(void)
 		printf("CPU: Renesas Electronics R8A7791 rev %d.%d\n",
 #else
 		printf("CPU: Renesas Electronics R8A7743 rev %d.%d\n",
-#endif
 		       rmobile_get_cpu_rev_integer(),
 		       rmobile_get_cpu_rev_fraction());
+#endif
+#ifdef CONFIG_IWG20M
+		      rcar_thermal_update_temp();
+#endif
 		break;
 
 	case 0x4B:
+#ifdef CONFIG_IWG20M
+		printf("CPU: Renesas Electronics R8A7744 rev %d.%d\n",
+		       rmobile_get_cpu_rev_integer(),
+		       rmobile_get_cpu_rev_fraction());
+		       rcar_thermal_update_temp();
+#else
 		printf("CPU: Renesas Electronics R8A7793 rev %d.%d\n",
 		       rmobile_get_cpu_rev_integer(),
 		       rmobile_get_cpu_rev_fraction());
+#endif
 		break;
 
 	case 0x4C:

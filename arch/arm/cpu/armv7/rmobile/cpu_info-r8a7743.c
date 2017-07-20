@@ -22,6 +22,21 @@
 
 #define PRR 0xFF000044
 
+#ifdef CONFIG_IWG20M
+#define BASE 0xe61f0000
+
+#define REG_THSCR       0x12c
+#define REG_THSSR       0x130
+
+/* THSCR */
+#define CPCTL   (1 << 12)
+
+/* THSSR */
+#define CTEMP   0x3f
+#endif
+
+
+
 u32 rmobile_get_cpu_type(void)
 {
 	u32 product;
@@ -48,3 +63,60 @@ u32 rmobile_get_cpu_rev_fraction(void)
 
 	return (u32)(product & 0x0000000F);
 }
+
+#ifdef CONFIG_IWG20M
+static void rcar_thermal_bset(u32 reg, u32 mask, u32 data)
+{
+        u32 val;
+
+        val = readl(BASE + reg);
+        val &= ~mask;
+        val |= (data & mask);
+        writel(val, BASE + reg);
+        val = readl(BASE + reg);
+}
+
+static u32 rcar_thermal_read(u32 reg)
+{
+	return readl(BASE + reg);
+}
+
+int rcar_thermal_update_temp()
+{
+	u32 ctemp, new, old, i;
+
+	ctemp = 0;
+	old = ~0;
+
+	/* Before reading the temperature , CPCTL(12th bit) in THSCR register
+	   should be set to 1 Which indicates temperature value is determined 
+	   automatically by hardware */
+	rcar_thermal_bset(REG_THSCR, CPCTL, CPCTL);
+
+	for (i = 0; i < 128; i++) {
+		/*
+		 * we need to wait 300us after changing comparator offset
+		 * to get stable temperature.
+		 * see "Usage Notes" on datasheet
+		 */
+		udelay(300);
+		/* Temperature is read from CTEMP bit(0-5th bit) of THSSR register */
+		new = rcar_thermal_read(REG_THSSR) & CTEMP;
+		if (new == old) {
+			ctemp = new;
+			break;
+		}
+		old = new;
+	}
+
+	if (!ctemp) {
+		printf("CPU: Temperature: Can't find sensor device\n");
+		return -1;
+	}
+
+	/* Read temperature is calculated as per calculation T = CTEP[5:0] * 5 − 65 */
+	ctemp = (ctemp * 5) - 65;
+	printf("CPU: Temperature %d C\n", ctemp);
+	return 0;
+}
+#endif

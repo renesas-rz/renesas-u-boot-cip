@@ -455,6 +455,18 @@ void fdt_fixup_ethernet(void *fdt)
 	if (node < 0)
 		return;
 
+#ifdef CONFIG_IWG20M
+	sprintf(enet, "eth");
+	path = fdt_getprop(fdt, node, enet, NULL);
+		if (!path) {
+			debug("No alias for %s\n", enet);
+			sprintf(mac, "eth%daddr", ++i);
+			}
+		tmp = eth_getenv_enetaddr("ethaddr", mac_addr);
+		do_fixup_by_path(fdt, path, "mac-address", &mac_addr, 6, 0);
+		do_fixup_by_path(fdt, path, "local-mac-address",
+				&mac_addr, 6, 1);
+#else
 	i = 0;
 	while ((tmp = getenv(mac)) != NULL) {
 		sprintf(enet, "ethernet%d", i);
@@ -477,6 +489,7 @@ void fdt_fixup_ethernet(void *fdt)
 
 		sprintf(mac, "eth%daddr", ++i);
 	}
+#endif
 }
 
 /* Resize the fdt to its actual size + a bit of padding */

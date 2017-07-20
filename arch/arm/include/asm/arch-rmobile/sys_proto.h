@@ -23,6 +23,9 @@
 
 struct rmobile_sysinfo {
 	char *board_string;
+#ifdef CONFIG_IWG20M
+	char *board_str;
+#endif
 };
 extern const struct rmobile_sysinfo sysinfo;
 
