@@ -60,6 +60,61 @@ void s_init(void)
 #endif
 }
 
+#define SYSDMAC0_MSTP219	(1 << 19)
+
+#define SYSDMAC_L		0xE6700000
+#define SYSDMAC_OR		0x60
+#define SYSDMAC_CHCLR		0x80
+
+#define SYSDMAC_CH0		0xE6708000
+#define SYSDMAC_SAR		0x00
+#define SYSDMAC_DAR		0x04
+#define SYSDMAC_TCR		0x08
+#define SYSDMAC_CHCR		0x0C
+#define SYSDMAC_CHCRB		0x1C
+#define SYSDMAC_DPBASE		0x50
+
+#define SYSDMAC_DESC_L		0xE670A000
+#define SYSDMAC_DESC_SAR	0x0
+#define SYSDMAC_DESC_DAR	0x4
+#define SYSDMAC_DESC_TCR	0x8
+
+/* ARM-INTC work around */
+int start_dma_transfer(void)
+{
+	u32 val;
+
+	/* Enable clock of SYS-DMAC0 */
+	val = readl(MSTPSR2);
+	val &= ~SYSDMAC0_MSTP219;
+	writel(val, SMSTPCR2);
+	do {
+		val = readl(MSTPSR2) & SYSDMAC0_MSTP219;
+	} while (val);
+
+	/* Initialize ch0, Reset Descriptor */
+	writel(0x00000001, SYSDMAC_L + SYSDMAC_CHCLR);
+	writel(0x00008000, SYSDMAC_CH0 + SYSDMAC_CHCRB);
+
+	/* Enable DMA */
+	writel(0x00000001, SYSDMAC_L + SYSDMAC_OR);
+
+	/* Set first transfer */
+	writel(0xF1001FFC, SYSDMAC_CH0 + SYSDMAC_SAR);
+	writel(0xE61C0000, SYSDMAC_CH0 + SYSDMAC_DAR);
+	writel(0x00000001, SYSDMAC_CH0 + SYSDMAC_TCR);
+
+	/* Set descriptor */
+	writel(0x00000000, SYSDMAC_DESC_L + SYSDMAC_DESC_SAR);
+	writel(0x00000000, SYSDMAC_DESC_L + SYSDMAC_DESC_DAR);
+	writel(0x00200000, SYSDMAC_DESC_L + SYSDMAC_DESC_TCR);
+	writel(0x00000080, SYSDMAC_CH0 + SYSDMAC_CHCRB);
+	writel(SYSDMAC_DESC_L | 0x00000001, SYSDMAC_CH0 + SYSDMAC_DPBASE);
+
+	/* Set transfer parameter, Start transfer */
+	writel(0x32000411, SYSDMAC_CH0 + SYSDMAC_CHCR);
+}
+
 #define TMU0_MSTP125	(1 << 25)
 
 #define IIC1_MSTP323	(1 << 23)
@@ -107,6 +162,9 @@ int board_early_init_f(void)
 	 * Set SD1 to the 97.5MHz as well.
 	 */
 	writel(SD1_97500KHZ, SD1CKCR);
+
+	/* ARM-INTC work around */
+	start_dma_transfer();
 
 	return 0;
 }
@@ -270,7 +328,7 @@ struct mstp_ctl {
 		     RMSTPCR0,  0x00440801, 0x00000000 },
 	[MSTP01] = { SMSTPCR1,  0x936899DA, 0x00000000,
 		     RMSTPCR1,  0x936899DA, 0x00000000 },
-	[MSTP02] = { SMSTPCR2,  0x100D21FC, 0x00002000,
+	[MSTP02] = { SMSTPCR2,  0x100D21FC, 0x00082000,
 		     RMSTPCR2,  0x100D21FC, 0x00000000 },
 	[MSTP03] = { SMSTPCR3,  0xE084D810, 0x00000000,
 		     RMSTPCR3,  0xE084D810, 0x00000000 },
