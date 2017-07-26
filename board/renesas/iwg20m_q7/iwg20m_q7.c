@@ -125,6 +125,8 @@ int start_dma_transfer(void)
 
 	/* Set transfer parameter, Start transfer */
 	writel(0x32000411, SYSDMAC_CH0 + SYSDMAC_CHCR);
+
+	return 0;
 }
 
 #define MMC0_MSTP315	(1 << 15)
@@ -194,8 +196,6 @@ int board_early_init_f(void)
 
 int board_init(void)
 {
-	u32 val;
-
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = IWG20M_SDRAM_BASE + 0x100;
 
@@ -488,10 +488,10 @@ void arch_preboot_os()
 void iwg20m_fdt_update(void *fdt)
 {
         int node, num, phy_mode;
-        char *revision;
+        char *revision = NULL;
         const char *path;
 
-        node = fdt_node_check_compatible(fdt, NULL, "iwave,g20m-q7-com");
+        node = fdt_node_check_compatible(fdt, 0, "iwave,g20m-q7-com");
         if (node < 0)
                 return;
         sprintf(revision, "rev");

@@ -32,7 +32,7 @@ enum ECSR_STATUS_BIT {
 
 #define DEFAULT_ECSR_INIT       (ECSR_BRCRX | ECSR_PSRTO | ECSR_LCHNG | \
                                  ECSR_ICD | ECSIPR_MPDIP)
-
+*/
 /* ECSIPR */
 enum ECSIPR_STATUS_MASK_BIT {
         ECSIPR_BRCRXIP = 0x20, ECSIPR_PSRTOIP = 0x10,

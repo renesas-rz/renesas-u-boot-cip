@@ -110,7 +110,6 @@ int ravb_recv(struct eth_device *dev)
 {
 	struct ravb_dev *eth = dev->priv;
 	int len = 0;
-	int limit = NUM_RX_DESC;
 	u8 *packet;
 
 	while(ravb_read(eth, TCCR) & TCCR_TSRQ0);
@@ -256,7 +255,6 @@ static int ravb_rx_desc_init(struct ravb_dev *eth)
 	u32 alloc_desc_size = (NUM_RX_DESC + 1) * sizeof(struct ravb_rxdesc);
 	u32 alloc_buf_size = NUM_RX_DESC * MAX_BUF_SIZE;
 	struct ravb_rxdesc *cur_rx_desc;
-	struct ravb_desc *desc;
 	u8 *rx_buf;
 
 	/* Allocate rx descriptors. They must be aligned to size of struct */
@@ -358,7 +356,6 @@ static int ravb_phy_config(struct ravb_dev *eth)
 	int ret = 0, addr;
 	struct eth_device *dev = eth->dev;
 	struct phy_device *phydev;
-	int reg;
 
 #ifdef CONFIG_IWG20M
          for (addr = 0; addr <  32; addr++)
@@ -402,24 +399,6 @@ static int ravb_write_hwaddr(struct eth_device *dev)
 
 	return 0;
 }
-/* E-MAC init function */
-static int ravb_mac_init(struct ravb_dev *eth)
-{
-	struct eth_device *dev = eth->dev;
-
-	/* Disable MAC Interrupt */
-	ravb_write(eth, 0, ECSIPR);
-
-	/* Recv frame limit set register */
-	ravb_write(eth, RFLR_RFL_MIN, RFLR);
-
-	/* Set Mac address */
-	ravb_write_hwaddr(dev);
-
-	return 0;
-}
-
-
 
 static void ravb_start(struct ravb_dev *eth)
 {
@@ -431,7 +410,6 @@ static void ravb_start(struct ravb_dev *eth)
 static int ravb_config(struct ravb_dev *eth, bd_t *bd)
 {
 	int  ret = 0;
-	u32 val;
 	struct phy_device *phy;
 	struct eth_device *dev = eth->dev;
 
@@ -520,6 +498,7 @@ static int ravb_config(struct ravb_dev *eth, bd_t *bd)
 		printf("Half\n");
 		ravb_write(eth,  (ravb_read(eth, ECMR) |  ECMR_TE | ECMR_RE | ECMR_RTM | ECMR_CHG_DM), ECMR);
 	}
+	return 0;
 }
 
 int ravb_init(struct eth_device *dev, bd_t *bd)

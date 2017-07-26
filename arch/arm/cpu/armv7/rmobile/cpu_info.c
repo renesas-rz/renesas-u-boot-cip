@@ -23,7 +23,7 @@
  */
 #include <common.h>
 #include <asm/io.h>
-
+extern int rcar_thermal_update_temp(void);
 #ifdef CONFIG_ARCH_CPU_INIT
 int arch_cpu_init(void)
 {

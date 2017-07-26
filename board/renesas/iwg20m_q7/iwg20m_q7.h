@@ -25,6 +25,8 @@
 
 extern int sh_timer_init(void);
 extern int sdhi_mmc_init(unsigned long addr, int ch);
+extern int mmcif_mmc_init(void);
+extern int ravb_initialize(bd_t *bd);
 
 extern void arch_preboot_os(void);
 

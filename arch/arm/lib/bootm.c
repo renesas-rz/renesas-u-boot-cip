@@ -46,6 +46,8 @@ DECLARE_GLOBAL_DATA_PTR;
 static struct tag *params;
 #endif
 
+extern void iwg20m_fdt_update(void *fdt);
+
 static ulong get_sp(void)
 {
 	ulong ret;

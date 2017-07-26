@@ -81,7 +81,7 @@ static u32 rcar_thermal_read(u32 reg)
 	return readl(BASE + reg);
 }
 
-int rcar_thermal_update_temp()
+int rcar_thermal_update_temp(void)
 {
 	u32 ctemp, new, old, i;
 
