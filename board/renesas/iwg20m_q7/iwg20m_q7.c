@@ -333,7 +333,6 @@ int print_board_info (void)
 	get_som_revision();
 	printf ("\n");
 	printf ("Board Info:\n");
-	printf ("\tBSP Version     : %s\n", BSP_VERSION);
 	printf ("\tSOM Version     : iW-PREWZ-AP-01-R3.%x\n", som_revision);
 	printf ("\n");
 	return 0;
