@@ -67,6 +67,9 @@
 #define CONFIG_CMD_EXT4_WRITE
 #define CONFIG_CMD_SF
 #define CONFIG_CMD_SPI
+#define CONFIG_CMD_PART
+
+#define CONFIG_PARTITION_UUIDS
 
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
@@ -175,12 +178,29 @@
 	"fdt_check=if test ${fdtforce} = \"0\"; then dynamicfdt;fi;\0" \
 	"vin2_camera=ov5640\0" \
 	"kernel=uImage\0" \
-                "bootargs_base=console=ttySC0,115200n8 ignore_loglevel vmalloc=384M\0" \
-                "bootargs_mmc=setenv bootargs ${bootargs_base} " \
-                        "root=/dev/mmcblk2p2 rootwait rootfstype=ext3 rw\0" \
-                "bootcmd_mmc=run bootargs_mmc;run fdt_check;mmc dev 2;" \
-                        "fatload mmc 2 ${loadaddr} ${kernel};fatload mmc 2 ${fdt_addr} ${fdt_file};bootm ${loadaddr} - ${fdt_addr}\0" \
-                "bootcmd=run bootcmd_mmc\0" \
+	"bootargs_base=console=ttySC0,115200n8 ignore_loglevel vmalloc=384M\0" \
+	"bootargs_sd=part uuid mmc 0:2 sd_uuid;" \
+		"setenv bootargs ${bootargs_base} root=PARTUUID=${sd_uuid}" \
+		" rootwait rootfstype=ext3 rw\0" \
+	"bootcmd_sd=run bootargs_sd;run fdt_check;" \
+		"fatload mmc 0:1 ${loadaddr} ${kernel};" \
+		"fatload mmc 0:1 ${fdt_addr} ${fdt_file};" \
+		"bootm ${loadaddr} - ${fdt_addr}\0" \
+	"bootargs_usd=part uuid mmc 1:2 usd_uuid;" \
+		"setenv bootargs ${bootargs_base} root=PARTUUID=${usd_uuid}" \
+		" rootwait rootfstype=ext3 rw\0" \
+	"bootcmd_usd=run bootargs_usd;run fdt_check;"\
+		"fatload mmc 1:1 ${loadaddr} ${kernel};" \
+		"fatload mmc 1:1 ${fdt_addr} ${fdt_file};" \
+		"bootm ${loadaddr} - ${fdt_addr}\0" \
+	"bootargs_mmc=part uuid mmc 2:2 mmc_uuid;" \
+		"setenv bootargs ${bootargs_base} root=PARTUUID=${mmc_uuid}" \
+		" rootwait rootfstype=ext3 rw\0" \
+	"bootcmd_mmc=run bootargs_mmc;run fdt_check;" \
+		"fatload mmc 2:1 ${loadaddr} ${kernel};" \
+		"fatload mmc 2:1 ${fdt_addr} ${fdt_file};" \
+		"bootm ${loadaddr} - ${fdt_addr}\0" \
+	"bootcmd=run bootcmd_mmc\0" \
 
 /* SH Ether */
 #define CONFIG_NET_MULTI
