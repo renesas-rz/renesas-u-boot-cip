@@ -315,10 +315,14 @@ static void get_som_revision(void)
 
 int dynamic_fdt_file_selection(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
-	if (rmobile_get_cpu_type() == 0x47)
+	if (rmobile_get_cpu_type() == 0x47) {
 		setenv("fdt_file","r8a7743-iwg20m_q7.dtb");
-	else
+		setenv("fdt_file_alt","uImage-r8a7743-iwg20m.dtb");
+	}
+	else {
 		setenv("fdt_file","r8a7744-iwg20m_q7.dtb");
+		setenv("fdt_file_alt","uImage-r8a7744-iwg20m.dtb");
+	}
 	return 0;
 }
 
