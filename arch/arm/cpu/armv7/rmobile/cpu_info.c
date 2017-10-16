@@ -108,7 +108,9 @@ int print_cpuinfo(void)
 		break;
 
 	case 0x4C:
-#if defined(CONFIG_R8A7794)
+#if defined(CONFIG_IWG22M)
+                printf("CPU: Renesas Electronics R8A7745 rev %d.%d\n",
+#elif defined(CONFIG_R8A7794)
 		printf("CPU: Renesas Electronics R8A7794 rev %d.%d\n",
 #else
 		printf("CPU: Renesas Electronics R8A7745 rev %d.%d\n",

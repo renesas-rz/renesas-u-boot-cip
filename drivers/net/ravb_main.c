@@ -373,9 +373,26 @@ static int ravb_phy_config(struct ravb_dev *eth)
 
         }
 #else
+#ifdef CONFIG_IWG22M
+        /* IWG22M: ETH: Ethernet phy detection setting */
+        for (addr = 0; addr <  32; addr++)
+        {
+                phydev = phy_connect(
+                                miiphy_get_dev_by_name(dev->name),
+                                addr, dev, CONFIG_SH_ETHER_RAVB_PHY_MODE);
+                if (phydev == NULL)
+                        continue;
+                else
+                {
+                        printf("PHY detected at addr %d\n", addr);
+                        break;
+                }
+        }
+#else
 	phydev = phy_connect(
 			miiphy_get_dev_by_name(dev->name),
 			eth->phy_addr, dev, CONFIG_SH_ETHER_RAVB_PHY_MODE);
+#endif
 #endif
 	if (!phydev)
 		return -1;
@@ -460,7 +477,7 @@ static int ravb_config(struct ravb_dev *eth, bd_t *bd)
 	phy = eth->phydev;
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
-	defined(CONFIG_R8A7743)
+	defined(CONFIG_R8A7743) || defined(CONFIG_IWG22M)
 	ret = phy_read(phy, MDIO_DEVAD_NONE, 0x1e);
 	ret &= ~0xc000;
 	ret |= 0x4000;

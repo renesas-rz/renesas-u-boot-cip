@@ -198,7 +198,7 @@ static void sdhi_sync_reset(struct sdhi_host *host)
 		sdhi_writew(host, SDHI_HOST_MODE, 1);	/* 16bit access */
 #elif defined(KOELSCH_SDRAM_BASE) || defined(GOSE_SDRAM_BASE) || \
 	defined(ALT_SDRAM_BASE) || defined(SKRZG1M_SDRAM_BASE) || defined(SKRZG1E_SDRAM_BASE) || \
-	defined(IWG20M_SDRAM_BASE)
+	defined(IWG20M_SDRAM_BASE) || defined(IWG22M_SDRAM_BASE)
 	if (host->ch == 0)
 		sdhi_writew(host, SDHI_HOST_MODE, 1);	/* 16bit access */
 #else
@@ -672,7 +672,7 @@ int sdhi_mmc_init(unsigned long addr, int ch)
 		host->bus_shift = 0;
 #elif defined(KOELSCH_SDRAM_BASE) || defined(GOSE_SDRAM_BASE) || \
 	defined(ALT_SDRAM_BASE) || defined(SKRZG1E_SDRAM_BASE) || defined(SKRZG1M_SDRAM_BASE) || \
-	defined(IWG20M_SDRAM_BASE)
+	defined(IWG20M_SDRAM_BASE) || defined(IWG22M_SDRAM_BASE)
 	if (ch == 0)
 		host->bus_shift = 1;
 	else

@@ -52,7 +52,7 @@ static struct phy_driver KS8721_driver = {
 };
 #endif
 
-#ifdef CONFIG_IWG20M
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
 /**
  * KSZ9021 - KSZ9031 common
  */
@@ -83,6 +83,7 @@ static int ksz90xx_startup(struct phy_device *phydev)
 	return 0;
 }
 #endif
+
 #ifdef CONFIG_PHY_MICREL_KSZ9021
 /* ksz9021 PHY Registers */
 #define MII_KSZ9021_EXTENDED_CTRL	0x0b
@@ -233,15 +234,97 @@ static struct phy_driver ksz9031_driver = {
 };
 #endif
 
+#ifdef CONFIG_IWG22M
+/**
+ * KSZ9031
+ */
+/* PHY Registers */
+#define MII_KSZ9031_MMD_ACCES_CTRL	0x0d
+#define MII_KSZ9031_MMD_REG_DATA	0x0e
+
+/* Accessors to extended registers*/
+int ksz9031_phy_extended_write(struct phy_device *phydev,
+			       int devaddr, int regnum, u16 mode, u16 val)
+{
+	/*select register addr for mmd*/
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_ACCES_CTRL, devaddr);
+	/*select register for mmd*/
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_REG_DATA, regnum);
+	/*setup mode*/
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_ACCES_CTRL, (mode | devaddr));
+	/*write the value*/
+	return	phy_write(phydev, MDIO_DEVAD_NONE,
+		MII_KSZ9031_MMD_REG_DATA, val);
+}
+
+int ksz9031_phy_extended_read(struct phy_device *phydev, int devaddr,
+			      int regnum, u16 mode)
+{
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_ACCES_CTRL, devaddr);
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_REG_DATA, regnum);
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_ACCES_CTRL, (devaddr | mode));
+	return phy_read(phydev, MDIO_DEVAD_NONE, MII_KSZ9031_MMD_REG_DATA);
+}
+
+static int ksz9031_phy_extread(struct phy_device *phydev, int addr, int devaddr,
+			       int regnum)
+{
+	return ksz9031_phy_extended_read(phydev, devaddr, regnum,
+					 MII_KSZ9031_MOD_DATA_NO_POST_INC);
+};
+
+static int ksz9031_phy_extwrite(struct phy_device *phydev, int addr,
+				int devaddr, int regnum, u16 val)
+{
+	return ksz9031_phy_extended_write(phydev, devaddr, regnum,
+					 MII_KSZ9031_MOD_DATA_POST_INC_RW, val);
+};
+
+
+static struct phy_driver ksz9031_driver = {
+	.name = "Micrel ksz9031",
+	.uid  = 0x221620,
+	.mask = 0xfffff0,
+	.features = PHY_GBIT_FEATURES,
+	.config   = &genphy_config,
+	.startup  = &ksz90xx_startup,
+	.shutdown = &genphy_shutdown,
+	.writeext = &ksz9031_phy_extwrite,
+	.readext = &ksz9031_phy_extread,
+};
+#endif
+
+#ifdef CONFIG_PHY_MICREL_KSZ8081
+static struct phy_driver KSZ8081_driver = {
+        .name = "Micrel KSZ8081",
+        .uid = 0x221560,
+        .mask = 0xfffff0,
+        .features = PHY_BASIC_FEATURES,
+        .config = &genphy_config,
+        .startup = &genphy_startup,
+        .shutdown = &genphy_shutdown,
+};
+#endif
+
 int phy_micrel_init(void)
 {
 	phy_register(&KSZ804_driver);
 #ifdef CONFIG_PHY_MICREL_KSZ9021
 	phy_register(&ksz9021_driver);
 #else
+#ifdef CONFIG_PHY_MICREL_KSZ8081
+        phy_register(&KSZ8081_driver);
+#else
 	phy_register(&KS8721_driver);
-#ifdef CONFIG_IWG20M 
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
 	phy_register(&ksz9031_driver);
+#endif
 #endif
 #endif
 	return 0;

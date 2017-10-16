@@ -493,9 +493,10 @@ static const u16 ravb_reg_offset[RAVB_MAX_REGISTER_OFFSET] = {
 };
 
 /* Register Address */
+#if defined(CONFIG_R8A7790) || defined(CONFIG_IWG22M)
 #define SH_ETH_RAVB_TYPE_ETHER
 #define BASE_IO_ADDR	0xE6800000
-
+#endif
 /* Register's bits of Ethernet AVB */
 /* CCC */
 enum CCC_BIT {

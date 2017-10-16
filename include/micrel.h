@@ -8,7 +8,6 @@
 #define MII_KSZ9021_EXT_RGMII_RX_DATA_SKEW	0x105
 #define MII_KSZ9021_EXT_RGMII_TX_DATA_SKEW	0x106
 #define MII_KSZ9021_EXT_ANALOG_TEST		0x107
-#ifdef CONFIG_IWG20M
 /* Register operations */
 #define MII_KSZ9031_MOD_REG                     0x0000
 /* Data operations */
@@ -29,16 +28,12 @@
 #define MII_KSZ9031_EXT_RGMII_TX_DATA_SKEW      0x6
 #define MII_KSZ9031_EXT_RGMII_CLOCK_SKEW        0x8
 
-#endif
 struct phy_device;
 int ksz9021_phy_extended_write(struct phy_device *phydev, int regnum, u16 val);
 int ksz9021_phy_extended_read(struct phy_device *phydev, int regnum);
-
-#ifdef CONFIG_IWG20M
 int ksz9031_phy_extended_write(struct phy_device *phydev, int devaddr,
                                int regnum, u16 mode, u16 val);
 int ksz9031_phy_extended_read(struct phy_device *phydev, int devaddr,
                               int regnum, u16 mode);
-#endif
 
 #endif

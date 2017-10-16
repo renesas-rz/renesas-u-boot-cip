@@ -12,6 +12,8 @@
 #include <asm/arch/r8a7791.h>
 #elif defined(CONFIG_R8A7793)
 #include <asm/arch/r8a7793.h>
+#elif defined(CONFIG_IWG22M)
+#include <asm/arch/iwg22m.h>
 #elif defined(CONFIG_R8A7794)
 #include <asm/arch/r8a7794.h>
 #elif defined(CONFIG_R8A7743)
