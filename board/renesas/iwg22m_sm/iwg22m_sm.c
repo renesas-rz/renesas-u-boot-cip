@@ -396,7 +396,6 @@ void print_board_info(void)
 {
         printf("\n");
         printf("Board Info:\n");
-        printf("\tBSP Version     : %s\n", BSP_VERSION);
         printf("\tSOM Version     : %s\n", SOM_VERSION);
         printf("\n");
 }
