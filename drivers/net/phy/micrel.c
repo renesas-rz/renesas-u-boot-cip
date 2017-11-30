@@ -35,24 +35,7 @@ static struct phy_driver KSZ804_driver = {
 	.shutdown = &genphy_shutdown,
 };
 
-#ifndef CONFIG_PHY_MICREL_KSZ9021
-/*
- * I can't believe Micrel used the exact same part number
- * for the KSZ9021
- * Shame Micrel, Shame!!!!!
- */
-static struct phy_driver KS8721_driver = {
-	.name = "Micrel KS8721BL",
-	.uid = 0x221610,
-	.mask = 0xfffff0,
-	.features = PHY_BASIC_FEATURES,
-	.config = &genphy_config,
-	.startup = &genphy_startup,
-	.shutdown = &genphy_shutdown,
-};
-#endif
-
-#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
+#ifdef CONFIG_IWG20M
 /**
  * KSZ9021 - KSZ9031 common
  */
@@ -271,33 +254,6 @@ int ksz9031_phy_extended_read(struct phy_device *phydev, int devaddr,
 		  MII_KSZ9031_MMD_ACCES_CTRL, (devaddr | mode));
 	return phy_read(phydev, MDIO_DEVAD_NONE, MII_KSZ9031_MMD_REG_DATA);
 }
-
-static int ksz9031_phy_extread(struct phy_device *phydev, int addr, int devaddr,
-			       int regnum)
-{
-	return ksz9031_phy_extended_read(phydev, devaddr, regnum,
-					 MII_KSZ9031_MOD_DATA_NO_POST_INC);
-};
-
-static int ksz9031_phy_extwrite(struct phy_device *phydev, int addr,
-				int devaddr, int regnum, u16 val)
-{
-	return ksz9031_phy_extended_write(phydev, devaddr, regnum,
-					 MII_KSZ9031_MOD_DATA_POST_INC_RW, val);
-};
-
-
-static struct phy_driver ksz9031_driver = {
-	.name = "Micrel ksz9031",
-	.uid  = 0x221620,
-	.mask = 0xfffff0,
-	.features = PHY_GBIT_FEATURES,
-	.config   = &genphy_config,
-	.startup  = &ksz90xx_startup,
-	.shutdown = &genphy_shutdown,
-	.writeext = &ksz9031_phy_extwrite,
-	.readext = &ksz9031_phy_extread,
-};
 #endif
 
 #ifdef CONFIG_PHY_MICREL_KSZ8081

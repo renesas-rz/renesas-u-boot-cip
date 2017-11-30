@@ -123,6 +123,7 @@ int start_dma_transfer(void)
 		"orr	r0, r0, #(1 << 6)\n"		/* set SMP */
 		"mcr	p15, 0, r0, c1, c0, 1\n");	/* write ACTLR */
 #endif
+	return 0;
 }
 
 #define TMU0_MSTP125	(1 << 25)
@@ -218,7 +219,6 @@ int board_early_init_f(void)
 int board_init(void)
 {
 	u32 val;
-
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = IWG22M_SDRAM_BASE + 0x100;
 
@@ -351,8 +351,6 @@ int board_init(void)
 int board_eth_init(bd_t *bis)
 {
 	int ret = -ENODEV;
-	u32 val;
-	unsigned char enetaddr[6];
 
 #ifdef CONFIG_SH_ETHER
 	ret = sh_eth_initialize(bis);
@@ -440,9 +438,8 @@ void reset_cpu(ulong addr)
 
 void iwg22m_fdt_update(void *fdt)
 {
-	int node, node1;
+	int node;
         int nodeoffset, size;
-        int addr;
         struct fdt_property *prop;
         u32 *reg;
 
@@ -464,7 +461,7 @@ void iwg22m_fdt_update(void *fdt)
 
                 prop = fdt_get_property_w(fdt, nodeoffset, "pinctrl-0", &size);
         }
-	node = fdt_node_check_compatible(fdt, NULL, "iwave,cam-pd-g22");
+	node = fdt_node_check_compatible(fdt, 0, "iwave,cam-pd-g22");
 	if (node < 0)
 		return;
 
@@ -479,10 +476,6 @@ void iwg22m_fdt_update(void *fdt)
 			do_fixup_by_path_u32(fdt, "/camera_power_down", "vin2-ov5640", 0, 0);
 		}
 	}
-
-	node1 = fdt_node_check_compatible(fdt, NULL, "iwave,lcd-pwr-g22");
-	if (node < 0)
-		return;
 
 	/* iWave: FDT: camera selection */
 	if (!strcmp("hdmi", getenv ("disp"))) 

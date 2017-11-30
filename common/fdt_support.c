@@ -446,7 +446,7 @@ int fdt_fixup_memory(void *blob, u64 start, u64 size)
 void fdt_fixup_ethernet(void *fdt)
 {
 	int node, i = 0;
-	char enet[16], *tmp;
+	char enet[16];
 	char mac[16] = "ethaddr";
 	const char *path;
 	unsigned char mac_addr[6];
@@ -475,7 +475,7 @@ sprintf(enet, "eth1");
                         debug("No alias for %s\n", enet);
                         sprintf(mac, "eth%daddr", ++i);
                         }
-                tmp = eth_getenv_enetaddr("ethaddr", mac_addr);
+                eth_getenv_enetaddr("ethaddr", mac_addr);
                 do_fixup_by_path(fdt, path, "mac-address", &mac_addr, 6, 0);
                 do_fixup_by_path(fdt, path, "local-mac-address",
                                 &mac_addr, 6, 1);
@@ -485,7 +485,7 @@ sprintf(enet, "eth");
                         debug("No alias for %s\n", enet);
                         sprintf(mac, "eth%daddr", ++i);
                         }
-                tmp = eth_getenv_enetaddr("ethaddr1", mac_addr);
+                eth_getenv_enetaddr("ethaddr1", mac_addr);
                 do_fixup_by_path(fdt, path, "mac-address1", &mac_addr, 6, 0);
                 do_fixup_by_path(fdt, path, "local-mac-address",
                                 &mac_addr, 6, 1);
@@ -495,7 +495,7 @@ sprintf(enet, "eth");
 
 	i = 0;
 	while ((tmp = getenv(mac)) != NULL) {
-		char *end;
+		char *end, *tmp;
 		int j;
 		sprintf(enet, "ethernet%d", i);
 		path = fdt_getprop(fdt, node, enet, NULL);

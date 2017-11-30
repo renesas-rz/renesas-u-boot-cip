@@ -720,35 +720,6 @@ int asix_eth_probe(struct usb_device *dev, unsigned int ifnum,
 	return 1;
 }
 
-/* Get the PHY Identifier from the PHYSID1 & PHYSID2 MII registers */
-static u32 asix_get_phyid(struct ueth_data *dev)
-{
-	int phy_reg;
-	u32 phy_id;
-	int i;
-
-	/* Poll for the rare case the FW or phy isn't ready yet.  */
-	for (i = 0; i < 100; i++) {
-		phy_reg = asix_mdio_read(dev, dev->phy_id, MII_PHYSID1);
-		if (phy_reg != 0 && phy_reg != 0xFFFF)
-			break;
-		mdelay(1);
-	}
-
-	if (phy_reg <= 0 || phy_reg == 0xFFFF)
-		return 0;
-
-	phy_id = (phy_reg & 0xffff) << 16;
-
-	phy_reg = asix_mdio_read(dev, dev->phy_id, MII_PHYSID2);
-	if (phy_reg < 0)
-		return 0;
-
-	phy_id |= (phy_reg & 0xffff);
-
-	return phy_id;
-}
-
 static int marvell_phy_init(struct ueth_data *dev)
 {
 	u16 reg;
@@ -777,7 +748,7 @@ static int marvell_phy_init(struct ueth_data *dev)
 
 static int rtl8211cl_phy_init(struct ueth_data *dev)
 {
-	printf("%s : not support rtl8211cl.\n");
+	printf("Not support rtl8211cl.\n");
 
 	return 0;
 }
@@ -785,8 +756,6 @@ static int rtl8211cl_phy_init(struct ueth_data *dev)
 static int ax88178_reset(struct ueth_data *dev)
 {
 	int ret;
-	int gpio0 = 0;
-	u32 phyid;
 	u8 status __aligned(ARCH_DMA_MINALIGN);
 	__le16 eeprom __aligned(ARCH_DMA_MINALIGN);
 
@@ -799,11 +768,9 @@ static int ax88178_reset(struct ueth_data *dev)
 	if (eeprom == cpu_to_le16(0xffff)) {
 		dev->phymode = PHY_MODE_MARVELL;
 		dev->ledmode = 0;
-		gpio0 = 1;
 	} else {
 		dev->phymode = le16_to_cpu(eeprom) & 0x7F;
 		dev->ledmode = le16_to_cpu(eeprom) >> 8;
-		gpio0 = (le16_to_cpu(eeprom) & 0x80) ? 0 : 1;
 	}
 
 	/* Power up external GigaPHY through AX88178 GPIO pin */
@@ -816,9 +783,6 @@ static int ax88178_reset(struct ueth_data *dev)
 		asix_write_gpio(dev, AX_GPIO_GPO1EN, 30);
 		asix_write_gpio(dev, AX_GPIO_GPO1EN | AX_GPIO_GPO_1, 30);
 	}
-
-	/* Read PHYID register *AFTER* powering up PHY */
-	phyid = asix_get_phyid(dev);
 
 	/* Set AX88178 to enable MII/GMII/RGMII interface for external PHY */
 	asix_write_cmd(dev, AX_CMD_SW_PHY_SELECT, 0, 0, 0, NULL);
