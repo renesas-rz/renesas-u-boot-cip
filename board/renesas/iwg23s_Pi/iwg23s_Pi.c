@@ -38,7 +38,6 @@
 #include <libfdt.h>
 #include <spi_flash.h>
 
-#define BSP_VERSION                             "iW-PRFCC-SC-01-R1.0-REL0.3-Linux3.10.31"
 #define SOM_VERSION                             "iW-PRFCC-AP-01-R1.x"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -266,7 +265,6 @@ void print_board_info(void)
 {
         printf("\n");
         printf("Board Info:\n");
-        printf("\tBSP Version     : %s\n", BSP_VERSION);
         printf("\tSOM Version     : %s\n", SOM_VERSION);
         printf("\n");
 }
