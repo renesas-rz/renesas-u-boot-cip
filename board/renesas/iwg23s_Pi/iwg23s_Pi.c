@@ -58,8 +58,8 @@ extern char *name_spi;
 
 void s_init(void)
 {
-	struct r8a7747x_rwdt *rwdt = (struct iwg23s_rwdt *)RWDT_BASE;
-	struct r8a7747x_swdt *swdt = (struct iwg23s_swdt *)SWDT_BASE;
+	struct r8a7747x_rwdt *rwdt = (struct r8a7747x_rwdt *)RWDT_BASE;
+	struct r8a7747x_swdt *swdt = (struct r8a7747x_swdt *)SWDT_BASE;
 	u32 val;
 	u32 pll0_status;
 
@@ -145,8 +145,6 @@ int board_early_init_f(void)
 DECLARE_GLOBAL_DATA_PTR;
 int board_init(void)
 {
-	u32 val;
-
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = IWG23S_SDRAM_BASE + 0x100;
 
@@ -300,8 +298,10 @@ int board_mmc_init(bd_t *bis)
 
 void iwg23s_fdt_update(void *fdt)
 {
-	if(name_spi != "SST25VF016B")
-		fdt_setprop_string(fdt, "/spi@e6b10000", "compatible", "m25pe16");
+	int nodeoffset;
+	nodeoffset = fdt_path_offset(fdt, "/spi@e6b10000");
+	if(strcmp(name_spi, "SST25VF016B") != 0)
+		fdt_setprop_string(fdt, nodeoffset, "compatible", "m25pe16");
 }
 
 void reset_cpu(ulong addr)

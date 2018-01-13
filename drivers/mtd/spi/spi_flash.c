@@ -15,7 +15,7 @@
 #include <watchdog.h>
 
 #include "spi_flash_internal.h"
-char *name_spi;
+const char *name_spi;
 
 static void spi_flash_addr(u32 addr, u8 *cmd)
 {

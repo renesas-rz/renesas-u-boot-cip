@@ -446,7 +446,7 @@ int fdt_fixup_memory(void *blob, u64 start, u64 size)
 void fdt_fixup_ethernet(void *fdt)
 {
 	int node, i = 0;
-	char enet[16], *tmp;
+	char enet[16];
 	char mac[16] = "ethaddr";
 	const char *path;
 	unsigned char mac_addr[6];
@@ -494,9 +494,10 @@ sprintf(enet, "eth");
 #else
 
 	i = 0;
-	while ((tmp = getenv(mac)) != NULL) {
+	while (getenv(mac) != NULL) {
 		char *end, *tmp;
 		int j;
+		tmp = getenv(mac);
 		sprintf(enet, "ethernet%d", i);
 		path = fdt_getprop(fdt, node, enet, NULL);
 		if (!path) {
