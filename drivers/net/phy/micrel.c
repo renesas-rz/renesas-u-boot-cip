@@ -35,6 +35,18 @@ static struct phy_driver KSZ804_driver = {
 	.shutdown = &genphy_shutdown,
 };
 
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG23S)
+static struct phy_driver KS8721_driver = {
+	.name = "Micrel KS8721BL",
+	.uid = 0x221610,
+	.mask = 0xfffff0,
+	.features = PHY_BASIC_FEATURES,
+	.config = &genphy_config,
+	.startup = &genphy_startup,
+	.shutdown = &genphy_shutdown,
+};
+#endif
+
 #ifdef CONFIG_IWG20M
 /**
  * KSZ9021 - KSZ9031 common

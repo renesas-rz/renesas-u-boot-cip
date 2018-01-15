@@ -1,10 +1,21 @@
 /*
- * drivers/net/ravb.h
- *     This file is driver for Renesas Ethernet AVB.
+ * ravb.h - Driver for Renesas Ethernet AVB.
  *
  * Copyright (C) 2015  Renesas Electronics Corporation
  *
- * SPDX-License-Identifier:	GPL-2.0+
+ * This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
 #include <netdev.h>
@@ -12,7 +23,11 @@
 
 #define CARDNAME "ether_avb"
 
-#define NUM_TX_DESC	64
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
+#define NUM_TX_DESC    64
+#elif defined(CONFIG_IWG23S)
+#define NUM_TX_DESC	8
+#endif
 #define NUM_RX_DESC	64
 #define RAVB_ALIGN	128
 
@@ -47,7 +62,6 @@ enum ECSIPR_STATUS_MASK_BIT {
 enum APR_BIT {
         APR_AP = 0x00000001,
 };
-
 
 /* The ethernet avb descriptor definitions. */
 enum DT {
@@ -160,7 +174,6 @@ struct ravb_dev {
 	struct ravb_rxdesc *rx_desc_alloc;
 	struct ravb_rxdesc *rx_desc_base;
 	struct ravb_rxdesc *rx_desc_cur;
-	//added
 	struct ravb_rxdesc *cur_desc_rx;
 	u8 *rx_buf_alloc;
 	u8 *rx_buf_base;
@@ -493,10 +506,9 @@ static const u16 ravb_reg_offset[RAVB_MAX_REGISTER_OFFSET] = {
 };
 
 /* Register Address */
-#if defined(CONFIG_R8A7790) || defined(CONFIG_IWG22M)
 #define SH_ETH_RAVB_TYPE_ETHER
 #define BASE_IO_ADDR	0xE6800000
-#endif
+
 /* Register's bits of Ethernet AVB */
 /* CCC */
 enum CCC_BIT {
@@ -938,4 +950,3 @@ static inline unsigned long ravb_read(struct ravb_dev *eth,
 {
 	return readl(ravb_reg_addr(eth, enum_index));
 }
-

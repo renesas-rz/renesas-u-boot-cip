@@ -15,6 +15,7 @@
 #include <watchdog.h>
 
 #include "spi_flash_internal.h"
+char *name_spi;
 
 static void spi_flash_addr(u32 addr, u8 *cmd)
 {
@@ -539,6 +540,9 @@ struct spi_flash *spi_flash_probe(unsigned int bus, unsigned int cs,
 	}
 
 	printf("SF: Detected %s with page size ", flash->name);
+#ifdef CONFIG_IWG23S
+	name_spi = flash->name;
+#endif
 	print_size(flash->sector_size, ", total ");
 	print_size(flash->size, "\n");
 
