@@ -21,11 +21,11 @@
 #include <netdev.h>
 #include <asm/types.h>
 
-#define CARDNAME "ether_avb"
-
 #if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
+#define CARDNAME "ether_avb"
 #define NUM_TX_DESC    64
 #elif defined(CONFIG_IWG23S)
+#define CARDNAME "ravb"
 #define NUM_TX_DESC	8
 #endif
 #define NUM_RX_DESC	64
@@ -34,6 +34,8 @@
 /* Buffers must be big enough to hold the largest ethernet frame. Also, rx
    buffers must be a multiple of 128 bytes */
 #define MAX_BUF_SIZE	(RAVB_ALIGN * 12)
+
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
 /* ECMR */
 
 /* ECSR */
@@ -62,6 +64,7 @@ enum ECSIPR_STATUS_MASK_BIT {
 enum APR_BIT {
         APR_AP = 0x00000001,
 };
+#endif
 
 /* The ethernet avb descriptor definitions. */
 enum DT {
@@ -213,7 +216,9 @@ enum {
 	CDAR20,
 	CDAR21,
 	ESR,
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
 	APSR,
+#endif
 	RCR,
 	RQC,
 	RPC,
@@ -380,7 +385,11 @@ static const u16 ravb_reg_offset[RAVB_MAX_REGISTER_OFFSET] = {
 	[CDAR20] = 0x0060,
 	[CDAR21] = 0x0064,
 	[ESR] = 0x0088,
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
 	[APSR] = 0x008C,
+#elif defined(CONFIG_IWG23S)
+	[PSR] = 0x008C,
+#endif
 	[RCR] = 0x0090,
 	[RQC] = 0x0094,
 	[RPC] = 0x00B0,
@@ -506,7 +515,9 @@ static const u16 ravb_reg_offset[RAVB_MAX_REGISTER_OFFSET] = {
 };
 
 /* Register Address */
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
 #define SH_ETH_RAVB_TYPE_ETHER
+#endif
 #define BASE_IO_ADDR	0xE6800000
 
 /* Register's bits of Ethernet AVB */
@@ -922,7 +933,10 @@ enum ECMR_BIT {
 	ECMR_TRCCM = 0x04000000, ECMR_RCSC = 0x00800000, ECMR_DPAD = 0x00200000,
 	ECMR_RZPF = 0x00100000, ECMR_PFR = 0x00040000, ECMR_RXF = 0x00020000,
 	ECMR_MPDE = 0x00000200, ECMR_RE = 0x00000040, ECMR_TE = 0x00000020,
-	ECMR_DM = 0x00000002, ECMR_PRM = 0x00000001,ECMR_ZPF = 0x00080000,ECMR_TXF = 0x00010000, ECMR_RTM = 0x00000010
+	ECMR_DM = 0x00000002, ECMR_PRM = 0x00000001,
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
+	ECMR_ZPF = 0x00080000,ECMR_TXF = 0x00010000, ECMR_RTM = 0x00000010
+#endif
 };
 
 #define ECMR_CHG_DM (ECMR_TRCCM | ECMR_RZPF | ECMR_PFR | ECMR_RXF)
