@@ -19,7 +19,7 @@ include	$(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(BOARD).o
 
-COBJS	:= iwg23s_Pi.o
+COBJS	:= iwg23s_Pi.o qos.o
 SOBJS	:= lowlevel_init.o
 
 SRCS	:= $(SOBJS:.o=.S) $(COBJS:.o=.c)
