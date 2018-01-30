@@ -74,6 +74,11 @@ void s_init(void)
 	do {
 		pll0_status = readl(PLLECR) & PLL0ST;
 	} while (pll0_status == 0x0);
+
+#if !defined(CONFIG_EXTRAM_BOOT)
+        /* QoS */
+        qos_init();
+#endif
 }
 
 #define TMU1_MSTP111    (1 << 11)

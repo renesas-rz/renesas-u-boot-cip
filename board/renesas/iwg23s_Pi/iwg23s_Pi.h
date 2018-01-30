@@ -42,3 +42,5 @@ extern int sdhi_mmc_init(unsigned long addr, int ch);
 extern int ravb_initialize(bd_t *bd);
 
 extern void arch_preboot_os(void);
+
+extern void qos_init(void);
