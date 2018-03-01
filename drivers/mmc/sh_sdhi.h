@@ -62,10 +62,14 @@
 /* SDHI CMD VALUE */
 #define CMD_MASK			0x0000ffff
 #define SDHI_APP			0x0040
+#if defined(CONFIG_IWG23S)
 #define SDHI_MMC_SEND_OP_COND           0x0701
+#endif /* CONFIG_IWG23S */
 #define SDHI_SD_APP_SEND_SCR		0x0073
 #define SDHI_SD_SWITCH			0x1C06
+#if defined(CONFIG_IWG23S)
 #define SDHI_MMC_SEND_EXT_CSD           0x1C08
+#endif /* CONFIG_IWG23S */
 
 /* SDHI_PORTSEL */
 #define USE_1PORT			(1 << 8)	/* 1 port */
@@ -134,10 +138,14 @@
 #define CLK_ENABLE			(1 << 8)
 
 /* SDHI_OPTION */
+#if defined(CONFIG_IWG23S)
 #define OPT_BUS_WIDTH_M			(5 << 13)	/* 101b (15-13bit) */
 #define OPT_BUS_WIDTH_1			(4 << 13)	/* bus width = 1 bit */
 #define OPT_BUS_WIDTH_4			(0 << 13)	/* bus width = 4 bit */
 #define OPT_BUS_WIDTH_8			(1 << 13)	/* bus width = 8 bit */
+#else
+#define OPT_BUS_WIDTH_1			(1 << 15)       /* bus width = 1 bit */
+#endif /* CONFIG_IWG23S */
 
 /* SDHI_ERR_STS1 */
 #define ERR_STS1_CRC_ERROR		((1 << 11) | (1 << 10) | (1 << 9) | \
@@ -178,9 +186,11 @@
 #define CLKDEV_MMC_DATA			20000000	/* 20MHz */
 #define	CLKDEV_INIT			400000		/* 100 - 400 KHz */
 
+#if defined(CONFIG_IWG23S)
 /* For quirk */
 #define SH_SDHI_QUIRK_16BIT_BUF		(1 << 0)
 #define SH_SDHI_QUIRK_64BIT_BUF		(1 << 1)
+#endif /* CONFIG_IWG23S */
 
 struct sdhi_host {
 	struct mmc	*mmc;
@@ -190,7 +200,9 @@ struct sdhi_host {
 	unsigned int	power_mode;
 	int		ch;
 	int		bus_shift;
+#if defined(CONFIG_IWG23S)
 	unsigned long	quirks;
+#endif /* CONFIG_IWG23S */
 };
 
 static unsigned short g_wait_int[CONFIG_MMC_SH_SDHI_NR_CHANNEL];
@@ -206,6 +218,7 @@ static inline u16 sdhi_readw(struct sdhi_host *host, int reg)
 	return readw(host->addr + (reg << host->bus_shift));
 }
 
+#if defined(CONFIG_IWG23S)
 static inline void sdhi_writeq(struct sdhi_host *host, int reg, u64 val)
 {
 	*(volatile u64 *)(host->addr + (reg << host->bus_shift)) = val;
@@ -215,5 +228,6 @@ static inline u64 sdhi_readq(struct sdhi_host *host, int reg)
 {
 	return *(volatile u64 *)(host->addr + (reg << host->bus_shift));
 }
+#endif /* CONFIG_IWG23S*/
 
 #endif /* _SH_SDHI_H_ */

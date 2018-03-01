@@ -258,7 +258,9 @@ static int sdhi_single_read(struct sdhi_host *host, struct mmc_data *data)
 	long time;
 	unsigned short blocksize, i;
 	unsigned short *p = (unsigned short *)data->dest;
+#if defined(CONFIG_IWG23S)
 	u64 *q = (u64 *)data->dest;
+#endif
 
 	if ((unsigned long)p & 0x00000001) {
 		printf("%s: The data pointer is unaligned.", __func__);
@@ -278,13 +280,17 @@ static int sdhi_single_read(struct sdhi_host *host, struct mmc_data *data)
 	g_wait_int[ch] = 0;
 	blocksize = sdhi_readw(host, SDHI_SIZE);
 
+#if defined(CONFIG_IWG23S)
 	if (host->quirks & SH_SDHI_QUIRK_64BIT_BUF)
 		for (i = 0; i < blocksize / 8; i++)
 			*q++ = sdhi_readq(host, SDHI_BUF0);
 	else
 		for (i = 0; i < blocksize / 2; i++)
 			*p++ = sdhi_readw(host, SDHI_BUF0);
-
+#else
+	for (i = 0; i < blocksize / 2; i++)
+		*p++ = sdhi_readw(host, SDHI_BUF0);
+#endif
 	time = sdhi_wait_interrupt_flag(host);
 	if (time == 0 || g_sd_error[ch] != 0)
 		return sdhi_error_manage(host);
@@ -299,7 +305,9 @@ static int sdhi_multi_read(struct sdhi_host *host, struct mmc_data *data)
 	long time;
 	unsigned short blocksize, i, sec;
 	unsigned short *p = (unsigned short *)data->dest;
+#if defined(CONFIG_IWG23S)
         u64 *q = (u64 *)data->dest;
+#endif
 
 	if ((unsigned long)p & 0x00000001) {
 		printf("%s: The data pointer is unaligned.", __func__);
@@ -321,12 +329,17 @@ static int sdhi_multi_read(struct sdhi_host *host, struct mmc_data *data)
 
 		g_wait_int[ch] = 0;
 		blocksize = sdhi_readw(host, SDHI_SIZE);
+#if defined(CONFIG_IWG23S)
 		if (host->quirks & SH_SDHI_QUIRK_64BIT_BUF)
 			for (i = 0; i < blocksize / 8; i++)
 				*q++ = sdhi_readq(host, SDHI_BUF0);
 		else
 			for (i = 0; i < blocksize / 2; i++)
 				*p++ = sdhi_readw(host, SDHI_BUF0);
+#else
+		for (i = 0; i < blocksize / 2; i++)
+			*p++ = sdhi_readw(host, SDHI_BUF0);
+#endif
 	}
 
 	return 0;
@@ -338,7 +351,9 @@ static int sdhi_single_write(struct sdhi_host *host, struct mmc_data *data)
 	long time;
 	unsigned short blocksize, i;
 	const unsigned short *p = (const unsigned short *)data->src;
+#if defined(CONFIG_IWG23S)
         const u64 *q = (const u64 *)data->src;
+#endif
 
 	if ((unsigned long)p & 0x00000001) {
 		printf("%s: The data pointer is unaligned.", __func__);
@@ -360,6 +375,7 @@ static int sdhi_single_write(struct sdhi_host *host, struct mmc_data *data)
 		return sdhi_error_manage(host);
 
 	g_wait_int[ch] = 0;
+#if defined(CONFIG_IWG23S)
 	blocksize = sdhi_readw(host, SDHI_SIZE);
 	if (host->quirks & SH_SDHI_QUIRK_64BIT_BUF)
 		for (i = 0; i < blocksize / 8; i++)
@@ -367,6 +383,10 @@ static int sdhi_single_write(struct sdhi_host *host, struct mmc_data *data)
 	else
 		for (i = 0; i < blocksize / 2; i++)
 			sdhi_writew(host, SDHI_BUF0, *p++);
+#else
+	for (i = 0; i < blocksize / 2; i++)
+		sdhi_writew(host, SDHI_BUF0, *p++);
+#endif
 
 	time = sdhi_wait_interrupt_flag(host);
 	if (time == 0 || g_sd_error[ch] != 0)
@@ -382,7 +402,9 @@ static int sdhi_multi_write(struct sdhi_host *host, struct mmc_data *data)
 	long time;
 	unsigned short i, sec, blocksize;
 	const unsigned short *p = (const unsigned short *)data->src;
+#if defined(CONFIG_IWG23S)
         const u64 *q = (const u64 *)data->src;
+#endif
 
 	pr_debug("%s: blocks = %d, blocksize = %d\n",
 			__func__, data->blocks, data->blocksize);
@@ -399,12 +421,17 @@ static int sdhi_multi_write(struct sdhi_host *host, struct mmc_data *data)
 
 		g_wait_int[ch] = 0;
 		blocksize = sdhi_readw(host, SDHI_SIZE);
+#if defined(CONFIG_IWG23S)
 		if (host->quirks & SH_SDHI_QUIRK_64BIT_BUF)
 			for (i = 0; i < blocksize / 8; i++)
 				sdhi_writeq(host, SDHI_BUF0, *q++);
 		else
 			for (i = 0; i < blocksize / 2; i++)
 				sdhi_writew(host, SDHI_BUF0, *p++);
+#else
+		for (i = 0; i < blocksize / 2; i++)
+			sdhi_writew(host, SDHI_BUF0, *p++);
+#endif
 	}
 
 	return 0;
@@ -412,11 +439,19 @@ static int sdhi_multi_write(struct sdhi_host *host, struct mmc_data *data)
 
 static void sdhi_get_response(struct sdhi_host *host, struct mmc_cmd *cmd)
 {
-	unsigned short i, j, cnt = 1;
+	unsigned short i, j;
+#if defined(CONFIG_IWG23S)
+	unsigned short cnt = 1;
 	unsigned short resp[8];
+#else
+	volatile unsigned short resp[8];
+	volatile unsigned long *p1, *p2;
+#endif
 
 	if (cmd->resp_type & MMC_RSP_136) {
+#if defined(CONFIG_IWG23S)
                 cnt = 4;
+#endif
 		resp[0] = sdhi_readw(host, SDHI_RSP00);
 		resp[1] = sdhi_readw(host, SDHI_RSP01);
 		resp[2] = sdhi_readw(host, SDHI_RSP02);
@@ -432,9 +467,26 @@ static void sdhi_get_response(struct sdhi_host *host, struct mmc_cmd *cmd)
 			resp[i] |= (resp[j--] >> 8) & 0x00ff;
 		}
 		resp[0] = (resp[0] << 8) & 0xff00;
+#if !defined(CONFIG_IWG23S)
+		/* SDHI REGISTER SPECIFICATION */
+
+		p1 = ((unsigned long *)resp) + 3;
+		p2 = (unsigned long *)cmd->response;
+#if defined(__BIG_ENDIAN_BITFIELD)
+		for (i = 0; i < 4; i++) {
+			*p2++ = ((*p1 >> 16) & 0x0000ffff) |
+					((*p1 << 16) & 0xffff0000);
+			p1--;
+		}
+#else
+		for (i = 0; i < 4; i++)
+		*p2++ = *p1--;
+#endif /* __BIG_ENDIAN_BITFIELD */
+#endif /* CONFIG_IWG23S */
 	} else {
 		resp[0] = sdhi_readw(host, SDHI_RSP00);
 		resp[1] = sdhi_readw(host, SDHI_RSP01);
+#if defined(CONFIG_IWG23S)
         }
 
 #if defined(__BIG_ENDIAN_BITFIELD)
@@ -456,6 +508,16 @@ static void sdhi_get_response(struct sdhi_host *host, struct mmc_cmd *cmd)
 		cmd->response[0] = (resp[1] << 16) | resp[0];
 	}
 #endif /* __BIG_ENDIAN_BITFIELD */
+#else
+		p1 = ((unsigned long *)resp);
+		p2 = (unsigned long *)cmd->response;
+#if defined(__BIG_ENDIAN_BITFIELD)
+		*p2 = ((*p1 >> 16) & 0x0000ffff) | ((*p1 << 16) & 0xffff0000);
+#else
+		*p2 = *p1;
+#endif /* __BIG_ENDIAN_BITFIELD */
+        }
+#endif /* CONFIG_IWG23S */
 }
 
 static unsigned short sdhi_set_cmd(struct sdhi_host *host,
@@ -473,6 +535,7 @@ static unsigned short sdhi_set_cmd(struct sdhi_host *host,
 		else /* SD_SWITCH */
 			opc = SDHI_SD_SWITCH;
 		break;
+#if defined(CONFIG_IWG23S)
 #ifdef CONFIG_SH_SDHI_MMC
 	case MMC_CMD_SEND_OP_COND:
 		opc = SDHI_MMC_SEND_OP_COND;
@@ -482,6 +545,7 @@ static unsigned short sdhi_set_cmd(struct sdhi_host *host,
 			opc = SDHI_MMC_SEND_EXT_CSD;
 		break;
 #endif
+#endif /* CONFIG_IWG23S */
 	default:
 		break;
 	}
@@ -506,9 +570,11 @@ static unsigned short sdhi_data_trans(struct sdhi_host *host,
 	case MMC_CMD_READ_SINGLE_BLOCK:
 	case SDHI_SD_APP_SEND_SCR:
 	case SDHI_SD_SWITCH: /* SD_SWITCH */
+#if defined(CONFIG_IWG23S)
 #ifdef CONFIG_SH_SDHI_MMC
 	case SDHI_MMC_SEND_EXT_CSD:
 #endif
+#endif /* CONFIG_IWG23S */
 		ret = sdhi_single_read(host, data);
 		break;
 	default:
@@ -658,6 +724,7 @@ static void sdhi_set_ios(struct mmc *mmc)
 		break;
 	}
 
+#if defined(CONFIG_IWG23S)
 #ifdef CONFIG_SH_SDHI_MMC
 	if (mmc->bus_width == 8)
 		sdhi_writew(host, SDHI_OPTION,
@@ -679,6 +746,14 @@ static void sdhi_set_ios(struct mmc *mmc)
 		sdhi_writew(host, SDHI_OPTION, OPT_BUS_WIDTH_1 |
 					sdhi_readw(host, SDHI_OPTION));
 #endif
+#else
+	if (mmc->bus_width == 4)
+		sdhi_writew(host, SDHI_OPTION, ~OPT_BUS_WIDTH_1 &
+					sdhi_readw(host, SDHI_OPTION));
+	else
+		sdhi_writew(host, SDHI_OPTION, OPT_BUS_WIDTH_1 |
+					sdhi_readw(host, SDHI_OPTION));
+#endif /* CONFIG_IWG23S*/
 
 	pr_debug("clock = %d, buswidth = %d\n", mmc->clock, mmc->bus_width);
 }
@@ -705,6 +780,10 @@ int sdhi_mmc_init(unsigned long addr, int ch)
 
 	mmc->f_min = CLKDEV_INIT;
 	mmc->f_max = CLKDEV_HS_DATA;
+#if !defined(CONFIG_IWG23S)
+	mmc->voltages = MMC_VDD_32_33 | MMC_VDD_33_34;
+        mmc->host_caps = MMC_MODE_4BIT | MMC_MODE_HS;
+#endif /* CONFIG_IWG23S */
 	memcpy(mmc->name, DRIVER_NAME, sizeof(DRIVER_NAME));
 	mmc->send_cmd = sdhi_request;
 	mmc->set_ios = sdhi_set_ios;
