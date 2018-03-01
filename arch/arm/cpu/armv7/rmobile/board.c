@@ -26,6 +26,12 @@
 
 int checkboard(void)
 {
-	printf("Board: %s\n", sysinfo.board_string);
+	if (rmobile_get_cpu_type() != 0x4B)
+		printf("Board: %s\n", sysinfo.board_string);
+#if defined(CONFIG_IWG20M)
+	else
+		printf("Board: %s\n", sysinfo.board_str);
+#endif
+
 	return 0;
 }
