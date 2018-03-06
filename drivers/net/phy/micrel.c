@@ -47,7 +47,7 @@ static struct phy_driver KS8721_driver = {
 };
 #endif
 
-#ifdef CONFIG_IWG20M
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG21M)
 /**
  * KSZ9021 - KSZ9031 common
  */
@@ -163,7 +163,7 @@ static struct phy_driver ksz9021_driver = {
 	.shutdown = &genphy_shutdown,
 };
 #endif
-#ifdef CONFIG_IWG20M 
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG21M)
 /**
  * KSZ9031
  */
@@ -290,7 +290,7 @@ int phy_micrel_init(void)
         phy_register(&KSZ8081_driver);
 #else
 	phy_register(&KS8721_driver);
-#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG21M) || defined(CONFIG_IWG22M)
 	phy_register(&ksz9031_driver);
 #endif
 #endif

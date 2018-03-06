@@ -227,7 +227,8 @@ struct uart_port {
 #elif defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
 	defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745) || \
-        defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X)
+        defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X) || \
+	defined(CONFIG_R8A7742) || defined(CONFIG_IWG21M)
 # define SCIF_ORER	0x0001
 #ifdef CONFIG_SCIF_USE_EXT_CLK
 	# define SCSCR_INIT(port)	0x32	/* TIE=0,RIE=0,TE=1,RE=1,REIE=0, */
@@ -314,9 +315,14 @@ struct uart_port {
 #elif defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
 	defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745) || \
-        defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X)
+        defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X) || \
+	defined(CONFIG_R8A7742) || defined(CONFIG_IWG21M)
 # define SCIF_ERRORS (SCIF_PER | SCIF_FER | SCIF_ER | SCIF_BRK)
+#if defined(CONFIG_R8A7742) || defined(CONFIG_IWG21M)
+# define SCIF_RFDC_MASK	0x001f
+#else
 # define SCIF_RFDC_MASK	0x003f
+#endif
 #else
 # define SCIF_ERRORS (SCIF_PER | SCIF_FER | SCIF_ER | SCIF_BRK)
 # define SCIF_RFDC_MASK 0x001f
@@ -584,9 +590,15 @@ SCIF_FNS(SCLSR,  0,  0, 0x24, 16)
 SCIx_FNS(SCSMR,  0x00,  8, 0x00,  8, 0x00,  8, 0x00, 16, 0x00,  8)
 SCIx_FNS(SCBRR,  0x02,  8, 0x04,  8, 0x02,  8, 0x04,  8, 0x01,  8)
 SCIx_FNS(SCSCR,  0x04,  8, 0x08,  8, 0x04,  8, 0x08, 16, 0x02,  8)
+#if defined(CONFIG_SCIF_A) || defined(CONFIG_IWG21M)
+SCIx_FNS(SCxTDR, 0x06,  8, 0x20,  8, 0x06,  8, 0x0C,  8, 0x03,  8)
+SCIx_FNS(SCxSR,  0x08,  8, 0x14, 16, 0x08, 16, 0x10, 16, 0x04,  8)
+SCIx_FNS(SCxRDR, 0x0a,  8, 0x24,  8, 0x0A,  8, 0x14,  8, 0x05,  8)
+#else
 SCIx_FNS(SCxTDR, 0x06,  8, 0x0c,  8, 0x06,  8, 0x0C,  8, 0x03,  8)
 SCIx_FNS(SCxSR,  0x08,  8, 0x10,  8, 0x08, 16, 0x10, 16, 0x04,  8)
 SCIx_FNS(SCxRDR, 0x0a,  8, 0x14,  8, 0x0A,  8, 0x14,  8, 0x05,  8)
+#endif
 SCIF_FNS(SCFCR,                      0x0c,  8, 0x18, 16)
 #if defined(CONFIG_CPU_SH7760) || \
 	defined(CONFIG_CPU_SH7780) || \
@@ -612,11 +624,16 @@ SCIF_FNS(SCSPTR,                        0,  0, 0, 0)
 #else
 SCIF_FNS(SCSPTR,                        0,  0, 0x20, 16)
 #endif
-#if defined(CONFIG_R8A7745) || defined(CONFIG_R8A7743) || defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X)
+#if defined(CONFIG_R8A7745) || defined(CONFIG_R8A7743) || defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X) || \
+defined(CONFIG_R8A7742) || defined(CONFIG_IWG21M)
 SCIF_FNS(DL,				0,  0, 0x30, 16)
 SCIF_FNS(CKS,				0,  0, 0x34, 16)
 #endif
+#if defined(CONFIG_SCIF_A) || defined(CONFIG_IWG21M)
+SCIF_FNS(SCLSR,                         0,  0, 0, 0)
+#else
 SCIF_FNS(SCLSR,                         0,  0, 0x24, 16)
+#endif
 #endif
 #endif
 #define sci_in(port, reg) sci_##reg##_in(port)
@@ -760,9 +777,14 @@ static inline int scbrr_calc(struct uart_port port, int bps, int clk)
 #elif defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
 	defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745) || \
-        defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X)
+        defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X) || \
+	defined(CONFIG_R8A7742) || defined(CONFIG_IWG21M)
 #define DL_VALUE(bps, clk) (clk / bps / 16) /* External Clock */
+#if defined(CONFIG_R8A7742) || defined(CONFIG_IWG21M)
+#define SCBRR_VALUE(bps, clk) (clk / bps / 16 - 1) /* Internal Clock */
+#else
 #define SCBRR_VALUE(bps, clk) ((clk)/(32*bps)-1) /* Internal Clock */
+#endif
 #else /* Generic SH */
 #define SCBRR_VALUE(bps, clk) ((clk+16*bps)/(32*bps)-1)
 #endif

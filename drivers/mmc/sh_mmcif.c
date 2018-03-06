@@ -20,6 +20,8 @@
 
 #define DRIVER_NAME	"sh_mmcif"
 
+extern int sw1_val;
+
 static void *mmc_priv(struct mmc *mmc)
 {
 	return (void *)mmc->priv;
@@ -591,8 +593,16 @@ int mmcif_mmc_init(void)
 	mmc->f_min = CLKDEV_MMC_INIT;
 	mmc->f_max = CLKDEV_EMMC_DATA;
 	mmc->voltages = MMC_VDD_32_33 | MMC_VDD_33_34;
+#if defined(CONFIG_IWG21M)
+	if (sw1_val)
+		mmc->host_caps = MMC_MODE_HS | MMC_MODE_HS_52MHz | MMC_MODE_4BIT | MMC_MODE_HC;
+	else
+		mmc->host_caps = MMC_MODE_HS | MMC_MODE_HS_52MHz | MMC_MODE_4BIT |
+			MMC_MODE_8BIT | MMC_MODE_HC;
+#else
 	mmc->host_caps = MMC_MODE_HS | MMC_MODE_HS_52MHz | MMC_MODE_4BIT |
 			 MMC_MODE_8BIT | MMC_MODE_HC;
+#endif
 	memcpy(mmc->name, DRIVER_NAME, sizeof(DRIVER_NAME));
 	mmc->send_cmd = sh_mmcif_request;
 	mmc->set_ios = sh_mmcif_set_ios;

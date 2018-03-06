@@ -76,7 +76,11 @@ int print_cpuinfo(void)
 		break;
 
 	case 0x45:
+#if defined(CONFIG_R8A7790)
 		printf("CPU: Renesas Electronics R8A7790 rev %d.%d\n",
+#else
+		printf("CPU: Renesas Electronics R8A7742 rev %d.%d\n",
+#endif
 		       rmobile_get_cpu_rev_integer(),
 		       rmobile_get_cpu_rev_fraction());
 		break;

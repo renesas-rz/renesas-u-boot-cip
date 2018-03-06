@@ -52,6 +52,10 @@ COBJS-$(CONFIG_R8A7743) += cpu_info-r8a7743.o
 ifndef CONFIG_IWG20M
 COBJS-$(CONFIG_R8A7743) += pfc-r8a7743.o
 endif
+COBJS-$(CONFIG_R8A7742) += cpu_info-r8a7742.o
+COBJS-$(CONFIG_R8A7742) += pfc-r8a7742.o
+COBJS-$(CONFIG_IWG21M) += cpu_info-iwg21m.o
+COBJS-$(CONFIG_IWG21M) += pfc-iwg21m.o
 COBJS-$(CONFIG_R8A7740) += cpu_info-r8a7740.o
 COBJS-$(CONFIG_R8A7740) += pfc-r8a7740.o
 COBJS-$(CONFIG_SH73A0) += cpu_info-sh73a0.o

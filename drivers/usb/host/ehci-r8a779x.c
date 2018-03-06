@@ -40,6 +40,10 @@
 #define PHYS_OFFSET	SKRZG1E_SDRAM_BASE
 #elif defined(SKRZG1M_SDRAM_BASE)
 #define PHYS_OFFSET	SKRZG1M_SDRAM_BASE
+#elif defined(SKRZG1H_SDRAM_BASE)
+#define PHYS_OFFSET	SKRZG1H_SDRAM_BASE
+#elif defined(IWG21M_SDRAM_BASE)
+#define PHYS_OFFSET     IWG21M_SDRAM_BASE
 #else
 #error
 #endif
@@ -67,6 +71,9 @@
 static u32 usb_base_address[CONFIG_USB_MAX_CONTROLLER_COUNT] = {
 	0xee080000,	/* USB0 (EHCI) */
 #ifdef CONFIG_MACH_LAGER
+	0xee0a0000,	/* USB1 */
+#endif
+#ifdef CONFIG_MACH_SKRZG1H
 	0xee0a0000,	/* USB1 */
 #endif
 	0xee0c0000,	/* USB2 */

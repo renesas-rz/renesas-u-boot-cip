@@ -451,7 +451,7 @@ static int sh_eth_config(struct sh_eth_dev *eth, bd_t *bd)
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
 	defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745) || defined(CONFIG_IWG22M) || \
-        defined(CONFIG_R8A7747X)
+        defined(CONFIG_R8A7747X) || defined(CONFIG_R8A7742) || defined(CONFIG_IWG21M)
 	ret = phy_read(phy, MDIO_DEVAD_NONE, 0x1e);
 	ret &= ~0xc000;
 	ret |= 0x4000;
@@ -475,7 +475,7 @@ static int sh_eth_config(struct sh_eth_dev *eth, bd_t *bd)
 #elif defined(CONFIG_CPU_SH7724) || defined(CONFIG_R8A7790) || \
 		defined(CONFIG_R8A7791) || defined(CONFIG_R8A7793) || \
 		defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745) || defined(CONFIG_IWG22M) || \
-                defined(CONFIG_R8A7747X)
+                defined(CONFIG_R8A7747X) || defined(CONFIG_R8A7742) || defined(CONFIG_IWG21M)
 		val = ECMR_RTM;
 #endif
 	} else if (phy->speed == 10) {

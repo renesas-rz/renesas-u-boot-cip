@@ -42,6 +42,8 @@
 # define SCIF_BASE	SCIF6_BASE
 #elif defined(CONFIG_CONS_SCIF7)
 # define SCIF_BASE	SCIF7_BASE
+#elif defined(CONFIG_CONS_SCIFA2)
+# define SCIF_BASE	SCIFA2_BASE
 #else
 # error "Default SCIF doesn't set....."
 #endif
@@ -64,7 +66,8 @@ static void sh_serial_setbrg(void)
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
 	defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745) || \
-        defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X)
+        defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X) || \
+	defined(CONFIG_R8A7742) || defined(CONFIG_IWG21M)
 #ifdef CONFIG_SCIF_USE_EXT_CLK
 	sci_out(&sh_sci, DL, DL_VALUE(gd->baudrate, CONFIG_SCIF_CLK_FREQ));
 	udelay((1000000 * 2 * 16 / CONFIG_SYS_CLK_FREQ) * 1000 + 1);

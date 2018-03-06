@@ -357,7 +357,7 @@ static int ravb_phy_config(struct ravb_dev *eth)
 	struct eth_device *dev = eth->dev;
 	struct phy_device *phydev;
 
-#ifdef CONFIG_IWG20M
+#if defined(CONFIG_IWG20M)
          for (addr = 0; addr <  32; addr++)
         {
                 phydev = phy_connect(
@@ -372,14 +372,13 @@ static int ravb_phy_config(struct ravb_dev *eth)
                 }
 
         }
-#else
-#ifdef CONFIG_IWG22M
+#elif defined(CONFIG_IWG22M)
         /* IWG22M: ETH: Ethernet phy detection setting */
         for (addr = 0; addr <  32; addr++)
         {
                 phydev = phy_connect(
-                                miiphy_get_dev_by_name(dev->name),
-                                addr, dev, CONFIG_SH_ETHER_RAVB_PHY_MODE);
+						miiphy_get_dev_by_name(dev->name),
+						addr, dev, CONFIG_SH_ETHER_RAVB_PHY_MODE);
                 if (phydev == NULL)
                         continue;
                 else
@@ -388,11 +387,24 @@ static int ravb_phy_config(struct ravb_dev *eth)
                         break;
                 }
         }
+#elif defined(CONFIG_IWG21M)
+         for (addr = 0; addr <  32; addr++)
+        {
+                phydev = phy_connect(
+                        miiphy_get_dev_by_name(dev->name),
+                        addr, dev, CONFIG_SH_ETHER_RAVB_PHY_MODE);
+                if (phydev == NULL)
+                        continue;
+                else
+                {
+                        printf("PHY detected at addr %d\n", addr);
+                        break;
+                }
+		}
 #else
 	phydev = phy_connect(
 			miiphy_get_dev_by_name(dev->name),
 			eth->phy_addr, dev, CONFIG_SH_ETHER_RAVB_PHY_MODE);
-#endif
 #endif
 	if (!phydev)
 		return -1;
@@ -416,6 +428,25 @@ static int ravb_write_hwaddr(struct eth_device *dev)
 
 	return 0;
 }
+#ifdef CONFIG_IWG21M
+/* E-MAC init function */
+static int ravb_mac_init(struct ravb_dev *eth)
+{
+	struct eth_device *dev = eth->dev;
+
+	/* Disable MAC Interrupt */
+	ravb_write(eth, 0, ECSIPR);
+	
+	/* Recv frame limit set register */
+	ravb_write(eth, RFLR_RFL_MIN, RFLR);
+
+	/* Set Mac address */
+	ravb_write_hwaddr(dev);
+
+	return 0;
+}
+#endif
+
 
 static void ravb_start(struct ravb_dev *eth)
 {
@@ -477,7 +508,8 @@ static int ravb_config(struct ravb_dev *eth, bd_t *bd)
 	phy = eth->phydev;
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
-	defined(CONFIG_R8A7743) || defined(CONFIG_IWG22M)
+	defined(CONFIG_R8A7743) || defined(CONFIG_IWG22M) || \
+	defined(CONFIG_IWG21M)
 	ret = phy_read(phy, MDIO_DEVAD_NONE, 0x1e);
 	ret &= ~0xc000;
 	ret |= 0x4000;

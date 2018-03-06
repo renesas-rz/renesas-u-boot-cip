@@ -75,6 +75,8 @@ static char * delete_char (char *buffer, char *p, int *colp, int *np, int plen);
 static const char erase_seq[] = "\b \b";		/* erase sequence	*/
 static const char   tab_seq[] = "        ";		/* used to expand TABs	*/
 
+extern int sw1_val;
+
 #ifdef CONFIG_BOOT_RETRY_TIME
 static uint64_t endtime = 0;  /* must be set, default is instant timeout */
 static int      retry_time = -1; /* -1 so can call readline before main_loop */

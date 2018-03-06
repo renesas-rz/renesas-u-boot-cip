@@ -25,6 +25,12 @@ void r8a7793_pinmux_init(void);
 #elif defined(CONFIG_R8A7794)
 #include "r8a7794-gpio.h"
 void r8a7794_pinmux_init(void);
+#elif defined(CONFIG_R8A7742)
+#include "r8a7742-gpio.h"
+void r8a7742_pinmux_init(void);
+#elif defined(CONFIG_IWG21M)
+#include "iwg21m-gpio.h"
+void iwg21m_pinmux_init(void);
 #elif defined(CONFIG_R8A7743)
 #include "r8a7743-gpio.h"
 void r8a7743_pinmux_init(void);

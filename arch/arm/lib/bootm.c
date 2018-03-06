@@ -82,7 +82,8 @@ void arch_lmb_reserve(struct lmb *lmb)
 
 #ifdef CONFIG_OF_LIBFDT
 #if !(defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X))
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X) || \
+	defined(CONFIG_IWG21M))
 static int fixup_memory_node(void *blob)
 {
 	bd_t	*bd = gd->bd;
@@ -267,7 +268,8 @@ static int create_fdt(bootm_headers_t *images)
 
 	fdt_chosen(*of_flat_tree, 1);
 #if !(defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X))
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M) || defined(CONFIG_R8A7747X) || \
+	defined(CONFIG_IWG21M))
 	fixup_memory_node(*of_flat_tree);
 #endif
 	fdt_fixup_ethernet(*of_flat_tree);
@@ -280,6 +282,9 @@ static int create_fdt(bootm_headers_t *images)
 #endif
 #ifdef CONFIG_IWG23S
 	iwg23s_fdt_update(*of_flat_tree);
+#endif
+#ifdef CONFIG_IWG21M
+       iwg21m_fdt_update(*of_flat_tree);
 #endif
 #ifdef CONFIG_OF_BOARD_SETUP
 	ft_board_setup(*of_flat_tree, gd->bd);

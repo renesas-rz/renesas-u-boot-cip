@@ -323,7 +323,8 @@ static const u16 sh_eth_offset_fast_sh4[SH_ETH_MAX_REGISTER_OFFSET] = {
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
 	defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745) || \
 	defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M) || \
-        defined(CONFIG_R8A7747X)
+        defined(CONFIG_R8A7747X) ||defined(CONFIG_R8A7742) || \
+	defined(CONFIG_IWG21M)
 #define SH_ETH_TYPE_ETHER
 #define BASE_IO_ADDR	0xEE700200
 #endif
@@ -526,7 +527,8 @@ enum FELIC_MODE_BIT {
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
 	defined(CONFIG_R8A7743) || defined(CONFIG_R8A7745) || \
 	defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M) || \
-        defined(CONFIG_R8A7747X)
+        defined(CONFIG_R8A7747X) || defined(CONFIG_R8A7742)|| \
+	defined(CONFIG_IWG21M)
 	ECMR_RTM = 0x00000004,
 #endif
 

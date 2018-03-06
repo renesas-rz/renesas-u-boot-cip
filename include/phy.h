@@ -135,7 +135,7 @@ struct phy_driver {
 
 	/* Called when bringing down the controller */
 	int (*shutdown)(struct phy_device *phydev);
-#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG22M)
+#if defined(CONFIG_IWG20M) || defined(CONFIG_IWG21M) || defined(CONFIG_IWG22M)
 	int (*readext)(struct phy_device *phydev, int addr, int devad, int reg);
 	int (*writeext)(struct phy_device *phydev, int addr, int devad, int reg,
                         u16 val);

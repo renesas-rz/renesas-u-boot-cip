@@ -193,7 +193,7 @@ static void sdhi_sync_reset(struct sdhi_host *host)
 	while (sdhi_readw(host, SDHI_INFO2) & INFO2_CBUSY)
 		udelay(100);
 
-#if defined(LAGER_SDRAM_BASE)
+#if defined(LAGER_SDRAM_BASE) || defined(SKRZG1H_SDRAM_BASE) || defined(IWG21M_SDRAM_BASE)
 	if (host->ch < 2)
 		sdhi_writew(host, SDHI_HOST_MODE, 1);	/* 16bit access */
 #elif defined(KOELSCH_SDRAM_BASE) || defined(GOSE_SDRAM_BASE) || \
@@ -790,7 +790,7 @@ int sdhi_mmc_init(unsigned long addr, int ch)
 	mmc->init = sdhi_init;
 	host->ch = ch;
 	host->addr = addr;
-#if defined(LAGER_SDRAM_BASE)
+#if defined(LAGER_SDRAM_BASE) || defined(SKRZG1H_SDRAM_BASE) || defined(IWG21M_SDRAM_BASE)
 	if (ch < 2)
 		host->bus_shift = 1;
 	else

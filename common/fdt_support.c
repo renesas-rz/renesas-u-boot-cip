@@ -447,7 +447,12 @@ void fdt_fixup_ethernet(void *fdt)
 {
 	int node, i = 0;
 	char enet[16];
+#ifdef CONFIG_IWG21M
+	char enet1[16];
+	char mac[16] = "eth1addr";
+#else
 	char mac[16] = "ethaddr";
+#endif
 	const char *path;
 	unsigned char mac_addr[6];
 
@@ -455,7 +460,7 @@ void fdt_fixup_ethernet(void *fdt)
 	if (node < 0)
 		return;
 
-#ifdef CONFIG_IWG20M
+#if defined(CONFIG_IWG20M)
 	sprintf(enet, "eth");
 	path = fdt_getprop(fdt, node, enet, NULL);
 		if (!path) {
@@ -466,9 +471,7 @@ void fdt_fixup_ethernet(void *fdt)
 		do_fixup_by_path(fdt, path, "mac-address", &mac_addr, 6, 0);
 		do_fixup_by_path(fdt, path, "local-mac-address",
 				&mac_addr, 6, 1);
-#else
-
-#ifdef CONFIG_IWG22M
+#elif defined(CONFIG_IWG22M)
 sprintf(enet, "eth1");
         path = fdt_getprop(fdt, node, enet, NULL);
                 if (!path) {
@@ -491,6 +494,27 @@ sprintf(enet, "eth");
                                 &mac_addr, 6, 1);
 
 
+#elif defined(CONFIG_IWG21M)
+	sprintf(enet, "eth");
+		path = fdt_getprop(fdt, node, enet, NULL);
+			if (!path) {
+				debug("No alias for %s\n", enet);
+				sprintf(mac, "eth%daddr", ++i);
+				}
+			eth_getenv_enetaddr("eth1addr", mac_addr);
+			do_fixup_by_path(fdt, path, "mac-address", &mac_addr, 6, 0);
+			do_fixup_by_path(fdt, path, "local-mac-address",
+				&mac_addr, 6, 1);
+	sprintf(enet1, "eth1");
+		path = fdt_getprop(fdt, node, enet1, NULL);
+			if (!path) {
+				debug("No alias for %s\n", enet1);
+				sprintf(mac, "eth1%daddr", ++i);
+				}
+			eth_getenv_enetaddr("ethaddr", mac_addr);
+			do_fixup_by_path(fdt, path, "mac-address", &mac_addr, 6, 0);
+			do_fixup_by_path(fdt, path, "local-mac-address",
+				&mac_addr, 6, 1);
 #else
 
 	i = 0;
@@ -518,7 +542,6 @@ sprintf(enet, "eth");
 
 		sprintf(mac, "eth%daddr", ++i);
 	}
-#endif
 #endif
 }
 
