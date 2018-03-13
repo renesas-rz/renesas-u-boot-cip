@@ -430,7 +430,7 @@ static int ravb_write_hwaddr(struct eth_device *dev)
 }
 #ifdef CONFIG_IWG21M
 /* E-MAC init function */
-static int ravb_mac_init(struct ravb_dev *eth)
+static int __maybe_unused ravb_mac_init(struct ravb_dev *eth)
 {
 	struct eth_device *dev = eth->dev;
 

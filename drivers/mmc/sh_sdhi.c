@@ -349,7 +349,7 @@ static int sdhi_single_write(struct sdhi_host *host, struct mmc_data *data)
 {
 	int ch = host->ch;
 	long time;
-	unsigned short blocksize, i;
+	unsigned short blocksize = 0, i;
 	const unsigned short *p = (const unsigned short *)data->src;
 #if defined(CONFIG_IWG23S)
         const u64 *q = (const u64 *)data->src;

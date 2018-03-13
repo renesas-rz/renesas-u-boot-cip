@@ -47,6 +47,7 @@ static struct tag *params;
 #endif
 
 extern void iwg20m_fdt_update(void *fdt);
+extern void iwg21m_fdt_update(void *fdt);
 extern void iwg22m_fdt_update(void *fdt);
 extern void iwg23s_fdt_update(void *fdt);
 

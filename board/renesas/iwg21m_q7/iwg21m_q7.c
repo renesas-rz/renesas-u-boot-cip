@@ -366,10 +366,10 @@ int board_init(void)
 int board_eth_init(bd_t *bis)
 {
 	int ret = -ENODEV;
-	u32 val;
-	unsigned char enetaddr[6];
 
 #ifdef CONFIG_SH_ETHER
+	u32 val;
+	unsigned char enetaddr[6];
 	ret = sh_eth_initialize(bis);
 	if (!eth_getenv_enetaddr("ethaddr", enetaddr))
 		return ret;

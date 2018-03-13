@@ -216,7 +216,7 @@ static int ksz9031_phy_extwrite(struct phy_device *phydev, int addr,
 };
 
 
-static struct phy_driver ksz9031_driver = {
+static struct phy_driver __maybe_unused ksz9031_driver = {
 	.name = "Micrel ksz9031",
 	.uid  = 0x221620,
 	.mask = 0xfffff0,
