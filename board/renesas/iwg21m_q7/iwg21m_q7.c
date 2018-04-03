@@ -39,7 +39,7 @@
 #include <libfdt.h>
 #include <fdt_support.h>
 
-#define BSP_VERSION                             "iW-PREXZ-SC-01-R2.0-REL1.0-Linux3.10.31"
+#define BSP_VERSION                             "iW-PREXZ-SC-01-R2.0-REL1.0-Linux3.10.31-PATCH009"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -47,6 +47,14 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define PLLECR		0xE61500D0
 #define PLL0ST		0x100
+
+
+#define FRQCRB			0xE6150004
+#define FRQCRB_KICK		(0x1ul << 31)
+
+#define FRQCRC			0xE61500E0
+#define FRQCRC_ZFC_MASK		(0x1Ful << FRQCRC_ZFC_SHIFT)
+#define FRQCRC_ZFC_SHIFT	(8)
 
 #define PUPR3		0xE606010C
 #define PUPR3_MMC	0xFEFEC000
@@ -62,6 +70,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 static int som_rev;
 int sw1_val;
+u8 rst_cause = 0;
 
 void s_init(void)
 {
@@ -70,20 +79,58 @@ void s_init(void)
 	u32 val;
 	u32 pll0_status;
 
-	/* Watchdog init */
-	writel(0xA5A5A500, &rwdt->rwtcsra);
-	writel(0xA5A5A500, &swdt->swtcsra);
-
 	/* cpu frequency setting */
 	if (rmobile_get_cpu_rev_integer() >= IWG21M_CUT_ES2X) {
+		u32 mult;
+		u32 kick;
+		int count;
+
+		val = readl(FRQCRC);
+		mult = (val & FRQCRC_ZFC_MASK) >> FRQCRC_ZFC_SHIFT;
+
+		/* z clk ratio is 1/32 */
+		val &= ~FRQCRC_ZFC_MASK;
+		val |= 0x1Ful << FRQCRC_ZFC_SHIFT;
+		val |= 0x1Ful;
+		writel(val, FRQCRC);
+
+		kick = readl(FRQCRB);
+		kick |= FRQCRB_KICK;
+		writel(kick, FRQCRB);
+
+		do {
+			kick = readl(FRQCRB) & FRQCRB_KICK;
+		} while (kick);
+
 		val = readl(PLL0CR);
 		val &= ~0x7F000000;
 		val |= 0x45000000;			/* 1.4GHz */
 		writel(val, PLL0CR);
 
+		count = 0;
 		do {
 			pll0_status = readl(PLLECR) & PLL0ST;
-		} while (pll0_status == 0x0);
+			if (pll0_status)
+				count++;
+			else
+				count = 0;
+
+		} while (count < 10);
+
+		/* z clk ratio is <mult>/32 */
+		val = readl(FRQCRC);
+		val &= ~FRQCRC_ZFC_MASK;
+		val |= mult << FRQCRC_ZFC_SHIFT;
+		val &= ~0x1Ful;
+		writel(val, FRQCRC);
+
+		kick = readl(FRQCRB);
+		kick |= FRQCRB_KICK;
+		writel(kick, FRQCRB);
+
+		do {
+			kick = readl(FRQCRB) & FRQCRB_KICK;
+		} while (kick);
 	}
 
 	/* QoS */
@@ -91,6 +138,23 @@ void s_init(void)
 	qos_init();
 #endif
 }
+
+void reset_cause(void)
+{
+        struct iwg21m_rwdt *rwdt = (struct iwg21m_rwdt *)RWDT_BASE;
+        struct iwg21m_swdt *swdt = (struct iwg21m_swdt *)SWDT_BASE;
+
+	/* Reading the watchdog status register */
+	rst_cause = readb(0xE6020004);
+	if(rst_cause & 0x10)
+		printf("Reset Cause : WDOG\n");
+	else
+		printf("Reset Cause : POR\n");
+	/* Watchdog init */
+	writel(0xA5A5A500, &rwdt->rwtcsra);
+	writel(0xA5A5A500, &swdt->swtcsra);
+}
+
 
 #define SYSDMAC0_MSTP219	(1 << 19)
 #ifdef CONFIG_SH_ETHER_RAVB
@@ -468,6 +532,11 @@ int board_mmc_init(bd_t *bis)
 void reset_cpu(ulong addr)
 {
 	struct iwg21m_rwdt *rwdt = (struct iwg21m_rwdt *)RWDT_BASE;
+	/* Disable presetout */
+	writel(0x0, RST_RSTOUTCR);
+
+	/* 10ms delay after disabling presetout */
+	mdelay(10);
 
 	writel(0x5A5AFF00, &rwdt->rwtcnt);
 	writel(0xA5A5A500, &rwdt->rwtcsra);

@@ -455,6 +455,12 @@ void board_init_f(ulong bootflag)
 #endif
 
 	gd->bd->bi_baudrate = gd->baudrate;
+
+#ifdef CONFIG_IWG21M
+        /* IWG21M: Reset: Checking the reset cause */
+        reset_cause();
+#endif
+
 	/* Ram ist board specific, so move it to board code ... */
 	dram_init_banksize();
 	display_dram_config();	/* and display it */

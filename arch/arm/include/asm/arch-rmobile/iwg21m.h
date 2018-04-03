@@ -37,6 +37,7 @@
 #define SDHI1_BASE		0xEE120000
 #define SDHI2_BASE		0xEE140000
 #define SDHI3_BASE		0xEE160000
+#define RST_RSTOUTCR		0xE6160058
 #define CA15BAR                0xE6160020
 #define WDTRSTCR               0xE6160054
 
