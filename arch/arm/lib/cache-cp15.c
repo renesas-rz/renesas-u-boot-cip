@@ -166,8 +166,21 @@ static void cache_disable(uint32_t cache_bit)
 	}
 	reg = get_cr();
 	cp_delay();
-	if (cache_bit == (CR_C | CR_M))
+	if (cache_bit == (CR_C | CR_M)) {
 		flush_dcache_all();
+	/*
+	 * FIX ME
+	 * Having issue with disabling cache
+	 * There is one cache-cable memory access between L1 and L2 cache flush.
+	 * and the process of disabling cache and MMU did not complete yet.
+	 * so system can not jump to linux(kernel). It leads to kernel hang up
+	 * This fix make sure that bit CR_C is cleared
+	 */
+#ifdef	CONFIG_IWG22M
+		set_cr(reg & ~CR_C);
+		flush_dcache_all();
+#endif
+	}
 	set_cr(reg & ~cache_bit);
 }
 #endif
