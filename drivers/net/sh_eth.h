@@ -1,7 +1,7 @@
 /*
  * sh_eth.h - Driver for Renesas SuperH ethernet controler.
  *
- * Copyright (C) 2013-2014  Renesas Electronics Corporation
+ * Copyright (C) 2013-2015  Renesas Electronics Corporation
  * Copyright (C) 2008 - 2012 Renesas Solutions Corp.
  * Copyright (c) 2008 - 2012 Nobuhiro Iwamatsu
  * Copyright (c) 2007 Carlos Munoz <carlos@kenati.com>
@@ -320,7 +320,8 @@ static const u16 sh_eth_offset_fast_sh4[SH_ETH_MAX_REGISTER_OFFSET] = {
 #define SH_ETH_TYPE_GETHER
 #define BASE_IO_ADDR	0xE9A00000
 #elif defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
+	defined(CONFIG_R8A7794X)|| defined(CONFIG_R8A7747X)
 #define SH_ETH_TYPE_ETHER
 #define BASE_IO_ADDR	0xEE700200
 #endif
@@ -520,7 +521,8 @@ enum FELIC_MODE_BIT {
 #ifdef CONFIG_CPU_SH7724
 	ECMR_RTM = 0x00000010,
 #elif defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
+	defined(CONFIG_R8A7794X)|| defined(CONFIG_R8A7747X)
 	ECMR_RTM = 0x00000004,
 #endif
 

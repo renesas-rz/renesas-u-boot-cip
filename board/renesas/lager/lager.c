@@ -2,7 +2,7 @@
  * board/renesas/lager/lager.c
  *     This file is lager board support.
  *
- * Copyright (C) 2013-2014 Renesas Electronics Corporation
+ * Copyright (C) 2013-2015 Renesas Electronics Corporation
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -294,9 +294,13 @@ void reset_cpu(ulong addr)
 	u8 val;
 
 	i2c_init(0, 0);
-	i2c_read(0x58, 0x13, 1, &val, 1);
-	val |= 0x02;
-	i2c_write(0x58, 0x13, 1, &val, 1);
+	i2c_read(DA9063_I2C_ADDR, REG_LDO5_CONT, 1, &val, 1);
+	val |= L_LDO5_PD_DIS;
+	i2c_write(DA9063_I2C_ADDR, REG_LDO5_CONT, 1, &val, 1);
+
+	i2c_read(DA9063_I2C_ADDR, REG_CONTROL_F, 1, &val, 1);
+	val |= L_SHUTDOWN;
+	i2c_write(DA9063_I2C_ADDR, REG_CONTROL_F, 1, &val, 1);
 }
 
 enum {

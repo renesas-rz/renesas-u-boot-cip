@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Renesas Electronics Corporation
+ * Copyright (C) 2013-2015 Renesas Electronics Corporation
  * (C) Copyright 2012 Nobuhiro Iwamatsu <nobuhiro.iwamatsu.yj@renesas.com>
  * (C) Copyright 2012 Renesas Solutions Corp.
  *
@@ -95,6 +95,16 @@ int print_cpuinfo(void)
 
 	case 0x4C:
 		printf("CPU: Renesas Electronics R8A7794 rev %d.%d\n",
+		       rmobile_get_cpu_rev_integer(),
+		       rmobile_get_cpu_rev_fraction());
+		break;
+
+	case 0x53:
+#if defined(CONFIG_R8A7747X)
+		printf("CPU: Renesas Electronics R8A7747X rev %d.%d\n",
+#else
+		printf("CPU: Renesas Electronics R8A7794X rev %d.%d\n",
+#endif
 		       rmobile_get_cpu_rev_integer(),
 		       rmobile_get_cpu_rev_fraction());
 		break;

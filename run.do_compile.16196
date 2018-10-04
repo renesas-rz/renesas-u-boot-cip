@@ -1,0 +1,156 @@
+#!/bin/sh
+
+# Emit a useful diagnostic if something fails:
+bb_exit_handler() {
+    ret=$?
+    case $ret in
+    0)  ;;
+    *)  case $BASH_VERSION in
+        "")   echo "WARNING: exit code $ret from a shell command.";;
+        *)    echo "WARNING: ${BASH_SOURCE[0]}:${BASH_LINENO[0]} exit $ret from
+  "$BASH_COMMAND"";;
+        esac
+        exit $ret
+    esac
+}
+trap 'bb_exit_handler' 0
+set -e
+export prefix="/usr"
+export STRIP="arm-poky-linux-gnueabi-strip"
+export localstatedir="/var"
+export USER="sonlam"
+export libexecdir="/usr/lib/u-boot"
+export PSEUDO_UNLOAD="1"
+export datadir="/usr/share"
+export BUILD_CXX="g++ "
+export LD="arm-poky-linux-gnueabi-ld --sysroot=/data2/sonlam/build/tmp/sysroots/iwg23s "
+export bindir="/usr/bin"
+export TARGET_CXXFLAGS=" -O2 -pipe -g -feliminate-unused-debug-types"
+export includedir="/usr/include"
+export BUILD_CC="gcc "
+export BUILD_LDFLAGS="-L/data2/sonlam/build/tmp/sysroots/x86_64-linux/usr/lib -L/data2/sonlam/build/tmp/sysroots/x86_64-linux/lib -Wl,-rpath-link,/data2/sonlam/build/tmp/sysroots/x86_64-linux/usr/lib -Wl,-rpath-link,/data2/sonlam/build/tmp/sysroots/x86_64-linux/lib -Wl,-rpath,/data2/sonlam/build/tmp/sysroots/x86_64-linux/usr/lib -Wl,-rpath,/data2/sonlam/build/tmp/sysroots/x86_64-linux/lib -Wl,-O1"
+unset TARGET_ARCH
+export STRINGS="arm-poky-linux-gnueabi-strings"
+export CCACHE_DIR="/home/sonlam"
+export BUILD_LD="ld "
+export oldincludedir="/usr/include"
+export BUILD_CCLD="gcc "
+export BUILD_CFLAGS="-isystem/data2/sonlam/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe"
+export docdir="/usr/share/doc"
+export infodir="/usr/share/info"
+export CC="arm-poky-linux-gnueabi-gcc  -march=armv7-a -mfloat-abi=hard -mfpu=neon -mtune=cortex-a7 --sysroot=/data2/sonlam/build/tmp/sysroots/iwg23s"
+export TERM="screen"
+export RANLIB="arm-poky-linux-gnueabi-ranlib"
+export CPPFLAGS=""
+export base_sbindir="/sbin"
+export CXX="arm-poky-linux-gnueabi-g++  -march=armv7-a -mfloat-abi=hard -mfpu=neon -mtune=cortex-a7 --sysroot=/data2/sonlam/build/tmp/sysroots/iwg23s"
+export systemd_unitdir="/lib/systemd"
+export FC="arm-poky-linux-gnueabi-gfortran  -march=armv7-a -mfloat-abi=hard -mfpu=neon -mtune=cortex-a7 --sysroot=/data2/sonlam/build/tmp/sysroots/iwg23s"
+export BUILD_RANLIB="ranlib"
+export BUILD_FC="gfortran "
+export AS="arm-poky-linux-gnueabi-as "
+export AR="arm-poky-linux-gnueabi-ar"
+export BUILD_CPPFLAGS="-isystem/data2/sonlam/build/tmp/sysroots/x86_64-linux/usr/include"
+export BUILD_AR="ar"
+export CPP="arm-poky-linux-gnueabi-gcc -E --sysroot=/data2/sonlam/build/tmp/sysroots/iwg23s  -march=armv7-a -mfloat-abi=hard -mfpu=neon -mtune=cortex-a7"
+export mandir="/usr/share/man"
+export sharedstatedir="/com"
+export PKG_CONFIG_SYSROOT_DIR="/data2/sonlam/build/tmp/sysroots/iwg23s"
+export BUILD_CXXFLAGS="-isystem/data2/sonlam/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe"
+export OBJCOPY="arm-poky-linux-gnueabi-objcopy"
+export CCACHE_DISABLE="1"
+export servicedir="/srv"
+export PKG_CONFIG_PATH="/data2/sonlam/build/tmp/sysroots/iwg23s/usr/lib/pkgconfig:/data2/sonlam/build/tmp/sysroots/iwg23s/usr/share/pkgconfig"
+export LC_ALL="C"
+export TARGET_CPPFLAGS=""
+export PKG_CONFIG_DIR="/data2/sonlam/build/tmp/sysroots/iwg23s/usr/lib/pkgconfig"
+export LDFLAGS="-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed"
+export BUILD_NM="nm"
+export nonarch_libdir="/usr/lib"
+export sysconfdir="/etc"
+export CCLD="arm-poky-linux-gnueabi-gcc  -march=armv7-a -mfloat-abi=hard -mfpu=neon -mtune=cortex-a7 --sysroot=/data2/sonlam/build/tmp/sysroots/iwg23s"
+export base_libdir="/lib"
+export MAKE="make"
+export LOGNAME="sonlam"
+export PATH="/data2/sonlam/poky/scripts:/data2/sonlam/build/tmp/sysroots/x86_64-linux/usr/bin/arm-poky-linux-gnueabi:/data2/sonlam/build/tmp/sysroots/iwg23s/usr/bin/crossscripts:/data2/sonlam/build/tmp/sysroots/x86_64-linux/usr/sbin:/data2/sonlam/build/tmp/sysroots/x86_64-linux/usr/bin:/data2/sonlam/build/tmp/sysroots/x86_64-linux/sbin:/data2/sonlam/build/tmp/sysroots/x86_64-linux/bin:/home/sonlam/bin:/home/sonlam/.local/bin:/data2/sonlam/poky/scripts:/data2/sonlam/poky/bitbake/bin:/home/sonlam/bin:/home/sonlam/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+export TARGET_CFLAGS=" -O2 -pipe -g -feliminate-unused-debug-types"
+export base_bindir="/bin"
+export HOME="/home/sonlam"
+export PKG_CONFIG_LIBDIR="/data2/sonlam/build/tmp/sysroots/iwg23s/usr/lib/pkgconfig"
+unset MACHINE
+export sbindir="/usr/sbin"
+export CFLAGS=" -O2 -pipe -g -feliminate-unused-debug-types"
+export BUILD_AS="as "
+export OBJDUMP="arm-poky-linux-gnueabi-objdump"
+unset DISTRO
+export systemd_system_unitdir="/lib/systemd/system"
+export exec_prefix="/usr"
+export TARGET_LDFLAGS="-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed"
+export PKG_CONFIG_DISABLE_UNINSTALLED="yes"
+export libdir="/usr/lib"
+export nonarch_base_libdir="/lib"
+export PSEUDO_DISABLED="1"
+unset SHELL
+export BUILD_CPP="gcc  -E"
+export systemd_user_unitdir="/usr/lib/systemd/user"
+export PATCH_GET="0"
+export CXXFLAGS=" -O2 -pipe -g -feliminate-unused-debug-types -fvisibility-inlines-hidden"
+export NM="arm-poky-linux-gnueabi-nm"
+export base_prefix=""
+export BUILD_STRIP="strip"
+
+do_compile() {
+    if [ "" = "ld-is-gold" ] ; then
+        sed -i 's/$(CROSS_COMPILE)ld$/$(CROSS_COMPILE)ld.bfd/g' config.mk
+    fi
+
+    unset LDFLAGS
+    unset CFLAGS
+    unset CPPFLAGS
+    oe_runmake iwg23s_config
+    oe_runmake all
+
+}
+
+oe_runmake() {
+	oe_runmake_call "$@" || die "oe_runmake failed"
+
+}
+
+die() {
+	bbfatal_log "$*"
+
+}
+
+oe_runmake_call() {
+	bbnote make -j 2 CROSS_COMPILE=arm-poky-linux-gnueabi- CC="arm-poky-linux-gnueabi-gcc  --sysroot=/data2/sonlam/build/tmp/sysroots/iwg23s" "$@"
+	make -j 2 CROSS_COMPILE=arm-poky-linux-gnueabi- CC="arm-poky-linux-gnueabi-gcc  --sysroot=/data2/sonlam/build/tmp/sysroots/iwg23s" "$@"
+
+}
+
+bbfatal_log() {
+	if [ -p /data2/sonlam/build/tmp/work/cortexa7hf-vfp-neon-poky-linux-gnueabi/u-boot/v2013.01.01+git9eefbd1f4e3160fca54d224447d75b93f30da6a5-r0/temp/fifo.16196 ] ; then
+		printf "%b\0" "bbfatal_log $*" > /data2/sonlam/build/tmp/work/cortexa7hf-vfp-neon-poky-linux-gnueabi/u-boot/v2013.01.01+git9eefbd1f4e3160fca54d224447d75b93f30da6a5-r0/temp/fifo.16196
+	else
+		echo "ERROR: $*"
+	fi
+	exit 1
+
+}
+
+bbnote() {
+	if [ -p /data2/sonlam/build/tmp/work/cortexa7hf-vfp-neon-poky-linux-gnueabi/u-boot/v2013.01.01+git9eefbd1f4e3160fca54d224447d75b93f30da6a5-r0/temp/fifo.16196 ] ; then
+		printf "%b\0" "bbnote $*" > /data2/sonlam/build/tmp/work/cortexa7hf-vfp-neon-poky-linux-gnueabi/u-boot/v2013.01.01+git9eefbd1f4e3160fca54d224447d75b93f30da6a5-r0/temp/fifo.16196
+	else
+		echo "NOTE: $*"
+	fi
+
+}
+
+cd '/data2/sonlam/build/tmp/work/cortexa7hf-vfp-neon-poky-linux-gnueabi/u-boot/v2013.01.01+git9eefbd1f4e3160fca54d224447d75b93f30da6a5-r0/git'
+do_compile
+
+# cleanup
+ret=$?
+trap '' 0
+exit $ret

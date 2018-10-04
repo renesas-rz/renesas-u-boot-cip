@@ -225,7 +225,8 @@ struct uart_port {
 # define SCIF_ORER 0x0001		/* Overrun error bit */
 # define SCSCR_INIT(port)	0x38	/* TIE=0,RIE=0,TE=1,RE=1,REIE=1 */
 #elif defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
+	defined(CONFIG_R8A7794X)|| defined(CONFIG_R8A7747X)
 # define SCIF_ORER	0x0001
 # define SCSCR_INIT(port)	0x32	/* TIE=0,RIE=0,TE=1,RE=1,REIE=0, */
 #else
@@ -588,7 +589,8 @@ SCIF_FNS(SCSPTR,                        0,  0, 0, 0)
 SCIF_FNS(SCSPTR,                        0,  0, 0x20, 16)
 #endif
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
+	defined(CONFIG_R8A7794X)|| defined(CONFIG_R8A7747X)
 SCIF_FNS(DL,				0,  0, 0x30, 16)
 SCIF_FNS(CKS,				0,  0, 0x34, 16)
 #endif
@@ -734,7 +736,8 @@ static inline int scbrr_calc(struct uart_port port, int bps, int clk)
 #elif defined(__H8300H__) || defined(__H8300S__)
 #define SCBRR_VALUE(bps, clk) (((clk*1000/32)/bps)-1)
 #elif defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
-	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794)
+	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
+	defined(CONFIG_R8A7794X)|| defined(CONFIG_R8A7747X)
 #define DL_VALUE(bps, clk)	(clk / bps / 16)
 #else /* Generic SH */
 #define SCBRR_VALUE(bps, clk) ((clk+16*bps)/(32*bps)-1)

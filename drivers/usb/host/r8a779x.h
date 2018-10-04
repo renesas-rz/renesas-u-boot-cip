@@ -21,14 +21,36 @@ struct rmobile_usb_platdata {
 
 /*-------------------------------------------------------------------------*/
 /* Register offset */
+#if defined(CONFIG_R8A7794X) || defined(CONFIG_R8A7747X)
+#define OHCI_OFFSET		0x00
+#define OHCI_SIZE		0x100
+#define EHCI_OFFSET		0x100
+#define EHCI_SIZE		0x100
+#define AHB_OFFSET		0x200
+#define USB_CORE_OFFSET	0x300
+#else
 #define OHCI_OFFSET		0
 #define OHCI_SIZE		0x1000
 
 #define EHCI_OFFSET		0x1000
 #define EHCI_SIZE		0x1000
+#endif
 
 #define EHCI_USBCMD	(EHCI_OFFSET + 0x0020)
 
+#if defined(CONFIG_R8A7794X) || defined(CONFIG_R8A7747X)
+/* INT_ENABLE (0x200) */
+#define WAKEON_INTEN		(1 << 4)
+#define UCOM_INTEN			(1 << 3)
+#define USBH_INTBEN			(1 << 2)
+#define USBH_INTAEN			(1 << 1)
+#define USBH_INTEN			(1 << 0)
+
+/* USBCTR (0x20C) */
+#define DIRPD				(1 << 2)
+#define PLL_RST				(1 << 1)
+
+#else
 /* PCI Configuration Registers */
 #define PCI_CONF_OHCI_OFFSET	0x10000
 #define OHCI_VID_DID		(PCI_CONF_OHCI_OFFSET + 0x0000)
@@ -202,9 +224,25 @@ struct rmobile_usb_platdata {
 #define PCIREQ2			(1 << 2)		/* RW */
 #define PCIREQ1			(1 << 1)		/* RW */
 #define PCIREQ0			(1 << 0)		/* RW */
-
+#endif
 /*-------------------------------------------------------------------------*/
+#if defined(CONFIG_R8A7794X) || defined(CONFIG_R8A7747X)
+struct ahb_bridge {
+	u32 int_enable;
+	u32 int_status;
+	u32 ahb_bus_ctr;
+	u32 usbctr;
+};
 
+struct usb_core_reg {
+	u32 revid;
+	u32 regen_cg_ctrl;
+	u32 spd_ctrl;
+	u32 spd_rsm_timset;
+	u32 oc_timset;
+	u32 sbrn_fladj_pw;
+};
+#else
 struct rmobile_ohci_reg {
 	u32	HcRevision;		/* HcRevision */
 	u32	HcControl;		/* HcControl */
@@ -231,6 +269,7 @@ struct rmobile_ohci_reg {
 
 	u32	save_flag;		/* Save Flag */
 };
+#endif
 
 struct rmobile_ehci_reg {
 	u32	HCIVERSION;		/* HCIVERSION/CAPLENGTH */
