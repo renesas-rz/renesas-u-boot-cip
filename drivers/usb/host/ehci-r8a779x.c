@@ -34,6 +34,8 @@
 #define PHYS_OFFSET	ALEX_SDRAM_BASE
 #elif defined(SKRZG1C_SDRAM_BASE)
 #define PHYS_OFFSET	SKRZG1C_SDRAM_BASE
+#elif defined(IWG23S_SDRAM_BASE)
+#define PHYS_OFFSET     IWG23S_SDRAM_BASE
 #else
 #error
 #endif

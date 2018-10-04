@@ -52,6 +52,37 @@ static struct phy_driver KS8721_driver = {
 };
 #endif
 
+#if defined(CONFIG_PHY_MICREL_KSZ9021) || defined (CONFIG_PHY_MICREL_KSZ9031)
+/**
+ * KSZ9021 - KSZ9031 common
+ */
+
+#define MII_KSZ90xx_PHY_CTL		0x1f
+#define MIIM_KSZ90xx_PHYCTL_1000	(1 << 6)
+#define MIIM_KSZ90xx_PHYCTL_100		(1 << 5)
+#define MIIM_KSZ90xx_PHYCTL_10		(1 << 4)
+#define MIIM_KSZ90xx_PHYCTL_DUPLEX	(1 << 3)
+
+static int ksz90xx_startup(struct phy_device *phydev)
+{
+	unsigned phy_ctl;
+	genphy_update_link(phydev);
+	phy_ctl = phy_read(phydev, MDIO_DEVAD_NONE, MII_KSZ90xx_PHY_CTL);
+
+	if (phy_ctl & MIIM_KSZ90xx_PHYCTL_DUPLEX)
+		phydev->duplex = DUPLEX_FULL;
+	else
+		phydev->duplex = DUPLEX_HALF;
+
+	if (phy_ctl & MIIM_KSZ90xx_PHYCTL_1000)
+		phydev->speed = SPEED_1000;
+	else if (phy_ctl & MIIM_KSZ90xx_PHYCTL_100)
+		phydev->speed = SPEED_100;
+	else if (phy_ctl & MIIM_KSZ90xx_PHYCTL_10)
+		phydev->speed = SPEED_10;
+	return 0;
+}
+#endif
 #ifdef CONFIG_PHY_MICREL_KSZ9021
 /* ksz9021 PHY Registers */
 #define MII_KSZ9021_EXTENDED_CTRL	0x0b
@@ -136,6 +167,71 @@ static struct phy_driver ksz9021_driver = {
 	.shutdown = &genphy_shutdown,
 };
 #endif
+#ifdef CONFIG_PHY_MICREL_KSZ9031 
+/**
+ * KSZ9031
+ */
+/* PHY Registers */
+#define MII_KSZ9031_MMD_ACCES_CTRL	0x0d
+#define MII_KSZ9031_MMD_REG_DATA	0x0e
+
+/* Accessors to extended registers*/
+int ksz9031_phy_extended_write(struct phy_device *phydev,
+			       int devaddr, int regnum, u16 mode, u16 val)
+{
+	/*select register addr for mmd*/
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_ACCES_CTRL, devaddr);
+	/*select register for mmd*/
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_REG_DATA, regnum);
+	/*setup mode*/
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_ACCES_CTRL, (mode | devaddr));
+	/*write the value*/
+	return	phy_write(phydev, MDIO_DEVAD_NONE,
+		MII_KSZ9031_MMD_REG_DATA, val);
+}
+
+int ksz9031_phy_extended_read(struct phy_device *phydev, int devaddr,
+			      int regnum, u16 mode)
+{
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_ACCES_CTRL, devaddr);
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_REG_DATA, regnum);
+	phy_write(phydev, MDIO_DEVAD_NONE,
+		  MII_KSZ9031_MMD_ACCES_CTRL, (devaddr | mode));
+	return phy_read(phydev, MDIO_DEVAD_NONE, MII_KSZ9031_MMD_REG_DATA);
+}
+
+static int ksz9031_phy_extread(struct phy_device *phydev, int addr, int devaddr,
+			       int regnum)
+{
+	return ksz9031_phy_extended_read(phydev, devaddr, regnum,
+					 MII_KSZ9031_MOD_DATA_NO_POST_INC);
+};
+
+static int ksz9031_phy_extwrite(struct phy_device *phydev, int addr,
+				int devaddr, int regnum, u16 val)
+{
+	return ksz9031_phy_extended_write(phydev, devaddr, regnum,
+					 MII_KSZ9031_MOD_DATA_POST_INC_RW, val);
+};
+
+
+static struct phy_driver ksz9031_driver = {
+	.name = "Micrel ksz9031",
+	.uid  = 0x221620,
+	.mask = 0xfffff0,
+	.features = PHY_GBIT_FEATURES,
+	.config   = &genphy_config,
+	.startup  = &ksz90xx_startup,
+	.shutdown = &genphy_shutdown,
+	.writeext = &ksz9031_phy_extwrite,
+	.readext = &ksz9031_phy_extread,
+};
+#endif
 
 int phy_micrel_init(void)
 {
@@ -144,6 +240,9 @@ int phy_micrel_init(void)
 	phy_register(&ksz9021_driver);
 #else
 	phy_register(&KS8721_driver);
+#endif
+#ifdef CONFIG_PHY_MICREL_KSZ9031 
+	phy_register(&ksz9031_driver);
 #endif
 	return 0;
 }

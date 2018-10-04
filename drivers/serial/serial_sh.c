@@ -64,8 +64,12 @@ static void sh_serial_setbrg(void)
 #if defined(CONFIG_R8A7790) || defined(CONFIG_R8A7791) || \
 	defined(CONFIG_R8A7793) || defined(CONFIG_R8A7794) || \
 	defined(CONFIG_R8A7794X)|| defined(CONFIG_R8A7747X)
+#if defined(CONFIG_IWG23S)
+	sci_out(&sh_sci, SCBRR, SCBRR_VALUE(gd->baudrate, CONFIG_SYS_CLK_FREQ));
+#else
 	sci_out(&sh_sci, DL, DL_VALUE(gd->baudrate, CONFIG_SCIF_CLK_FREQ));
 	udelay((1000000 * 2 * 16 / CONFIG_SYS_CLK_FREQ) * 1000 + 1);
+#endif
 #else
 	sci_out(&sh_sci, SCBRR, SCBRR_VALUE(gd->baudrate, CONFIG_SYS_CLK_FREQ));
 #endif

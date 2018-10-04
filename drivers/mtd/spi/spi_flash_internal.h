@@ -23,6 +23,10 @@
 #define CMD_WRITE_STATUS		0x01
 #define CMD_PAGE_PROGRAM		0x02
 #define CMD_WRITE_DISABLE		0x04
+/* IWG23: SPI: Adding support for SST26VF016B */
+#ifdef CONFIG_IWG23S
+#define CMD_UNLOCK_BPR                  0x98    /* Global Block Protection Unlock */
+#endif
 #define CMD_READ_STATUS			0x05
 #define CMD_WRITE_ENABLE		0x06
 #define CMD_ERASE_4K			0x20

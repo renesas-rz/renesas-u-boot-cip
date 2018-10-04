@@ -23,13 +23,42 @@
 
 #define CARDNAME "ravb"
 
-#define NUM_TX_DESC	8
+#define NUM_TX_DESC	64
 #define NUM_RX_DESC	64
 #define RAVB_ALIGN	128
 
 /* Buffers must be big enough to hold the largest ethernet frame. Also, rx
    buffers must be a multiple of 128 bytes */
 #define MAX_BUF_SIZE	(RAVB_ALIGN * 12)
+/* ECMR */
+
+/* ECSR */
+enum ECSR_STATUS_BIT {
+        ECSR_BRCRX = 0x20, ECSR_PSRTO = 0x10,
+        ECSR_LCHNG = 0x04,
+        ECSR_MPD = 0x02, ECSR_ICD = 0x01,
+};
+/*
+#define ECMR_CHG_DM (ECMR_ZPF | ECMR_PFR | ECMR_RXF | ECMR_TXF)
+
+#define DEFAULT_ECSR_INIT       (ECSR_BRCRX | ECSR_PSRTO | ECSR_LCHNG | \
+                                 ECSR_ICD | ECSIPR_MPDIP)
+
+/* ECSIPR */
+enum ECSIPR_STATUS_MASK_BIT {
+        ECSIPR_BRCRXIP = 0x20, ECSIPR_PSRTOIP = 0x10,
+        ECSIPR_LCHNGIP = 0x04,
+        ECSIPR_MPDIP = 0x02, ECSIPR_ICDIP = 0x01,
+};
+
+#define DEFAULT_ECSIPR_INIT     (ECSIPR_BRCRXIP | ECSIPR_PSRTOIP | \
+                                 ECSIPR_LCHNGIP | ECSIPR_ICDIP | ECSIPR_MPDIP)
+
+/* APR */
+enum APR_BIT {
+        APR_AP = 0x00000001,
+};
+
 
 /* The ethernet avb descriptor definitions. */
 enum DT {
@@ -142,6 +171,8 @@ struct ravb_dev {
 	struct ravb_rxdesc *rx_desc_alloc;
 	struct ravb_rxdesc *rx_desc_base;
 	struct ravb_rxdesc *rx_desc_cur;
+	//added
+	struct ravb_rxdesc *cur_desc_rx;
 	u8 *rx_buf_alloc;
 	u8 *rx_buf_base;
 	u8 mac_addr[6];
@@ -180,6 +211,7 @@ enum {
 	CDAR20,
 	CDAR21,
 	ESR,
+	APSR,
 	RCR,
 	RQC,
 	RPC,
@@ -346,7 +378,7 @@ static const u16 ravb_offset_rcar_gen2[RAVB_MAX_REGISTER_OFFSET] = {
 	[CDAR20] = 0x0060,
 	[CDAR21] = 0x0064,
 	[ESR] = 0x0088,
-	[PSR] = 0x008C,
+	[APSR] = 0x008C,
 	[RCR] = 0x0090,
 	[RQC] = 0x0094,
 	[RPC] = 0x00B0,
@@ -472,6 +504,7 @@ static const u16 ravb_offset_rcar_gen2[RAVB_MAX_REGISTER_OFFSET] = {
 };
 
 /* Register Address */
+#define SH_ETH_RAVB_TYPE_ETHER
 #define BASE_IO_ADDR	0xE6800000
 
 /* Register's bits of Ethernet AVB */
@@ -887,7 +920,7 @@ enum ECMR_BIT {
 	ECMR_TRCCM = 0x04000000, ECMR_RCSC = 0x00800000, ECMR_DPAD = 0x00200000,
 	ECMR_RZPF = 0x00100000, ECMR_PFR = 0x00040000, ECMR_RXF = 0x00020000,
 	ECMR_MPDE = 0x00000200, ECMR_RE = 0x00000040, ECMR_TE = 0x00000020,
-	ECMR_DM = 0x00000002, ECMR_PRM = 0x00000001,
+	ECMR_DM = 0x00000002, ECMR_PRM = 0x00000001,ECMR_ZPF = 0x00080000,ECMR_TXF = 0x00010000, ECMR_RTM = 0x00000010
 };
 
 #define ECMR_CHG_DM (ECMR_TRCCM | ECMR_RZPF | ECMR_PFR | ECMR_RXF)

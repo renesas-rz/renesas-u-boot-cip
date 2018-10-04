@@ -629,6 +629,8 @@ static int mmc_change_freq(struct mmc *mmc)
 
 	cardtype = ext_csd[EXT_CSD_CARD_TYPE] & 0xf;
 
+	/* IWG23S: EMMC : Temp Fix - Adding 1ms delay to avoid CRC error */
+	mdelay(1);
 	err = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_HS_TIMING, 1);
 
 	if (err)

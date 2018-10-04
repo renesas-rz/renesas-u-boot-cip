@@ -200,7 +200,7 @@ static void sdhi_sync_reset(struct sdhi_host *host)
 	defined(ALT_SDRAM_BASE)
 	if (host->ch == 0)
 		sdhi_writew(host, SDHI_HOST_MODE, 1);	/* 16bit access */
-#elif defined(ALEX_SDRAM_BASE) || defined(SKRZG1C_SDRAM_BASE) 
+#elif defined(ALEX_SDRAM_BASE) || defined(SKRZG1C_SDRAM_BASE) || defined(IWG23S_SDRAM_BASE)
 	if ((host->ch == 0) || (host->ch == 2))
 		sdhi_writew(host, SDHI_HOST_MODE, 1);	/* 16bit access */
 #else
@@ -721,7 +721,7 @@ int sdhi_mmc_init(unsigned long addr, int ch)
 		host->bus_shift = 1;
 	else
 		host->bus_shift = 0;
-#elif defined(ALEX_SDRAM_BASE) || defined(SKRZG1C_SDRAM_BASE)
+#elif defined(ALEX_SDRAM_BASE) || defined(SKRZG1C_SDRAM_BASE) || defined(IWG23S_SDRAM_BASE)
 	if ((ch == 0) || (ch == 2)) {
 		host->quirks = SH_SDHI_QUIRK_16BIT_BUF;
 		host->bus_shift = 1;

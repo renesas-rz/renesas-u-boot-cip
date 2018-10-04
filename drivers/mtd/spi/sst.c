@@ -29,11 +29,19 @@
 #define SST_SR_AAI		(1 << 6)	/* Addressing mode */
 #define SST_SR_BPL		(1 << 7)	/* BP bits lock */
 
+/* IWG23: SPI: Adding support for SST26VF016B
+ * Flag entry for Global block protection
+ */
+#ifdef CONFIG_IWG23S
+#define SST_BLOCK_PROTECT	(1 << 7) 
+#endif
+
 #define SST_FEAT_WP		(1 << 0)	/* Supports AAI word program */
 #define SST_FEAT_MBP		(1 << 1)	/* Supports multibyte program */
 
 struct sst_spi_flash_params {
 	u8 idcode1;
+	u8 idcode2;
 	u8 flags;
 	u16 nr_sectors;
 	const char *name;
@@ -57,10 +65,27 @@ static const struct sst_spi_flash_params sst_spi_flash_table[] = {
 		.name = "SST25VF080B",
 	},{
 		.idcode1 = 0x41,
+		.idcode2 = 0x25,
 		.flags = SST_FEAT_WP,
 		.nr_sectors = 512,
 		.name = "SST25VF016B",
-	},{
+	},
+/* IWG23: SPI: Adding support for SST26VF016B, IS25LP016D*/
+#ifdef CONFIG_IWG23S
+	{
+                .idcode1 = 0x41,
+                .idcode2 = 0x26,
+                .flags = SST_FEAT_MBP | SST_BLOCK_PROTECT,
+                .nr_sectors = 512,
+                .name = "SST26VF016B",
+        },{
+                .idcode1 = 0x15,
+                .flags = SST_FEAT_MBP,
+                .nr_sectors = 512,
+                .name = "IS25LP016D",
+        },
+#endif
+	{
 		.idcode1 = 0x4a,
 		.flags = SST_FEAT_WP,
 		.nr_sectors = 1024,
@@ -92,6 +117,23 @@ static const struct sst_spi_flash_params sst_spi_flash_table[] = {
 		.name = "SST25WF040",
 	},
 };
+
+/* IWG23: SPI: Adding support for SST26VF016B */
+#ifdef CONFIG_IWG23S
+static int sst_unlock_block_protection(struct spi_flash *flash)
+{
+       int ret;
+       ret = spi_flash_cmd_write_enable(flash);
+       if (ret) {
+               printf("Write enable failed\n");
+                return ret;
+       }
+       ret = spi_flash_cmd(flash->spi, CMD_UNLOCK_BPR, NULL, 0);
+       if (ret) 
+               printf("ULBPR failed\n");
+       return ret;
+}
+#endif
 
 static int
 sst_byte_write(struct spi_flash *flash, u32 offset, const void *buf)
@@ -194,8 +236,15 @@ spi_flash_probe_sst(struct spi_slave *spi, u8 *idcode)
 
 	for (i = 0; i < ARRAY_SIZE(sst_spi_flash_table); ++i) {
 		params = &sst_spi_flash_table[i];
-		if (params->idcode1 == idcode[2])
-			break;
+		/* IWG23: SPI: Comparing Device ID and Memory Type*/
+		if (params->idcode1 == idcode[2]) {
+			if (params->idcode2) {
+				if (params->idcode2 == idcode[1]) 
+					break;
+			} 
+			else 
+				break;
+		}
 	}
 
 	if (i == ARRAY_SIZE(sst_spi_flash_table)) {
@@ -225,6 +274,13 @@ spi_flash_probe_sst(struct spi_slave *spi, u8 *idcode)
 
 	/* Flash powers up read-only, so clear BP# bits */
 	spi_flash_cmd_write_status(&stm->flash, 0);
+	
+	/* IWG23: SPI: Adding support for SST26VF016B */
+#ifdef CONFIG_IWG23S
+        if (stm->params->flags & SST_BLOCK_PROTECT) {
+                sst_unlock_block_protection(&stm->flash);
+        }
+#endif
 
 	return &stm->flash;
 }

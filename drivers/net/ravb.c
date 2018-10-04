@@ -72,9 +72,9 @@ int ravb_send(struct eth_device *dev, void *packet, int len)
 	desc->dt = DT_FSINGLE;
 	ravb_flush_dcache((u32)desc, sizeof(struct ravb_txdesc));
 	/* Restart the transmitter if disabled */
-	if (!(ravb_read(eth, TCCR) & TCCR_TSRQ0))
-		ravb_write(eth,
-			ravb_read(eth, TCCR) | TCCR_TSRQ0, TCCR);
+        ravb_write(eth, ravb_read(eth, TCCR) | TCCR_TSRQ0, TCCR);
+
+        while(ravb_read(eth, TCCR) & TCCR_TSRQ0);
 
 	/* Wait until packet is transmitted */
 	timeout = TIMEOUT_CNT;
@@ -106,9 +106,10 @@ int ravb_recv(struct eth_device *dev)
 	int limit = NUM_RX_DESC;
 	u8 *packet;
 
+        while(ravb_read(eth, TCCR) & TCCR_TSRQ0);
 	/* Check if the rx descriptor is ready */
 	ravb_invalidate_dcache((u32)desc, sizeof(struct ravb_rxdesc));
-	while (limit-- && desc->dt != DT_FEMPTY) {
+	while (desc->dt != DT_FEMPTY) {
 		/* Check for errors */
 		if (desc->msc & MSC_RX_ERR_MASK) {
 			desc->msc = 0x0;
@@ -123,14 +124,14 @@ int ravb_recv(struct eth_device *dev)
 		desc->ds = MAX_BUF_SIZE;
 		desc->dt = DT_FEMPTY;
 		ravb_flush_dcache((u32)desc, sizeof(struct ravb_rxdesc));
+	}
 		/* Point to the next descriptor */
 		eth->rx_desc_cur++;
 		if (eth->rx_desc_cur >=
-		    eth->rx_desc_base + NUM_RX_DESC)
+		    eth->cur_desc_rx + NUM_RX_DESC)
 			eth->rx_desc_cur = eth->rx_desc_base;
 		desc = eth->rx_desc_cur;
 		ravb_invalidate_dcache((u32)desc, sizeof(struct ravb_rxdesc));
-	}
 
 	return len;
 }
@@ -155,7 +156,7 @@ static int ravb_reset(struct ravb_dev *eth)
 	int ret = 0;
 
 	/* set config mode */
-	ravb_write(eth, CCC_OPC_CONFIG, CCC);
+	ravb_write(eth, (ravb_read(eth, CCC) & ~CCC_OPC) | CCC_OPC_CONFIG, CCC);
 
 	/* check the operating mode is changed to the config mode */
 	ret = ravb_wait_setting(eth, CSR, CSR_OPS_CONFIG);
@@ -200,6 +201,7 @@ static int ravb_tx_desc_init(struct ravb_dev *eth)
 {
 	int i, ret = 0;
 	u32 alloc_desc_size = (NUM_TX_DESC + 1) * sizeof(struct ravb_txdesc);
+        u32 desc_size = DBAT_ENTRY_NUM * sizeof(struct ravb_desc);
 	struct ravb_txdesc *cur_tx_desc;
 	struct ravb_desc *desc;
 
@@ -230,7 +232,11 @@ static int ravb_tx_desc_init(struct ravb_dev *eth)
 	desc = &eth->desc_bat_base[TX_QUEUE];
 	desc->dt = DT_LINKFIX;
 	desc->dptr = (u32)eth->tx_desc_base;
-	ravb_flush_dcache((u32)desc, sizeof(struct ravb_desc));
+	desc = &eth->desc_bat_base[RX_QUEUE];
+	desc->dt = DT_LINKFIX;
+	desc->dptr = (u32)eth->rx_desc_base;
+	//ravb_flush_dcache((u32)desc, sizeof(struct ravb_desc));
+	ravb_flush_dcache(ravb_read(eth, DBAT), desc_size);
 
 err:
 	return ret;
@@ -255,6 +261,7 @@ static int ravb_rx_desc_init(struct ravb_dev *eth)
 		goto err;
 	}
 	eth->rx_desc_cur = eth->rx_desc_base;
+	eth->cur_desc_rx = eth->rx_desc_base;
 
 	/* Allocate rx data buffers. They should be RAVB_ALIGN bytes */
 	/* aligned. */
@@ -283,10 +290,6 @@ static int ravb_rx_desc_init(struct ravb_dev *eth)
 	ravb_flush_dcache((u32)eth->rx_desc_base, alloc_desc_size);
 
 	/* Point the controller to the rx descriptor list */
-	desc = &eth->desc_bat_base[RX_QUEUE];
-	desc->dt = DT_LINKFIX;
-	desc->dptr = (u32)eth->rx_desc_base;
-	ravb_flush_dcache((u32)desc, sizeof(struct ravb_desc));
 
 	return ret;
 
@@ -331,13 +334,13 @@ static int ravb_desc_init(struct ravb_dev *eth)
 {
 	int ret = 0;
 
-	ret = ravb_tx_desc_init(eth);
-	if (ret)
-		goto err_tx_init;
-
 	ret = ravb_rx_desc_init(eth);
 	if (ret)
 		goto err_rx_init;
+
+	ret = ravb_tx_desc_init(eth);
+	if (ret)
+		goto err_tx_init;
 
 	return ret;
 
@@ -354,9 +357,27 @@ static int ravb_phy_config(struct ravb_dev *eth)
 	struct eth_device *dev = eth->dev;
 	struct phy_device *phydev;
 
+#ifdef CONFIG_IWG23S
+	int addr;
+         for (addr = 0; addr <  32; addr++)
+        {
+                phydev = phy_connect(
+                        miiphy_get_dev_by_name(dev->name),
+                        addr, dev, CONFIG_RAVB_PHY_MODE);
+                if (phydev == NULL)
+                        continue;
+                else
+                {
+                        printf("PHY detected at addr %d\n", addr);
+                        break;
+                }
+
+        }
+#else
 	phydev = phy_connect(
 			miiphy_get_dev_by_name(dev->name),
 			eth->phy_addr, dev, CONFIG_RAVB_PHY_MODE);
+#endif
 	if (!phydev)
 		return -1;
 
@@ -437,6 +458,48 @@ static int ravb_config(struct ravb_dev *eth, bd_t *bd)
 {
 	int ret = 0;
 	struct phy_device *phy;
+        u32 val;
+        struct eth_device *dev = eth->dev;
+
+        /* all ravb int mask disable*/
+        ravb_write(eth, ( ravb_read(eth, ECMR) & ~( ECMR_TE | ECMR_RE )), ECMR);
+        ravb_write(eth, 0, RIC0);
+        ravb_write(eth, 0, RIC1);
+        ravb_write(eth, 0, RIC2);
+        ravb_write(eth, 0, TIC);
+        ravb_write(eth, ravb_read(eth, CCC) & ~CCC_BOC, CCC);
+
+        ravb_write(eth, 0x18000001, RCR);
+
+        /* FIFO size set */
+        ravb_write(eth, 0x00222210, TGC);
+#ifdef NETETH
+        /* delay CLK: 2ns */
+        ravb_write(eth, 0x1ul << 14, PSR);
+#endif
+
+        /* Timestamp Enable */
+        ravb_write(eth, 0x00000100, TCCR);
+        ravb_write(eth, 0x00000003, RIC0);
+        /* Receive FIFO full warning */
+        ravb_write(eth, 0x80000000, RIC1);
+        /* Receive FIFO full error, Descriptor Empty */
+        ravb_write(eth, 0x80000003, RIC2);
+        /* Frame Transmited, Timestamp FIFO updated */
+        ravb_write(eth, 0x00000103, TIC);
+
+        ravb_write(eth, RFLR_RFL_MIN, RFLR);
+
+        /* Setting the control will start the AVB-DMAC process. */
+        ravb_write(eth,(ravb_read(eth, CCC) & ~CCC_OPC) | CCC_OPC_OPERATION, CCC);
+
+        ravb_write_hwaddr(dev);
+        /* mask reset */
+        ravb_write(eth, MPR_MP, MPR);
+        /* E-MAC Status Register clear */
+        ravb_write(eth, ECSR_ICD | ECSR_MPD, ECSR);
+        /* Configure phy */
+        ravb_write(eth, ECSIPR_LCHNGIP | ECSIPR_ICDIP | ECSIPR_MPDIP, ECSIPR);
 
 	/* Configure AVB-DMAC register */
 	ravb_dmac_init(eth);
@@ -452,6 +515,11 @@ static int ravb_config(struct ravb_dev *eth, bd_t *bd)
 	}
 	phy = eth->phydev;
 
+	ret = phy_read(phy, MDIO_DEVAD_NONE, 0x1e);
+	ret &= ~0xc000;
+	ret |= 0x4000;
+	phy_write(phy, MDIO_DEVAD_NONE, 0x1e, (u16)ret);
+
 	ret = phy_startup(phy);
 	if (ret) {
 		printf(CARDNAME ": phy startup failure\n");
@@ -465,16 +533,16 @@ static int ravb_config(struct ravb_dev *eth, bd_t *bd)
 	} else if (phy->speed == 1000) {
 		printf(CARDNAME ": 1000Base/");
 		ravb_write(eth, 1, GECMR);
-	}
+	} else if (phy->speed == 10)
+                printf(CARDNAME ": not supported /");
 
 	/* Check if full duplex mode is supported by the phy */
 	if (phy->duplex) {
 		printf("Full\n");
-		ravb_write(eth, ECMR_CHG_DM | ECMR_RE | ECMR_TE | ECMR_DM,
-			   ECMR);
+        ravb_write(eth, ( ravb_read(eth, ECMR) | ECMR_TE |ECMR_DM | ECMR_RE | ECMR_ZPF | ECMR_TXF), ECMR);
 	} else {
 		printf("Half\n");
-		ravb_write(eth, ECMR_CHG_DM | ECMR_RE | ECMR_TE, ECMR);
+        ravb_write(eth,  (ravb_read(eth, ECMR) |  ECMR_TE | ECMR_RE | ECMR_RTM | ECMR_CHG_DM), ECMR);
 	}
 
 	return ret;
@@ -487,6 +555,7 @@ static void ravb_start(struct ravb_dev *eth)
 {
 	/* Setting the control will start the AVB-DMAC process. */
 	ravb_write(eth, CCC_OPC_OPERATION, CCC);
+        udelay(100);
 }
 
 int ravb_init(struct eth_device *dev, bd_t *bd)
@@ -524,15 +593,41 @@ err:
 
 static void ravb_stop(struct ravb_dev *eth)
 {
+        int timeout = 100, timeout1 = 100;
+        /* Request for transfer suspension */
+        ravb_write(eth, CCC_DTSR, CCC);
+        while(ravb_read(eth, CSR) == CSR_DTS && timeout )
+                timeout--;
+
 	/* Setting the control will stop the Hardware process. */
 	ravb_write(eth, CCC_OPC_RESET, CCC);
+
+        /*Wait until reset is done */
+        while(ravb_read(eth, CSR) == CSR_OPS && timeout1)
+                timeout1--;
 }
 
 static void ravb_halt(struct eth_device *dev)
 {
 	struct ravb_dev *eth = dev->priv;
-	ravb_reset(eth);
-	ravb_stop(eth);
+	int i;
+
+	while(ravb_read(eth, CCC) & CCC_OPC_OPERATION)
+	{
+		/*Disable receive */
+		ravb_write(eth, ravb_read(eth, ECMR) & ~ECMR_RE, ECMR);
+		ravb_write(eth, ravb_read(eth, ECMR) & ~ECMR_TE, ECMR);
+		for (i = 0; i < 100; i++) {
+			if (!(ravb_read(eth, CSR) & (CSR_TPO0 | CSR_RPO)))
+				break;
+			udelay(100);
+		}
+		if (i >= 100)
+			printf("Timeout error\n");
+
+		ravb_reset(eth);
+		ravb_stop(eth);
+	}
 }
 
 int ravb_initialize(bd_t *bd)
@@ -573,8 +668,15 @@ int ravb_initialize(bd_t *bd)
 	/* Register Device to EtherNet subsystem */
 	eth_register(dev);
 
+        /*Configuration mode*/
+        ravb_write(eth,(ravb_read(eth, CCC) & ~CCC_OPC) | CCC_OPC_CONFIG, CCC);
+
 	bb_miiphy_buses[dev->index].priv = eth;
 	miiphy_register(dev->name, bb_miiphy_read, bb_miiphy_write);
+
+        if (!eth_getenv_enetaddr("ethaddr", dev->enetaddr))
+                puts("Please set MAC address\n");
+
 
 	return ret;
 
@@ -592,6 +694,13 @@ err:
 /******* for bb_miiphy *******/
 int ravb_bb_init(struct bb_miiphy_bus *bus)
 {
+        struct ravb_dev *eth = bus->priv;
+        int ret;
+
+        ret = ravb_reset(eth);
+        if (ret)
+                return ret;
+
 	return 0;
 }
 
