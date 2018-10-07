@@ -461,7 +461,7 @@ void fdt_fixup_ethernet(void *fdt)
 		return;
 
 #if defined(CONFIG_IWG20M)
-	sprintf(enet, "eth");
+	sprintf(enet, "ethernet0");
 	path = fdt_getprop(fdt, node, enet, NULL);
 		if (!path) {
 			debug("No alias for %s\n", enet);
