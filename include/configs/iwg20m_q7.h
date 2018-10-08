@@ -186,7 +186,7 @@
 	"bootcmd_sd=run bootargs_sd;run fdt_check;" \
 		"fatload mmc 0:1 ${loadaddr} ${kernel};" \
 		"fatload mmc 0:1 ${fdt_addr} ${fdt_file};if test \"$?\" = \"1\";then " \
-		"fatload mmc 0:1 ${fdt_addr} ${fdt_file_alt};fi" \
+		"fatload mmc 0:1 ${fdt_addr} ${fdt_file_alt};fi;" \
 		"bootm ${loadaddr} - ${fdt_addr}\0" \
 	"bootargs_usd=part uuid mmc 1:2 usd_uuid;" \
 		"setenv bootargs ${bootargs_base} root=PARTUUID=${usd_uuid}" \
@@ -194,7 +194,7 @@
 	"bootcmd_usd=run bootargs_usd;run fdt_check;"\
 		"fatload mmc 1:1 ${loadaddr} ${kernel};" \
 		"fatload mmc 1:1 ${fdt_addr} ${fdt_file};if test \"$?\" = \"1\";then " \
-		"fatload mmc 0:1 ${fdt_addr} ${fdt_file_alt};fi" \
+		"fatload mmc 1:1 ${fdt_addr} ${fdt_file_alt};fi;" \
 		"bootm ${loadaddr} - ${fdt_addr}\0" \
 	"bootargs_mmc=part uuid mmc 2:2 mmc_uuid;" \
 		"setenv bootargs ${bootargs_base} root=PARTUUID=${mmc_uuid}" \
@@ -202,7 +202,7 @@
 	"bootcmd_mmc=run bootargs_mmc;run fdt_check;" \
 		"fatload mmc 2:1 ${loadaddr} ${kernel};" \
 		"fatload mmc 2:1 ${fdt_addr} ${fdt_file};if test \"$?\" = \"1\";then " \
-		"fatload mmc 0:1 ${fdt_addr} ${fdt_file_alt};fi" \
+		"fatload mmc 2:1 ${fdt_addr} ${fdt_file_alt};fi;" \
 		"bootm ${loadaddr} - ${fdt_addr}\0" \
 	"bootcmd=run bootcmd_mmc\0" \
 
