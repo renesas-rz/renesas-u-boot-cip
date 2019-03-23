@@ -472,7 +472,7 @@ void fdt_fixup_ethernet(void *fdt)
 		do_fixup_by_path(fdt, path, "local-mac-address",
 				&mac_addr, 6, 1);
 #elif defined(CONFIG_IWG22M)
-sprintf(enet, "eth1");
+sprintf(enet, "ethernet0");
         path = fdt_getprop(fdt, node, enet, NULL);
                 if (!path) {
                         debug("No alias for %s\n", enet);
