@@ -31,6 +31,17 @@ void s_init(void)
 {
 }
 
+#define GPIO_WLAN_REG_ON 157
+#define GPIO_BT_REG_ON 158
+
+void clear_wlan_bt_reg_on(void)
+{
+	gpio_request(GPIO_WLAN_REG_ON, "wlan_reg_on");
+	gpio_request(GPIO_BT_REG_ON, "bt_reg_on");
+	gpio_direction_output(GPIO_WLAN_REG_ON, 0);
+	gpio_direction_output(GPIO_BT_REG_ON, 0);
+}
+
 #define SCIF2_MSTP310		BIT(10)	/* SCIF2 */
 #define DVFS_MSTP926		BIT(26)
 #define GPIO2_MSTP910		BIT(10)
@@ -70,6 +81,7 @@ int board_init(void)
 	/* low power status */
 	setbits_le16(HSUSB_REG_LPSTS, HSUSB_REG_LPSTS_SUSPM_NORMAL);
 
+	clear_wlan_bt_reg_on();
 	return 0;
 }
 
