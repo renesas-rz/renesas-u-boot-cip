@@ -16,6 +16,7 @@
 	#size-cells = <2>;
 
 	aliases {
+		i2c4 = &i2c4;
 		i2c7 = &i2c_dvfs;
 	};
 
@@ -710,9 +711,17 @@
 		i2c4: i2c@e66d8000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
-
+			compatible = "renesas,i2c-r8a774b1",
+						 "renesas,rcar-gen3-i2c";
 			reg = <0 0xe66d8000 0 0x40>;
-			/* placeholder */
+			interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD 927>;
+			power-domains = <&sysc 32>;
+			resets = <&cpg 927>;
+			dmas = <&dmac0 0x99>, <&dmac0 0x98>;
+			dma-names = "tx", "rx";
+			i2c-scl-internal-delay-ns = <110>;
+			status = "disabled";
 		};
 
 		i2c5: i2c@e66e0000 {
