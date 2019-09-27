@@ -227,7 +227,7 @@ void ecc_help(void)
  */
 int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
-#ifdef CONFIG_TARGET_EK874
+#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N)
 	if (strncmp(argv[1], "list", 4) == 0) {
 		/* List all Register ID with ECC status*/
 		ecc_list_setting();
