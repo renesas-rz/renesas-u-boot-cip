@@ -11,6 +11,8 @@
 #include <command.h>
 #include <linux/log2.h>
 #include <linux/io.h>
+#include <mapmem.h>
+#include <dm.h>
 
 #define	DFUSAAREACR		0xE6785000	/* DRAM FuSa Area Conf */
 #define	DECCAREACR		0xE6785040	/* DRAM ECC Area Conf */
@@ -37,8 +39,58 @@
 #define SIZE_1MB		(1024 * 1024)
 #define MAX_BLOCK_SIZE_MB 	(512)
 #define DRAM_ADDR_BASE 		(0x400000000)
+#define DRAM_LEGACY_ADDR_OFSET	(0x3C0000000)
 #define ECC_ADDR_XOR		(0x200000000)
 #define BANK_SIZE_MB		(2048)
+
+/* ecc_bzero64(u64 addr, u32 size)
+ * Write zero-valued octa-byte words
+ * addr : start address
+ * size : size in bytes
+ */
+void ecc_bzero64(u64 addr, u32 size)
+{
+	void *buf;
+	u64 *ptr;
+	u64 *end;
+
+	if (gd->bd->bi_dram[1].start == 0 ||
+	    addr < gd->bd->bi_dram[1].start)
+		addr = (addr - DRAM_LEGACY_ADDR_OFSET);
+
+	buf = map_sysmem(addr, size);
+	ptr = (u64 *)buf;
+	end = ptr + (size / sizeof(u64));
+
+	while (ptr < end)
+		*ptr++ = 0;
+
+	unmap_sysmem(buf);
+	flush_dcache_all();
+}
+
+/* void ecc_bzero64_blocks(u32 block_pos, u32 blocks,
+ *			u32 blocksize, u64 addr_mask)
+ * block_pos : position of block in extra split mode
+ * blocks : areas of ECC enabled
+ * blocksize : size in MB
+ * addr_mask : exclusive or with start address
+ */
+void ecc_bzero64_blocks(u32 block_pos, u32 blocks,
+			u32 blocksize, u32 addr_mask)
+{
+	int i;
+	u64 addr;
+
+	for (i = 0; i < NUM_DFUSACR; i++) {
+		if (blocks & (0x1 << i)) {
+			addr = (DRAM_ADDR_BASE ^ addr_mask)
+			     + block_pos * blocksize * NUM_DFUSACR * SIZE_1MB
+			     + blocksize * i * SIZE_1MB;
+			ecc_bzero64(addr, blocksize * SIZE_1MB);
+		}
+	}
+}
 
 /* ecc_check_address(unsigned long long addr)
  * Check if address is 36 bits
@@ -151,11 +203,16 @@ int ecc_add_configure( unsigned long long data_addr, unsigned long long ecc_addr
 		}
 
 		if(mode == 64) {
+			ecc_bzero64(ecc_addr, (block_size / NUM_DFUSACR)
+					    * SIZE_1MB);
 			writel(FUSAAREACR(1, ilog2(block_size), data_addr),((uint32_t *)DFUSAAREACR + i));
 			writel(ECCAREACR(1, ecc_addr) ,((uint32_t *)DECCAREACR + i));
+			ecc_bzero64(data_addr, block_size * SIZE_1MB);
 		} else if (mode == 8) {
+			ecc_bzero64(ecc_addr, block_size * SIZE_1MB);
 			writel(FUSAAREACR(1, ilog2(block_size), data_addr),((uint32_t *)DFUSAAREACR + i));
 			writel(ECCAREACR(0, ecc_addr) ,((uint32_t *)DECCAREACR + i));
+			ecc_bzero64(data_addr, block_size * SIZE_1MB);
 		} else {
 			printf("ECC: ERROR: not support mode %ld\n", mode);
 			return 0;
@@ -337,6 +394,7 @@ void ecc_add_setting_dual(u64 data_start_addr, u32 size)
 		data_addr += block_size * SIZE_1MB;
 	}
 
+	ecc_bzero64_blocks(block_pos, dfusa, block_size, ECC_ADDR_XOR);
 	if (block_size == extra_block_size) {
 		adsplcr0 |= (SPLITSEL(0x1 << block_pos));
 		adsplcr1 |= (SPLITSEL(0x1 << block_pos));
@@ -349,6 +407,7 @@ void ecc_add_setting_dual(u64 data_start_addr, u32 size)
 	writel(adsplcr1, (uint32_t *)DADSPLCR1);
 	writel(adsplcr2, (uint32_t *)DADSPLCR2);
 	writel(adsplcr3, (uint32_t *)DADSPLCR3);
+	ecc_bzero64_blocks(block_pos, dfusa, block_size, 0);
 #else
 	printf("ECC: Command not support for this platform\n");
 #endif
