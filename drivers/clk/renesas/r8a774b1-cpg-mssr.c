@@ -72,6 +72,8 @@ static const struct cpg_core_clk r8a774b1_core_clks[] = {
 	DEF_FIXED(".sdsrc",     CLK_SDSRC,         CLK_PLL1_DIV2,  2, 1),
 	DEF_FIXED(".rpcsrc",    CLK_RPCSRC,        CLK_PLL1,       2, 1),
 
+	DEF_GEN3_OSC(".r",      CLK_RINT,          CLK_EXTAL,      32),
+
 	/* Core Clock Outputs */
 	DEF_FIXED("ztr",        R8A774B1_CLK_ZTR,   CLK_PLL1_DIV2,  6, 1),
 	DEF_FIXED("ztrd2",      R8A774B1_CLK_ZTRD2, CLK_PLL1_DIV2, 12, 1),
@@ -269,23 +271,23 @@ static const struct mssr_mod_clk r8a774b1_mod_clks[] = {
 					 (((md) & BIT(17)) >> 17))
 
 static const struct rcar_gen3_cpg_pll_config cpg_pll_configs[16] = {
-	/* EXTAL div	PLL1 mult/div	PLL3 mult/div */
-	{ 1,		192,	1,	192,	1,	},
-	{ 1,		192,	1,	128,	1,	},
-	{ 0, /* Prohibited setting */			},
-	{ 1,		192,	1,	192,	1,	},
-	{ 1,		160,	1,	160,	1,	},
-	{ 1,		160,	1,	106,	1,	},
-	{ 0, /* Prohibited setting */			},
-	{ 1,		160,	1,	160,	1,	},
-	{ 1,		128,	1,	128,	1,	},
-	{ 1,		128,	1,	84,	1,	},
-	{ 0, /* Prohibited setting */			},
-	{ 1,		128,	1,	128,	1,	},
-	{ 2,		192,	1,	192,	1,	},
-	{ 2,		192,	1,	128,	1,	},
-	{ 0, /* Prohibited setting */			},
-	{ 2,		192,	1,	192,	1,	},
+	/* EXTAL div	PLL1 mult/div	PLL3 mult/div   OSC prediv */
+	{ 1,		192,	1,	192,	1,	16,	},
+	{ 1,		192,	1,	128,	1,	16,	},
+	{ 0, /* Prohibited setting */				},
+	{ 1,		192,	1,	192,	1,	16,	},
+	{ 1,		160,	1,	160,	1,	16,	},
+	{ 1,		160,	1,	106,	1,	16,	},
+	{ 0, /* Prohibited setting */				},
+	{ 1,		160,	1,	160,	1,	16,	},
+	{ 1,		128,	1,	128,	1,	16,	},
+	{ 1,		128,	1,	84,	1,	16,	},
+	{ 0, /* Prohibited setting */				},
+	{ 1,		128,	1,	128,	1,	16,	},
+	{ 2,		192,	1,	192,	1,	16,	},
+	{ 2,		192,	1,	128,	1,	16,	},
+	{ 0, /* Prohibited setting */				},
+	{ 2,		192,	1,	192,	1,	16,	},
 };
 
 static const struct mstp_stop_table r8a774b1_mstp_table[] = {
