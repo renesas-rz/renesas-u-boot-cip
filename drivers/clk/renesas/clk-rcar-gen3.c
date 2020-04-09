@@ -26,6 +26,8 @@
 
 #define CPG_RST_MODEMR		0x0060
 
+#define CPG_RCKCR_CKSEL BIT(15) /* RCLK Clock Source Select */
+
 #define CPG_PLL0CR		0x00d8
 #define CPG_PLL2CR		0x002c
 #define CPG_PLL4CR		0x01f4
@@ -164,6 +166,7 @@ static u64 gen3_clk_get_rate64(struct clk *clk)
 					priv->cpg_pll_config;
 	u32 value, mult, div, prediv, postdiv;
 	u64 rate = 0;
+	unsigned int rckcr_div;
 	int i, ret;
 
 	debug("%s[%i] Clock: id=%lu\n", __func__, __LINE__, clk->id);
@@ -311,6 +314,43 @@ static u64 gen3_clk_get_rate64(struct clk *clk)
 
 		return -EINVAL;
 
+	case CLK_TYPE_FR:
+		rate = core->mult;
+		return rate;
+
+	case CLK_TYPE_DIV6_RO:
+		div = core->div;
+		rckcr_div = (readl(priv->base + core->offset) & 0x3f);
+		if (rckcr_div != 0x2f) {
+			writel(readl(priv->base + core->offset) | BIT(8)
+				, priv->base + core->offset);
+			udelay(105);
+			writel(((readl(priv->base + core->offset) & (BIT(15) |
+				BIT(12))) | 0x2f), priv->base + core->offset);
+			rckcr_div = (readl(priv->base + core->offset) & 0x3f);
+		}
+		div *= (readl(priv->base + core->offset) & 0x3f) + 1;
+		rate = gen3_clk_get_rate64(&parent) / div;
+		return rate;
+
+	case CLK_TYPE_GEN3_RCKSEL:
+		if (readl(priv->base + CPG_RCKCR) & CPG_RCKCR_CKSEL) {
+			div = core->div & 0xffff;
+		} else {
+			parent.id = parent.id >> 16;
+			div = core->div >> 16;
+		}
+		rate = gen3_clk_get_rate64(&parent) / div;
+		return rate;
+
+	case CLK_TYPE_GEN3_R:
+		rate = gen3_clk_get_rate64(&parent);
+		return rate;
+
+	case CLK_TYPE_GEN3_OSC:
+		div = pll_config->osc_prediv * core->div;
+		rate = gen3_clk_get_rate64(&parent) / div;
+		return rate;
 	}
 
 	printf("%s[%i] unknown fail\n", __func__, __LINE__);
