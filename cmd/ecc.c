@@ -109,7 +109,8 @@ int ecc_check_address(unsigned long long addr)
  */
 void ecc_list_setting(void)
 {
-#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N)
+#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N || \
+			     CONFIG_TARGET_HIHOPE_RZG2H)
 	int i;
 	uint32_t dfusaareacr;
 	uint32_t deccareacr;
@@ -140,7 +141,7 @@ void ecc_list_setting(void)
  */
 void ecc_list_setting_dual(void)
 {
-#if (CONFIG_TARGET_HIHOPE_RZG2M)
+#if (CONFIG_TARGET_HIHOPE_RZG2M || CONFIG_TARGET_HIHOPE_RZG2H)
 	int i;
 	u32 dfusacr = readl((uint32_t *)DFUSACR);
 	u32 adsplcr0 = readl((uint32_t *)DADSPLCR0);
@@ -190,7 +191,8 @@ void ecc_list_setting_dual(void)
  */
 int ecc_add_configure( unsigned long long data_addr, unsigned long long ecc_addr, unsigned long block_size, unsigned long mode)
 {
-#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N)
+#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N || \
+			     CONFIG_TARGET_HIHOPE_RZG2H)
 	int i;
 	uint32_t dfusaareacr;
 	uint32_t deccareacr;
@@ -275,7 +277,8 @@ err_no_resource:
 void ecc_add_setting( unsigned long long data_start_addr, unsigned long long ecc_start_addr,
 			unsigned long size, unsigned long mode)
 {
-#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N)
+#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N || \
+			     CONFIG_TARGET_HIHOPE_RZG2H)
 	unsigned int block_size = MAX_BLOCK_SIZE_MB;
 	unsigned long long data_addr= data_start_addr;
 	unsigned long long ecc_addr = ecc_start_addr;
@@ -324,7 +327,7 @@ void ecc_add_setting( unsigned long long data_start_addr, unsigned long long ecc
  */
 void ecc_add_setting_dual(u64 data_start_addr, u32 size)
 {
-#if (CONFIG_TARGET_HIHOPE_RZG2M)
+#if (CONFIG_TARGET_HIHOPE_RZG2M || CONFIG_TARGET_HIHOPE_RZG2H)
 	u32 block_size = BANK_SIZE_MB / 8;
 	u32 extra_block_size = block_size / 8;
 	u32 block_pos;
@@ -419,7 +422,8 @@ void ecc_add_setting_dual(u64 data_start_addr, u32 size)
  */
 void ecc_rm_setting(unsigned int id)
 {
-#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N)
+#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N || \
+			     CONFIG_TARGET_HIHOPE_RZG2H)
 	uint32_t dfusaareacr;
 
 	if (id > NUM_DAREA){
@@ -448,7 +452,7 @@ void ecc_rm_setting(unsigned int id)
  */
 void ecc_rm_setting_dual(unsigned int id)
 {
-#if (CONFIG_TARGET_HIHOPE_RZG2M)
+#if (CONFIG_TARGET_HIHOPE_RZG2M || CONFIG_TARGET_HIHOPE_RZG2H)
 	u32 dfusacr = readl((uint32_t *)DFUSACR);
 
 	if (id > NUM_DFUSACR) {
@@ -479,8 +483,8 @@ void ecc_help(void)
 	printf("usage: ecc <command> <mode> [<args>]\n"
 	       "\n"
 	       "There are two modes supported depends on SoC\n"
-	       "  -s, --single     single channel mode (RZ/G2N, RZ/G2E)\n"
-	       "  -d, --dual       dual channel mode (RZ/G2M)\n"
+	       "  -s, --single     single channel mode (RZ/G2H, RZ/G2N, RZ/G2E)\n"
+	       "  -d, --dual       dual channel mode (RZ/G2H, RZ/G2M)\n"
 	       "\n");
 	printf("These are commands supported, they may take different args\n"
 	       "depend on single or dual mode\n"
@@ -528,7 +532,8 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 #if (CONFIG_TARGET_EK874 || \
 	CONFIG_TARGET_HIHOPE_RZG2N || \
-	CONFIG_TARGET_HIHOPE_RZG2M)
+	CONFIG_TARGET_HIHOPE_RZG2M || \
+	CONFIG_TARGET_HIHOPE_RZG2H)
 	if (strncmp(argv[1], "list", 4) == 0) {
 		/* List all Register ID with ECC status*/
 		if (strncmp(argv[2], "-s", 2) == 0 ||
