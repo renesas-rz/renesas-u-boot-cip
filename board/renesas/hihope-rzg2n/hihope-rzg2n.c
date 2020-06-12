@@ -121,6 +121,8 @@ int board_init(void)
 int board_late_init(void)
 {
 	env_set_hex("board_rev", board_rev);
+
+	return 0;
 }
 
 int dram_init(void)
