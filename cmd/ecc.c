@@ -426,7 +426,7 @@ void ecc_rm_setting(unsigned int id)
 			     CONFIG_TARGET_HIHOPE_RZG2H)
 	uint32_t dfusaareacr;
 
-	if (id > NUM_DAREA){
+	if (id >= NUM_DAREA) {
 		printf("ECC: Not support ECC at id %d\n", id);
 		return;
 	}
@@ -455,7 +455,7 @@ void ecc_rm_setting_dual(unsigned int id)
 #if (CONFIG_TARGET_HIHOPE_RZG2M || CONFIG_TARGET_HIHOPE_RZG2H)
 	u32 dfusacr = readl((uint32_t *)DFUSACR);
 
-	if (id > NUM_DFUSACR) {
+	if (id >= NUM_DFUSACR) {
 		printf("ECC: Not support ECC at id %d\n", id);
 		return;
 	}
@@ -534,17 +534,17 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	CONFIG_TARGET_HIHOPE_RZG2N || \
 	CONFIG_TARGET_HIHOPE_RZG2M || \
 	CONFIG_TARGET_HIHOPE_RZG2H)
-	if (strncmp(argv[1], "list", 4) == 0) {
+	if (strcmp(argv[1], "list") == 0) {
 		/* List all Register ID with ECC status*/
-		if (strncmp(argv[2], "-s", 2) == 0 ||
-		    strncmp(argv[2], "--single", 8) == 0)
+		if (strcmp(argv[2], "-s") == 0 ||
+		    strcmp(argv[2], "--single") == 0)
 			ecc_list_setting();
-		else if (strncmp(argv[2], "-d", 2) == 0 ||
-			 strncmp(argv[2], "--dual", 6) == 0)
+		else if (strcmp(argv[2], "-d") == 0 ||
+			 strcmp(argv[2], "--dual") == 0)
 			ecc_list_setting_dual();
 		else
 			ecc_help();
-	} else if (strncmp(argv[1], "add", 3) == 0) {
+	} else if (strcmp(argv[1], "add") == 0) {
 		/* Add an ECC area*/
 		unsigned long long data_addr = 0;
 		unsigned long long ecc_addr = 0;
@@ -552,8 +552,8 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		unsigned long mode = 8;
 
 		data_addr = simple_strtoull(argv[3], NULL, 16);
-		if (strncmp(argv[2], "-s", 2) == 0 ||
-		    strncmp(argv[2], "--single", 8) == 0) {
+		if (strcmp(argv[2], "-s") == 0 ||
+		    strcmp(argv[2], "--single") == 0) {
 			if (argc == 7) {
 				ecc_addr = simple_strtoull(argv[4], NULL, 16);
 				if (ecc_check_address(ecc_addr) == 0) {
@@ -571,34 +571,34 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 				ecc_help();
 				return 0;
 			}
-		} else if (strncmp(argv[2], "-d", 2) == 0 ||
-			   strncmp(argv[2], "--dual", 6) == 0) {
+		} else if (strcmp(argv[2], "-d") == 0 ||
+			   strcmp(argv[2], "--dual") == 0) {
 			size = simple_strtoul(argv[4], NULL, 10);
 		} else {
 			ecc_help();
 		}
 
 		if (ecc_check_address(data_addr)) {
-			if (strncmp(argv[2], "-s", 2) == 0 ||
-			    strncmp(argv[2], "--single", 8) == 0)
+			if (strcmp(argv[2], "-s") == 0 ||
+			    strcmp(argv[2], "--single") == 0)
 				ecc_add_setting(data_addr, ecc_addr,
 						size, mode);
-			else if (strncmp(argv[2], "-d", 2) == 0 ||
-				 strncmp(argv[2], "--dual", 6) == 0)
+			else if (strcmp(argv[2], "-d") == 0 ||
+				 strcmp(argv[2], "--dual") == 0)
 				ecc_add_setting_dual(data_addr, size);
 		} else {
 			printf("ECC: Please use 36 bits address\n");
 		}
 
-	} else if (strncmp(argv[1], "rm", 2) == 0) {
+	} else if (strcmp(argv[1], "rm") == 0) {
 		/* Remove an ECC area*/
 		unsigned long id;
 		id = simple_strtoul(argv[3], NULL, 10);
-		if (strncmp(argv[2], "-s", 2) == 0 ||
-		    strncmp(argv[2], "--single", 8) == 0)
+		if (strcmp(argv[2], "-s") == 0 ||
+		    strcmp(argv[2], "--single") == 0)
 			ecc_rm_setting(id);
-		else if (strncmp(argv[2], "-d", 2) == 0 ||
-			 strncmp(argv[2], "--dual", 6) == 0)
+		else if (strcmp(argv[2], "-d") == 0 ||
+			 strcmp(argv[2], "--dual") == 0)
 			ecc_rm_setting_dual(id);
 		else
 			ecc_help();
