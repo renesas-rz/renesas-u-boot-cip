@@ -136,7 +136,7 @@ void ecc_list_setting(void)
 		deccareacr = readl(((uint32_t *)DECCAREACR + i));
 		if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
 			printf("%2d: %s : Data from 0x%llx : ECC from 0x%llx :",
-			       i,
+			       i + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR,
 			       dfusaareacr & ECC_ENABLE_MASK_BIT ?
 			       "Enabled" : "Disabled",
 			       (unsigned long long)(dfusaareacr << 8) << 4,
@@ -146,8 +146,13 @@ void ecc_list_setting(void)
 			       1 << ((dfusaareacr >> 24) & 0xF),
 			       deccareacr & ECC_ENABLE_MASK_BIT ? 64 : 8);
 		} else {
-			printf("%2d: Disabled\n", i);
+			printf("%2d: Disabled\n",
+			       i + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR);
 		}
+		/* (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR :
+		 * If device support 2 ECC modes, we should increase
+		 * the ID of ECC Single Channel in logging.
+		 */
 	}
 #else
 	printf("ECC: Command not support for this platform\n");
@@ -454,7 +459,8 @@ void ecc_rm_setting(unsigned int id)
 	uint32_t dfusaareacr;
 
 	if (id >= NUM_DAREA) {
-		printf("ECC: Not support ECC at id %d\n", id);
+		printf("ECC: Not support ECC at id %d\n",
+		       id + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR);
 		return;
 	}
 
@@ -464,10 +470,16 @@ void ecc_rm_setting(unsigned int id)
 	dfusaareacr = readl(((uint32_t *)DFUSAAREACR + id));
 
 	if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
-		printf("ECC: Failed to disable ECC at id %d\n", id);
+		printf("ECC: Failed to disable ECC at id %d\n",
+		       id + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR);
 	} else {
-		printf("ECC: Disabled ECC at id %d\n", id);
+		printf("ECC: Disabled ECC at id %d\n",
+		       id + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR);
 	}
+	/* (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR :
+	 * If device support 2 ECC modes, we should increase
+	 * the ID of ECC Single Channel in logging.
+	 */
 #else
 	printf("ECC: Command not support for this platform\n");
 #endif
@@ -497,6 +509,7 @@ void ecc_rm_setting_dual(unsigned int id)
 		writel(adsplcr1 & (~SPLITSEL(0x1 << id)), (u32 *)DADSPLCR1);
 		writel(dfusacr & (~(FUSACR(0xff, 0))), (u32 *)DFUSACR);
 	}
+	printf("ECC: Disabled ECC at id %d\n", id);
 #else
 	printf("ECC: Command not support for this platform\n");
 #endif
@@ -507,7 +520,7 @@ void ecc_rm_setting_dual(unsigned int id)
  */
 void ecc_help(void)
 {
-	printf("usage: ecc <command> <mode> [<args>]\n"
+	printf("usage: ecc <command> [<mode>] [<args>]\n"
 	       "\n"
 	       "There are two modes supported depends on SoC\n"
 	       "  -s, --single     single channel mode (RZ/G2H, RZ/G2N, RZ/G2E)\n"
@@ -516,7 +529,9 @@ void ecc_help(void)
 	printf("These are commands supported, they may take different args\n"
 	       "depend on single or dual mode\n"
 	       "  list             list all ecc areas with enabled or disabled status\n"
-	       "                   number of ecc areas is different in single and dual mode\n"
+	       "		   list -d : Will list all ecc areas with dual channel mode\n"
+	       "		   list -s : Will list all ecc areas with single channel mode\n"
+	       "                   this command can be executed without <mode> and <args>\n"
 	       "\n");
 	printf("  add              enable one or multiple ecc areas depend on size\n"
 	       "                   args with -s : <data address> [ecc address] <size> <bits>\n"
@@ -543,9 +558,9 @@ void ecc_help(void)
 	       "                            Note that only one ecc area can be configured with\n"
 	       "                            extra split\n"
 	       "\n");
-	printf("  rm               disable an ECC area with id\n"
-	       "                   -s <id>  use 'ecc list -s' to get id\n"
-	       "                   -d <id>  use 'ecc list -d' to get id\n"
+	printf("  rm               disable an ECC area\n"
+	       "                   rm <id> : remove ECC Area with <id> in 'ecc list <mode>'\n"
+	       "                   rm all  : remove all ECC Area\n"
 	       "\n"
 	       "  help             print this help log\n");
 }
@@ -558,16 +573,32 @@ void ecc_help(void)
 int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 #if (ECC_SUPPORT)
+	int mode_process = 0;
+
+	if (strcmp(argv[2], "-s") == 0 ||
+	    strcmp(argv[2], "--single") == 0)
+		mode_process |= ECC_SINGLE;     /* Single channel process */
+	else if (strcmp(argv[2], "-d") == 0 ||
+		 strcmp(argv[2], "--dual") == 0)
+		mode_process |= ECC_DUAL;       /* Dual channel process */
 	if (strcmp(argv[1], "list") == 0) {
-		/* List all Register ID with ECC status*/
-		if (strcmp(argv[2], "-s") == 0 ||
-		    strcmp(argv[2], "--single") == 0)
-			ecc_list_setting();
-		else if (strcmp(argv[2], "-d") == 0 ||
-			 strcmp(argv[2], "--dual") == 0)
-			ecc_list_setting_dual();
-		else
+		/* We only allow command has no parameter or "select ECC mode"
+		 * after "list" parameter.
+		 */
+		if ((mode_process == 0 && argc > 2) ||
+		    (mode_process != 0 && argc > 3)) {
 			ecc_help();
+		} else {
+			/* List all Register ID with ECC status
+			 * ECC dual channel setting should be printed first.
+			 */
+			if (mode_process == 0)
+				mode_process = ECC_SUPPORT;
+			if (mode_process & ECC_DUAL)
+				ecc_list_setting_dual();
+			if (mode_process & ECC_SINGLE)
+				ecc_list_setting();
+		}
 	} else if (strcmp(argv[1], "add") == 0) {
 		/* Add an ECC area*/
 		unsigned long long data_addr = 0;
@@ -616,17 +647,45 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 
 	} else if (strcmp(argv[1], "rm") == 0) {
 		/* Remove an ECC area*/
-		unsigned long id;
-
-		id = simple_strtoul(argv[3], NULL, 10);
-		if (strcmp(argv[2], "-s") == 0 ||
-		    strcmp(argv[2], "--single") == 0)
-			ecc_rm_setting(id);
-		else if (strcmp(argv[2], "-d") == 0 ||
-			 strcmp(argv[2], "--dual") == 0)
-			ecc_rm_setting_dual(id);
-		else
+		if (argc > 3) {
 			ecc_help();
+		} else {
+			unsigned long id;
+
+			mode_process = ECC_SUPPORT;
+			/* User want to remove all ECC area
+			 */
+			if (strcmp(argv[2], "all") == 0) {
+				if (mode_process & ECC_DUAL) {
+					for (id = 0; id < NUM_DFUSACR; id++)
+						ecc_rm_setting_dual(id);
+				}
+				if (mode_process & ECC_SINGLE) {
+					for (id = 0; id < NUM_DAREA; id++)
+						ecc_rm_setting(id);
+				}
+			} else {
+				id = simple_strtoul(argv[2], NULL, 10);
+				/* If device support more than 1 ECC setting
+				 * we should select one
+				 */
+				if (mode_process & ECC_DUAL &&
+				    mode_process & ECC_SINGLE) {
+				/* When the id is over the number of
+				 * area in ECC Dual Channel, we need
+				 * to process it as ECC Single Channel.
+				 */
+					if (id >= NUM_DFUSACR) {
+						id -= NUM_DFUSACR;
+						mode_process = ECC_SINGLE;
+					}
+				}
+				if (mode_process & ECC_DUAL)
+					ecc_rm_setting_dual(id);
+				else if (mode_process & ECC_SINGLE)
+					ecc_rm_setting(id);
+			}
+		}
 	} else {
 		/* print usage log*/
 		ecc_help();
