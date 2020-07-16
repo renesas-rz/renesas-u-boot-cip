@@ -25,6 +25,21 @@
 #define	DADSPLCR3		0xE6784014	/* Address Split Control 3 */
 #define	NUM_DFUSACR		8
 
+/* We define macro for supported ECC mode on which platform.
+ * BIT(0) will be described for ECC Dual Channel setting
+ * BIT(1) will be described for ECC Single Channel setting
+ */
+#define ECC_DUAL       BIT(0)
+#define ECC_SINGLE     BIT(1)
+#if (CONFIG_TARGET_EK874 || \
+	CONFIG_TARGET_HIHOPE_RZG2N)
+#define ECC_SUPPORT    (ECC_SINGLE)
+#elif (CONFIG_TARGET_HIHOPE_RZG2M)
+#define ECC_SUPPORT    (ECC_DUAL)
+#elif (CONFIG_TARGET_HIHOPE_RZG2H)
+#define ECC_SUPPORT    (ECC_SINGLE | ECC_DUAL)
+#endif
+
 /* As the saddr, specify high-memory address (> 4 GB) */
 #define	FUSAAREACR(en, size, saddr)	\
 	(((uint32_t)en << 31) | ((uint32_t)size << 24) | (uint32_t)(((uintptr_t)saddr) >> 12))
@@ -109,8 +124,7 @@ int ecc_check_address(unsigned long long addr)
  */
 void ecc_list_setting(void)
 {
-#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N || \
-			     CONFIG_TARGET_HIHOPE_RZG2H)
+#if (ECC_SUPPORT & ECC_SINGLE)
 	int i;
 	uint32_t dfusaareacr;
 	uint32_t deccareacr;
@@ -141,7 +155,7 @@ void ecc_list_setting(void)
  */
 void ecc_list_setting_dual(void)
 {
-#if (CONFIG_TARGET_HIHOPE_RZG2M || CONFIG_TARGET_HIHOPE_RZG2H)
+#if (ECC_SUPPORT & ECC_DUAL)
 	int i;
 	u32 dfusacr = readl((uint32_t *)DFUSACR);
 	u32 adsplcr0 = readl((uint32_t *)DADSPLCR0);
@@ -191,8 +205,7 @@ void ecc_list_setting_dual(void)
  */
 int ecc_add_configure( unsigned long long data_addr, unsigned long long ecc_addr, unsigned long block_size, unsigned long mode)
 {
-#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N || \
-			     CONFIG_TARGET_HIHOPE_RZG2H)
+#if (ECC_SUPPORT & ECC_SINGLE)
 	int i;
 	uint32_t dfusaareacr;
 	uint32_t deccareacr;
@@ -277,8 +290,7 @@ err_no_resource:
 void ecc_add_setting( unsigned long long data_start_addr, unsigned long long ecc_start_addr,
 			unsigned long size, unsigned long mode)
 {
-#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N || \
-			     CONFIG_TARGET_HIHOPE_RZG2H)
+#if (ECC_SUPPORT & ECC_DUAL)
 	unsigned int block_size = MAX_BLOCK_SIZE_MB;
 	unsigned long long data_addr= data_start_addr;
 	unsigned long long ecc_addr = ecc_start_addr;
@@ -327,7 +339,7 @@ void ecc_add_setting( unsigned long long data_start_addr, unsigned long long ecc
  */
 void ecc_add_setting_dual(u64 data_start_addr, u32 size)
 {
-#if (CONFIG_TARGET_HIHOPE_RZG2M || CONFIG_TARGET_HIHOPE_RZG2H)
+#if (ECC_SUPPORT & ECC_DUAL)
 	u32 block_size = BANK_SIZE_MB / 8;
 	u32 extra_block_size = block_size / 8;
 	u32 block_pos;
@@ -422,8 +434,7 @@ void ecc_add_setting_dual(u64 data_start_addr, u32 size)
  */
 void ecc_rm_setting(unsigned int id)
 {
-#if (CONFIG_TARGET_EK874 || CONFIG_TARGET_HIHOPE_RZG2N || \
-			     CONFIG_TARGET_HIHOPE_RZG2H)
+#if (ECC_SUPPORT & ECC_SINGLE)
 	uint32_t dfusaareacr;
 
 	if (id >= NUM_DAREA) {
@@ -452,7 +463,7 @@ void ecc_rm_setting(unsigned int id)
  */
 void ecc_rm_setting_dual(unsigned int id)
 {
-#if (CONFIG_TARGET_HIHOPE_RZG2M || CONFIG_TARGET_HIHOPE_RZG2H)
+#if (ECC_SUPPORT & ECC_DUAL)
 	u32 dfusacr = readl((uint32_t *)DFUSACR);
 
 	if (id >= NUM_DFUSACR) {
@@ -530,10 +541,7 @@ void ecc_help(void)
  */
 int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
-#if (CONFIG_TARGET_EK874 || \
-	CONFIG_TARGET_HIHOPE_RZG2N || \
-	CONFIG_TARGET_HIHOPE_RZG2M || \
-	CONFIG_TARGET_HIHOPE_RZG2H)
+#if (ECC_SUPPORT)
 	if (strcmp(argv[1], "list") == 0) {
 		/* List all Register ID with ECC status*/
 		if (strcmp(argv[2], "-s") == 0 ||
