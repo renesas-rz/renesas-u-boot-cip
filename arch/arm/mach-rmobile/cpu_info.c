@@ -112,6 +112,12 @@ int print_cpuinfo(void)
 			printf("CPU: Renesas Electronics R8A774A1 rev 1.1/rev 1.2\n");
 			return 0;
 		}
+
+		if ((rmobile_get_cpu_rev_integer() == 3) &&
+		    (rmobile_get_cpu_rev_fraction() == 0)) {
+			printf("CPU: Renesas Electronics R8A774A3\n");
+			return 0;
+		}
 	}
 
 	printf("CPU: Renesas Electronics %s rev %d.%d\n",
