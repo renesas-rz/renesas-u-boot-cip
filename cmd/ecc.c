@@ -311,7 +311,7 @@ void ecc_add_setting(unsigned long long data_start_addr,
 		     unsigned long long ecc_start_addr,
 		     unsigned long size, unsigned long mode)
 {
-#if (ECC_SUPPORT & ECC_DUAL)
+#if (ECC_SUPPORT & ECC_SINGLE)
 	unsigned int block_size = MAX_BLOCK_SIZE_MB;
 	unsigned long long data_addr = data_start_addr;
 	unsigned long long ecc_addr = ecc_start_addr;
@@ -572,7 +572,7 @@ void ecc_help(void)
  */
 int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
-#if (ECC_SUPPORT)
+#ifdef ECC_SUPPORT
 	int mode_process = 0;
 
 	if (strcmp(argv[2], "-s") == 0 ||
