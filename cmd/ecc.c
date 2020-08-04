@@ -29,16 +29,9 @@
  * BIT(0) will be described for ECC Dual Channel setting
  * BIT(1) will be described for ECC Single Channel setting
  */
-#define ECC_DUAL       BIT(0)
-#define ECC_SINGLE     BIT(1)
-#if (CONFIG_TARGET_EK874 || \
-	CONFIG_TARGET_HIHOPE_RZG2N)
-#define ECC_SUPPORT    (ECC_SINGLE)
-#elif (CONFIG_TARGET_HIHOPE_RZG2M)
-#define ECC_SUPPORT    (ECC_DUAL)
-#elif (CONFIG_TARGET_HIHOPE_RZG2H)
-#define ECC_SUPPORT    (ECC_SINGLE | ECC_DUAL)
-#endif
+#define ECC_DUAL	BIT(0)
+#define ECC_SINGLE	BIT(1)
+
 
 /* As the saddr, specify high-memory address (> 4 GB) */
 #define	FUSAAREACR(en, size, saddr)	\
@@ -58,6 +51,18 @@
 #define DRAM_LEGACY_ADDR_OFSET	(0x3C0000000)
 #define ECC_ADDR_XOR		(0x200000000)
 #define BANK_SIZE_MB		(2048)
+
+static int ecc_support =
+#if (CONFIG_TARGET_EK874 || \
+	CONFIG_TARGET_HIHOPE_RZG2N)
+	(ECC_SINGLE);
+#elif (CONFIG_TARGET_HIHOPE_RZG2M)
+	(ECC_DUAL);
+#elif (CONFIG_TARGET_HIHOPE_RZG2H)
+	(ECC_SINGLE | ECC_DUAL);
+#else
+	0;
+#endif;
 
 /* ecc_bzero64(u64 addr, u32 size)
  * Write zero-valued octa-byte words
@@ -125,10 +130,15 @@ int ecc_check_address(unsigned long long addr)
  */
 void ecc_list_setting(void)
 {
-#if (ECC_SUPPORT & ECC_SINGLE)
 	int i;
 	uint32_t dfusaareacr;
 	uint32_t deccareacr;
+
+	if (!(ecc_support & ECC_SINGLE))
+	{
+		printf("ECC: Command not support for this platform\n");
+		return;
+	}
 
 	printf("ECC: List of ECC area:\n");
 	for (i = 0; i < NUM_DAREA; i++) {
@@ -136,7 +146,7 @@ void ecc_list_setting(void)
 		deccareacr = readl(((uint32_t *)DECCAREACR + i));
 		if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
 			printf("%2d: %s : Data from 0x%llx : ECC from 0x%llx :",
-			       i + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR,
+			       i + (ecc_support & ECC_DUAL) * NUM_DFUSACR,
 			       dfusaareacr & ECC_ENABLE_MASK_BIT ?
 			       "Enabled" : "Disabled",
 			       (unsigned long long)(dfusaareacr << 8) << 4,
@@ -147,16 +157,14 @@ void ecc_list_setting(void)
 			       deccareacr & ECC_ENABLE_MASK_BIT ? 64 : 8);
 		} else {
 			printf("%2d: Disabled\n",
-			       i + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR);
+			       i + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
 		}
-		/* (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR :
+		/* (ecc_support & ECC_DUAL) * NUM_DFUSACR :
 		 * If device support 2 ECC modes, we should increase
 		 * the ID of ECC Single Channel in logging.
 		 */
 	}
-#else
-	printf("ECC: Command not support for this platform\n");
-#endif
+
 }
 
 /* ecc_list_setting_dual()
@@ -165,12 +173,18 @@ void ecc_list_setting(void)
  */
 void ecc_list_setting_dual(void)
 {
-#if (ECC_SUPPORT & ECC_DUAL)
 	int i;
-	u32 dfusacr = readl((uint32_t *)DFUSACR);
-	u32 adsplcr0 = readl((uint32_t *)DADSPLCR0);
-	u32 adsplcr1 = readl((uint32_t *)DADSPLCR1);
+	u32 dfusacr, adsplcr0, adsplcr1;
 
+	if (!(ecc_support & ECC_DUAL))
+	{
+		printf("ECC: Command not support for this platform\n");
+		return;
+	}
+
+	dfusacr = readl((uint32_t *)DFUSACR);
+	adsplcr0 = readl((uint32_t *)DADSPLCR0);
+	adsplcr1 = readl((uint32_t *)DADSPLCR1);
 	printf("ECC: List of ECC area:\n");
 	for (i = 0; i < NUM_DFUSACR; i++) {
 		if (dfusacr & FUSACR(0, 0x1 << i)) {
@@ -201,9 +215,6 @@ void ecc_list_setting_dual(void)
 			printf("%2d: Disabled\n", i);
 		}
 	}
-#else
-	printf("ECC: Command not support for this platform\n");
-#endif
 }
 
 /* ecc_add_configure(unsigned long long data_addr, unsigned long long ecc_addr,
@@ -217,10 +228,15 @@ void ecc_list_setting_dual(void)
 int ecc_add_configure(unsigned long long data_addr, unsigned long long ecc_addr,
 		      unsigned long block_size, unsigned long mode)
 {
-#if (ECC_SUPPORT & ECC_SINGLE)
 	int i;
 	uint32_t dfusaareacr;
 	uint32_t deccareacr;
+
+	if (!(ecc_support & ECC_SINGLE))
+	{
+		printf("ECC: Command not support for this platform\n");
+		return 0;
+	}
 
 	for (i = 0; i < NUM_DAREA; i++) {
 		if (readl((uint32_t *)DFUSAAREACR + i) & ECC_ENABLE_MASK_BIT) {
@@ -272,10 +288,6 @@ err_no_resource:
 	printf("ECC: ERROR : Not Enough Resource, only support %d Areas\n",
 	       NUM_DAREA);
 	return 0;
-#else
-	printf("ECC: Command not support for this platform yet\n");
-	return 0;
-#endif
 }
 
 /* ecc_add_setting(unsigned long long data_start_addr,
@@ -311,10 +323,15 @@ void ecc_add_setting(unsigned long long data_start_addr,
 		     unsigned long long ecc_start_addr,
 		     unsigned long size, unsigned long mode)
 {
-#if (ECC_SUPPORT & ECC_SINGLE)
 	unsigned int block_size = MAX_BLOCK_SIZE_MB;
 	unsigned long long data_addr = data_start_addr;
 	unsigned long long ecc_addr = ecc_start_addr;
+
+	if (!(ecc_support & ECC_SINGLE))
+	{
+		printf("ECC: Command not support for this platform\n");
+		return;
+	}
 
 	if (ecc_addr == 0)
 		ecc_addr = data_start_addr + size * SIZE_1MB;
@@ -334,9 +351,6 @@ void ecc_add_setting(unsigned long long data_start_addr,
 			block_size = block_size / 2;
 		}
 	}
-#else
-	printf("ECC: Command not support for this platform yet\n");
-#endif
 }
 
 /* ecc_add_setting_dual( unsigned long long data_start_addr, unsigned long size)
@@ -360,18 +374,25 @@ void ecc_add_setting(unsigned long long data_start_addr,
  */
 void ecc_add_setting_dual(u64 data_start_addr, u32 size)
 {
-#if (ECC_SUPPORT & ECC_DUAL)
 	u32 block_size = BANK_SIZE_MB / 8;
 	u32 extra_block_size = block_size / 8;
 	u32 block_pos;
 	u64 data_addr = data_start_addr;
 	u32 block_count;
 	u32 dfusa = 0;
-	u32 dfusacr = readl((u32 *)DFUSACR);
-	u32 adsplcr0 = readl((u32 *)DADSPLCR0);
-	u32 adsplcr1 = readl((u32 *)DADSPLCR1);
-	u32 adsplcr2 = 0;
-	u32 adsplcr3 = readl((u32 *)DADSPLCR3);
+	u32 dfusacr, adsplcr0, adsplcr1, adsplcr2, adsplcr3;
+
+	if (!(ecc_support & ECC_DUAL))
+	{
+		printf("ECC: Command not support for this platform\n");
+		return;
+	}
+
+	dfusacr = readl((u32 *)DFUSACR);
+	adsplcr0 = readl((u32 *)DADSPLCR0);
+	adsplcr1 = readl((u32 *)DADSPLCR1);
+	adsplcr2 = 0;
+	adsplcr3 = readl((u32 *)DADSPLCR3);
 
 	if (adsplcr0 == 0 || adsplcr1 == 0 || adsplcr3 == 0) {
 		adsplcr0 = AREA(ilog2(block_size * SIZE_1MB));
@@ -444,9 +465,6 @@ void ecc_add_setting_dual(u64 data_start_addr, u32 size)
 	writel(adsplcr2, (uint32_t *)DADSPLCR2);
 	writel(adsplcr3, (uint32_t *)DADSPLCR3);
 	ecc_bzero64_blocks(block_pos, dfusa, block_size, 0);
-#else
-	printf("ECC: Command not support for this platform\n");
-#endif
 }
 
 /* ecc_rm_setting(unsigned int id)
@@ -455,12 +473,17 @@ void ecc_add_setting_dual(u64 data_start_addr, u32 size)
  */
 void ecc_rm_setting(unsigned int id)
 {
-#if (ECC_SUPPORT & ECC_SINGLE)
 	uint32_t dfusaareacr;
+
+	if (!(ecc_support & ECC_SINGLE))
+	{
+		printf("ECC: Command not support for this platform\n");
+		return;
+	}
 
 	if (id >= NUM_DAREA) {
 		printf("ECC: Not support ECC at id %d\n",
-		       id + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR);
+		       id + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
 		return;
 	}
 
@@ -471,18 +494,15 @@ void ecc_rm_setting(unsigned int id)
 
 	if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
 		printf("ECC: Failed to disable ECC at id %d\n",
-		       id + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR);
+		       id + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
 	} else {
 		printf("ECC: Disabled ECC at id %d\n",
-		       id + (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR);
+		       id + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
 	}
-	/* (ECC_SUPPORT & ECC_DUAL) * NUM_DFUSACR :
+	/* (ecc_support & ECC_DUAL) * NUM_DFUSACR :
 	 * If device support 2 ECC modes, we should increase
 	 * the ID of ECC Single Channel in logging.
 	 */
-#else
-	printf("ECC: Command not support for this platform\n");
-#endif
 }
 
 /* ecc_rm_setting(unsigned int id)
@@ -491,8 +511,14 @@ void ecc_rm_setting(unsigned int id)
  */
 void ecc_rm_setting_dual(unsigned int id)
 {
-#if (ECC_SUPPORT & ECC_DUAL)
-	u32 dfusacr = readl((uint32_t *)DFUSACR);
+	u32 dfusacr;
+
+	if (!(ecc_support & ECC_DUAL))
+	{
+		printf("ECC: Command not support for this platform\n");
+		return;
+	}
+	dfusacr = readl((uint32_t *)DFUSACR);
 
 	if (id >= NUM_DFUSACR) {
 		printf("ECC: Not support ECC at id %d\n", id);
@@ -510,9 +536,6 @@ void ecc_rm_setting_dual(unsigned int id)
 		writel(dfusacr & (~(FUSACR(0xff, 0))), (u32 *)DFUSACR);
 	}
 	printf("ECC: Disabled ECC at id %d\n", id);
-#else
-	printf("ECC: Command not support for this platform\n");
-#endif
 }
 
 /* ecc_help()
@@ -523,8 +546,8 @@ void ecc_help(void)
 	printf("usage: ecc <command> [<mode>] [<args>]\n"
 	       "\n"
 	       "There are two modes supported depends on SoC\n"
-	       "  -s, --single     single channel mode (RZ/G2H, RZ/G2N, RZ/G2E)\n"
-	       "  -d, --dual       dual channel mode (RZ/G2H, RZ/G2M)\n"
+	       "  -s, --single     single channel mode (RZ/G2H, RZ/G2N, RZ/G2E, RZ/G2M v3.0)\n"
+	       "  -d, --dual       dual channel mode (RZ/G2H, RZ/G2M v1.3, RZ/G2M v3.0)\n"
 	       "\n");
 	printf("These are commands supported, they may take different args\n"
 	       "depend on single or dual mode\n"
@@ -572,8 +595,18 @@ void ecc_help(void)
  */
 int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
-#ifdef ECC_SUPPORT
 	int mode_process = 0;
+
+#if (CONFIG_TARGET_HIHOPE_RZG2M)
+	if (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1)
+	if (rmobile_get_cpu_rev_integer() == 3)
+		ecc_support |= ECC_SINGLE;
+#endif
+	if (!(ecc_support & ECC_SINGLE || ecc_support & ECC_DUAL))
+	{
+		printf("ECC: Command not support for this platform yet\n");
+		return 1;
+	}
 
 	if (strcmp(argv[2], "-s") == 0 ||
 	    strcmp(argv[2], "--single") == 0)
@@ -593,7 +626,7 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 			 * ECC dual channel setting should be printed first.
 			 */
 			if (mode_process == 0)
-				mode_process = ECC_SUPPORT;
+				mode_process = ecc_support;
 			if (mode_process & ECC_DUAL)
 				ecc_list_setting_dual();
 			if (mode_process & ECC_SINGLE)
@@ -652,7 +685,7 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		} else {
 			unsigned long id;
 
-			mode_process = ECC_SUPPORT;
+			mode_process = ecc_support;
 			/* User want to remove all ECC area
 			 */
 			if (strcmp(argv[2], "all") == 0) {
@@ -690,9 +723,6 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		/* print usage log*/
 		ecc_help();
 	}
-#else
-	printf("ECC: Command not support for this platform yet\n");
-#endif
 	return 1;
 }
 
