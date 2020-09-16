@@ -64,6 +64,12 @@ static int ecc_support =
 	0;
 #endif
 
+/* id_offset :
+ * If device support 2 ECC modes, we should increase
+ * the ID of ECC Single Channel in logging.
+ */
+int id_offset;
+
 /* ecc_bzero64(u64 addr, u32 size)
  * Write zero-valued octa-byte words
  * addr : start address
@@ -124,97 +130,84 @@ int ecc_check_address(unsigned long long addr)
 	return 1;
 }
 
-/* ecc_list_setting()
- * Check All ECC registers for single channel mode then print value of them in
- * format that User can understand.
+/* ecc_list_setting(int mode_process)
+ * Check All ECC registers follow mode_process parameter, then print
+ * value of them in format that User can understand.
+ * mode_process: Select which ECC area have which mode will be printed
  */
-void ecc_list_setting(void)
+void ecc_list_setting(int mode_process)
 {
 	int i;
-	uint32_t dfusaareacr;
-	uint32_t deccareacr;
 
-	if (!(ecc_support & ECC_SINGLE))
+	if (!(ecc_support & mode_process))
 	{
 		printf("ECC: Command not support for this platform\n");
 		return;
 	}
 
-	printf("ECC: List of ECC area:\n");
-	for (i = 0; i < NUM_DAREA; i++) {
-		dfusaareacr = readl(((uint32_t *)DFUSAAREACR + i));
-		deccareacr = readl(((uint32_t *)DECCAREACR + i));
-		if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
-			printf("%2ld: %s : Data from 0x%llx : ECC from 0x%llx :",
-			       i + (ecc_support & ECC_DUAL) * NUM_DFUSACR,
-			       dfusaareacr & ECC_ENABLE_MASK_BIT ?
-			       "Enabled" : "Disabled",
-			       (unsigned long long)(dfusaareacr << 8) << 4,
-			       (unsigned long long)(deccareacr << 8) << 4);
+	if (mode_process & ECC_DUAL) {
+		uint32_t dfusacr, adsplcr0, adsplcr1;
 
-			printf(" size  %d MB : mode %d bits\n",
-			       1 << ((dfusaareacr >> 24) & 0xF),
-			       deccareacr & ECC_ENABLE_MASK_BIT ? 64 : 8);
-		} else {
-			printf("%2ld: Disabled\n",
-			       i + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
-		}
-		/* (ecc_support & ECC_DUAL) * NUM_DFUSACR :
-		 * If device support 2 ECC modes, we should increase
-		 * the ID of ECC Single Channel in logging.
-		 */
-	}
-
-}
-
-/* ecc_list_setting_dual()
- * Check All ECC settings for dual channel mode then print value of them in
- * format that User can understand.
- */
-void ecc_list_setting_dual(void)
-{
-	int i;
-	u32 dfusacr, adsplcr0, adsplcr1;
-
-	if (!(ecc_support & ECC_DUAL))
-	{
-		printf("ECC: Command not support for this platform\n");
-		return;
-	}
-
-	dfusacr = readl((uint32_t *)DFUSACR);
-	adsplcr0 = readl((uint32_t *)DADSPLCR0);
-	adsplcr1 = readl((uint32_t *)DADSPLCR1);
-	printf("ECC: List of ECC area:\n");
-	for (i = 0; i < NUM_DFUSACR; i++) {
-		if (dfusacr & FUSACR(0, 0x1 << i)) {
-			printf("%2d: %s : Data from 0x%llx\n",
-			       i, "Enabled",
-			       (u64)(i * SIZE_1MB * BANK_SIZE_MB / 8
-				   + DRAM_ADDR_BASE));
-			printf("	      ECC from 0x%llx\n",
-			       (u64)(ECC_ADDR_XOR ^ (i * SIZE_1MB
-						   * BANK_SIZE_MB / 8
-						   + DRAM_ADDR_BASE)));
-			printf("	      size %dMB : mode %d bits\n",
-			       BANK_SIZE_MB / 8, 8);
-		} else if ((adsplcr0 & SPLITSEL(0x1 << i)) &&
-			   (adsplcr1 & SPLITSEL(0x1 << i))) {
-			printf("%2d: %s : Data in %dMB from 0x%llx\n", i,
-			       "Enabled", BANK_SIZE_MB / 8,
-			       (u64)(i * SIZE_1MB * BANK_SIZE_MB / 8
-				   + DRAM_ADDR_BASE));
-			printf("	      ECC in %dMB from 0x%llx\n",
-			       BANK_SIZE_MB / 8,
-			       (u64)(ECC_ADDR_XOR ^ (i * SIZE_1MB
-						   * BANK_SIZE_MB / 8
-						   + DRAM_ADDR_BASE)));
-			printf("	      EFUSA  0x%x : mode %d bits\n",
-			       GET_EFUSA(dfusacr), 8);
-		} else {
-			printf("%2d: Disabled\n", i);
+		dfusacr = readl((uint32_t *)DFUSACR);
+		adsplcr0 = readl((uint32_t *)DADSPLCR0);
+		adsplcr1 = readl((uint32_t *)DADSPLCR1);
+		printf("ECC: List of ECC area Dual Channel:\n");
+		for (i = 0; i < NUM_DFUSACR; i++) {
+			if (dfusacr & FUSACR(0, 0x1 << i)) {
+				printf("%2d: %s : Data from 0x%llx\n",
+				       i, "Enabled",
+				       (u64)(i * SIZE_1MB * BANK_SIZE_MB / 8
+					   + DRAM_ADDR_BASE));
+				printf("	      ECC from 0x%llx\n",
+				       (u64)(ECC_ADDR_XOR ^ (i * SIZE_1MB
+							   * BANK_SIZE_MB / 8
+							   + DRAM_ADDR_BASE)));
+				printf("	      size %dMB : mode %d bits\n",
+				       BANK_SIZE_MB / 8, 8);
+			} else if ((adsplcr0 & SPLITSEL(0x1 << i)) &&
+				   (adsplcr1 & SPLITSEL(0x1 << i))) {
+				printf("%2d: %s : Data in %dMB from 0x%llx\n",
+				       i, "Enabled", BANK_SIZE_MB / 8,
+				       (u64)(i * SIZE_1MB * BANK_SIZE_MB / 8
+					   + DRAM_ADDR_BASE));
+				printf("	      ECC in %dMB from 0x%llx\n",
+				       BANK_SIZE_MB / 8,
+				       (u64)(ECC_ADDR_XOR ^ (i * SIZE_1MB
+							   * BANK_SIZE_MB / 8
+							   + DRAM_ADDR_BASE)));
+				printf("	      EFUSA  0x%x : mode %d bits\n",
+				       GET_EFUSA(dfusacr), 8);
+			} else {
+				printf("%2d: Disabled\n", i);
+			}
 		}
 	}
+
+	if (mode_process & ECC_SINGLE) {
+		uint32_t dfusaareacr;
+		uint32_t deccareacr;
+
+		printf("ECC: List of ECC area Single Channel:\n");
+		for (i = 0; i < NUM_DAREA; i++) {
+			dfusaareacr = readl(((uint32_t *)DFUSAAREACR + i));
+			deccareacr = readl(((uint32_t *)DECCAREACR + i));
+			if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
+				printf("%2d: %s : Data from 0x%llx : ECC from 0x%llx :",
+				       i + id_offset,
+				       dfusaareacr & ECC_ENABLE_MASK_BIT ?
+				       "Enabled" : "Disabled",
+				       (unsigned long long)(dfusaareacr << 8) << 4,
+				       (unsigned long long)(deccareacr << 8) << 4);
+				printf(" size  %d MB : mode %d bits\n",
+				       1 << ((dfusaareacr >> 24) & 0xF),
+				       deccareacr & ECC_ENABLE_MASK_BIT ? 64 : 8);
+			} else {
+				printf("%2d: Disabled\n",
+				       i + id_offset);
+			}
+		}
+	}
+
 }
 
 /* ecc_add_configure(unsigned long long data_addr, unsigned long long ecc_addr,
@@ -291,14 +284,17 @@ err_no_resource:
 }
 
 /* ecc_add_setting(unsigned long long data_start_addr,
+ *		   unsigned long size, unsigned long mode,
  *		   unsigned long long ecc_start_addr,
- *		   unsigned long size, unsigned long mode)
- * Get user input and call ecc_add_configure to enable ECC areas
- * in single channel mode
+ *                 int mode_process)
+ * Get user input to enable ECC areas which ECC mode determite by mode_process
  * data_start_addr : Data start address must be 36 bits address
- * ecc_start_addr : ECC start address must be 36 bits address
  * size : size of Data area
- * mode : ECC mode : 64 / 8 : 64bitsdata/8bitsECC OR 8bitsdata/5bitsECC
+ * mode_process: select ECC mode will be configurated.
+ * For ECC Single mode only:
+ *   mode : ECC mode : 64 / 8 : 64bitsdata/8bitsECC OR 8bitsdata/5bitsECC
+ *   ecc_start_addr : ECC start address must be 36 bits address
+ * For ECC Single Channel Setting:
  *
  *  ________________________  data_start_addr
  * |                        |   |
@@ -317,46 +313,8 @@ err_no_resource:
  * |                        |    > auto-caculated size depend on mode
  * |                        |   |
  * |________________________|   |
- */
-
-void ecc_add_setting(unsigned long long data_start_addr,
-		     unsigned long long ecc_start_addr,
-		     unsigned long size, unsigned long mode)
-{
-	unsigned int block_size = MAX_BLOCK_SIZE_MB;
-	unsigned long long data_addr = data_start_addr;
-	unsigned long long ecc_addr = ecc_start_addr;
-
-	if (!(ecc_support & ECC_SINGLE))
-	{
-		printf("ECC: Command not support for this platform\n");
-		return;
-	}
-
-	if (ecc_addr == 0)
-		ecc_addr = data_start_addr + size * SIZE_1MB;
-
-	while ((block_size >= 1) && (size != 0)) {
-		if (size >= block_size) {
-			ecc_add_configure(data_addr, ecc_addr, block_size,
-					  mode);
-			data_addr = data_addr + block_size * SIZE_1MB;
-			if (mode == 64) {
-				ecc_addr = ecc_addr + block_size * SIZE_1MB / 8;
-			} else if (mode == 8) {
-				ecc_addr = ecc_addr + block_size * SIZE_1MB;
-			}
-			size = size - block_size;
-		} else {
-			block_size = block_size / 2;
-		}
-	}
-}
-
-/* ecc_add_setting_dual( unsigned long long data_start_addr, unsigned long size)
- * enable ECC areas in dual channel mode
- * data_start_addr : Data start address must be 36 bits address
- * size : size of Data area
+ *
+ * For ECC Dual Channel Setting:
  *
  *                DRAM Channel 0              DRAM Channel 1
  * data_start_addr______________  _ _ _ _ _ _ ______________ ecc_start_addr
@@ -372,170 +330,191 @@ void ecc_add_setting(unsigned long long data_start_addr,
  *               |              |            |              |
  *               |______________|            |______________|
  */
-void ecc_add_setting_dual(u64 data_start_addr, u32 size)
+void ecc_add_setting(unsigned long long data_start_addr,
+		     unsigned long size, unsigned long mode,
+		     unsigned long long ecc_start_addr,
+		     int mode_process)
 {
-	u32 block_size = BANK_SIZE_MB / 8;
-	u32 extra_block_size = block_size / 8;
-	u32 block_pos;
-	u64 data_addr = data_start_addr;
-	u32 block_count;
-	u32 dfusa = 0;
-	u32 dfusacr, adsplcr0, adsplcr1, adsplcr2, adsplcr3;
+	unsigned int block_size;
+	unsigned long long data_addr = data_start_addr;
+	unsigned long long ecc_addr = ecc_start_addr;
 
-	if (!(ecc_support & ECC_DUAL))
+	if (!(ecc_support & mode_process))
 	{
 		printf("ECC: Command not support for this platform\n");
 		return;
 	}
 
-	dfusacr = readl((u32 *)DFUSACR);
-	adsplcr0 = readl((u32 *)DADSPLCR0);
-	adsplcr1 = readl((u32 *)DADSPLCR1);
-	adsplcr2 = 0;
-	adsplcr3 = readl((u32 *)DADSPLCR3);
+	if (mode_process & ECC_DUAL) {
+		u32 extra_block_size, block_pos, block_count;
+		u32 dfusa = 0;
+		u32 dfusacr, adsplcr0, adsplcr1, adsplcr2, adsplcr3;
 
-	if (adsplcr0 == 0 || adsplcr1 == 0 || adsplcr3 == 0) {
-		adsplcr0 = AREA(ilog2(block_size * SIZE_1MB));
-		adsplcr1 = AREA(ilog2(block_size * SIZE_1MB));
-		adsplcr3 = AREA(ilog2(extra_block_size * SIZE_1MB));
-	}
+		block_size = BANK_SIZE_MB / 8;
+		extra_block_size = block_size / 8;
+		dfusacr = readl((u32 *)DFUSACR);
+		adsplcr0 = readl((u32 *)DADSPLCR0);
+		adsplcr1 = readl((u32 *)DADSPLCR1);
+		adsplcr2 = 0;
+		adsplcr3 = readl((u32 *)DADSPLCR3);
 
-	if (size >= block_size) {
-		block_count = size / block_size;
-		block_pos = 0;
-	} else if (size >= extra_block_size && size < block_size) {
-		block_count = size / extra_block_size;
-		block_pos = (data_start_addr - DRAM_ADDR_BASE)
-			  / (block_size * SIZE_1MB);
-		if (dfusacr & FUSACR(0, 0x1 << block_pos)) {
-			printf("ECC: ECC already enabled from 0x%llx (%dMB)\n",
-			       (u64)(DRAM_ADDR_BASE
-				   + block_pos * block_size * SIZE_1MB),
+		if (adsplcr0 == 0 || adsplcr1 == 0 || adsplcr3 == 0) {
+			adsplcr0 = AREA(ilog2(block_size * SIZE_1MB));
+			adsplcr1 = AREA(ilog2(block_size * SIZE_1MB));
+			adsplcr3 = AREA(ilog2(extra_block_size * SIZE_1MB));
+		}
+
+		if (size >= block_size) {
+			block_count = size / block_size;
+			block_pos = 0;
+		} else if (size >= extra_block_size && size < block_size) {
+			block_count = size / extra_block_size;
+			block_pos = (data_start_addr - DRAM_ADDR_BASE)
+				  / (block_size * SIZE_1MB);
+			if (dfusacr & FUSACR(0, 0x1 << block_pos)) {
+				printf("ECC: ECC already enabled from 0x%llx (%dMB)\n",
+				       (u64)(DRAM_ADDR_BASE
+					   + block_pos * block_size * SIZE_1MB),
+				       block_size);
+				return;
+			}
+
+			if (dfusacr & FUSACR(0xff, 00)) {
+				printf("ECC: Extra split mode used (FUSACR:0x%x)\n",
+				       dfusacr);
+				printf("ECC: Only one ECC area can use split mode\n");
+				return;
+			}
+			block_size = extra_block_size;
+		} else {
+			printf("ECC: size %ldMB is too small, smallest size is %dMB\n",
+			       size, extra_block_size);
+			return;
+		}
+
+		if (data_start_addr & (block_size * SIZE_1MB - 1)) {
+			printf("ECC: 0x%llx not aligned to block size (%dMB)\n",
+			       data_start_addr, block_size);
+			data_addr = data_start_addr
+				  & (~((u64)(block_size * SIZE_1MB - 1)));
+			printf("ECC: new address 0x%llx\n", data_addr);
+		}
+
+		if (size % block_size) {
+			printf("ECC: size %ldMB is not aligned to block size (%dMB)\n",
+			       size,
 			       block_size);
-			return;
+			size = block_count * block_size;
+			printf("ECC: new size %ldMB\n", size);
 		}
 
-		if (dfusacr & FUSACR(0xff, 00)) {
-			printf("ECC: Extra split mode used (FUSACR:0x%x)\n",
-			       dfusacr);
-			printf("ECC: Only one ECC area can use split mode\n");
-			return;
+		for (; block_count > 0 ; block_count--) {
+			dfusa |= (0x1 << ((data_addr - DRAM_ADDR_BASE -
+					   block_pos * block_size * 8 * SIZE_1MB)
+					 / (block_size * SIZE_1MB)));
+			data_addr += block_size * SIZE_1MB;
 		}
-		block_size = extra_block_size;
-	} else {
-		printf("ECC: size %dMB is too small, smallest size is %dMB\n",
-		       size, extra_block_size);
-		return;
-	}
 
-	if (data_start_addr & (block_size * SIZE_1MB - 1)) {
-		printf("ECC: 0x%llx not aligned to block size (%dMB)\n",
-		       data_start_addr, block_size);
-		data_addr = data_start_addr
-			  & (~((u64)(block_size * SIZE_1MB - 1)));
-		printf("ECC: new address 0x%llx\n", data_addr);
-	}
+		ecc_bzero64_blocks(block_pos, dfusa, block_size, ECC_ADDR_XOR);
+		if (block_size == extra_block_size) {
+			adsplcr0 |= (SPLITSEL(0x1 << block_pos));
+			adsplcr1 |= (SPLITSEL(0x1 << block_pos));
+			writel(dfusacr | FUSACR(dfusa, 0), (uint32_t *)DFUSACR);
+		} else {
+			writel(dfusacr | FUSACR(0, dfusa), (uint32_t *)DFUSACR);
+		}
 
-	if (size % block_size) {
-		printf("ECC: size %dMB is not aligned to block size (%dMB)\n",
-		       size,
-		       block_size);
-		size = block_count * block_size;
-		printf("ECC: new size %dMB\n", size);
-	}
+		writel(adsplcr0, (uint32_t *)DADSPLCR0);
+		writel(adsplcr1, (uint32_t *)DADSPLCR1);
+		writel(adsplcr2, (uint32_t *)DADSPLCR2);
+		writel(adsplcr3, (uint32_t *)DADSPLCR3);
+		ecc_bzero64_blocks(block_pos, dfusa, block_size, 0);
+	} else if (mode_process & ECC_SINGLE) {
+		unsigned int block_size = MAX_BLOCK_SIZE_MB;
+		if (ecc_addr == 0)
+			ecc_addr = data_start_addr + size * SIZE_1MB;
 
-	for (; block_count > 0 ; block_count--) {
-		dfusa |= (0x1 << ((data_addr - DRAM_ADDR_BASE
-				 - block_pos * block_size * 8 * SIZE_1MB)
-				 / (block_size * SIZE_1MB)));
-		data_addr += block_size * SIZE_1MB;
+		while ((block_size >= 1) && (size != 0)) {
+			if (size >= block_size) {
+				ecc_add_configure(data_addr, ecc_addr,
+						  block_size, mode);
+				data_addr = data_addr + block_size * SIZE_1MB;
+				if (mode == 64) {
+					ecc_addr = ecc_addr +
+						   block_size * SIZE_1MB / 8;
+				} else if (mode == 8) {
+					ecc_addr = ecc_addr +
+						   block_size * SIZE_1MB;
+				}
+				size = size - block_size;
+			} else {
+				block_size = block_size / 2;
+			}
+		}
 	}
-
-	ecc_bzero64_blocks(block_pos, dfusa, block_size, ECC_ADDR_XOR);
-	if (block_size == extra_block_size) {
-		adsplcr0 |= (SPLITSEL(0x1 << block_pos));
-		adsplcr1 |= (SPLITSEL(0x1 << block_pos));
-		writel(dfusacr | FUSACR(dfusa, 0), (uint32_t *)DFUSACR);
-	} else {
-		writel(dfusacr | FUSACR(0, dfusa), (uint32_t *)DFUSACR);
-	}
-
-	writel(adsplcr0, (uint32_t *)DADSPLCR0);
-	writel(adsplcr1, (uint32_t *)DADSPLCR1);
-	writel(adsplcr2, (uint32_t *)DADSPLCR2);
-	writel(adsplcr3, (uint32_t *)DADSPLCR3);
-	ecc_bzero64_blocks(block_pos, dfusa, block_size, 0);
 }
 
-/* ecc_rm_setting(unsigned int id)
- * Remove an ECC area by id in single channel mode
- * id : input id , can get id by 'ecc list'
- */
-void ecc_rm_setting(unsigned int id)
-{
-	uint32_t dfusaareacr;
 
-	if (!(ecc_support & ECC_SINGLE))
+
+/* ecc_rm_setting(unsigned int id, int mode_process)
+ * Remove an ECC area by id in 'mode_process' ECC mode
+ * id : input id , can get id by 'ecc list'
+ * mode_process: input ecc mode will be processed.
+ */
+void ecc_rm_setting(unsigned int id, int mode_process)
+{
+	if (!(ecc_support & mode_process))
 	{
 		printf("ECC: Command not support for this platform\n");
 		return;
 	}
 
-	if (id >= NUM_DAREA) {
-		printf("ECC: Not support ECC at id %ld\n",
-		       id + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
-		return;
+	if (mode_process & ECC_DUAL) {
+		u32 dfusacr;
+
+		dfusacr = readl((uint32_t *)DFUSACR);
+
+		if (id >= NUM_DFUSACR) {
+			printf("ECC: Not support ECC at id %d\n", id);
+			return;
+		}
+
+		if (dfusacr & FUSACR(0, 0x1 << id)) {
+			writel(dfusacr & (~(FUSACR(0, 0x1 << id))),
+			       (u32 *)DFUSACR);
+		} else {
+			u32 adsplcr0 = readl((u32 *)DADSPLCR0);
+			u32 adsplcr1 = readl((u32 *)DADSPLCR1);
+
+			writel(adsplcr0 & (~SPLITSEL(0x1 << id)),
+			       (u32 *)DADSPLCR0);
+			writel(adsplcr1 & (~SPLITSEL(0x1 << id)),
+			       (u32 *)DADSPLCR1);
+			writel(dfusacr & (~(FUSACR(0xff, 0))), (u32 *)DFUSACR);
+		}
+		printf("ECC: Disabled ECC at id %d\n", id);
+	} else if (mode_process & ECC_SINGLE) {
+		uint32_t dfusaareacr;
+
+		if (id >= NUM_DAREA) {
+			printf("ECC: Not support ECC at id %d\n",
+			       id + id_offset);
+			return;
+		}
+
+		writel(0, ((uint32_t *)DFUSAAREACR + id));
+		writel(0, ((uint32_t *)DECCAREACR + id));
+
+		dfusaareacr = readl(((uint32_t *)DFUSAAREACR + id));
+
+		if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
+			printf("ECC: Failed to disable ECC at id %d\n",
+			       id + id_offset);
+		} else {
+			printf("ECC: Disabled ECC at id %d\n",
+			       id + id_offset);
+		}
 	}
-
-	writel(0, ((uint32_t *)DFUSAAREACR + id));
-	writel(0, ((uint32_t *)DECCAREACR + id));
-
-	dfusaareacr = readl(((uint32_t *)DFUSAAREACR + id));
-
-	if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
-		printf("ECC: Failed to disable ECC at id %ld\n",
-		       id + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
-	} else {
-		printf("ECC: Disabled ECC at id %ld\n",
-		       id + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
-	}
-	/* (ecc_support & ECC_DUAL) * NUM_DFUSACR :
-	 * If device support 2 ECC modes, we should increase
-	 * the ID of ECC Single Channel in logging.
-	 */
-}
-
-/* ecc_rm_setting(unsigned int id)
- * Remove an ECC area by id in dual channel mode
- * id : input id , can get id by 'ecc list'
- */
-void ecc_rm_setting_dual(unsigned int id)
-{
-	u32 dfusacr;
-
-	if (!(ecc_support & ECC_DUAL))
-	{
-		printf("ECC: Command not support for this platform\n");
-		return;
-	}
-	dfusacr = readl((uint32_t *)DFUSACR);
-
-	if (id >= NUM_DFUSACR) {
-		printf("ECC: Not support ECC at id %d\n", id);
-		return;
-	}
-
-	if (dfusacr & FUSACR(0, 0x1 << id)) {
-		writel(dfusacr & (~(FUSACR(0, 0x1 << id))), (u32 *)DFUSACR);
-	} else {
-		u32 adsplcr0 = readl((u32 *)DADSPLCR0);
-		u32 adsplcr1 = readl((u32 *)DADSPLCR1);
-
-		writel(adsplcr0 & (~SPLITSEL(0x1 << id)), (u32 *)DADSPLCR0);
-		writel(adsplcr1 & (~SPLITSEL(0x1 << id)), (u32 *)DADSPLCR1);
-		writel(dfusacr & (~(FUSACR(0xff, 0))), (u32 *)DFUSACR);
-	}
-	printf("ECC: Disabled ECC at id %d\n", id);
 }
 
 /* ecc_help()
@@ -609,6 +588,8 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		return 1;
 	}
 
+	id_offset = (ecc_support & ECC_DUAL) ? NUM_DFUSACR : 0;
+
 	if (strcmp(argv[2], "-s") == 0 ||
 	    strcmp(argv[2], "--single") == 0)
 		mode_process |= ECC_SINGLE;     /* Single channel process */
@@ -629,9 +610,9 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 			if (mode_process == 0)
 				mode_process = ecc_support;
 			if (mode_process & ECC_DUAL)
-				ecc_list_setting_dual();
+				ecc_list_setting(ECC_DUAL);
 			if (mode_process & ECC_SINGLE)
-				ecc_list_setting();
+				ecc_list_setting(ECC_SINGLE);
 		}
 	} else if (strcmp(argv[1], "add") == 0) {
 		/* Add an ECC area*/
@@ -641,8 +622,7 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		unsigned long mode = 8;
 
 		data_addr = simple_strtoull(argv[3], NULL, 16);
-		if (strcmp(argv[2], "-s") == 0 ||
-		    strcmp(argv[2], "--single") == 0) {
+		if (mode_process & ECC_SINGLE) {
 			if (argc == 7) {
 				ecc_addr = simple_strtoull(argv[4], NULL, 16);
 				if (ecc_check_address(ecc_addr) == 0) {
@@ -660,21 +640,15 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 				ecc_help();
 				return 0;
 			}
-		} else if (strcmp(argv[2], "-d") == 0 ||
-			   strcmp(argv[2], "--dual") == 0) {
+		} else if (mode_process & ECC_DUAL) {
 			size = simple_strtoul(argv[4], NULL, 10);
 		} else {
 			ecc_help();
 		}
 
 		if (ecc_check_address(data_addr)) {
-			if (strcmp(argv[2], "-s") == 0 ||
-			    strcmp(argv[2], "--single") == 0)
-				ecc_add_setting(data_addr, ecc_addr,
-						size, mode);
-			else if (strcmp(argv[2], "-d") == 0 ||
-				 strcmp(argv[2], "--dual") == 0)
-				ecc_add_setting_dual(data_addr, size);
+			ecc_add_setting(data_addr, size, mode,
+					ecc_addr, mode);
 		} else {
 			printf("ECC: Please use 36 bits address\n");
 		}
@@ -692,11 +666,11 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 			if (strcmp(argv[2], "all") == 0) {
 				if (mode_process & ECC_DUAL) {
 					for (id = 0; id < NUM_DFUSACR; id++)
-						ecc_rm_setting_dual(id);
+						ecc_rm_setting(id, ECC_DUAL);
 				}
 				if (mode_process & ECC_SINGLE) {
 					for (id = 0; id < NUM_DAREA; id++)
-						ecc_rm_setting(id);
+						ecc_rm_setting(id, ECC_SINGLE);
 				}
 			} else {
 				id = simple_strtoul(argv[2], NULL, 10);
@@ -712,12 +686,11 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 					if (id >= NUM_DFUSACR) {
 						id -= NUM_DFUSACR;
 						mode_process = ECC_SINGLE;
+					} else {
+						mode_process = ECC_DUAL;
 					}
 				}
-				if (mode_process & ECC_DUAL)
-					ecc_rm_setting_dual(id);
-				else if (mode_process & ECC_SINGLE)
-					ecc_rm_setting(id);
+					ecc_rm_setting(id, mode_process);
 			}
 		}
 	} else {
