@@ -25,6 +25,9 @@
 #include <asm/arch/sh_sdhi.h>
 #include <i2c.h>
 #include <mmc.h>
+#include <linux/bitops.h>
+#include <linux/delay.h>
+#include <asm/arch/rcar-mstp.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -79,6 +82,7 @@ int board_early_init_f(void)
 #define HSUSB_REG_UGCTRL2		0xE6590184
 #define HSUSB_REG_UGCTRL2_USB0SEL	0x30
 #define HSUSB_REG_UGCTRL2_USB0SEL_EHCI	0x10
+#define HSUSB_REG_UGCTRL2_RESERVED_3	0x00000001 /* bit[3:0] must be B'0001 */
 
 #define	GPIO_REV_BIT1		113	/* GP5_19	*/
 #define	GPIO_REV_BIT0		115	/* GP5_21	*/
@@ -94,9 +98,10 @@ int board_init(void)
 
 	/* Configure the HSUSB block */
 	mstp_clrbits_le32(SMSTPCR7, SMSTPCR7, HSUSB_MSTP704);
+	udelay(2);
 	/* Choice USB0SEL */
-	clrsetbits_le32(HSUSB_REG_UGCTRL2, HSUSB_REG_UGCTRL2_USB0SEL,
-			HSUSB_REG_UGCTRL2_USB0SEL_EHCI);
+	writel(HSUSB_REG_UGCTRL2_USB0SEL_EHCI | HSUSB_REG_UGCTRL2_RESERVED_3,
+	       HSUSB_REG_UGCTRL2);
 	/* low power status */
 	setbits_le16(HSUSB_REG_LPSTS, HSUSB_REG_LPSTS_SUSPM_NORMAL);
 
