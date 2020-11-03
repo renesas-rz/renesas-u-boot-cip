@@ -609,7 +609,7 @@ void arch_preboot_os()
 
 void iwg21m_fdt_update(void *fdt)
 {
-	u32 vin0_st, vin1_st, vin2_st, width, off;
+	u32 vin0_st, vin1_st, vin2_st, off;
 	char *status_ok = "okay";
 	char *vin2_check = NULL;
 	int vin_all, val, phy_mode;
@@ -699,12 +699,8 @@ void iwg21m_fdt_update(void *fdt)
 	}else{
 		/* MMC-8bit selectd */
 		vin1_st = 0;
-		width=8;
-		off = fdt_path_offset(fdt, "/soc/mmc@ee220000");
-		fdt_delprop(fdt, off, "pinctrl-1");
-		do_fixup_by_path_u32(fdt, "/soc/mmc@ee220000", "pinctrl-0", 0x12, 0);
 		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin1-status", vin1_st, 0);
-		do_fixup_by_path_u32(fdt, "/soc/mmc@ee220000", "bus-width", width, 1);
+
 		/*Enabling Pull-ups for MMC1_D4-PUPR3_30, MMC1_D5-PUPR3_31, MMC1_D6-PUPR3_14, MMC1_D7-PUPR3_15*/ 
 		val = readl(PUPR3);
 		val |= PUPR3_MMC;
