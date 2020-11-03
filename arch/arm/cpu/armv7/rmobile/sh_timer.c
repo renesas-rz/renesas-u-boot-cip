@@ -1,1 +1,1 @@
-/data2/khatran/03_yocto_G1H/build/tmp/work/cortexa15hf-vfp-neon-poky-linux-gnueabi/u-boot/v2013.01.01+gitb74f925bbca6de64f27443e8d25d5d689edae99e-r0/git/arch/sh/lib/time.c
+/data2/haobui/03_g1/cip49rt/build/tmp/work/iwg21m-poky-linux-gnueabi/u-boot/v2013.01.01+git07690dd532b726752faafa3bdfb70152f820901a-r0/git/arch/sh/lib/time.c
