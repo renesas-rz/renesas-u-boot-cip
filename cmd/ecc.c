@@ -648,7 +648,7 @@ int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 
 		if (ecc_check_address(data_addr)) {
 			ecc_add_setting(data_addr, size, mode,
-					ecc_addr, mode);
+					ecc_addr, mode_process);
 		} else {
 			printf("ECC: Please use 36 bits address\n");
 		}
