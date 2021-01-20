@@ -467,6 +467,8 @@ static const struct {
 #endif
 #ifdef CONFIG_SPI_FLASH_SST
 	{ 0, 0xbf, spi_flash_probe_sst, },
+	/* Support for IS25LP016D */
+	{ 0, 0x9d, spi_flash_probe_sst, },
 #endif
 #ifdef CONFIG_SPI_FLASH_STMICRO
 	{ 0, 0x20, spi_flash_probe_stmicro, },

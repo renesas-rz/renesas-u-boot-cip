@@ -61,6 +61,11 @@ static const struct sst_spi_flash_params sst_spi_flash_table[] = {
 		.nr_sectors = 512,
 		.name = "SST25VF016B",
 	},{
+		.idcode1 = 0x15,
+		.flags = SST_FEAT_MBP,
+		.nr_sectors = 512,
+		.name = "IS25LP016D",
+	},{
 		.idcode1 = 0x4a,
 		.flags = SST_FEAT_WP,
 		.nr_sectors = 1024,
