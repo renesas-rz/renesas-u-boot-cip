@@ -609,37 +609,13 @@ void arch_preboot_os()
 
 void iwg21m_fdt_update(void *fdt)
 {
-	u32 vin0_st, vin1_st, vin2_st, off;
+	u32 vin0_st, vin1_st;
+	char *status_disabled = "disabled";
 	char *status_ok = "okay";
-	char *vin2_check = NULL;
-	int vin_all, val, phy_mode;
+	int val, phy_mode;
 
 	/* Update the SOM revision */
 	do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "som-rev", som_rev, 1);
-	/* iWave: FDT: camera selection */
-	/* VIN0 camera selection */
-	if (!strcmp("ov5640", getenv ("vin0_camera")))
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin0-ov5640", 1, 0);
-	else
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin0-ov5640", 0, 0);
-
-	/* VIN1 camera selection */
-	if (!strcmp("ov5640", getenv ("vin1_camera")))
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin1-ov5640", 1, 0);
-	else
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin1-ov5640", 0, 0);
-
-	/* VIN2 camera selection */
-	if (!strcmp("ov5640", getenv ("vin2_camera")))
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin2-ov5640", 1, 0);
-	else
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin2-ov5640", 0, 0);
-
-	/* VIN3 camera selection */
-	if (!strcmp("ov5640", getenv ("vin3_camera")))
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin3-ov5640", 1, 0);
-	else
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin3-ov5640", 0, 0);
 
 	/*
 	 * MD24:MD23
@@ -673,6 +649,7 @@ void iwg21m_fdt_update(void *fdt)
 		fdt_status_disabled_by_alias(fdt, "pciec");
 		fdt_status_disabled_by_alias(fdt, "pcie_clk");
 	}
+
 	/* Update the VI0 or AVB selection
 	 * switch(0)- AVB select
 	 * switch(1)- VIN0 select 
@@ -685,8 +662,8 @@ void iwg21m_fdt_update(void *fdt)
 	}else{
 		/* AVB selected */
 		vin0_st = 0;
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin0-status", vin0_st, 1);
-		do_fixup_by_path(fdt, "/soc/ethernet@e6800000", "status", status_ok, 4,  0);
+		do_fixup_by_path(fdt, "/soc/ethernet@e6800000", "status", status_ok, sizeof(status_ok), 0);
+		do_fixup_by_path(fdt, "/soc/video@e6ef0000", "status", status_disabled, sizeof(status_disabled), 0);
 	} 
 
 	/* Update the VI1 or MMC-8bit selection
@@ -699,7 +676,6 @@ void iwg21m_fdt_update(void *fdt)
 	}else{
 		/* MMC-8bit selectd */
 		vin1_st = 0;
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin1-status", vin1_st, 0);
 
 		/*Enabling Pull-ups for MMC1_D4-PUPR3_30, MMC1_D5-PUPR3_31, MMC1_D6-PUPR3_14, MMC1_D7-PUPR3_15*/ 
 		val = readl(PUPR3);
@@ -708,63 +684,13 @@ void iwg21m_fdt_update(void *fdt)
 	} 
 
 	/* Update the VI2 or QSPI SPI flash selection
-	 * vin2_sel(1) - set the the gpio for VIN2 select  
-	 * vin2_sel(0) - reset the gpio for QSPI(flash) select 
+	 * *** NOTE ***
+	 * Since VLP2.1.9, Linux kernel can handle VI2/QSPI selection
+	 * automatically via GPIO-hog setting of GP0_18 in devicetree.
+	 * As a result, the handling in U-boot is no longer needed.
 	 */
-	vin2_check = getenv("vin2_sel");
-
-	gpio_request(GPIO_GP_0_18, NULL);
-	gpio_direction_output(GPIO_GP_0_18, 0);
-
-	if (simple_strtoul(vin2_check, NULL, 16)){
-		gpio_set_value(GPIO_GP_0_18, 1);
-		vin2_st = 1;
-	}else{
-		vin2_st = 0;
-		do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "vin2-status", vin2_st, 0);
-		gpio_set_value(GPIO_GP_0_18, 0);
-		do_fixup_by_path(fdt, "/soc/spi@e6b10000", "status", status_ok, 4,  0);
-	}
 
 	/* VIN2 Camera 8-bit or 16-bit selection GPIO */
 	gpio_request(GPIO_GP_5_7, NULL);
 	gpio_direction_input(GPIO_GP_5_7);
-
-	vin_all = (vin0_st << 0) | (vin1_st << 1) | (vin2_st << 2) ;
-	off = fdt_path_offset(fdt, "/soc/pfc@e6060000");
-	switch(vin_all){
-		case 0:	
-			fdt_delprop(fdt, off, "pinctrl-1");
-			fdt_delprop(fdt, off, "pinctrl-2");
-			fdt_delprop(fdt, off, "pinctrl-3");
-			break;
-		case 1:
-			fdt_delprop(fdt, off, "pinctrl-2");
-			fdt_delprop(fdt, off, "pinctrl-3");
-			break;
-		case 2:
-			do_fixup_by_path_u32(fdt, "/soc/pfc@e6060000", "pinctrl-1", 0x15, 0);
-			fdt_delprop(fdt, off, "pinctrl-2");
-			fdt_delprop(fdt, off, "pinctrl-3");
-			break;
-		case 3:
-			fdt_delprop(fdt, off, "pinctrl-3");
-			break;
-		case 4:
-			fdt_delprop(fdt, off, "pinctrl-2");
-			fdt_delprop(fdt, off, "pinctrl-3");
-			do_fixup_by_path_u32(fdt, "/soc/pfc@e6060000", "pinctrl-1", 0x16, 0);
-			break;
-		case 5:
-			fdt_delprop(fdt, off, "pinctrl-3");
-			do_fixup_by_path_u32(fdt, "/soc/pfc@e6060000", "pinctrl-2", 0x16, 0);
-			break;
-		case 6:
-			fdt_delprop(fdt, off, "pinctrl-3");
-			do_fixup_by_path_u32(fdt, "/soc/pfc@e6060000", "pinctrl-1", 0x15, 0);
-			do_fixup_by_path_u32(fdt, "/soc/pfc@e6060000", "pinctrl-2", 0x16, 0);
-			break;
-		default:
-			break;
-	}
 }
