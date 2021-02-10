@@ -22,10 +22,23 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define PFC_BASE	0x11030000
+
+#define ETH_CH0		(PFC_BASE + 0x300c)
+#define ETH_CH1		(PFC_BASE + 0x3010)
+#define ETH_PVDD_3300	0x00
+#define ETH_PVDD_1800	0x01
+#define ETH_PVDD_2500	0x02
+#define ETH_MII_RGMII	(PFC_BASE + 0x3018)
+
 void s_init(void)
 {
+	/* can go in board_eht_init() once enabled */
+	*(volatile u32 *)(ETH_CH0) = (*(volatile u32 *)(ETH_CH0) & 0xFFFFFFFC) | ETH_PVDD_1800;
+	*(volatile u32 *)(ETH_CH1) = (*(volatile u32 *)(ETH_CH1) & 0xFFFFFFFC) | ETH_PVDD_1800;
+	/* Enable RGMII for both ETH{0,1} */
+	*(volatile u32 *)(ETH_MII_RGMII) = (*(volatile u32 *)(ETH_MII_RGMII) & 0xFFFFFFFC);
 }
-
 
 int board_early_init_f(void)
 {
@@ -42,7 +55,6 @@ int board_early_init_f(void)
 #define CPG_CLKON_ETH				(CPG_CLKON_BASE + 0x7C)
 
 /* PFC */
-#define PFC_BASE					0x11030000
 #define PFC_P37						(PFC_BASE + 0x037)
 #define PFC_PM37					(PFC_BASE + 0x16E)
 #define PFC_PMC37					(PFC_BASE + 0x237)
