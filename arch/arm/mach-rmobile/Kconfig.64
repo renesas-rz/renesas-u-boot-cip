@@ -5,6 +5,9 @@ menu "Select Target SoC"
 config R8A774A1
         bool "Renesas SoC R8A774A1"
 
+config R8A774C0
+	bool "Renesas SoC R8A774C0"
+
 config R8A7795
 	bool "Renesas SoC R8A7795"
 	imply CLK_R8A7795
@@ -50,6 +53,12 @@ config TARGET_BEACON_RZG2M
 	bool "Beacon EmbeddedWorks RZ/G2M Dev Kit"
 	select R8A774A1
 	select PINCTRL_PFC_R8A774A1
+
+config TARGET_EK874
+	bool "EK874 board"
+	select PINCTRL_PFC_R8A774C0
+	help
+          Support for Renesas RZ/G2E EK874 platform
 
 config TARGET_CONDOR
 	bool "Condor board"
@@ -109,6 +118,7 @@ source "board/renesas/ebisu/Kconfig"
 source "board/renesas/salvator-x/Kconfig"
 source "board/renesas/ulcb/Kconfig"
 source "board/beacon/beacon-rzg2m/Kconfig"
+source "board/renesas/ek874/Kconfig"
 
 config MULTI_DTB_FIT_UNCOMPRESS_SZ
 	default 0x80000 if TARGET_SALVATOR_X

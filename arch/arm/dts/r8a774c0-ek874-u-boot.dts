@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source extras for U-Boot for the ek874 board
+ *
+ * Copyright (C) 2018 Marek Vasut <marek.vasut@gmail.com>
+ * Copyright (C) 2021 Renesas Electronics Corporation
+ */
+
+#include "r8a774c0-ek874.dts"
+#include "r8a774c0-u-boot.dtsi"

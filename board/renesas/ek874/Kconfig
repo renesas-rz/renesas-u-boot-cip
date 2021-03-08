@@ -1,0 +1,15 @@
+if TARGET_EK874
+
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "ek874"
+
+config SYS_VENDOR
+	default "renesas"
+
+config SYS_CONFIG_NAME
+	default "ek874"
+
+endif

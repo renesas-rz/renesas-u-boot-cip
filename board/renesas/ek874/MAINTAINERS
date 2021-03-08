@@ -1,0 +1,6 @@
+EK874 BOARD
+M:	Marek Vasut <marek.vasut+renesas@gmail.com>
+S:	Maintained
+F:	board/renesas/ek874/
+F:	include/configs/ek874.h
+F:	configs/r8a774c0_ek874_defconfig
