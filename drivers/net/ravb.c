@@ -438,7 +438,10 @@ static int ravb_config(struct udevice *dev)
 
 	writel(mask, eth->iobase + RAVB_REG_ECMR);
 
-	phy->drv->writeext(phy, -1, 0x02, 0x08, (0x0f << 5) | 0x19);
+	if (phy->drv->writeext)
+	{
+		phy->drv->writeext(phy, -1, 0x02, 0x08, (0x0f << 5) | 0x19);
+	}
 
 	return 0;
 }
