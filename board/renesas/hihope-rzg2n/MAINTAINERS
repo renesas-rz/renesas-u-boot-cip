@@ -1,0 +1,6 @@
+HIHOPE_RZG2N BOARD
+M:	Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+S:	Maintained
+F:	board/renesas/hihope-rzg2n/
+F:	include/configs/hihope-rzg2n.h
+F:	configs/r8a774b1_hihope-rzg2n_defconfig

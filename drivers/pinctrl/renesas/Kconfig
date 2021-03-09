@@ -89,7 +89,6 @@ config PINCTRL_PFC_R8A774A1
 
 config PINCTRL_PFC_R8A774B1
 	bool "Renesas RZG2N R8A774B1 pin control driver"
-	def_bool y if R8A774B1
 	depends on PINCTRL_PFC
 	help
 	  Support pin multiplexing control on Renesas RZG2N R8A774B1 SoCs.

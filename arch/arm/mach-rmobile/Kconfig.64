@@ -5,6 +5,9 @@ menu "Select Target SoC"
 config R8A774A1
         bool "Renesas SoC R8A774A1"
 
+config R8A774B1
+	bool "Renesas SoC R8A774B1"
+
 config R8A774C0
 	bool "Renesas SoC R8A774C0"
 
@@ -59,6 +62,12 @@ config TARGET_HIHOPE_RZG2M
 	select PINCTRL_PFC_R8A774A1
 	help
           Support for RZG2M HiHope platform
+
+config TARGET_HIHOPE_RZG2N
+	bool "HiHope RZ/G2N board"
+	select PINCTRL_PFC_R8A774B1
+	help
+          Support for RZG2N HiHope platform
 
 config TARGET_EK874
 	bool "EK874 board"
@@ -125,6 +134,7 @@ source "board/renesas/salvator-x/Kconfig"
 source "board/renesas/ulcb/Kconfig"
 source "board/beacon/beacon-rzg2m/Kconfig"
 source "board/renesas/hihope-rzg2m/Kconfig"
+source "board/renesas/hihope-rzg2n/Kconfig"
 source "board/renesas/ek874/Kconfig"
 
 config MULTI_DTB_FIT_UNCOMPRESS_SZ
