@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source extras for U-Boot for the Hihope board
+ *
+ * Copyright (C) 2019 Renesas Electronisc Corporation
+ */
+
+#include "r8a774e1-hihope-rzg2h.dts"
+#include "r8a774e1-u-boot.dtsi"
