@@ -54,6 +54,12 @@ config TARGET_BEACON_RZG2M
 	select R8A774A1
 	select PINCTRL_PFC_R8A774A1
 
+config TARGET_HIHOPE_RZG2M
+	bool "HiHope RZ/G2M board"
+	select PINCTRL_PFC_R8A774A1
+	help
+          Support for RZG2M HiHope platform
+
 config TARGET_EK874
 	bool "EK874 board"
 	select PINCTRL_PFC_R8A774C0
@@ -118,6 +124,7 @@ source "board/renesas/ebisu/Kconfig"
 source "board/renesas/salvator-x/Kconfig"
 source "board/renesas/ulcb/Kconfig"
 source "board/beacon/beacon-rzg2m/Kconfig"
+source "board/renesas/hihope-rzg2m/Kconfig"
 source "board/renesas/ek874/Kconfig"
 
 config MULTI_DTB_FIT_UNCOMPRESS_SZ
