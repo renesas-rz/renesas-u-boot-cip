@@ -56,6 +56,8 @@
 /* The HF/QSPI layout permits up to 1 MiB large bootloader blob */
 #define CONFIG_BOARD_SIZE_LIMIT		1048576
 
+#define CONFIG_PRAM			(32 * 1024) /*reserve mem for Kerenel/dtb ECC area*/
+
 /* ENV setting */
 
 #define CONFIG_EXTRA_ENV_SETTINGS	\
