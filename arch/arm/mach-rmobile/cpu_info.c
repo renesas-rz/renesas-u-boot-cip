@@ -92,10 +92,15 @@ int arch_misc_init(void)
 	int i, idx = rmobile_cpuinfo_idx();
 	char cpu[10] = { 0 };
 
-	for (i = 0; i < sizeof(cpu); i++)
-		cpu[i] = tolower(rmobile_cpuinfo[idx].cpu_name[i]);
-
-	env_set("platform", cpu);
+	if ((rmobile_cpuinfo[idx].cpu_type == RMOBILE_CPU_TYPE_R8A774A1) &&
+		(rmobile_get_cpu_rev_integer() == 3) &&
+		(rmobile_get_cpu_rev_fraction() == 0)) {
+		env_set("platform", "r8a774a3");
+	} else {
+		for (i = 0; i < sizeof(cpu); i++)
+			cpu[i] = tolower(rmobile_cpuinfo[idx].cpu_name[i]);
+		env_set("platform", cpu);
+	}
 
 	return 0;
 }
