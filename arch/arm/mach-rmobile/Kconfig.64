@@ -11,6 +11,9 @@ config R8A774B1
 config R8A774C0
 	bool "Renesas SoC R8A774C0"
 
+config R8A774E1
+	bool "Renesas SoC R8A774E1"
+
 config R8A7795
 	bool "Renesas SoC R8A7795"
 	imply CLK_R8A7795
@@ -75,6 +78,12 @@ config TARGET_EK874
 	help
           Support for Renesas RZ/G2E EK874 platform
 
+config TARGET_HIHOPE_RZG2H
+	bool "HiHope RZ/G2H board"
+	select PINCTRL_PFC_R8A774E1
+	help
+          Support for RZG2H HiHope platform
+
 config TARGET_CONDOR
 	bool "Condor board"
 	imply R8A77980
@@ -135,7 +144,9 @@ source "board/renesas/ulcb/Kconfig"
 source "board/beacon/beacon-rzg2m/Kconfig"
 source "board/renesas/hihope-rzg2m/Kconfig"
 source "board/renesas/hihope-rzg2n/Kconfig"
+source "board/renesas/hihope-rzg2h/Kconfig"
 source "board/renesas/ek874/Kconfig"
+
 
 config MULTI_DTB_FIT_UNCOMPRESS_SZ
 	default 0x80000 if TARGET_SALVATOR_X
