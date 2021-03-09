@@ -62,7 +62,7 @@ static int ecc_support =
 	(ECC_SINGLE | ECC_DUAL);
 #else
 	0;
-#endif;
+#endif
 
 /* ecc_bzero64(u64 addr, u32 size)
  * Write zero-valued octa-byte words
@@ -98,7 +98,7 @@ void ecc_bzero64(u64 addr, u32 size)
  * addr_mask : exclusive or with start address
  */
 void ecc_bzero64_blocks(u32 block_pos, u32 blocks,
-			u32 blocksize, u32 addr_mask)
+			u32 blocksize, u64 addr_mask)
 {
 	int i;
 	u64 addr;
@@ -145,7 +145,7 @@ void ecc_list_setting(void)
 		dfusaareacr = readl(((uint32_t *)DFUSAAREACR + i));
 		deccareacr = readl(((uint32_t *)DECCAREACR + i));
 		if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
-			printf("%2d: %s : Data from 0x%llx : ECC from 0x%llx :",
+			printf("%2ld: %s : Data from 0x%llx : ECC from 0x%llx :",
 			       i + (ecc_support & ECC_DUAL) * NUM_DFUSACR,
 			       dfusaareacr & ECC_ENABLE_MASK_BIT ?
 			       "Enabled" : "Disabled",
@@ -156,7 +156,7 @@ void ecc_list_setting(void)
 			       1 << ((dfusaareacr >> 24) & 0xF),
 			       deccareacr & ECC_ENABLE_MASK_BIT ? 64 : 8);
 		} else {
-			printf("%2d: Disabled\n",
+			printf("%2ld: Disabled\n",
 			       i + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
 		}
 		/* (ecc_support & ECC_DUAL) * NUM_DFUSACR :
@@ -482,7 +482,7 @@ void ecc_rm_setting(unsigned int id)
 	}
 
 	if (id >= NUM_DAREA) {
-		printf("ECC: Not support ECC at id %d\n",
+		printf("ECC: Not support ECC at id %ld\n",
 		       id + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
 		return;
 	}
@@ -493,10 +493,10 @@ void ecc_rm_setting(unsigned int id)
 	dfusaareacr = readl(((uint32_t *)DFUSAAREACR + id));
 
 	if (dfusaareacr & ECC_ENABLE_MASK_BIT) {
-		printf("ECC: Failed to disable ECC at id %d\n",
+		printf("ECC: Failed to disable ECC at id %ld\n",
 		       id + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
 	} else {
-		printf("ECC: Disabled ECC at id %d\n",
+		printf("ECC: Disabled ECC at id %ld\n",
 		       id + (ecc_support & ECC_DUAL) * NUM_DFUSACR);
 	}
 	/* (ecc_support & ECC_DUAL) * NUM_DFUSACR :
