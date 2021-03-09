@@ -1,8 +1,8 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+// SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the Silicon Linux RZ/G2E 96board platform (EK874)
+ * Device Tree Source for the Silicon Linux RZ/G2E 96board platform (EK874) Rev.C
  *
- * Copyright (C) 2019 Renesas Electronics Corporation
+ * Copyright (C) 2020 Renesas Electronics Corporation
  */
 
 /dts-v1/;
@@ -119,23 +119,9 @@
 		function = "sdhi0";
 		power-source = <1800>;
 	};
-
-	sdhi3_pins: sd3 {
-		groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
-		function = "sdhi3";
-		power-source = <1800>;
-	};
-
-	usb0_pins: usb {
-		groups = "usb0_b";
-		function = "usb0";
-	};
 };
 
 &usb2_phy0 {
-	pinctrl-0 = <&usb0_pins>;
-	pinctrl-names = "default";
-
 	status = "okay";
 };
 
@@ -179,20 +165,5 @@
 	pinctrl-0 = <&scif2_pins>;
 	pinctrl-names = "default";
 
-	status = "okay";
-};
-
-&sdhi3 {
-	/* used for on-board 8bit eMMC */
-	pinctrl-0 = <&sdhi3_pins>;
-	pinctrl-1 = <&sdhi3_pins>;
-	pinctrl-names = "default", "state_uhs";
-
-	vmmc-supply = <&reg_3p3v>;
-	vqmmc-supply = <&reg_1p8v>;
-	bus-width = <8>;
-	mmc-hs200-1_8v;
-	mmc-hs400-1_8v;
-	non-removable;
 	status = "okay";
 };
