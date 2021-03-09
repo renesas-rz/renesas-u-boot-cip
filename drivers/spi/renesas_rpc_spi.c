@@ -449,6 +449,7 @@ static const struct dm_spi_ops rpc_spi_ops = {
 
 static const struct udevice_id rpc_spi_ids[] = {
 	{ .compatible = "renesas,rpc-r8a774a1" },
+	{ .compatible = "renesas,rpc-r8a774b1" },
 	{ .compatible = "renesas,rpc-r8a774c0" },
 	{ .compatible = "renesas,rpc-r8a7795" },
 	{ .compatible = "renesas,rpc-r8a7796" },
