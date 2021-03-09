@@ -43,6 +43,8 @@ enum clk_ids {
 	CLK_S2,
 	CLK_S3,
 	CLK_SDSRC,
+	CLK_RINT,
+	CLK_OCO,
 	CLK_RPCSRC,
 
 	/* Module Clocks */
@@ -72,6 +74,10 @@ static const struct cpg_core_clk r8a774c0_core_clks[] = {
 	DEF_FIXED(".s3",       CLK_S3,             CLK_PLL1,       6, 1),
 	DEF_FIXED(".sdsrc",    CLK_SDSRC,          CLK_PLL1,       2, 1),
 	DEF_FIXED(".rpcsrc",   CLK_RPCSRC,         CLK_PLL1,       2, 1),
+
+	DEF_DIV6_RO(".r",      CLK_RINT,           CLK_EXTAL,      CPG_RCKCR,  32),
+
+	DEF_RATE(".oco",       CLK_OCO,            8 * 1000 * 1000),
 
 	/* Core Clock Outputs */
 	DEF_FIXED("za2",       R8A774C0_CLK_ZA2,   CLK_PLL0D24,    1, 1),
@@ -104,7 +110,7 @@ static const struct cpg_core_clk r8a774c0_core_clks[] = {
 	DEF_FIXED("cp",        R8A774C0_CLK_CP,    CLK_EXTAL,      2, 1),
 	DEF_FIXED("cpex",      R8A774C0_CLK_CPEX,  CLK_EXTAL,      4, 1),
 	DEF_FIXED("osc",       R8A774C0_CLK_OSC,   CLK_EXTAL,    384, 1),
-	DEF_FIXED("r",         R8A774C0_CLK_R,     CLK_EXTAL,   1536, 1),
+	DEF_GEN3_RCKSEL("r",   R8A774C0_CLK_R,     CLK_RINT,       1, CLK_OCO, 61 * 4),
 
 	DEF_GEN3_PE("s0d6c",   R8A774C0_CLK_S0D6C, CLK_S0, 6, CLK_PE, 6),
 	DEF_GEN3_PE("s3d1c",   R8A774C0_CLK_S3D1C, CLK_S3, 1, CLK_PE, 1),
