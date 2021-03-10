@@ -8,6 +8,7 @@
  */
 
 #include <common.h>
+#include <cpu_func.h>
 #include <command.h>
 #include <linux/log2.h>
 #include <linux/io.h>
@@ -568,12 +569,12 @@ void ecc_help(void)
 	       "  help             print this help log\n");
 }
 
-/* do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+/* do_ecc(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
  * Main process parse user command
  * argc : number of parameters
  * argv : array of parameters
  */
-int do_ecc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+int do_ecc(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
 {
 	int mode_process = 0;
 
