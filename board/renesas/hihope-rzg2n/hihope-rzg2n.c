@@ -8,6 +8,7 @@
  */
 
 #include <common.h>
+#include <env.h>
 #include <malloc.h>
 #include <netdev.h>
 #include <dm.h>
@@ -27,19 +28,33 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+static int board_rev;
+
 void s_init(void)
 {
 }
 
 #define GPIO_WLAN_REG_ON 157
 #define GPIO_BT_REG_ON 158
+#define	GPIO_BT_POWER		73	/* GP3_13	*/
+#define	GPIO_WIFI_POWER		82	/* GP4_06	*/
 
 void clear_wlan_bt_reg_on(void)
 {
-	gpio_request(GPIO_WLAN_REG_ON, "wlan_reg_on");
-	gpio_request(GPIO_BT_REG_ON, "bt_reg_on");
-	gpio_direction_output(GPIO_WLAN_REG_ON, 0);
-	gpio_direction_output(GPIO_BT_REG_ON, 0);
+	if (board_rev > 2)
+	{
+		gpio_request(GPIO_BT_POWER, "bt_power");
+		gpio_request(GPIO_WIFI_POWER, "wifi_power");
+		gpio_direction_output(GPIO_BT_POWER, 0);
+		gpio_direction_output(GPIO_WIFI_POWER, 0);
+	}
+	else
+	{
+		gpio_request(GPIO_WLAN_REG_ON, "wlan_reg_on");
+		gpio_request(GPIO_BT_REG_ON, "bt_reg_on");
+		gpio_direction_output(GPIO_WLAN_REG_ON, 0);
+		gpio_direction_output(GPIO_BT_REG_ON, 0);
+	}
 }
 
 #define SCIF2_MSTP310		BIT(10)	/* SCIF2 */
@@ -65,6 +80,10 @@ int board_early_init_f(void)
 #define HSUSB_REG_UGCTRL2_USB0SEL	0x30
 #define HSUSB_REG_UGCTRL2_USB0SEL_EHCI	0x10
 
+#define	GPIO_REV_BIT1		113	/* GP5_19	*/
+#define	GPIO_REV_BIT0		115	/* GP5_21	*/
+#define	GPIO_REV2_BOARD_CHECK	119	/* GP5_25	*/
+
 int board_init(void)
 {
 	/* adress of boot parameters */
@@ -81,8 +100,27 @@ int board_init(void)
 	/* low power status */
 	setbits_le16(HSUSB_REG_LPSTS, HSUSB_REG_LPSTS_SUSPM_NORMAL);
 
+	gpio_request(GPIO_REV2_BOARD_CHECK, "rev2_check");
+	gpio_direction_input(GPIO_REV2_BOARD_CHECK);
+	if (gpio_get_value(GPIO_REV2_BOARD_CHECK))
+	{
+		board_rev = 2;
+	}
+	else
+	{
+		gpio_request(GPIO_REV_BIT0, "rev_bit0");
+		gpio_request(GPIO_REV_BIT1, "rev_bit1");
+		gpio_direction_input(GPIO_REV_BIT1);
+		gpio_direction_input(GPIO_REV_BIT0);
+		board_rev = 0x03 + ((gpio_get_value(GPIO_REV_BIT1) << 1)  | gpio_get_value(GPIO_REV_BIT0));
+	}
 	clear_wlan_bt_reg_on();
+
 	return 0;
+}
+int board_late_init(void)
+{
+	env_set_hex("board_rev", board_rev);
 }
 
 int dram_init(void)

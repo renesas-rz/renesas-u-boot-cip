@@ -18,4 +18,6 @@
 /* Generic Timer Definitions (use in assembler source) */
 #define COUNTER_FREQUENCY	0xFE502A	/* 16.66MHz from CPclk */
 
+#define CONFIG_BOARD_LATE_INIT
+
 #endif /* __HIHOPE_RZG2M_H */
