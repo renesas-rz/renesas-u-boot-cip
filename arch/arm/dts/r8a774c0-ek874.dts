@@ -196,3 +196,8 @@
 	non-removable;
 	status = "okay";
 };
+
+&rwdt {
+	timeout-sec = <60>;
+	status = "okay";
+};
