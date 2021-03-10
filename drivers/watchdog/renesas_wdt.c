@@ -17,6 +17,7 @@
 #include <linux/delay.h>
 #include <linux/types.h>
 #include <env.h>
+#include <renesas_wdt.h>
 
 #define CODE_VAL1       0x5a5a0000 /* Code value of RWTCNT */
 #define CODE_VAL2_3     0xa5a5a500 /* Code value of RWTCSRA and RWTCSRB */
@@ -193,6 +194,29 @@ static int rwdt_start(struct udevice *watchdog_dev, u64 timeout, ulong flag)
 	}
 
 	return 0;
+}
+
+int reinitr_wdt(void)
+{
+	u64 timeout;
+	int ret;
+
+	if (uclass_get_device(UCLASS_WDT, 0,
+			      (struct udevice **)&gd->watchdog_dev)) {
+		printf("Re-init wdt failed!\n");
+		return -ENODEV;
+	}
+
+	if (env_get_ulong("wdt_status", 2, 1)) {
+		timeout = env_get_ulong("wdt_timeout", 10, 0);
+		ret = wdt_start(gd->watchdog_dev, timeout, 1);
+		printf("U-boot WDT started!\n");
+	} else {
+		ret = wdt_stop(gd->watchdog_dev);
+		printf("U-boot WDT stopped!\n");
+	}
+	second_init = 1;
+	return ret;
 }
 
 static int rwdt_probe(struct udevice *watchdog_dev)
