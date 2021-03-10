@@ -9,5 +9,5 @@
 ifdef CONFIG_SPL_BUILD
 obj-y	:= ../rcar-common/gen3-spl.o
 else
-obj-y	:= ek874.o ../rcar-common/common.o
+obj-y	:= ek874.o ../rcar-common/common.o ../rzg-common/update_fdt.o
 endif

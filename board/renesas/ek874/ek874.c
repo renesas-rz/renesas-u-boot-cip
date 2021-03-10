@@ -20,6 +20,7 @@
 #include <asm/io.h>
 #include <linux/errno.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/system.h>
 #include <asm/gpio.h>
 #include <asm/arch/gpio.h>
 #include <asm/arch/rmobile.h>
@@ -27,6 +28,8 @@
 #include <asm/arch/sh_sdhi.h>
 #include <i2c.h>
 #include <mmc.h>
+
+#include "../rzg-common/common.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -145,3 +148,48 @@ int board_fit_config_name_match(const char *name)
 	return -1;
 }
 #endif
+
+static const char * const dt_non_ecc[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
+};
+
+static const char * const dt_ecc_full_single[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x3c000000>",
+};
+
+int ft_verify_fdt(void *fdt)
+{
+	const char **fdt_dt = NULL;
+	int use_ecc, ecc_mode, size;
+	struct pt_regs regs;
+
+	size = 0;
+	/* Setting SiP Service GET_ECC_MODE command*/
+	regs.regs[0] = RZG_SIP_SVC_GET_ECC_MODE;
+	smc_call(&regs);
+	/* First result is USE ECC or not, Second result is ECC MODE*/
+	use_ecc = regs.regs[0];
+	ecc_mode = regs.regs[1];
+
+	if (!use_ecc) {
+		fdt_dt = (const char **)dt_non_ecc;
+		size = ARRAY_SIZE(dt_non_ecc);
+	} else if (use_ecc == 1) {
+		switch (ecc_mode) {
+		case 0:
+			/* The memory map of partial ECC same as non-ECC mode*/
+			fdt_dt = (const char **)dt_non_ecc;
+			size = ARRAY_SIZE(dt_non_ecc);
+			break;
+		case 2:
+			fdt_dt = (const char **)dt_ecc_full_single;
+			size = ARRAY_SIZE(dt_ecc_full_single);
+			break;
+		default:
+			printf("Not support changing device-tree to ");
+			printf("compatible with ECC_MODE = %d\n", ecc_mode);
+			return 1;
+		};
+	}
+	return update_fdt(fdt, fdt_dt, size);
+}

@@ -19,6 +19,7 @@
 #include <linux/errno.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
+#include <asm/system.h>
 #include <asm/arch/gpio.h>
 #include <asm/arch/rmobile.h>
 #include <asm/arch/rcar-mstp.h>
@@ -28,6 +29,8 @@
 #include <linux/bitops.h>
 #include <linux/delay.h>
 #include <asm/arch/rcar-mstp.h>
+
+#include "../rzg-common/common.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -171,4 +174,116 @@ void board_cleanup_before_linux(void)
 	 */
 	mstp_setbits_le32(SMSTPCR9, SMSTPCR9,
 			  GPIO2_MSTP910 | GPIO3_MSTP909 | GPIO5_MSTP907);
+}
+
+static const char * const dt_non_ecc[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
+	"/memory@500000000", "reg", "<0x5 0x00000000 0x0 0x80000000>",
+	"/memory@500000000", "device_type", "memory",
+	"/memory@600000000", NULL, NULL,
+	"/reserved-memory/linux,lossy_decompress", "reg",
+					     "<0x0 0x54000000 0x0 0x3000000>",
+	"/reserved-memory/linux,lossy_decompress", "no-map", NULL,
+	"/reserved-memory/linux,cma", "reg", "<0x0 0x58000000 0x0 0x20000000>",
+	"/reserved-memory/linux,multimedia", "reg",
+					     "<0x0 0x78000000 0x0 0x10000000>",
+	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia \
+				    &/reserved-memory/linux,lossy_decompress>",
+	"/soc/mmu@e67b0000", "status", "disabled",
+	"/soc/mmu@fd800000", "status", "disabled",
+	"/soc/mmu@fd950000", "status", "disabled",
+	"/soc/mmu@fd960000", "status", "disabled",
+};
+
+static const char * const dt_ecc_partial[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
+	"/memory@500000000", NULL, NULL,
+	"/memory@600000000", "reg", "<0x6 0x00000000 0x0 0x80000000>",
+	"/memory@600000000", "device_type", "memory",
+	"/reserved-memory/linux,lossy_decompress", "reg",
+					     "<0x0 0x54000000 0x0 0x3000000>",
+	"/reserved-memory/linux,lossy_decompress", "no-map", NULL,
+	"/reserved-memory/linux,cma", "reg", "<0x0 0x58000000 0x0 0x20000000>",
+	"/reserved-memory/linux,multimedia", "reg",
+					     "<0x0 0x78000000 0x0 0x10000000>",
+	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia \
+				    &/reserved-memory/linux,lossy_decompress>",
+	"/soc/mmu@e67b0000", "status", "disabled",
+	"/soc/mmu@fd800000", "status", "disabled",
+	"/soc/mmu@fd950000", "status", "disabled",
+	"/soc/mmu@fd960000", "status", "disabled",
+};
+
+static const char * const dt_ecc_full_single[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x4C000000>",
+	"/memory@500000000", NULL, NULL,
+	"/memory@600000000", "reg", "<0x6 0x00000000 0x0 0x40000000>",
+	"/memory@600000000", "device_type", "memory",
+	"/reserved-memory/linux,lossy_decompress", NULL, NULL,
+	"/reserved-memory/linux,cma", "reg", "<0x0 0x50000000 0x0 0x20000000>",
+	"/reserved-memory/linux,multimedia", "reg",
+					     "<0x0 0x70000000 0x0 0x10000000>",
+	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia>",
+	"/soc/mmu@e67b0000", "status", "disabled",
+	"/soc/mmu@fd800000", "status", "disabled",
+	"/soc/mmu@fd950000", "status", "disabled",
+	"/soc/mmu@fd960000", "status", "disabled",
+};
+
+static const char * const dt_ecc_full_dual[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
+	"/memory@500000000", NULL, NULL,
+	"/memory@600000000", NULL, NULL,
+	"/reserved-memory/linux,lossy_decompress", NULL, NULL,
+	"/reserved-memory/linux,cma", "reg", "<0x0 0x50000000 0x0 0x20000000>",
+	"/reserved-memory/linux,multimedia", "reg",
+					     "<0x0 0x70000000 0x0 0x10000000>",
+	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia>",
+	"/soc/mmu@e67b0000", "status", "okay",
+	"/soc/mmu@fd800000", "status", "okay",
+	"/soc/mmu@fd950000", "status", "okay",
+	"/soc/mmu@fd960000", "status", "okay",
+};
+
+int ft_verify_fdt(void *fdt)
+{
+	const char **fdt_dt = NULL;
+	int use_ecc, ecc_mode, size;
+	struct pt_regs regs;
+
+	size = 0;
+	/* Setting SiP Service GET_ECC_MODE command*/
+	regs.regs[0] = RZG_SIP_SVC_GET_ECC_MODE;
+	smc_call(&regs);
+	/* First result is USE ECC or not, Second result is ECC MODE*/
+	use_ecc = regs.regs[0];
+	ecc_mode = regs.regs[1];
+
+	if (!use_ecc) {
+		fdt_dt = (const char **)dt_non_ecc;
+		size = ARRAY_SIZE(dt_non_ecc);
+	} else if (use_ecc == 1) {
+		switch (ecc_mode) {
+		case 0:
+			fdt_dt = (const char **)dt_ecc_partial;
+			size = ARRAY_SIZE(dt_ecc_partial);
+			break;
+		case 1:
+			fdt_dt = (const char **)dt_ecc_full_dual;
+			size = ARRAY_SIZE(dt_ecc_full_dual);
+			break;
+		case 2:
+			fdt_dt = (const char **)dt_ecc_full_single;
+			size = ARRAY_SIZE(dt_ecc_full_single);
+			break;
+		default:
+			printf("Not support changing device-tree to ");
+			printf("compatible with ECC_MODE = %d\n", ecc_mode);
+			return 1;
+		};
+	} else {
+		return 1;
+	}
+
+	return update_fdt(fdt, fdt_dt, size);
 }
