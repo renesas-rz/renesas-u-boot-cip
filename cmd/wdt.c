@@ -9,6 +9,7 @@
 #include <command.h>
 #include <dm.h>
 #include <wdt.h>
+#include <env.h>
 
 static struct udevice *currdev;
 
@@ -60,6 +61,28 @@ static int check_currdev(void)
 	return 0;
 }
 
+static int do_wdt_info(struct cmd_tbl *cmdtp, int flag, int argc,
+		       char *const argv[])
+{
+	int ret;
+	u64 timeout;
+
+	ret = check_currdev();
+	if (ret)
+		return ret;
+
+	printf("Watchdog device: %s\n", currdev->name);
+	printf("Current status: %s\n",
+	       env_get_ulong("wdt_status", 2, 0) ? "active" : "stopped");
+	timeout = env_get_ulong("wdt_timeout", 10, 0);
+	if (!timeout)
+		printf("No watchdog timeout found\n");
+	else
+		printf("Current timeout: %lld\n", timeout);
+
+	return CMD_RET_SUCCESS;
+}
+
 static int do_wdt_start(struct cmd_tbl *cmdtp, int flag, int argc,
 			char *const argv[])
 {
@@ -67,14 +90,18 @@ static int do_wdt_start(struct cmd_tbl *cmdtp, int flag, int argc,
 	u64 timeout;
 	ulong flags = 0;
 
-	if (argc < 2)
+	if (argc < 1)
 		return CMD_RET_USAGE;
 
 	ret = check_currdev();
 	if (ret)
 		return ret;
 
-	timeout = simple_strtoull(argv[1], NULL, 0);
+	if (argv[1] != NULL)
+		timeout = simple_strtoull(argv[1], NULL, 0);
+	else
+		timeout = env_get_ulong("wdt_timeout", 10, 0);
+
 	if (argc > 2)
 		flags = simple_strtoul(argv[2], NULL, 0);
 
@@ -160,6 +187,7 @@ static int do_wdt_expire(struct cmd_tbl *cmdtp, int flag, int argc,
 static char wdt_help_text[] =
 	"list - list watchdog devices\n"
 	"wdt dev [<name>] - get/set current watchdog device\n"
+	"wdt info - get information about current watchdog device\n"
 	"wdt start <timeout ms> [flags] - start watchdog timer\n"
 	"wdt stop - stop watchdog timer\n"
 	"wdt reset - reset watchdog timer\n"
@@ -168,6 +196,7 @@ static char wdt_help_text[] =
 U_BOOT_CMD_WITH_SUBCMDS(wdt, "Watchdog sub-system", wdt_help_text,
 	U_BOOT_SUBCMD_MKENT(list, 1, 1, do_wdt_list),
 	U_BOOT_SUBCMD_MKENT(dev, 2, 1, do_wdt_dev),
+	U_BOOT_SUBCMD_MKENT(info, 1, 1, do_wdt_info),
 	U_BOOT_SUBCMD_MKENT(start, 3, 1, do_wdt_start),
 	U_BOOT_SUBCMD_MKENT(stop, 1, 1, do_wdt_stop),
 	U_BOOT_SUBCMD_MKENT(reset, 1, 1, do_wdt_reset),
