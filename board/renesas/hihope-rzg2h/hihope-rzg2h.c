@@ -114,43 +114,6 @@ int board_late_init(void)
 	return 0;
 }
 
-int dram_init(void)
-{
-	if (fdtdec_setup_mem_size_base() != 0)
-		return -EINVAL;
-
-	return 0;
-}
-
-int dram_init_banksize(void)
-{
-	int use_ecc = 0;
-	struct pt_regs regs;
-
-	fdtdec_setup_memory_banksize();
-
-	/* Setting SiP Service GET_ECC_MODE command*/
-	regs.regs[0] = RZG_SIP_SVC_GET_ECC_MODE;
-	smc_call(&regs);
-	/* First result is USE ECC or not*/
-	use_ecc = regs.regs[0];
-
-	if (use_ecc == 1) {
-		int bank;
-
-		for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
-			if ((gd->bd->bi_dram[bank].start & (0x500000000U)) ==
-			    (0x500000000U)) {
-				gd->bd->bi_dram[bank].start =
-				  (gd->bd->bi_dram[bank].start & 0x0FFFFFFFFU)
-				  | 0x600000000U;
-			}
-		}
-	}
-
-	return 0;
-}
-
 #define RST_BASE	0xE6160000
 #define RST_CA57RESCNT	(RST_BASE + 0x40)
 #define RST_RSTOUTCR	(RST_BASE + 0x58)
