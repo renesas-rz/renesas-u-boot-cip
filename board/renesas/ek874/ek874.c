@@ -28,6 +28,7 @@
 #include <asm/arch/sh_sdhi.h>
 #include <i2c.h>
 #include <mmc.h>
+#include <renesas_wdt.h>
 
 #include "../rzg-common/common.h"
 
@@ -102,6 +103,9 @@ int board_init(void)
 
 int board_late_init(void)
 {
+#ifdef CONFIG_WDT_RENESAS
+	reinitr_wdt();
+#endif
 	env_set("board_rev", &board_rev);
 
 	return 0;

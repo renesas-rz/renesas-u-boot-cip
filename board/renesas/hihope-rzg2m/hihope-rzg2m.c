@@ -29,6 +29,7 @@
 #include <linux/bitops.h>
 #include <linux/delay.h>
 #include <asm/arch/rcar-mstp.h>
+#include <renesas_wdt.h>
 
 #include "../rzg-common/common.h"
 
@@ -126,6 +127,9 @@ int board_init(void)
 
 int board_late_init(void)
 {
+#ifdef CONFIG_WDT_RENESAS
+	reinitr_wdt();
+#endif
 	env_set_hex("board_rev", board_rev);
 
 	return 0;
