@@ -872,24 +872,24 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	struct tmio_sd_plat *plat = dev_get_platdata(dev);
 
 	/* HS400 is not supported on H3 ES1.x and M3W ES1.0, ES1.1 */
-	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
+	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774E1) &&
 	    (rmobile_get_cpu_rev_integer() <= 1)) ||
-	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7796) &&
+	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
 	    (rmobile_get_cpu_rev_integer() == 1) &&
 	    (rmobile_get_cpu_rev_fraction() < 2)))
 		plat->cfg.host_caps &= ~MMC_MODE_HS400;
 
 	/* H3 ES2.0, ES3.0 and M3W ES1.2 and M3N bad taps */
-	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
+	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774E1) &&
 	    (rmobile_get_cpu_rev_integer() >= 2)) ||
-	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7796) &&
+	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
 	    (rmobile_get_cpu_rev_integer() == 1) &&
 	    (rmobile_get_cpu_rev_fraction() == 2)) ||
-	    (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A77965))
+	    (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774B1))
 		priv->hs400_bad_tap = BIT(2) | BIT(3) | BIT(6) | BIT(7);
 
 	/* H3 ES3.0 can use HS400 with manual adjustment */
-	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
+	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774E1) &&
 	    (rmobile_get_cpu_rev_integer() >= 3)) {
 		priv->adjust_hs400_enable = true;
 		priv->adjust_hs400_offset = 0;
@@ -898,7 +898,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	}
 
 	/* M3W ES1.2 can use HS400 with manual adjustment */
-	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7796) &&
+	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
 	    (rmobile_get_cpu_rev_integer() == 1) &&
 	    (rmobile_get_cpu_rev_fraction() == 2)) {
 		priv->adjust_hs400_enable = true;
@@ -908,7 +908,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	}
 
 	/* M3W ES1.x for x>2 can use HS400 with manual adjustment and taps */
-	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7796) &&
+	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
 	    (rmobile_get_cpu_rev_integer() == 1) &&
 	    (rmobile_get_cpu_rev_fraction() > 2)) {
 		priv->adjust_hs400_enable = true;
@@ -919,7 +919,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	}
 
 	/* M3N can use HS400 with manual adjustment */
-	if (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A77965) {
+	if (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774B1) {
 		priv->adjust_hs400_enable = true;
 		priv->adjust_hs400_offset = 3;
 		priv->adjust_hs400_calib_table =
@@ -927,7 +927,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	}
 
 	/* E3 can use HS400 with manual adjustment */
-	if (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A77990) {
+	if (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774C0) {
 		priv->adjust_hs400_enable = true;
 		priv->adjust_hs400_offset = 3;
 		priv->adjust_hs400_calib_table =
@@ -935,9 +935,9 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	}
 
 	/* H3 ES1.x, ES2.0 and M3W ES1.0, ES1.1, ES1.2 uses 4 tuning taps */
-	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
+	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774E1) &&
 	    (rmobile_get_cpu_rev_integer() <= 2)) ||
-	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7796) &&
+	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
 	    (rmobile_get_cpu_rev_integer() == 1) &&
 	    (rmobile_get_cpu_rev_fraction() <= 2)))
 		priv->nrtaps = 4;
@@ -945,9 +945,9 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 		priv->nrtaps = 8;
 #endif
 	/* H3 ES1.x and M3W ES1.0 uses bit 17 for DTRAEND */
-	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
+	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774E1) &&
 	    (rmobile_get_cpu_rev_integer() <= 1)) ||
-	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7796) &&
+	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
 	    (rmobile_get_cpu_rev_integer() == 1) &&
 	    (rmobile_get_cpu_rev_fraction() == 0)))
 		priv->read_poll_flag = TMIO_SD_DMA_INFO1_END_RD;

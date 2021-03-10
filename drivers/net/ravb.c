@@ -397,8 +397,8 @@ static int ravb_dmac_init(struct udevice *dev)
 	writel(0x00222210, eth->iobase + RAVB_REG_TGC);
 
 	/* Delay CLK: 2ns (not applicable on R-Car E3/D3) */
-	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A77990) ||
-	    (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A77995))
+	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774C0) ||
+	    (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774B1))
 		return 0;
 
 	if ((pdata->phy_interface == PHY_INTERFACE_MODE_RGMII_ID) ||
