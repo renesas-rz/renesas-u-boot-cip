@@ -955,7 +955,9 @@ dtb-$(CONFIG_ARCH_IMXRT) += imxrt1050-evk.dtb \
 	imxrt1170-evk.dtb \
 
 dtb-$(CONFIG_RCAR_GEN3) += \
-	r8a774c0-ek874-revc-u-boot.dtb
+	r8a774c0-ek874-revc-u-boot.dtb \
+	r8a77995-draak-u-boot.dtb \
+	rzg2l-dev.dtb
 dtb-$(CONFIG_RCAR_GEN4) += \
 	r8a779h0-gray-hawk.dtb
 
