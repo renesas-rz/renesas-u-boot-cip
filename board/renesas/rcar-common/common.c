@@ -43,7 +43,9 @@ static void apply_atf_overlay(void *fdt_blob)
 
 int fdtdec_board_setup(const void *fdt_blob)
 {
+#ifndef CONFIG_TARGET_RZG2L_DEV
 	apply_atf_overlay((void *)fdt_blob);
+#endif
 
 	return 0;
 }
