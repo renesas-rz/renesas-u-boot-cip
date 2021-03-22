@@ -30,6 +30,10 @@
 
 };
 
+&xinclk {
+        clock-frequency = <24000000>;
+};
+
 &scif0 {
 	status = "okay";
 	clock = <100000000>;
