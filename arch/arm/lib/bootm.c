@@ -34,6 +34,10 @@
 #include <vxworks.h>
 #include <asm/cache.h>
 
+#ifdef CONFIG_WDT
+#include <wdt.h>
+#endif
+
 #ifdef CONFIG_ARMV7_NONSEC
 #include <asm/armv7.h>
 #endif
@@ -199,6 +203,11 @@ __weak void board_prep_linux(struct bootm_headers *images) { }
 static void boot_prep_linux(struct bootm_headers *images)
 {
 	char *commandline = env_get("bootargs");
+
+#ifdef CONFIG_WDT
+	strcat(commandline, " wdt_overflow=");
+	strcat(commandline, simple_itoa(watchdog_overflow));
+#endif
 
 	if (CONFIG_IS_ENABLED(OF_LIBFDT) && IS_ENABLED(CONFIG_LMB) && images->ft_len) {
 		debug("using: FDT\n");
