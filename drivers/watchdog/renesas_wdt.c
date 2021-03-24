@@ -25,6 +25,7 @@
 #define RWTCNT          0
 #define RWTCSRA         4
 #define RWTCSRA_WRFLG   BIT(5)
+#define RWTCSRA_WOVF    BIT(4)
 #define RWTCSRA_TME     BIT(7)
 #define RWTCSRB         8
 #define RWDT_DEFAULT_TIMEOUT	60
@@ -41,6 +42,7 @@
 
 static const unsigned int clk_divs[] = { 1, 4, 16, 32, 64, 128, 1024, 4096 };
 static bool second_init;
+bool watchdog_overflow;
 
 struct rwdt_priv {
 	struct clk clk;
@@ -248,6 +250,8 @@ static int rwdt_probe(struct udevice *watchdog_dev)
 			break;
 		}
 	}
+
+	watchdog_overflow = (readl(priv->base + RWTCSRA) & RWTCSRA_WOVF) >> 4;
 
 	return 0;
 }
