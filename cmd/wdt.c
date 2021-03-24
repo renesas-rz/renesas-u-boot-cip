@@ -80,6 +80,11 @@ static int do_wdt_info(struct cmd_tbl *cmdtp, int flag, int argc,
 	else
 		printf("Current timeout: %lld\n", timeout);
 
+	if (watchdog_overflow)
+		printf("WDT status at boot: Overflow\n");
+	else
+		printf("WDT status at boot: No overflow\n");
+
 	return CMD_RET_SUCCESS;
 }
 
