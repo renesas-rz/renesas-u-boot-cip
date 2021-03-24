@@ -20,4 +20,7 @@
 
 #define CONFIG_BOARD_LATE_INIT
 
+/* ENV setting */
+#define CONFIG_ENV_OVERWRITE
+
 #endif /* __HIHOPE_RZG2H_H */
