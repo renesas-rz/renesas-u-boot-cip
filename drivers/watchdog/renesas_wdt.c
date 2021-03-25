@@ -28,7 +28,7 @@
 #define RWTCSRA_WOVF    BIT(4)
 #define RWTCSRA_TME     BIT(7)
 #define RWTCSRB         8
-#define RWDT_DEFAULT_TIMEOUT	60
+#define RWDT_DEFAULT_TIMEOUT	60000
 
 /*
  * In probe, clk_rate is checked to be not more than 16 bit x biggest
@@ -86,8 +86,8 @@ static int rwdt_init_timeout(struct udevice *watchdog_dev)
 {
 	struct rwdt_priv *priv = dev_get_priv(watchdog_dev);
 
-	rwdt_write(priv, MAX_VAL - MUL_BY_CLKS_PER_SEC(priv, priv->timeout),
-			RWTCNT);
+	rwdt_write(priv, 65536 - MUL_BY_CLKS_PER_SEC(priv, priv->timeout),
+		   RWTCNT);
 
 	return 0;
 }
@@ -101,7 +101,7 @@ int rwdt_reset(struct udevice *watchdog_dev)
 
 	if (second_init) {
 		env_set_ulong("wdt_status", priv->is_active);
-		env_set_ulong("wdt_timeout", priv->timeout);
+		env_set_ulong("wdt_timeout", priv->timeout * 1000);
 	}
 
 	return 0;
@@ -152,11 +152,11 @@ static int rwdt_start(struct udevice *watchdog_dev, u64 timeout, ulong flag)
 	 */
 	if (timeout < RWDT_DEFAULT_TIMEOUT) {
 		printf("Input timeout must be equal or bigger than ");
-		printf("default timeout %d(s)\n", RWDT_DEFAULT_TIMEOUT);
-		priv->timeout = RWDT_DEFAULT_TIMEOUT;
-	} else {
-		priv->timeout = timeout;
+		printf("default timeout %d(ms)\n", RWDT_DEFAULT_TIMEOUT);
+		timeout = RWDT_DEFAULT_TIMEOUT;
 	}
+
+	priv->timeout = timeout / 1000;
 
 	if (priv->is_active) {
 		rwdt_init_timeout(watchdog_dev);
@@ -191,7 +191,7 @@ static int rwdt_start(struct udevice *watchdog_dev, u64 timeout, ulong flag)
 	 */
 	if (flag) {
 		env_set_ulong("wdt_status", 1);
-		env_set_ulong("wdt_timeout", priv->timeout);
+		env_set_ulong("wdt_timeout", timeout);
 		env_save();
 	}
 
@@ -208,12 +208,13 @@ int reinitr_wdt(void)
 		printf("Re-init wdt failed!\n");
 		return -ENODEV;
 	}
+	timeout = env_get_ulong("wdt_timeout", 10, 0);
 
 	if (env_get_ulong("wdt_status", 2, 1)) {
-		timeout = env_get_ulong("wdt_timeout", 10, 0);
 		ret = wdt_start(gd->watchdog_dev, timeout, 1);
 		printf("U-boot WDT started!\n");
 	} else {
+		ret = wdt_start(gd->watchdog_dev, timeout, 0);
 		ret = wdt_stop(gd->watchdog_dev);
 		printf("U-boot WDT stopped!\n");
 	}
