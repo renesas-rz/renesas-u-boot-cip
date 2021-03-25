@@ -1,16 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * include/configs/salvator-x.h
- *     This file is Salvator-X board configuration.
- *
  * Copyright (C) 2015 Renesas Electronics Corporation
  */
 
 #ifndef __RZG2L_DEV_H
 #define __RZG2L_DEV_H
-
-/* Clone from "rcar-gen3-common.h"
-*/
 
 #include <asm/arch/rmobile.h>
 
@@ -64,12 +58,9 @@
 #define CONFIG_BOARD_SIZE_LIMIT		1048576
 
 /* ENV setting */
-
 #define CONFIG_EXTRA_ENV_SETTINGS	\
 	"bootm_size=0x10000000\0"
 
-/* Different with RCAR: kernel=0x80080000,dtb=0x82000000
-u-boot(BL33)=70000000 */
 #define CONFIG_BOOTCOMMAND	\
 	"tftp 0x48080000 Image; " \
 	"tftp 0x48000000 Image-"CONFIG_DEFAULT_FDT_FILE"; " \
@@ -78,10 +69,5 @@ u-boot(BL33)=70000000 */
 /* For board */
 /* Ethernet RAVB */
 #define CONFIG_BITBANGMII_MULTI
-
-/* FIXME: need check Generic Timer Definitions (use in assembler source) */
-//#define COUNTER_FREQUENCY	0xFE502A	/* 16.66MHz from CPclk */
-
-/* Environment in eMMC, at the end of 2nd "boot sector" */
 
 #endif /* __RZG2L_DEV_H */
