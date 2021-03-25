@@ -37,15 +37,15 @@ static void apply_atf_overlay(void *fdt_blob)
 {
 	void *atf_fdt_blob = (void *)(rcar_atf_boot_args[1]);
 
+#if !defined(CONFIG_R9A07G044L)
 	if (fdt_magic(atf_fdt_blob) == FDT_MAGIC)
 		fdt_overlay_apply_node(fdt_blob, 0, atf_fdt_blob, 0);
+#endif
 }
 
 int fdtdec_board_setup(const void *fdt_blob)
 {
-#ifndef CONFIG_TARGET_RZG2L_DEV
 	apply_atf_overlay((void *)fdt_blob);
-#endif
 
 	return 0;
 }
