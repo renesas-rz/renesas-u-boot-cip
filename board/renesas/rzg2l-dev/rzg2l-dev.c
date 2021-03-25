@@ -68,7 +68,12 @@ int board_mmc_init(struct bd_info *bis)
 	/* SD1 power control: P39_1 = 0; P39_2 = 1; */
 	*(volatile u32 *)(PFC_PMC37) &= 0xFFFFFFF9; /* Port func mode 0b00 */
 	*(volatile u32 *)(PFC_PM37) = (*(volatile u32 *)(PFC_PM37) & 0xFFFFFFC3) | 0x28; /* Port output mode 0b1010 */
+#if CONFIG_TARGET_SMARC_RZG2L
+	*(volatile u32 *)(PFC_P37) = (*(volatile u32 *)(PFC_P37) & 0xFFFFFFF9) | 0x6;	/* Port 39[2:1] output value 0b11*/
+#else
+
 	*(volatile u32 *)(PFC_P37) = (*(volatile u32 *)(PFC_P37) & 0xFFFFFFF9) | 0x4;	/* Port 39[2:1] output value 0b10*/
+#endif
 		
 	ret |= sh_sdhi_init(CONFIG_SYS_SH_SDHI0_BASE,
 						0,
