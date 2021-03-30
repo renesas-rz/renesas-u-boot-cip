@@ -73,6 +73,9 @@ static void sh_serial_setbrg(void)
 	udelay((1000000 * 2 * 16 / CONFIG_SYS_CLK_FREQ) * 1000 + 1);
 #else
 	sci_out(&sh_sci, SCBRR, SCBRR_VALUE(gd->baudrate, CONFIG_SCIF_CLK_FREQ));
+#if defined(CONFIG_SCIF_A)
+	udelay((1000000 * 2 * 16 / CONFIG_SYS_CLK_FREQ) * 1000 + 1);
+#endif
 #endif
 #if defined(CONFIG_IWG23S)
 	sci_out(&sh_sci, SCBRR, SCBRR_VALUE(gd->baudrate, CONFIG_SYS_CLK_FREQ));
