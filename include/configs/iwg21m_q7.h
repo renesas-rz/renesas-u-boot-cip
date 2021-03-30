@@ -67,6 +67,9 @@
 #define CONFIG_CMD_EXT4_WRITE
 #define CONFIG_CMD_SF
 #define CONFIG_CMD_SPI
+#define CONFIG_CMD_PART
+
+#define CONFIG_PARTITION_UUIDS
 
 #define	CONFIG_CMDLINE_TAG
 #define	CONFIG_SETUP_MEMORY_TAGS
@@ -169,12 +172,11 @@
         "fdt_addr=0x40f00000\0" \
         "ethaddr=00:01:02:03:04:05\0" \
 	"eth1addr=11:22:33:44:55:66\0" \
-	"vin2_sel=1\0" \
 	"vin0_camera=ov5640\0" \
 	"vin1_camera=ov5640\0" \
 	"vin2_camera=ov5640\0" \
 	"vin3_camera=ov5640\0" \
-        "fdt_file=r8a7742-iwg21m_q7.dtb\0" \
+        "fdt_file=r8a7742-iwg21d-q7.dtb\0" \
 	"bootfile=uImage\0" \
         "kernel=uImage\0" \
 		"bootargs_base=console=ttySC2,115200n8 ignore_loglevel vmalloc=384M\0" \
@@ -182,13 +184,15 @@
 			"run bootargs_net;bootm ${loadaddr} - ${fdt_addr}\0" \
 		"bootargs_net=setenv bootargs ${bootargs_base} " \
 			"root=/dev/nfs ip=dhcp nfsroot=${serverip}:${nfsroot} rootwait rw,v3,tcp\0" \
-                "bootargs_mmc=setenv bootargs ${bootargs_base} " \
-                        "root=/dev/mmcblk1p2 rootwait rootfstype=ext3 rw\0" \
+                "bootargs_mmc=part uuid mmc 1:2 mmc_uuid;" \
+                        "setenv bootargs ${bootargs_base} root=PARTUUID=${mmc_uuid} " \
+                        "rootwait rootfstype=ext4 rw\0" \
                 "bootcmd_mmc=run bootargs_mmc;mmc dev 1;" \
                         "fatload mmc 1 ${loadaddr} ${kernel};fatload mmc 1 ${fdt_addr} ${fdt_file};bootm ${loadaddr} - ${fdt_addr}\0" \
                 "bootcmd=run bootcmd_mmc\0" \
-                "bootargs_ssd=setenv bootargs ${bootargs_base} " \
-                        "root=/dev/mmcblk0p2 rootwait rootfstype=ext3 rw\0" \
+                "bootargs_ssd=part uuid mmc 0:2 ssd_uuid;" \
+                        "setenv bootargs ${bootargs_base} root=PARTUUID=${ssd_uuid} " \
+                        "rootwait rootfstype=ext4 rw\0" \
                 "bootcmd_ssd=run bootargs_ssd;mmc dev 0;" \
                         "fatload mmc 0 ${loadaddr} ${kernel};fatload mmc 0 ${fdt_addr} ${fdt_file};bootm ${loadaddr} - ${fdt_addr}\0" \
 		"\0"
