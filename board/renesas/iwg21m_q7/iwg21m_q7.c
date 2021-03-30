@@ -39,7 +39,7 @@
 #include <libfdt.h>
 #include <fdt_support.h>
 
-#define BSP_VERSION                             "iW-PREXZ-SC-01-R2.0-REL1.0-Linux3.10.31-PATCH009"
+#define BSP_VERSION                             "iW-EMEWQ-SC-01-Linux4.4"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -74,8 +74,6 @@ u8 rst_cause = 0;
 
 void s_init(void)
 {
-	struct iwg21m_rwdt *rwdt = (struct iwg21m_rwdt *)RWDT_BASE;
-	struct iwg21m_swdt *swdt = (struct iwg21m_swdt *)SWDT_BASE;
 	u32 val;
 	u32 pll0_status;
 
@@ -233,6 +231,8 @@ int start_dma_transfer(void)
 #define MMC1CKCR        0xE6150244
 #define MMC1_97500KHZ   0x7
 
+#define SPI_MSTP918   (1 << 17)
+
 int board_early_init_f(void)
 {
 	u32 val;
@@ -252,6 +252,11 @@ int board_early_init_f(void)
 	val &= ~ETHER_MSTP813;
 	writel(val, SMSTPCR8);
 
+#ifdef CONFIG_SPI
+	val = readl(MSTPSR9);
+	val &= ~SPI_MSTP918;
+	writel(val, SMSTPCR9);
+#endif
 	/*ETHER AVB */
 #ifdef CONFIG_SH_ETHER_RAVB
 	val = readl(MSTPSR8);
@@ -503,7 +508,8 @@ void print_board_info (void)
         get_som_revision();
         printf ("\n");
         printf ("Board Info:\n");
-        printf ("\tSOM Version     : iW-PREXZ-AP-01-R2.%x\n", som_rev);
+	printf ("\tBSP Version     : %s\n", BSP_VERSION);
+	printf ("\tSOM Version     : iW-PREXZ-AP-01\n");
         printf ("\n");
         return ;
 }
@@ -609,13 +615,10 @@ void arch_preboot_os()
 
 void iwg21m_fdt_update(void *fdt)
 {
-	u32 vin0_st, vin1_st;
+	u32 addr_phandle;
 	char *status_disabled = "disabled";
 	char *status_ok = "okay";
-	int val, phy_mode;
-
-	/* Update the SOM revision */
-	do_fixup_by_path_u32(fdt, "/soc/iwg21m_q7_common", "som-rev", som_rev, 1);
+	int val, phy_mode, off, nodeoffset, ret;
 
 	/*
 	 * MD24:MD23
@@ -657,13 +660,26 @@ void iwg21m_fdt_update(void *fdt)
 	gpio_request(GPIO_GP_5_21, NULL);
 	gpio_direction_input(GPIO_GP_5_21);
 	if (gpio_get_value(GPIO_GP_5_21)) {
-		/* Camera selected */
-		vin0_st = 1;
+		/* VIN0 camera selection */
+		if (!strcmp("ov7725", getenv ("vin0_camera"))) {
+			off = fdt_path_offset(fdt, "/soc/i2c@e6508000/ov7725@0");
+			fdt_status_okay(fdt, off);
+			do_fixup_by_path(fdt, "/soc/i2c@e6508000/ov5640@0", "status", status_disabled, sizeof(status_disabled), 1);
+
+			nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6508000/ov7725@0/port/endpoint");
+			ret = fdt_create_phandle (fdt, nodeoffset);
+			if (ret < 0) {
+				printf ("Error creating camera node in FDT\n");
+				return;
+			}
+			addr_phandle = fdt_get_phandle (fdt, nodeoffset);
+			do_fixup_by_path_u32(fdt, "/soc/video@e6ef0000/port/endpoint", "remote-endpoint", addr_phandle, 0);
+		}
 	}else{
 		/* AVB selected */
-		vin0_st = 0;
 		do_fixup_by_path(fdt, "/soc/ethernet@e6800000", "status", status_ok, sizeof(status_ok), 0);
 		do_fixup_by_path(fdt, "/soc/video@e6ef0000", "status", status_disabled, sizeof(status_disabled), 0);
+		do_fixup_by_path(fdt, "/soc/i2c@e6508000/ov5640@0", "status", status_disabled, sizeof(status_disabled), 1);
 	} 
 
 	/* Update the VI1 or MMC-8bit selection
@@ -671,11 +687,24 @@ void iwg21m_fdt_update(void *fdt)
 	 * switch(1)- VIN1 select 
 	 */
 	if( sw1_val ){
-		/* Camera selected */
-		vin1_st = 1;
+		/* VIN1 camera selection */
+		if (!strcmp("ov7725", getenv ("vin1_camera"))) {
+			off = fdt_path_offset(fdt, "/soc/i2c@e6518000/ov7725@1");
+			fdt_status_okay(fdt, off);
+			do_fixup_by_path(fdt, "/soc/i2c@e6518000/ov5640@1", "status", status_disabled, sizeof(status_disabled), 1);
+
+			nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6518000/ov7725@1/port/endpoint");
+			ret = fdt_create_phandle (fdt, nodeoffset);
+			if (ret < 0) {
+				printf ("Error creating camera node in FDT\n");
+				return;
+			}
+			addr_phandle = fdt_get_phandle (fdt, nodeoffset);
+			do_fixup_by_path_u32(fdt, "/soc/video@e6ef1000/port/endpoint", "remote-endpoint", addr_phandle, 0);
+		}
 	}else{
-		/* MMC-8bit selectd */
-		vin1_st = 0;
+		do_fixup_by_path(fdt, "/soc/video@e6ef1000", "status", status_disabled, sizeof(status_disabled), 0);
+		do_fixup_by_path(fdt, "/soc/i2c@e6518000/ov5640@1", "status", status_disabled, sizeof(status_disabled), 1);
 
 		/*Enabling Pull-ups for MMC1_D4-PUPR3_30, MMC1_D5-PUPR3_31, MMC1_D6-PUPR3_14, MMC1_D7-PUPR3_15*/ 
 		val = readl(PUPR3);
@@ -689,6 +718,38 @@ void iwg21m_fdt_update(void *fdt)
 	 * automatically via GPIO-hog setting of GP0_18 in devicetree.
 	 * As a result, the handling in U-boot is no longer needed.
 	 */
+
+	/* VIN2 camera selection */
+	if (!strcmp("ov7725", getenv ("vin2_camera"))) {
+		off = fdt_path_offset(fdt, "/soc/i2c@e6530000/ov7725@2");
+		fdt_status_okay(fdt, off);
+		do_fixup_by_path(fdt, "/soc/i2c@e6530000/ov5640@2", "status", status_disabled, sizeof(status_disabled), 1);
+
+		nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6530000/ov7725@2/port/endpoint");
+		ret = fdt_create_phandle (fdt, nodeoffset);
+		if (ret < 0) {
+			printf ("Error creating camera node in FDT\n");
+			return;
+		}
+		addr_phandle = fdt_get_phandle (fdt, nodeoffset);
+		do_fixup_by_path_u32(fdt, "/soc/video@e6ef2000/port/endpoint", "remote-endpoint", addr_phandle, 0);
+	}
+
+	/* VIN3 camera selection */
+	if (!strcmp("ov7725", getenv ("vin3_camera"))) {
+		off = fdt_path_offset(fdt, "/soc/i2c@e6540000/ov7725@3");
+		fdt_status_okay(fdt, off);
+		do_fixup_by_path(fdt, "/soc/i2c@e6540000/ov5640@3", "status", status_disabled, sizeof(status_disabled), 1);
+
+		nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6540000/ov7725@3/port/endpoint");
+		ret = fdt_create_phandle (fdt, nodeoffset);
+		if (ret < 0) {
+			printf ("Error creating camera node in FDT\n");
+			return;
+		}
+		addr_phandle = fdt_get_phandle (fdt, nodeoffset);
+		do_fixup_by_path_u32(fdt, "/soc/video@e6ef3000/port/endpoint", "remote-endpoint", addr_phandle, 0);
+	}
 
 	/* VIN2 Camera 8-bit or 16-bit selection GPIO */
 	gpio_request(GPIO_GP_5_7, NULL);
