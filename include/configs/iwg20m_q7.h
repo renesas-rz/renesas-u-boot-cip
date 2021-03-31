@@ -174,7 +174,6 @@
 	"fdt_addr=0x40f00000\0" \
 	"ethaddr=00:01:02:03:04:05\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
-	"fdt_file_alt=uImage-r8a7743-iwg20m.dtb\0" \
 	"fdtforce=0\0" \
 	"fdt_check=if test ${fdtforce} = \"0\"; then dynamicfdt;fi;\0" \
 	"vin2_camera=ov5640\0" \
@@ -182,27 +181,24 @@
 	"bootargs_base=console=ttySC0,115200n8 ignore_loglevel vmalloc=384M\0" \
 	"bootargs_sd=part uuid mmc 0:2 sd_uuid;" \
 		"setenv bootargs ${bootargs_base} root=PARTUUID=${sd_uuid}" \
-		" rootwait rootfstype=ext3 rw\0" \
+		" rootwait rootfstype=ext4 rw\0" \
 	"bootcmd_sd=run bootargs_sd;run fdt_check;" \
 		"fatload mmc 0:1 ${loadaddr} ${kernel};" \
-		"fatload mmc 0:1 ${fdt_addr} ${fdt_file};if test \"$?\" = \"1\";then " \
-		"fatload mmc 0:1 ${fdt_addr} ${fdt_file_alt};fi;" \
+		"fatload mmc 0:1 ${fdt_addr} ${fdt_file};" \
 		"bootm ${loadaddr} - ${fdt_addr}\0" \
 	"bootargs_usd=part uuid mmc 1:2 usd_uuid;" \
 		"setenv bootargs ${bootargs_base} root=PARTUUID=${usd_uuid}" \
-		" rootwait rootfstype=ext3 rw\0" \
+		" rootwait rootfstype=ext4 rw\0" \
 	"bootcmd_usd=run bootargs_usd;run fdt_check;"\
 		"fatload mmc 1:1 ${loadaddr} ${kernel};" \
-		"fatload mmc 1:1 ${fdt_addr} ${fdt_file};if test \"$?\" = \"1\";then " \
-		"fatload mmc 1:1 ${fdt_addr} ${fdt_file_alt};fi;" \
+		"fatload mmc 1:1 ${fdt_addr} ${fdt_file};" \
 		"bootm ${loadaddr} - ${fdt_addr}\0" \
 	"bootargs_mmc=part uuid mmc 2:2 mmc_uuid;" \
 		"setenv bootargs ${bootargs_base} root=PARTUUID=${mmc_uuid}" \
-		" rootwait rootfstype=ext3 rw\0" \
+		" rootwait rootfstype=ext4 rw\0" \
 	"bootcmd_mmc=run bootargs_mmc;run fdt_check;" \
 		"fatload mmc 2:1 ${loadaddr} ${kernel};" \
-		"fatload mmc 2:1 ${fdt_addr} ${fdt_file};if test \"$?\" = \"1\";then " \
-		"fatload mmc 2:1 ${fdt_addr} ${fdt_file_alt};fi;" \
+		"fatload mmc 2:1 ${fdt_addr} ${fdt_file};" \
 		"bootm ${loadaddr} - ${fdt_addr}\0" \
 	"bootcmd=run bootcmd_mmc\0" \
 
