@@ -63,6 +63,9 @@
 #define CONFIG_CMD_SF
 #define CONFIG_CMD_SPI
 #define CONFIG_CMD_CACHE
+#define CONFIG_CMD_PART
+
+#define CONFIG_PARTITION_UUIDS
 
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
@@ -168,21 +171,25 @@
         "fdt_addr=0x40f00000\0" \
         "ethaddr=00:01:02:03:04:05\0" \
 	"ethaddr1=1a:2b:3c:4d:5e:6f\0" \
-        "fdt_file=r8a7745-iwg22m_sm.dtb\0" \
+        "fdt_file=r8a7745-iwg22d-sodimm.dtb\0" \
 	"vin2_camera=ov5640\0" \
 	"disp=lcd\0" \
+	"wifi_sel=wifi\0" \
         "kernel=uImage\0" \
 	"bootargs_base=console=ttySC3,115200n8 ignore_loglevel vmalloc=200M\0" \
-                "bootargs_msd1=setenv bootargs ${bootargs_base} " \
-                        "root=/dev/mmcblk1p2 rootwait rootfstype=ext3 rw\0" \
+		"bootargs_msd1=part uuid mmc 1:2 msd1_uuid;" \
+			"setenv bootargs ${bootargs_base} root=PARTUUID=${msd1_uuid} " \
+			"rootwait rootfstype=ext4 rw\0" \
                 "bootcmd_msd1=run bootargs_msd1;mmc dev 1;" \
                         "fatload mmc 1 ${loadaddr} ${kernel};fatload mmc 1 ${fdt_addr} ${fdt_file};bootm ${loadaddr} - ${fdt_addr}\0" \
-                 "bootargs_msd0=setenv bootargs ${bootargs_base} " \
-                        "root=/dev/mmcblk0p2 rootwait rootfstype=ext3 rw\0" \
+		"bootargs_msd0=part uuid mmc 0:2 msd0_uuid;" \
+			"setenv bootargs ${bootargs_base} root=PARTUUID=${msd0_uuid} " \
+			"rootwait rootfstype=ext4 rw\0" \
                 "bootcmd_msd0=run bootargs_msd0;mmc dev 0;" \
                         "fatload mmc 0 ${loadaddr} ${kernel};fatload mmc 0 ${fdt_addr} ${fdt_file};bootm ${loadaddr} - ${fdt_addr}\0" \
-	        "bootargs_mmc=setenv bootargs ${bootargs_base} " \
-                        "root=/dev/mmcblk2p2 rootwait rootfstype=ext3 rw\0" \
+		"bootargs_mmc=part uuid mmc 2:2 mmc_uuid;" \
+			"setenv bootargs ${bootargs_base} root=PARTUUID=${mmc_uuid} " \
+			"rootwait rootfstype=ext4 rw\0" \
                 "bootcmd_mmc=run bootargs_mmc;mmc dev 2;" \
                         "fatload mmc 2 ${loadaddr} ${kernel};fatload mmc 2 ${fdt_addr} ${fdt_file};bootm ${loadaddr} - ${fdt_addr}\0" \
                 "bootcmd=run bootcmd_mmc\0" \
@@ -215,6 +222,7 @@
 
 /* Board Clock */
 #define CONFIG_SYS_CLK_FREQ	20000000
+#define CONFIG_COM_PER_CLK	32500000
 #define CONFIG_SCIF_CLK_FREQ	260000000
 #define CONFIG_SYS_TMU_CLK_DIV	4
 #define CONFIG_SYS_HZ		1000
