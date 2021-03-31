@@ -40,8 +40,8 @@
 #include <spi_flash.h>
 #include <micrel.h>
 
-#define BSP_VERSION                             "iW-PRFCC-SC-01-R3.0-REL1.0-Linux3.10.31"
-#define SOM_VERSION                             "iW-PRFCC-AP-01-R3.x"
+#define BSP_VERSION                             "iW-EMEWQ-SC-01-Linux4.4"
+#define SOM_VERSION                             "iW-PRFCC-AP-01"
 
 u8 rst_cause = 0;
 
