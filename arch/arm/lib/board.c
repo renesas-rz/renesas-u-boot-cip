@@ -62,6 +62,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 ulong monitor_flash_len;
 
+void reset_cause(void);
 #ifdef CONFIG_HAS_DATAFLASH
 extern int  AT91F_DataflashInit(void);
 extern void dataflash_print_info(void);
@@ -456,7 +457,7 @@ void board_init_f(ulong bootflag)
 
 	gd->bd->bi_baudrate = gd->baudrate;
 
-#if (defined (CONFIG_IWG21M) || defined (CONFIG_IWG20M))
+#if (defined (CONFIG_IWG21M) || defined (CONFIG_IWG20M) || defined (CONFIG_IWG22M))
 	/* Reset: Checking the reset cause */
         reset_cause();
 #endif

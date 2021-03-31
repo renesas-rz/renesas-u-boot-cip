@@ -43,6 +43,7 @@
 #define SDHI2_BASE		0xEE160000
 #define CA7BAR                0xE6160030
 #define WDTRSTCR               0xE6160054
+#define RST_RSTOUTCR           0xE6160058
 
 #define MSTPSR0			0xe6150030
 #define MSTPSR1			0xe6150038

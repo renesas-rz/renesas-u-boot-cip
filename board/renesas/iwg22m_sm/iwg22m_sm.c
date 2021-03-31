@@ -39,24 +39,35 @@
 #include <micrel.h>
 #include <miiphy.h>
 
-#define BSP_VERSION                             "iW-PREZZ-SC-01-R2.0-REL1.0-Linux3.10.31"
-#define SOM_VERSION                             "iW-PREZZ-AP-01-R2.x"
+#define BSP_VERSION				"iW-EMEWQ-SC-01-Linux4.4"
+#define SOM_VERSION				"iW-PREZZ-AP-01"
+u8 rst_cause = 0;
 
 DECLARE_GLOBAL_DATA_PTR;
 
 void s_init(void)
 {
-	struct iwg22m_rwdt *rwdt = (struct iwg22m_rwdt *)RWDT_BASE;
-	struct iwg22m_swdt *swdt = (struct iwg22m_swdt *)SWDT_BASE;
-
-	/* Watchdog init */
-	writel(0xA5A5A500, &rwdt->rwtcsra);
-	writel(0xA5A5A500, &swdt->swtcsra);
 
 #if !defined(CONFIG_EXTRAM_BOOT)
 	/* QoS */
 	qos_init();
 #endif
+}
+
+void reset_cause(void)
+{
+	struct iwg22m_rwdt *rwdt = (struct iwg22m_rwdt *)RWDT_BASE;
+	struct iwg22m_swdt *swdt = (struct iwg22m_swdt *)SWDT_BASE;
+
+	/* Reading the watchdog status register */
+	rst_cause = readb(0xE6020004);
+	if(rst_cause & 0x10)
+		printf("Reset Cause : WDOG\n");
+	else
+		printf("Reset Cause : POR\n");
+	/* Watchdog init */
+	writel(0xA5A5A500, &rwdt->rwtcsra);
+	writel(0xA5A5A500, &swdt->swtcsra);
 }
 
 #define SYSDMAC0_MSTP219	(1 << 19)
@@ -394,6 +405,7 @@ void print_board_info(void)
 {
         printf("\n");
         printf("Board Info:\n");
+	printf("\tBSP Version     : %s\n", BSP_VERSION);
         printf("\tSOM Version     : %s\n", SOM_VERSION);
         printf("\n");
 }
@@ -428,6 +440,12 @@ void reset_cpu(ulong addr)
 {
         struct iwg22m_rwdt *rwdt = (struct iwg22m_rwdt *)RWDT_BASE;
 
+	/* Disable presetout */
+	writel(0x0, RST_RSTOUTCR);
+	/* 10ms delay after disabling presetout */
+	mdelay(10);
+
+
         writel(0x5A5AFF00, &rwdt->rwtcnt);
         writel(0xA5A5A500, &rwdt->rwtcsra);
         writel(0xA55A0002, WDTRSTCR);
@@ -438,51 +456,26 @@ void reset_cpu(ulong addr)
 
 void iwg22m_fdt_update(void *fdt)
 {
-	int node;
-        int nodeoffset, size;
-        struct fdt_property *prop;
-        u32 *reg;
-
-        if (!strcmp("camera", getenv ("eth_vin")))
-        {
-                fdt_status_disabled_by_alias (fdt, "eth1");
-        }
-        else if (!strcmp("ethernet", getenv ("eth_vin")))
-        {
-                fdt_status_okay_by_alias (fdt, "eth1");
-
-                nodeoffset = fdt_path_offset (fdt, "/pfc");
-
-                prop = fdt_get_property_w(fdt, nodeoffset, "pinctrl-0", &size);
-                reg = (u32 *)&prop->data[0];
-
-                size -= 4;
-                fdt_setprop(fdt, nodeoffset, "pinctrl-0", reg, size);
-
-                prop = fdt_get_property_w(fdt, nodeoffset, "pinctrl-0", &size);
-        }
-	node = fdt_node_check_compatible(fdt, 0, "iwave,cam-pd-g22");
-	if (node < 0)
-		return;
+	int nodeoffset, offs, ret;
+	uint32_t addr_phandle;
+	char *status_disabled = "disabled";
 
 	/* iWave: FDT: camera selection */
-	if (!strcmp("camera", getenv ("eth_vin"))) {
-		if (!strcmp("ov5640", getenv ("vin2_camera")))
-		{
-			do_fixup_by_path_u32(fdt, "/camera_power_down", "vin2-ov5640", 1, 0);
+	if (!strcmp("ov7725", getenv ("vin2_camera"))) {
+		offs = fdt_path_offset(fdt, "/soc/i2c@e6528000/ov7725@21");
+		fdt_status_okay(fdt, offs);
+		do_fixup_by_path(fdt, "/soc/i2c@e6528000/ov5640@3c", "status", status_disabled, sizeof(status_disabled), 1);
+
+		nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6528000/ov7725@21/port/endpoint");
+
+		ret = fdt_create_phandle (fdt, nodeoffset);
+		if (ret < 0) {
+			printf ("Error creating camera node in FDT\n");
+			return;
 		}
-		else if (!strcmp("ov7725", getenv ("vin2_camera")))
-		{
-			do_fixup_by_path_u32(fdt, "/camera_power_down", "vin2-ov5640", 0, 0);
-		}
+		addr_phandle = fdt_get_phandle (fdt, nodeoffset);
+		do_fixup_by_path_u32(fdt, "/soc/video@e6ef1000/port/endpoint", "remote-endpoint", addr_phandle, 0);
 	}
-
-	/* iWave: FDT: camera selection */
-	if (!strcmp("hdmi", getenv ("disp"))) 
-		do_fixup_by_path_u32(fdt, "/lcd_power_g22", "lcd", 0, 0);
-	else        
-		do_fixup_by_path_u32(fdt, "/lcd_power_g22", "lcd", 1, 0);
-
 }
 
 #define TSTR0	4
