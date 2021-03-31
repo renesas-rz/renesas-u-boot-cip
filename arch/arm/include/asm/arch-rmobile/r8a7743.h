@@ -38,6 +38,7 @@
 #ifdef CONFIG_IWG20M
 #define CA15BAR                 0xE6160020
 #define WDTRSTCR                0xE6160054
+#define RST_RSTOUTCR           0xE6160058
 #endif
 
 #define MSTPSR0			0xe6150030

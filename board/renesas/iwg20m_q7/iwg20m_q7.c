@@ -42,7 +42,7 @@
 #include <fdt_support.h>
 #include "iwg20m_q7.h"
 
-#define BSP_VERSION                             "iW-PREWZ-SC-01-R3.0-REL2.0-Linux3.10.31"
+#define BSP_VERSION     "iW-EMEWQ-SC-01Linux4.4"
 #define   MODEMR        0xE6160060
 static int som_revision;
 
@@ -52,13 +52,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 void s_init(void)
 {
-	struct r8a7743_rwdt *rwdt = (struct r8a7743_rwdt *)RWDT_BASE;
-	struct r8a7743_swdt *swdt = (struct r8a7743_swdt *)SWDT_BASE;
 	u32 val;
-
-	/* Watchdog init */
-	writel(0xA5A5A500, &rwdt->rwtcsra);
-	writel(0xA5A5A500, &swdt->swtcsra);
 
 	/* cpu frequency setting */
 	val = readl(PLL0CR);
@@ -71,6 +65,23 @@ void s_init(void)
 	qos_init();
 #endif
 }
+void reset_cause(void)
+{
+	struct r8a7743_rwdt *rwdt = (struct r8a7743_rwdt *)RWDT_BASE;
+	struct r8a7743_swdt *swdt = (struct r8a7743_swdt *)SWDT_BASE;
+	u8 rst_cause = 0;
+
+	/* Reading the watchdog status register */
+	rst_cause = readb(0xE6020004);
+	if(rst_cause & 0x10)
+	       printf("Reset Cause : WDOG\n");
+	else
+	       printf("Reset Cause : POR\n");
+	/* Watchdog init */
+	writel(0xA5A5A500, &rwdt->rwtcsra);
+	writel(0xA5A5A500, &swdt->swtcsra);
+}
+
 
 #define SYSDMAC0_MSTP219	(1 << 19)
 
@@ -315,14 +326,10 @@ static void get_som_revision(void)
 
 int dynamic_fdt_file_selection(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
-	if (rmobile_get_cpu_type() == 0x47) {
+	if (rmobile_get_cpu_type() == 0x47)
 		setenv("fdt_file","r8a7743-iwg20m_q7.dtb");
-		setenv("fdt_file_alt","uImage-r8a7743-iwg20m.dtb");
-	}
-	else {
+	else
 		setenv("fdt_file","r8a7744-iwg20m_q7.dtb");
-		setenv("fdt_file_alt","uImage-r8a7744-iwg20m.dtb");
-	}
 	return 0;
 }
 
@@ -337,6 +344,7 @@ int print_board_info (void)
 	get_som_revision();
 	printf ("\n");
 	printf ("Board Info:\n");
+	printf ("\tBSP Version     : %s\n", BSP_VERSION);
 	printf ("\tSOM Version     : iW-PREWZ-AP-01-R3.%x\n", som_revision);
 	printf ("\n");
 	return 0;
@@ -419,6 +427,12 @@ int board_mmc_init(bd_t *bis)
 void reset_cpu(ulong addr)
 {
 	struct r8a7743_rwdt *rwdt = (struct r8a7743_rwdt *)RWDT_BASE;
+	/* Disable presetout */
+	writel(0x0, RST_RSTOUTCR);
+
+	/* 10ms delay after disabling presetout */
+	mdelay(10);
+
 	writel(0x5A5AFF00, &rwdt->rwtcnt);
 	writel(0xA5A5A500, &rwdt->rwtcsra);
 	writel(0xA55A0002, WDTRSTCR);
@@ -490,66 +504,92 @@ void arch_preboot_os()
 
 void iwg20m_fdt_update(void *fdt)
 {
-        int node, num, phy_mode;
-        char *revision = NULL;
-        const char *path;
+	int phy_mode, ret, offs;
+	uint32_t addr_phandle, nodeoffset;
+	char *status_disabled = "disabled";
 
-        node = fdt_node_check_compatible(fdt, 0, "iwave,g20m-q7-com");
-        if (node < 0)
-                return;
-        sprintf(revision, "rev");
-        path = fdt_getprop(fdt, node, revision, NULL);
-                if (!path) {
-                        debug("No alias for %s\n", revision);
-                        }
-        num = som_revision;
-        do_fixup_by_compat(fdt, "iwave,g20m-q7-com", "number", &num, 1, 1);
-        /* iWave: FDT: camera selection */
-        if (!strcmp("ov5640", getenv ("vin2_camera")))
-        {
-                do_fixup_by_path_u32(fdt, "/iwg20m_q7_common", "vin2-ov5640", 1, 0);
-        }
-        else if (!strcmp("ov7725", getenv ("vin2_camera")))
-        {
-                do_fixup_by_path_u32(fdt, "/iwg20m_q7_common", "vin2-ov5640", 0, 0);
-        }
+	/* iWave: FDT: camera selection */
+	if (!strcmp("ov7725", getenv ("vin2_camera")))
+	{
+		offs = fdt_path_offset(fdt, "/soc/i2c@e6528000/ov7725@21");
+		fdt_status_okay(fdt, offs);
+		do_fixup_by_path(fdt, "/soc/i2c@e6528000/ov5640@3c", "status", status_disabled, sizeof(status_disabled), 1);
+
+		nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6528000/ov7725@21/port/endpoint");
+		ret = fdt_create_phandle (fdt, nodeoffset);
+		if (ret < 0) {
+			printf ("Error creating camera node in FDT\n");
+			return;
+		}
+		addr_phandle = fdt_get_phandle (fdt, nodeoffset);
+		do_fixup_by_path_u32(fdt, "/soc/video@e6ef2000/port/endpoint", "remote-endpoint", addr_phandle, 0);
+	}
 
 
-/*
- * MD24:MD23
- *   0 0        SATA1 and SATA0
- *   0 1        SATA1 and USB3.0
- *   1 0        PCIe and SATA0  
- *   1 1        PCIe and USB3.0 
- */
+	if ((rmobile_get_cpu_type() == 0x47))
+	{
+		/*
+		* MD24:MD23
+		*   0 0        SATA1 and SATA0
+		*   0 1        SATA1 and USB3.0
+		*   1 0        PCIe and SATA0
+		*   1 1        PCIe and USB3.0
+		*/
+		/* iWave: USB: XHCI & USB2(PCI1) uses the USB PHY channel 2, either one can work at a time */
+		phy_mode = (readl(MODEMR) & 0x1800000) >> 23;
+		switch (phy_mode)
+		{
+			case 0:
+				fdt_status_okay_by_alias(fdt, "sata0");
+				fdt_status_okay_by_alias(fdt, "sata1");
+				fdt_status_okay_by_alias(fdt, "usb2");
+				break;
+			case 1:
+				fdt_status_okay_by_alias(fdt, "sata1");
+				fdt_status_okay_by_alias(fdt, "xhci");
+				break;
+			case 2:
+				fdt_status_okay_by_alias(fdt, "sata0");
+				fdt_status_okay_by_alias(fdt, "pciec");
+				fdt_status_okay_by_alias(fdt, "pcie_clk");
+				fdt_status_okay_by_alias(fdt, "usb2");
+				break;
 
-        phy_mode = (readl(MODEMR) & 0x1800000) >> 23;
+			case 3:
+				fdt_status_okay_by_alias(fdt, "xhci");
+				fdt_status_okay_by_alias(fdt, "pciec");
+				fdt_status_okay_by_alias(fdt, "pcie_clk");
+				break;
+			default:
+				break;
+		}
+	} else {
+		/*
+		* MD24:MD23
+		*   0 0        SATA0
+		*   0 1        USB3.0
+		*   1 0        PCIe
+		*/
+		/* iWave: USB: XHCI & USB2(PCI1) uses the USB PHY channel 2, either one can work at a time */
+		phy_mode = (readl(MODEMR) & 0x1800000) >> 23;
+		switch (phy_mode)
+		{
+			case 0:
+				fdt_status_okay_by_alias(fdt, "sata0");
+				fdt_status_okay_by_alias(fdt, "usb2");
+				break;
+			case 1:
+				fdt_status_okay_by_alias(fdt, "xhci");
+				break;
+			case 2:
+				fdt_status_okay_by_alias(fdt, "pciec");
+				fdt_status_okay_by_alias(fdt, "pcie_clk");
+				fdt_status_okay_by_alias(fdt, "usb2");
+			break;
+				default:
+			break;
 
-        if( (phy_mode & 0x1) == 0x1 )	
-        {
-                fdt_status_okay_by_alias(fdt, "xhci");
-                fdt_status_disabled_by_alias(fdt, "sata0");
-        }
-        else
-        {
-                fdt_status_okay_by_alias(fdt, "sata0");
-                fdt_status_disabled_by_alias(fdt, "xhci");
-        }
-
-        if ((rmobile_get_cpu_type() == 0x47))
-        {
-                if( (phy_mode & 0x2) == 0x2 )
-                {
-                fdt_status_okay_by_alias(fdt, "pciec");
-                fdt_status_okay_by_alias(fdt, "pcie_clk");
-                fdt_status_disabled_by_alias(fdt, "sata1");
-                }
-                else
-                {
-                fdt_status_okay_by_alias(fdt, "sata1");
-                fdt_status_disabled_by_alias(fdt, "pciec");
-                fdt_status_disabled_by_alias(fdt, "pcie_clk");
-                }
-        }
+		}
+	}
 }
 

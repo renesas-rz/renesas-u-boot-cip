@@ -456,8 +456,8 @@ void board_init_f(ulong bootflag)
 
 	gd->bd->bi_baudrate = gd->baudrate;
 
-#ifdef CONFIG_IWG21M
-        /* IWG21M: Reset: Checking the reset cause */
+#if (defined (CONFIG_IWG21M) || defined (CONFIG_IWG20M))
+	/* Reset: Checking the reset cause */
         reset_cause();
 #endif
 
