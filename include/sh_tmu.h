@@ -69,7 +69,12 @@ struct tmu_regs {
 
 static inline unsigned long get_tmu0_clk_rate(void)
 {
+#ifdef CONFIG_IWG22M
+	/* IWG22M: Common Peripheral clock is the base clock for tmu timer.*/
+	return CONFIG_COM_PER_CLK;
+#else
 	return CONFIG_SYS_CLK_FREQ;
+#endif
 }
 
 #endif	/* __SH_TMU_H */
