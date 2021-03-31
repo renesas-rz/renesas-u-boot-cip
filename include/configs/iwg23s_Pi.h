@@ -31,7 +31,7 @@
 #define CONFIG_CMD_BDI
 #define CONFIG_CMD_BOOTD
 #define CONFIG_ENV_OVERWRITE
-#define CONFIG_DEFAULT_FDT_FILE         "r8a7747x-iwg23s_Pi.dtb"
+#define CONFIG_DEFAULT_FDT_FILE         "r8a77470-iwg23s-sbc.dtb"
 #define CONFIG_SYS_HUSH_PARSER
 
 
@@ -58,6 +58,9 @@
 #define CONFIG_CMD_EXT4_WRITE
 #define CONFIG_CMD_SF
 #define CONFIG_CMD_SPI
+#define CONFIG_CMD_PART
+
+#define CONFIG_PARTITION_UUIDS
 
 #define	CONFIG_CMDLINE_TAG
 #define	CONFIG_SETUP_MEMORY_TAGS
@@ -165,12 +168,14 @@
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"kernel=uImage\0" \
                 "bootargs_base=console=ttySC1,115200n8 ignore_loglevel vmalloc=384M\0" \
-                "bootargs_mmc=setenv bootargs ${bootargs_base} " \
-                        "root=/dev/mmcblk1p2 rootwait rootfstype=ext4 rw\0" \
+		"bootargs_mmc=part uuid mmc 1:2 mmc_uuid;" \
+			"setenv bootargs ${bootargs_base} root=PARTUUID=${mmc_uuid} " \
+			  "rootwait rootfstype=ext4 rw\0" \
                 "bootcmd_mmc=run bootargs_mmc;mmc dev 1;" \
                         "fatload mmc 1 ${loadaddr} ${kernel};fatload mmc 1 ${fdt_addr} ${fdt_file};bootm ${loadaddr} - ${fdt_addr}\0" \
-       		"bootargs_msd=setenv bootargs ${bootargs_base} " \
-                        "root=/dev/mmcblk0p2 rootwait rootfstype=ext4 rw\0" \
+		"bootargs_msd=part uuid mmc 0:2 msd_uuid;" \
+		"setenv bootargs ${bootargs_base} root=PARTUUID=${msd_uuid} " \
+		  "rootwait rootfstype=ext4 rw\0" \
                 "bootcmd_msd=run bootargs_msd;mmc dev 0;" \
                         "fatload mmc 0 ${loadaddr} ${kernel};fatload mmc 0 ${fdt_addr} ${fdt_file};bootm ${loadaddr} - ${fdt_addr}\0" \
                 "bootargs_net=setenv bootargs ${bootargs_base} root=/dev/nfs ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
