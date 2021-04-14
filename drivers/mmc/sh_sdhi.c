@@ -895,6 +895,7 @@ static const struct udevice_id sh_sdhi_sd_match[] = {
 	{ .compatible = "renesas,sdhi-r8a7795", .data = SH_SDHI_QUIRK_64BIT_BUF },
 	{ .compatible = "renesas,sdhi-r8a7796", .data = SH_SDHI_QUIRK_64BIT_BUF },
 	{ .compatible = "renesas,sdhi-r9a07g044l", .data = SH_SDHI_QUIRK_64BIT_BUF },
+	{ .compatible = "renesas,sdhi-r9a07g054l", .data = SH_SDHI_QUIRK_64BIT_BUF },
 	{ /* sentinel */ }
 };
 
