@@ -91,7 +91,8 @@ struct uart_port {
 # define SCSCR_INIT(port)	0x38 /* TIE=0,RIE=0,TE=1,RE=1,REIE=1 */
 # define SCIF_ORER 0x0001  /* overrun error bit */
 #elif defined(CONFIG_RCAR_GEN2) || defined(CONFIG_RCAR_GEN3) || \
-      defined(CONFIG_R7S72100) || defined(CONFIG_R9A07G044L)
+      defined(CONFIG_R7S72100) || defined(CONFIG_R9A07G044L) || \
+      defined(CONFIG_R9A07G054L)
 # if defined(CONFIG_SCIF_A)
 #  define SCIF_ORER	0x0200
 # else
@@ -310,7 +311,7 @@ static inline void sci_##name##_out(struct uart_port *port,\
 					sh4_scif_offset, sh4_scif_size)
 		#define SCIF_FNS(name, sh4_scif_offset, sh4_scif_size) \
 			CPU_SCIF_FNS(name, sh4_scif_offset, sh4_scif_size)
-#elif defined(CONFIG_R9A07G044L)
+#elif defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L)
 	#define SCIF_FNS(reg_name, reg_offset, reg_size) \
 		CPU_SCIF_FNS(reg_name, reg_offset, reg_size)
 #else
@@ -388,7 +389,7 @@ SCIF_FNS(SCLSR,  0,  0, 0x14, 16)
 #else
 SCIF_FNS(SCLSR,  0,  0, 0x24, 16)
 #endif
-#elif defined(CONFIG_R9A07G044L)
+#elif defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L)
 SCIF_FNS(SCSMR,  0x00, 16)
 SCIF_FNS(SCBRR,  0x02,  8)
 SCIF_FNS(SCSCR,  0x04, 16)
