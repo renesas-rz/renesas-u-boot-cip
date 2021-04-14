@@ -166,7 +166,7 @@
 #define SH_SDHI_QUIRK_64BIT_BUF		BIT(1)
 
 /* SDHI channel number defined based on specific SoC */
-#if defined(CONFIG_R9A07G044L)
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L)
 #define CONFIG_SYS_SH_SDHI_NR_CHANNEL 2
 #endif
 
