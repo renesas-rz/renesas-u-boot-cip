@@ -209,28 +209,32 @@ int update_fdt(void *fdt, const char **list_dt_change, int size)
 		val = (char *)list_dt_change[i + 2];
 		nodeoffset = fdt_path_offset(fdt, node);
 
+		if (!node)
+			continue;
+
 		if (!prop) {
 			if (nodeoffset < 0) {
 				pr_debug("\tUnavailable node %s\n", node);
 				continue;
 			}
-			printf("Removing %s\n", node);
+			printf("   Remove Node %s\n", node);
 			ret = fdt_del_node(fdt, nodeoffset);
 			if (ret < 0) {
-				printf("\tCan't remove node %s.", node);
-				printf("ERR %d\n", ret);
+				printf("\tCan't remove. ERR %d\n", ret);
+			} else {
+				printf("\tRemoved.\n");
 			}
 		} else {
+			printf("   Config Node %s\n", node);
 			if (nodeoffset < 0) {
-				pr_debug("Unavailable node  %s\n", node);
-				pr_debug("\tCreating...\n");
+				pr_debug("\tUnavailable node\n");
+				printf("\tCreate node.\n");
 				nodeoffset = add_new_node(fdt, node);
 			}
+			printf("\tSet property %s : %s\n", prop, val);
 			ret = process_node_data(fdt, node, prop, val);
 			if (ret < 0) {
-				printf("\tCan't set property ");
-				printf("%s of %s to %s. ", prop, node, val);
-				printf("ERR %d\n", ret);
+				printf("\t\tCan't set property. ERR %d\n", ret);
 			}
 		}
 	}

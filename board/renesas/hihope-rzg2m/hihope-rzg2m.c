@@ -184,23 +184,6 @@ void board_cleanup_before_linux(void)
 			  GPIO2_MSTP910 | GPIO3_MSTP909 | GPIO5_MSTP907);
 }
 
-static const char * const dt_non_ecc[] = {
-	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
-	"/memory@600000000", "reg", "<0x6 0x00000000 0x0 0x80000000>",
-	"/memory@600000000", "device_type", "memory",
-	"/reserved-memory/linux,lossy_decompress", "reg",
-					"<0x0 0x54000000 0x0 0x3000000>",
-	"/reserved-memory/linux,lossy_decompress", "no-map", NULL,
-	"/reserved-memory/linux,cma", "reg", "<0x0 0x58000000 0x0 0x20000000>",
-	"/reserved-memory/linux,multimedia", "reg",
-					     "<0x0 0x78000000 0x0 0x10000000>",
-	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia \
-				     &/reserved-memory/linux,lossy_decompress>",
-	"/soc/mmu@e67b0000", "status", "disabled",
-	"/soc/mmu@fd800000", "status", "disabled",
-	"/soc/mmu@fd950000", "status", "disabled",
-};
-
 static const char * const dt_ecc_full_single[] = {
 	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x4C000000>",
 	"/memory@600000000", "reg", "<0x6 0x00000000 0x0 0x40000000>",
@@ -210,9 +193,6 @@ static const char * const dt_ecc_full_single[] = {
 	"/reserved-memory/linux,multimedia", "reg",
 					     "<0x0 0x70000000 0x0 0x10000000>",
 	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia>",
-	"/soc/mmu@e67b0000", "status", "disabled",
-	"/soc/mmu@fd800000", "status", "disabled",
-	"/soc/mmu@fd950000", "status", "disabled",
 };
 
 static const char * const dt_ecc_full_dual[] = {
@@ -241,23 +221,18 @@ int ft_verify_fdt(void *fdt)
 	use_ecc = regs.regs[0];
 	ecc_mode = regs.regs[1];
 
-	if (!use_ecc) {
-		fdt_dt = (const char **)dt_non_ecc;
-		size = ARRAY_SIZE(dt_non_ecc);
-	} else if (use_ecc == 1) {
+	if (use_ecc == 1) {
 		switch (ecc_mode) {
-		case 0:
-			/* The memory map of partial ECC same as non-ECC mode*/
-			fdt_dt = (const char **)dt_non_ecc;
-			size = ARRAY_SIZE(dt_non_ecc);
-			break;
 		case 1:
 			fdt_dt = (const char **)dt_ecc_full_dual;
 			size = ARRAY_SIZE(dt_ecc_full_dual);
 			break;
 		case 2:
-			fdt_dt = (const char **)dt_ecc_full_single;
-			size = ARRAY_SIZE(dt_ecc_full_single);
+			/* ECC Single only configurate in RZ/G2M rev 3 */
+			if (rmobile_get_cpu_rev_integer() == 3) {
+				fdt_dt = (const char **)dt_ecc_full_single;
+				size = ARRAY_SIZE(dt_ecc_full_single);
+			}
 			break;
 		default:
 			printf("Not support changing device-tree to ");
