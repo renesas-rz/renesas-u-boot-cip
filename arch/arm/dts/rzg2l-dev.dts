@@ -60,3 +60,13 @@
 	bus-width = <4>;
 	status = "okay";
 };
+
+&eth0 {
+	phy-handle = <&phy0>;
+	phy-mode = "rgmii";
+	status = "okay";
+
+	phy0: ethernet-phy@7 {
+		reg = <7>;
+	};
+};
