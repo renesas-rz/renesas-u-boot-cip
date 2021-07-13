@@ -473,6 +473,7 @@ static int ravb_dmac_init(struct udevice *dev)
 	}
 
 	writel(mode, eth->iobase + RAVB_REG_APSR);
+#endif
 
 	return 0;
 }
@@ -481,8 +482,7 @@ static int ravb_config(struct udevice *dev)
 {
 	struct ravb_priv *eth = dev_get_priv(dev);
 	struct phy_device *phy = eth->phydev;
-#if defined(CONFIG_R9A07G044L)
-#else
+#if !defined(CONFIG_R9A07G044L)
 	u32 mask = ECMR_CHG_DM | ECMR_RE | ECMR_TE;
 #endif
 	int ret;
@@ -572,12 +572,8 @@ static int ravb_probe(struct udevice *dev)
 	eth->iobase = iobase;
 
 	ret = clk_get_bulk(dev, &eth->clks);
-#if defined(CONFIG_R9A07G044L)
-#else
-	ret = clk_get_by_index(dev, 0, &eth->clk);
 	if (ret < 0)
 		goto err_mdio_alloc;
-#endif
 
 	ret = dev_read_phandle_with_args(dev, "phy-handle", NULL, 0, 0, &phandle_args);
 	if (!ret) {
@@ -607,13 +603,10 @@ static int ravb_probe(struct udevice *dev)
 
 	eth->bus = miiphy_get_dev_by_name(dev->name);
 
-#if defined(CONFIG_R9A07G044L)
-#else
 	/* Bring up PHY */
 	ret = clk_enable_bulk(&eth->clks);
 	if (ret)
 		goto err_mdio_register;
-#endif
 
 	ret = ravb_reset(dev);
 	if (ret)
