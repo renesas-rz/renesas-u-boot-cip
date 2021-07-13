@@ -9,6 +9,7 @@
 /dts-v1/;
 #include <dt-bindings/gpio/gpio.h>
 #include "r9a07g044l.dtsi"
+#include "r9a07g044l-u-boot.dtsi"
 #include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
 
 / {
