@@ -9,6 +9,8 @@
 /dts-v1/;
 #include <dt-bindings/gpio/gpio.h>
 #include "r9a07g054l.dtsi"
+#include "r9a07g054l-u-boot.dtsi"
+#include <dt-bindings/pinctrl/rzv2l-pinctrl.h>
 
 / {
 	model = "rzv2l-dev";
@@ -28,6 +30,30 @@
 		reg = <0 0x48000000 0 0x78000000>;
 	};
 
+};
+
+&pinctrl {
+	eth0_pins: eth0 {
+		pinmux = <RZV2L_PINMUX(20, 0, 1)>,
+				<RZV2L_PINMUX(20, 1, 1)>,
+				<RZV2L_PINMUX(20, 2, 1)>,
+				<RZV2L_PINMUX(21, 0, 1)>,
+				<RZV2L_PINMUX(21, 1, 1)>,
+				<RZV2L_PINMUX(22, 0, 1)>,
+				<RZV2L_PINMUX(22, 1, 1)>,
+				<RZV2L_PINMUX(23, 0, 1)>,
+				<RZV2L_PINMUX(23, 1, 1)>,
+				<RZV2L_PINMUX(24, 0, 1)>,
+				<RZV2L_PINMUX(24, 1, 1)>,
+				<RZV2L_PINMUX(25, 0, 1)>,
+				<RZV2L_PINMUX(25, 1, 1)>,
+				<RZV2L_PINMUX(26, 0, 1)>,
+				<RZV2L_PINMUX(26, 1, 1)>,
+				<RZV2L_PINMUX(27, 0, 1)>,
+				<RZV2L_PINMUX(27, 1, 1)>,
+				<RZV2L_PINMUX(28, 0, 1)>,
+				<RZV2L_PINMUX(28, 1, 1)>;
+	};
 };
 
 &xinclk {
@@ -59,4 +85,16 @@
 	*/
 	bus-width = <4>;
 	status = "okay";
+};
+
+&eth0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&eth0_pins>;
+	phy-handle = <&phy0>;
+	phy-mode = "rgmii";
+	status = "okay";
+
+	phy0: ethernet-phy@7 {
+		reg = <7>;
+	};
 };
