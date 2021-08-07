@@ -961,7 +961,8 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	smarc-rzg2l.dtb \
 	rzv2l-dev.dtb \
 	smarc-rzv2l.dtb \
-	rzg2lc-dev.dtb
+	rzg2lc-dev.dtb \
+	smarc-rzg2lc.dtb
 
 dtb-$(CONFIG_RCAR_GEN4) += \
 	r8a779h0-gray-hawk.dtb
