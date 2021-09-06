@@ -54,6 +54,12 @@
 				<RZG2L_PINMUX(28, 0, 1)>,
 				<RZG2L_PINMUX(28, 1, 1)>;
 	};
+
+	i2c1_pins: i2c1 {
+		pinmux = <RZG2L_PINMUX(14, 2, 1)>,
+				<RZG2L_PINMUX(14, 3, 1)>;
+	};
+
 };
 
 &xinclk {
@@ -96,5 +102,16 @@
 	phy-mode = "rgmii";
 	phy0: ethernet-phy@7 {
 		reg = <7>;
+	};
+};
+
+&i2c1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c1_pins>;
+	status = "okay";
+
+	adv7535: hdmi@3d {
+		compatible = "adi,adv7535";
+		reg = <0x3d>;
 	};
 };
