@@ -36,6 +36,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_CLKON_BASE				(CPG_BASE + 0x500)
 #define CPG_RESET_BASE				(CPG_BASE + 0x800)
 #define CPG_RESET_ETH				(CPG_RESET_BASE + 0x7C)
+#define CPG_RESET_I2C                           (CPG_RESET_BASE + 0x80)
 
 void s_init(void)
 {
@@ -46,6 +47,9 @@ void s_init(void)
 	*(volatile u32 *)(ETH_MII_RGMII) = (*(volatile u32 *)(ETH_MII_RGMII) & 0xFFFFFFFC);
 	/* ETH CLK */
 	*(volatile u32 *)(CPG_RESET_ETH) = 0x30003;
+	/* I2C CLK */
+	*(volatile u32 *)(CPG_RESET_I2C) = 0xF000F;
+
 }
 
 int board_early_init_f(void)
