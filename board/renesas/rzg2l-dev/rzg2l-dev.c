@@ -26,6 +26,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define ETH_CH0		(PFC_BASE + 0x300c)
 #define ETH_CH1		(PFC_BASE + 0x3010)
+#define I2C_CH1 	(PFC_BASE + 0x1870)
 #define ETH_PVDD_3300	0x00
 #define ETH_PVDD_1800	0x01
 #define ETH_PVDD_2500	0x02
@@ -49,7 +50,8 @@ void s_init(void)
 	*(volatile u32 *)(CPG_RESET_ETH) = 0x30003;
 	/* I2C CLK */
 	*(volatile u32 *)(CPG_RESET_I2C) = 0xF000F;
-
+	/* I2C pin non GPIO enable */
+	*(volatile u32 *)(I2C_CH1) = 0x01010101;
 }
 
 int board_early_init_f(void)
