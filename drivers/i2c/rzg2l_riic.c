@@ -596,8 +596,17 @@ static int riic_probe_chip(struct udevice *dev, uint addr, uint flags)
 static int riic_probe(struct udevice *dev)
 {
 	struct riic_priv *priv = dev_get_priv(dev);
+	int ret;
 
 	priv->base = dev_read_addr_ptr(dev);
+
+	ret = clk_get_by_index(dev, 0, &priv->clk);
+	if (ret)
+		return ret;
+
+	ret = clk_enable(&priv->clk);
+	if (ret)
+		return ret;
 
 	riic_init_setting(dev, I2C_SPEED_STANDARD_RATE);
 
