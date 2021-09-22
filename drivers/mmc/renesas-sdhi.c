@@ -616,6 +616,10 @@ int renesas_sdhi_execute_tuning(struct udevice *dev, uint opcode)
 			priv->smpcmp |= BIT(i);
 
 		mdelay(1);
+
+		/* send stop after store result of smpcmp */
+		if (ret)
+			mmc_abort_tuning(mmc, opcode);
 	}
 
 	ret = renesas_sdhi_select_tuning(priv, taps);
