@@ -75,6 +75,8 @@ struct bd_info;
 #define MMC_CAP_NEEDS_POLL	BIT(15)
 #define MMC_CAP_CD_ACTIVE_HIGH  BIT(16)
 
+#define MMC_CAP2_STOP_TUNE_SD	BIT(25)	/* Host need to send stop command during tuning in SD */
+
 #define MMC_MODE_8BIT		BIT(30)
 #define MMC_MODE_4BIT		BIT(29)
 #define MMC_MODE_1BIT		BIT(28)

@@ -965,6 +965,10 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 		priv->needs_clkh_fallback = true;
 	else
 		priv->needs_clkh_fallback = false;
+
+	/* Host need to send stop command during tuning in SD */
+	plat->cfg.host_caps |= MMC_CAP2_STOP_TUNE_SD;
+
 }
 
 static int rzg2l_sdhi_setup(struct udevice *dev)
