@@ -98,3 +98,13 @@
 		reg = <7>;
 	};
 };
+
+&i2c1 {
+	pinctrl-names = "default";
+	status = "okay";
+
+	adv7535: hdmi@3d {
+		compatible = "adi,adv7535";
+		reg = <0x3d>;
+	};
+};
