@@ -250,6 +250,7 @@ struct rzg2l_clk_priv {
 };
 
 extern const struct cpg_mssr_info r9a07g044l_cpg_info;
+extern const struct cpg_mssr_info r9a07g043u_cpg_info;
 
 static inline bool is_mod_clk(struct clk *clk)
 {
