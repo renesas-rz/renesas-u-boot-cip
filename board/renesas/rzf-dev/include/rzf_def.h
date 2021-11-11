@@ -7,11 +7,6 @@
 #ifndef __RZF_DEF_H__
 #define __RZF_DEF_H__
 
-#define DEBUG_RZG2L_FPGA 1
-
-#define DDR_PLL4 1600
-//#define DDR_PLL4 1333
-
 #define RZF_BOOT_ROM_BASE         (0x00000000)
 #define RZF_MSRAM_BASE            (0x00010000)
 #define RZF_ASRAM_BASE            (0x00020000)

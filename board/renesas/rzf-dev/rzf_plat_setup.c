@@ -18,7 +18,6 @@
 
 void rzf_early_platform_setup(void)
 {
-//	int ret;
 
 	/* early setup Clock and Reset */
 	cpg_early_setup();
@@ -26,37 +25,21 @@ void rzf_early_platform_setup(void)
 	/* initialize SYC */
 	syc_init(RZF_SYC_INCK_HZ);
 
-	/* initialize Timer */
-//	generic_delay_timer_init();
-
 	/* setup PFC */
 	pfc_setup();
 
 	/* setup Clock and Reset */
 	cpg_setup();
 
-	/* initialize console driver */
-//	ret = console_rzg2l_register(
-//							RZG2L_SCIF0_BASE,
-//							RZG2L_UART_INCK_HZ,
-//							RZG2L_UART_BARDRATE,
-//							&rzg2l_bl31_console);
-//	if (!ret)
-//		panic();
-//
-//	console_set_scope(&rzg2l_bl31_console,
-//			CONSOLE_FLAG_BOOT | CONSOLE_FLAG_CRASH);
 }
 
 void rzf_platform_setup(void)
 {
-	/* Setup TZC-400, Access Control */
-//	plat_security_setup();
 
-//#if !DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZG2L_FPGA
 	/* initialize DDR */
 	ddr_setup();
-//#endif /* DEBUG_FPGA */
+#endif /* DEBUG_FPGA */
 
 	rz_io_setup();
 }

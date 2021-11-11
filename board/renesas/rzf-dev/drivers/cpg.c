@@ -45,10 +45,10 @@ typedef struct {
 } CPG_PLL_SETDATA_235;
 
 static CPG_PLL_SETDATA_146 cpg_pll4_setdata = {
-#if (DDR_PLL4 ==1600)
+#if (CONFIG_RZF_DDR_PLL4 ==1600)
 	{ CPG_PLL4_CLK1, 0xFAE13203 },
 	{ CPG_PLL4_CLK2, 0x00081000 },
-#elif (DDR_PLL4 == 1333)
+#elif (CONFIG_RZF_DDR_PLL4 == 1333)
 	{ CPG_PLL4_CLK1, 0xA66629C3 },
 	{ CPG_PLL4_CLK2, 0x00080D00 },
 #else
@@ -137,7 +137,7 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x003C0000,
 		CPG_T_CLK
 	},
-#if !DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZG2L_FPGA
 	{		/* DDR */
 		(uintptr_t)CPG_CLKON_DDR,
 		(uintptr_t)CPG_CLKMON_DDR,
@@ -335,7 +335,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x00060000,
 		CPG_T_RST
 	},
-#if !DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZG2L_FPGA
 	{		/* DDR */
 		(uintptr_t)CPG_RST_DDR,
 		(uintptr_t)CPG_RSTMON_DDR,
@@ -704,7 +704,7 @@ static void cpg_pll_start_146(CPG_PLL_SETDATA_146 *pdata)
 /* It is assumed that the PLL has stopped by the time this function is executed. */
 static void cpg_pll_setup(void)
 {
-#if !DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZG2L_FPGA
 	uint32_t val = 0;
 
 	/* PLL4 startup */
@@ -725,7 +725,7 @@ static void cpg_pll_setup(void)
 	/* Set PLL6 to normal mode */
 	cpg_pll_start_146(&cpg_pll6_setdata);
 
-#if !DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZG2L_FPGA
 	/* PLL4 normal mode transition confirmation */
 	do {
 		val = mmio_read_32(CPG_PLL4_MON);
@@ -746,7 +746,7 @@ static void cpg_div_sel_setup(CPG_REG_SETTING *tbl, uint32_t size)
 		mmio_write_32(tbl->reg, tbl->val);
 	}
 
-#if !DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZG2L_FPGA
 	/* Wait for completion of settings */
 	while (mmio_read_32(CPG_CLKSTATUS) != 0)
 		;

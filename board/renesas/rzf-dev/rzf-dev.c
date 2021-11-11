@@ -113,13 +113,6 @@ int dram_init_banksize(void)
 	return fdtdec_setup_memory_banksize();
 }
 
-#if defined(CONFIG_FTMAC100) && !defined(CONFIG_DM_ETH)
-int board_eth_init(struct bd_info *bd)
-{
-	return ftmac100_initialize(bd);
-}
-#endif
-
 ulong board_flash_get_legacy(ulong base, int banknum, flash_info_t *info)
 {
 	return 0;
@@ -130,42 +123,22 @@ void *board_fdt_blob_setup(void)
 	return (void *)CONFIG_SYS_FDT_BASE;
 }
 
-int smc_init(void)
-{
-	int node = -1;
-	const char *compat = "andestech,atfsmc020";
-	void *blob = (void *)gd->fdt_blob;
-	fdt_addr_t addr;
-	struct ftsmc020_bank *regs;
-
-	node = fdt_node_offset_by_compatible(blob, -1, compat);
-	if (node < 0)
-		return -FDT_ERR_NOTFOUND;
-
-	addr = fdtdec_get_addr_size_auto_noparent(blob, node,
-		"reg", 0, NULL, false);
-
-	if (addr == FDT_ADDR_T_NONE)
-		return -EINVAL;
-
-	regs = (struct ftsmc020_bank *)addr;
-	regs->cr &= ~FTSMC020_BANK_WPROT;
-
-	return 0;
-}
-
+#ifdef CONFIG_V5L2_CACHE
 static void v5l2_init(void)
 {
 	struct udevice *dev;
 
 	uclass_get_device(UCLASS_CACHE, 0, &dev);
 }
+#endif
+
 
 #ifdef CONFIG_BOARD_EARLY_INIT_F
 int board_early_init_f(void)
 {
-	smc_init();
+#ifdef CONFIG_V5L2_CACHE
 	v5l2_init();
+#endif
 
 	return 0;
 }
