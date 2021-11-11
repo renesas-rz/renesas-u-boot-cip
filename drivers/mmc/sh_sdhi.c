@@ -22,7 +22,12 @@
 #include <linux/compat.h>
 #include <linux/io.h>
 #include <linux/sizes.h>
+#ifdef CONFIG_ARCH_RMOBILE
 #include <asm/arch/rmobile.h>
+#endif
+#ifdef CONFIG_RZF_DEV
+#include <asm/arch-rzmpu/sh_sdhi.h>
+#endif
 #include <asm/arch/sh_sdhi.h>
 #include <asm/global_data.h>
 #include <clk.h>
