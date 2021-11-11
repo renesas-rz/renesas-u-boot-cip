@@ -70,6 +70,8 @@ void s_init(void)
 #define SH_SDHI_QUIRK_16BIT_BUF		BIT(0)
 #define SH_SDHI_QUIRK_64BIT_BUF		BIT(1)
 
+int sh_sdhi_init(unsigned long addr, int ch, unsigned long quirks);
+
 int board_mmc_init(struct bd_info *bis)
 {
 	int ret = 0;
@@ -195,3 +197,16 @@ int board_fit_config_name_match(const char *name)
 }
 #endif
 
+void rzf_early_platform_setup(void);
+void rzf_platform_setup(void);
+
+int spl_board_init_f(void)
+{
+    // initialize pinconfig,clock,reset control
+    rzf_early_platform_setup();
+    
+    // initialize DDR, setup IO
+    rzf_platform_setup();
+    
+	return 0;
+}
