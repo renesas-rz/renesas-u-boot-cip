@@ -1,5 +1,3 @@
-if ARCH_RMOBILE
-
 config PINCTRL_PFC
 	bool "Renesas pin control drivers"
 	depends on DM && ARCH_RMOBILE
@@ -157,4 +155,3 @@ config PINCTRL_PFC_RZG2L
 	  the GPIO definitions and pin control functions for each available
 	  multiplex function.
 
-endif
