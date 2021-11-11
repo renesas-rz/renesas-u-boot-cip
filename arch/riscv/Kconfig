@@ -93,6 +93,7 @@ source "board/sophgo/milkv_duo/Kconfig"
 source "board/starfive/visionfive2/Kconfig"
 source "board/thead/th1520_lpi4a/Kconfig"
 source "board/xilinx/mbv/Kconfig"
+source "board/renesas/rzf-dev/Kconfig"
 
 # platform-specific options below
 source "arch/riscv/cpu/andes/Kconfig"
