@@ -1,0 +1,175 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source for the GR-Peach board
+ *
+ * Copyright (C) 2017 Jacopo Mondi <jacopo+renesas@jmondi.org>
+ * Copyright (C) 2021 Renesas Electronics
+ */
+
+/dts-v1/;
+
+/ {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		compatible = "renesas,rzf";
+		model = "rzf-dev";
+
+		aliases {
+				serial0 = &scif0;
+		};
+
+		chosen {
+				stdout-path = "serial0:115200n8";
+		};
+
+		cpus {
+				u-boot,dm-spl;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				timebase-frequency = <12000000>;
+				CPU0: cpu@0 {
+						u-boot,dm-spl;
+						device_type = "cpu";
+						reg = <0>;
+						status = "okay";
+						compatible = "riscv";
+						riscv,isa = "rv64imafdc";
+						riscv,priv-major = <1>;
+						riscv,priv-minor = <10>;
+						mmu-type = "riscv,sv39";
+						clock-frequency = <1000000000>;
+						i-cache-size = <0x8000>;
+						i-cache-line-size = <32>;
+						d-cache-size = <0x8000>;
+						d-cache-line-size = <32>;
+						next-level-cache = <&L2>;
+						CPU0_intc: interrupt-controller {
+								u-boot,dm-spl;
+								#interrupt-cells = <1>;
+								interrupt-controller;
+								compatible = "riscv,cpu-intc";
+						};
+				};
+		};
+
+		L2: l2-cache@13400000 {
+				u-boot,dm-spl;
+				compatible = "v5l2cache";
+				cache-level = <2>;
+				cache-size = <0x40000>;
+				reg = <0x0 0x13400000 0x0 0x40000>;
+				andes,inst-prefetch = <0>;
+				andes,data-prefetch = <0>;
+				/* The value format is <XRAMOCTL XRAMICTL> */
+				andes,tag-ram-ctl = <1 0>;
+				andes,data-ram-ctl = <1 0>;
+		};
+
+		memory@48000000 {
+				u-boot,dm-spl;
+				device_type = "memory";
+				/* first 128MB is reserved for secure area. */
+				reg = <0 0x48000000 0 0x18000000>;
+		};
+
+		/*
+		 * The external audio clocks are configured as 0 Hz fixed frequency
+		 * clocks by default.
+		 * Boards that provide audio clocks should override them.
+		 */
+		xinclk: xinclk {
+				u-boot,dm-spl;
+				compatible = "fixed-clock";
+				#clock-cells = <0>;
+				clock-frequency = <24000000>;
+		};
+
+		soc: soc {
+				u-boot,dm-spl;
+				#address-cells = <2>;
+				#size-cells = <2>;
+				compatible = "simple-bus";
+				interrupt-parent = <&plic0>;
+				ranges;
+
+				plic0: interrupt-controller@12c00000 {
+						u-boot,dm-spl;
+						compatible = "riscv,plic0";
+						#address-cells = <2>;
+						#interrupt-cells = <2>;
+						interrupt-controller;
+						reg = <0x0 0x12c00000 0x0 0x2000000>;
+						interrupts-extended = <&CPU0_intc 11 &CPU0_intc 9>;
+				};
+
+				plic1: interrupt-controller@13000000 {
+						u-boot,dm-spl;
+						compatible = "riscv,plic1";
+						#address-cells = <2>;
+						#interrupt-cells = <2>;
+						interrupt-controller;
+						reg = <0x0 0x13000000 0x0 0x400000>;
+						interrupts-extended = <&CPU0_intc 3>;
+				};
+
+				sdhi0: sd@11c00000 {
+						compatible = "renesas,sdhi-r9a07g044l";
+						reg = <0 0x11c00000 0 0x10000>;
+						clocks = <&cpg 1 21>;
+						resets = <&cpg 21>;
+						power-domains = <&cpg>;
+						bus-width = <8>;
+						status = "okay";
+				};
+
+				sdhi1: sd@11c10000 {
+						compatible = "renesas,sdhi-r9a07g044l";
+						reg = <0x0 0x11c10000 0 0x10000>;
+						clocks = <&cpg 1 22>;
+						resets = <&cpg 22>;
+						power-domains = <&cpg>;
+						bus-width = <4>;
+						status = "okay";
+				};
+
+				plmt0@110c0000 {
+						u-boot,dm-spl;
+						compatible = "riscv,plmt0";
+						reg = <0x0 0x110c0000 0x0 0x100000>;
+						interrupts-extended = <&CPU0_intc 7>;
+				};
+
+				cpg: clock-controller@11010000 {
+						u-boot,dm-spl;
+						compatible = "renesas,r9a07g044l-cpg";
+						reg = <0 0x11010000 0 0x10000>;
+						clocks = <&xinclk>;
+						clock-names = "xinclk";
+						#clock-cells = <2>;
+						#reset-cells = <1>;
+						#power-domain-cells = <0>;
+				};
+
+				pinctrl: pin-controller@11030000 {
+						u-boot,dm-spl;
+						compatible = "renesas,r9a07g044l-pinctrl";
+						reg = <0 0x11030000 0 0x10000>;
+						gpio-controller;
+						#gpio-cells = <2>;
+						gpio-ranges = <&pinctrl 0 0 176>;
+						clocks = <&cpg 1 20>;
+				};
+
+				scif0: serial@1004b800 {
+						u-boot,dm-spl;
+						compatible = "renesas,scif-r9a07g044l", "renesas,scif";
+						reg = <0 0x1004b800 0 0x400>;
+						clocks = <&cpg 1 13>;
+						resets = <&cpg 13>;
+						power-domains = <&cpg>;
+						clock = <100000000>;
+						status = "okay";
+				};
+		};
+};
+
