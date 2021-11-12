@@ -8,7 +8,7 @@
 #define __CONFIG_H
 
 #ifdef CONFIG_SPL
-#define CONFIG_SPL_MAX_SIZE		0x00010D00
+#define CONFIG_SPL_MAX_SIZE		    0x00010D00
 #define CONFIG_SPL_BSS_START_ADDR	0x60000000
 #define CONFIG_SPL_BSS_MAX_SIZE		0x00100000
 
@@ -61,14 +61,6 @@
 #define PHYS_SDRAM_1_SIZE	0x20000000	/* 512 MB */
 #define CONFIG_SYS_SDRAM_BASE	PHYS_SDRAM_0
 
-/*
- * Serial console configuration
- */
-#define CONFIG_SYS_NS16550_SERIAL
-#ifndef CONFIG_DM_SERIAL
-#define CONFIG_SYS_NS16550_REG_SIZE	-4
-#endif
-#define CONFIG_SYS_NS16550_CLK		19660800
 
 /* Init Stack Pointer */
 #define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x1000000 - \
@@ -84,6 +76,7 @@
  * memtest works on 512 MB in DRAM
  */
 
+#if 0
 /*
  * FLASH and environment organization
  */
@@ -122,6 +115,7 @@
 /* environments */
 
 /* SPI FLASH */
+#endif
 
 /*
  * For booting Linux, the board info and command line data
@@ -142,6 +136,7 @@
 	func(DHCP, dhcp, na)
 #include <config_distro_bootcmd.h>
 
+#if 0
 #define CONFIG_EXTRA_ENV_SETTINGS	\
 				"kernel_addr_r=0x00080000\0" \
 				"pxefile_addr_r=0x01f00000\0" \
@@ -149,7 +144,7 @@
 				"fdt_addr_r=0x02000000\0" \
 				"ramdisk_addr_r=0x02800000\0" \
 				BOOTENV
-
+#endif
 #endif /* __CONFIG_H */
 
 #ifdef __RZG2L_DEV_H
@@ -167,12 +162,6 @@
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_INITRD_TAG
-
-/* Generic Interrupt Controller Definitions */
-/* RZ/G2L use GIC-v3 */
-#define CONFIG_GICV3
-#define GICD_BASE	0x11900000
-#define GICR_BASE	0x11960000
 
 /* console */
 #define CONFIG_SYS_CBSIZE		2048
