@@ -7,10 +7,8 @@
  */
 
 /dts-v1/;
-#include <dt-bindings/gpio/gpio.h>
-#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/renesas-cpg-mssr.h>
 #include <dt-bindings/clock/r9a07g044l-cpg.h>
-#include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
 
 / {
 		#address-cells = <2>;
@@ -988,6 +986,14 @@
 	};
 };
 
+#define RZG2L_PINS_PER_PORT	8
+
+/*
+ * Store the pin index from its port and position number in bits[11-0].
+ * And store its peripheral function mode identifier in 3 bits [14-12]
+ */
+#define RZG2L_PINMUX(port, pos, func)	\
+	(((port) * RZG2L_PINS_PER_PORT + (pos)) | ((func) << 12))
 
 &pinctrl {
 	eth0_pins: eth0 {
