@@ -17,6 +17,17 @@
 #include <fdtdec.h>
 #include <dm.h>
 #include <spl.h>
+#include <asm/sections.h>
+
+#include "include/rzf_def.h"
+#include "include/mmio.h"
+#include "include/pfc.h"
+#include "include/cpg.h"
+#include "include/ddr.h"
+#include "include/sys.h"
+#include "include/sys_regs.h"
+#include "include/spi_multi.h"
+#include "include/rz_private.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -120,7 +131,22 @@ ulong board_flash_get_legacy(ulong base, int banknum, flash_info_t *info)
 
 void *board_fdt_blob_setup(void)
 {
-	return (void *)CONFIG_SYS_FDT_BASE;
+	void *fdt_blob = NULL;
+#ifdef CONFIG_SPL_BUILD
+	/* FDT is at end of BSS unless it is in a different memory region */
+	if (IS_ENABLED(CONFIG_SPL_SEPARATE_BSS))
+		fdt_blob = (ulong *)&_image_binary_end;
+	else
+		fdt_blob = (ulong *)&__bss_end;
+#else
+#ifdef CONFIG_OF_PRIOR_STAGE
+         fdt_blob = (void *)prior_stage_fdt_address;
+#else
+        /* FDT is at end of image */
+    	fdt_blob = (ulong *)&_end;
+#endif
+#endif
+	return fdt_blob;
 }
 
 #ifdef CONFIG_V5L2_CACHE
@@ -170,16 +196,27 @@ int board_fit_config_name_match(const char *name)
 }
 #endif
 
-void rzf_early_platform_setup(void);
-void rzf_platform_setup(void);
 
 int spl_board_init_f(void)
 {
-    // initialize pinconfig,clock,reset control
-    rzf_early_platform_setup();
+	uint16_t boot_dev;
     
-    // initialize DDR, setup IO
-    rzf_platform_setup();
+	/* setup PFC */
+	pfc_setup();
+
+	/* setup Clock and Reset */
+	cpg_setup();
+
+//#ifndef CONFIG_DEBUG_RZF_FPGA
+	/* initialize DDR */
+	ddr_setup();
+//#endif /* DEBUG_FPGA */
+
+	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
+	if (boot_dev == BOOT_MODE_SPI_1_8 ||
+		boot_dev == BOOT_MODE_SPI_3_3) {
+		spi_multi_setup(SPI_MULTI_ADDR_WIDES_24, SPI_MULTI_DQ_WIDES_1_4_4, SPI_MULTI_DUMMY_10CYCLE);
+	}
     
 	return 0;
 }

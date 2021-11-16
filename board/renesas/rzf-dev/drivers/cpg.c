@@ -67,21 +67,6 @@ static CPG_PLL_SETDATA_146 cpg_pll6_setdata = {
 #define	CPG_PLL3_INDEX					(1)
 #define	CPG_PLL5_INDEX					(2)
 
-static const CPG_SETUP_DATA early_setup_tbl[] = {
-	{
-		(uintptr_t)CPG_CLKON_SYC,
-		(uintptr_t)CPG_CLKMON_SYC,
-		0x00010001,
-		CPG_T_CLK
-	},
-	{
-		(uintptr_t)CPG_RST_SYC,
-		(uintptr_t)CPG_RSTMON_SYC,
-		0x00010001,
-		CPG_T_RST
-	}
-};
-
 static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 	{		/* CM33 */
 		(uintptr_t)CPG_CLKON_CM33,
@@ -137,7 +122,7 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x003C0000,
 		CPG_T_CLK
 	},
-#ifndef CONFIG_DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZF_FPGA
 	{		/* DDR */
 		(uintptr_t)CPG_CLKON_DDR,
 		(uintptr_t)CPG_CLKMON_DDR,
@@ -335,7 +320,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x00060000,
 		CPG_T_RST
 	},
-#ifndef CONFIG_DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZF_FPGA
 	{		/* DDR */
 		(uintptr_t)CPG_RST_DDR,
 		(uintptr_t)CPG_RSTMON_DDR,
@@ -616,8 +601,10 @@ static void cpg_ctrl_clkrst(CPG_SETUP_DATA const *array, uint32_t num)
 		if (array->type == CPG_T_RST) {
 			cmp = ~(cmp);
 		}
+#ifndef CONFIG_DEBUG_RZF_FPGA
 		while ((mmio_read_32(array->mon) & mask) != (cmp & mask))
 			;
+#endif
 	}
 }
 
@@ -704,7 +691,7 @@ static void cpg_pll_start_146(CPG_PLL_SETDATA_146 *pdata)
 /* It is assumed that the PLL has stopped by the time this function is executed. */
 static void cpg_pll_setup(void)
 {
-#ifndef CONFIG_DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZF_FPGA
 	uint32_t val = 0;
 
 	/* PLL4 startup */
@@ -725,7 +712,7 @@ static void cpg_pll_setup(void)
 	/* Set PLL6 to normal mode */
 	cpg_pll_start_146(&cpg_pll6_setdata);
 
-#ifndef CONFIG_DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* PLL4 normal mode transition confirmation */
 	do {
 		val = mmio_read_32(CPG_PLL4_MON);
@@ -746,7 +733,7 @@ static void cpg_div_sel_setup(CPG_REG_SETTING *tbl, uint32_t size)
 		mmio_write_32(tbl->reg, tbl->val);
 	}
 
-#ifndef CONFIG_DEBUG_RZG2L_FPGA
+#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* Wait for completion of settings */
 	while (mmio_read_32(CPG_CLKSTATUS) != 0)
 		;
@@ -831,11 +818,6 @@ void cpg_reset_ddr_mc(void)
 		;
 
 	udelay(1);
-}
-
-void cpg_early_setup(void)
-{
-	cpg_ctrl_clkrst(&early_setup_tbl[0], ARRAY_SIZE(early_setup_tbl));
 }
 
 void cpg_setup(void)
