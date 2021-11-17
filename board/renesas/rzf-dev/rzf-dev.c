@@ -31,7 +31,10 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#ifdef CONFIG_OF_PRIOR_STAGE
 extern phys_addr_t prior_stage_fdt_address;
+#endif
+
 /*
  * Miscellaneous platform dependent initializations
  */
@@ -196,16 +199,20 @@ int board_fit_config_name_match(const char *name)
 }
 #endif
 
+void spl_eary_board_init_f(void);
 
-int spl_board_init_f(void)
+void spl_eary_board_init_f(void)
 {
-	uint16_t boot_dev;
-    
 	/* setup PFC */
 	pfc_setup();
 
 	/* setup Clock and Reset */
 	cpg_setup();
+}
+
+int spl_board_init_f(void)
+{
+	uint16_t boot_dev;
 
 //#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* initialize DDR */
@@ -220,3 +227,24 @@ int spl_board_init_f(void)
     
 	return 0;
 }
+
+#ifdef CONFIG_SPL_BUILD
+void board_init_f(ulong dummy)
+{
+	int ret;
+
+	ret = spl_early_init();
+	if (ret)
+		panic("spl_early_init() failed: %d\n", ret);
+
+	arch_cpu_init_dm();
+
+    spl_eary_board_init_f();
+    
+	preloader_console_init();
+
+	ret = spl_board_init_f();
+	if (ret)
+		panic("spl_board_init_f() failed: %d\n", ret);
+}
+#endif

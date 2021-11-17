@@ -68,12 +68,6 @@ static CPG_PLL_SETDATA_146 cpg_pll6_setdata = {
 #define	CPG_PLL5_INDEX					(2)
 
 static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
-	{		/* CM33 */
-		(uintptr_t)CPG_CLKON_CM33,
-		(uintptr_t)CPG_CLKMON_CM33,
-		0x00030000,
-		CPG_T_CLK
-	},
 	{		/* MHU */
 		(uintptr_t)CPG_CLKON_MHU,
 		(uintptr_t)CPG_CLKMON_MHU,
@@ -102,18 +96,6 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		(uintptr_t)CPG_CLKON_POE3,
 		(uintptr_t)CPG_CLKMON_POE3,
 		0x00010000,
-		CPG_T_CLK
-	},
-	{		/* GPT */
-		(uintptr_t)CPG_CLKON_GPT,
-		(uintptr_t)CPG_CLKMON_GPT,
-		0x00010000,
-		CPG_T_CLK
-	},
-	{		/* POEG */
-		(uintptr_t)CPG_CLKON_POEG,
-		(uintptr_t)CPG_CLKMON_POEG,
-		0x000F0000,
 		CPG_T_CLK
 	},
 	{		/* WDT */
@@ -147,42 +129,6 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		(uintptr_t)CPG_CLKON_SDHI,
 		(uintptr_t)CPG_CLKMON_SDHI,
 		0x00ff00ff,
-		CPG_T_CLK
-	},
-	{		/* GPU */
-		(uintptr_t)CPG_CLKON_GPU,
-		(uintptr_t)CPG_CLKMON_GPU,
-		0x00070000,
-		CPG_T_CLK
-	},
-	{		/* Image Scaling Unit */
-		(uintptr_t)CPG_CLKON_ISU,
-		(uintptr_t)CPG_CLKMON_ISU,
-		0x00030000,
-		CPG_T_CLK
-	},
-	{		/* H.264 codec */
-		(uintptr_t)CPG_CLKON_H264,
-		(uintptr_t)CPG_CLKMON_H264,
-		0x00010001,
-		CPG_T_CLK
-	},
-	{		/* Camera Data Receive Unit */
-		(uintptr_t)CPG_CLKON_CRU,
-		(uintptr_t)CPG_CLKMON_CRU,
-		0x001f0000,
-		CPG_T_CLK
-	},
-	{		/* MIPI-DSI */
-		(uintptr_t)CPG_CLKON_MIPI_DSI,
-		(uintptr_t)CPG_CLKMON_MIPI_DSI,
-		0x003f0000,
-		CPG_T_CLK
-	},
-	{		/* LCDC */
-		(uintptr_t)CPG_CLKON_LCDC,
-		(uintptr_t)CPG_CLKMON_LCDC,
-		0x00030000,
 		CPG_T_CLK
 	},
 	{		/* Serial Sound Interface */
@@ -266,18 +212,6 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 };
 
 static CPG_SETUP_DATA cpg_reset_tbl[] = {
-	{		/* CM33 */
-		(uintptr_t)CPG_RST_CM33,
-		(uintptr_t)CPG_RSTMON_CM33,
-		0x00070000,
-		CPG_T_RST
-	},
-	{		/* MHU */
-		(uintptr_t)CPG_RST_MHU,
-		(uintptr_t)CPG_RSTMON_MHU,
-		0x00010000,
-		CPG_T_RST
-	},
 	{		/* DMAC */
 		(uintptr_t)CPG_RST_DMAC,
 		(uintptr_t)CPG_RSTMON_DMAC,
@@ -300,18 +234,6 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		(uintptr_t)CPG_RST_POE3,
 		(uintptr_t)CPG_RSTMON_POE3,
 		0x00010000,
-		CPG_T_RST
-	},
-	{		/* GPT */
-		(uintptr_t)CPG_RST_GPT,
-		(uintptr_t)CPG_RSTMON_GPT,
-		0x00010000,
-		CPG_T_RST
-	},
-	{		/* POEG */
-		(uintptr_t)CPG_RST_POEG,
-		(uintptr_t)CPG_RSTMON_POEG,
-		0x000f0000,
 		CPG_T_RST
 	},
 	{		/* WDT */
@@ -345,42 +267,6 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		(uintptr_t)CPG_RST_SDHI,
 		(uintptr_t)CPG_RSTMON_SDHI,
 		0x00030003,
-		CPG_T_RST
-	},
-	{		/* GPU */
-		(uintptr_t)CPG_RST_GPU,
-		(uintptr_t)CPG_RSTMON_GPU,
-		0x00070000,
-		CPG_T_RST
-	},
-	{		/* Image Scaling Unit */
-		(uintptr_t)CPG_RST_ISU,
-		(uintptr_t)CPG_RSTMON_ISU,
-		0x00030000,
-		CPG_T_RST
-	},
-	{		/* H.264 codec */
-		(uintptr_t)CPG_RST_H264,
-		(uintptr_t)CPG_RSTMON_H264,
-		0x00030003,
-		CPG_T_RST
-	},
-	{		/* Camera Data Receive Unit */
-		(uintptr_t)CPG_RST_CRU,
-		(uintptr_t)CPG_RSTMON_CRU,
-		0x00070000,
-		CPG_T_RST
-	},
-	{		/* MIPI-DSI */
-		(uintptr_t)CPG_RST_MIPI_DSI,
-		(uintptr_t)CPG_RSTMON_MIPI_DSI,
-		0x00070000,
-		CPG_T_RST
-	},
-	{		/* LCDC */
-		(uintptr_t)CPG_RST_LCDC,
-		(uintptr_t)CPG_RSTMON_LCDC,
-		0x00010000,
 		CPG_T_RST
 	},
 	{		/* Serial Sound Interface */
@@ -765,13 +651,17 @@ void cpg_active_ddr(void (*disable_phy)(void))
 	/* Assert the reset of DDRTOP */
 	mmio_write_32(CPG_RST_DDR, 0x005F0000);
 	mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
+//#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005F) != 0x0000005F)
 		;
+//#endif
 
 	/* Start the clocks of DDRTOP */
 	mmio_write_32(CPG_CLKON_DDR, 0x00030003);
+//#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_CLKMON_DDR) & 0x00000003) != 0x00000003)
 		;
+//#endif
 
 	udelay(1);
 
@@ -782,8 +672,10 @@ void cpg_active_ddr(void (*disable_phy)(void))
 
 	/* De-assert PRESETN */
 	mmio_write_32(CPG_RST_DDR, 0x00020002);
+//#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x00000002) != 0x00000000)
 		;
+//#endif
 
 	udelay(1);
 
@@ -791,8 +683,10 @@ void cpg_active_ddr(void (*disable_phy)(void))
 
 	/* De-assert axiY_ARESETn, regARESETn, reset_n */
 	mmio_write_32(CPG_RST_DDR, 0x005D005D);
+//#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005D) != 0x00000000)
 		;
+//#endif
 
 	udelay(1);
 }
@@ -802,8 +696,10 @@ void cpg_reset_ddr_mc(void)
 	/* Assert rst_n, axiY_ARESETn, regARESETn */
 	mmio_write_32(CPG_RST_DDR, 0x005C0000);
 	mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
+//#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005C) != 0x0000005C)
 		;
+//#endif
 
 	udelay(1);
 
@@ -814,8 +710,10 @@ void cpg_reset_ddr_mc(void)
 
 	/* De-assert axiY_ARESETn, regARESETn */
 	mmio_write_32(CPG_RST_DDR, 0x005C005C);
+//#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005C) != 0x00000000)
 		;
+//#endif
 
 	udelay(1);
 }

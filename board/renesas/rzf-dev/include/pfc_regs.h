@@ -253,6 +253,8 @@
 #define PFC_SR0A						(PFC_BASE + 0x1450)	/* Slew-Rate switch register */
 #define PFC_SR0B						(PFC_BASE + 0x1458)	/* Slew-Rate switch register */
 #define PFC_SR0C						(PFC_BASE + 0x1460)	/* Slew-Rate switch register */
+#define PFC_SR16						(PFC_BASE + 0x14B0)	/* Slew-Rate switch register */
+#define PFC_SR18						(PFC_BASE + 0x14D8)	/* Slew-Rate switch register */
 #define PFC_SR22						(PFC_BASE + 0x1510)	/* Slew-Rate switch register */
 #define PFC_SR23						(PFC_BASE + 0x1518)	/* Slew-Rate switch register */
 #define PFC_SR36						(PFC_BASE + 0x15B0)	/* Slew-Rate switch register */
@@ -268,6 +270,8 @@
 #define PFC_PUPD0A						(PFC_BASE + 0x1C50)	/* PU/PD switch register */
 #define PFC_PUPD0B						(PFC_BASE + 0x1C58)	/* PU/PD switch register */
 #define PFC_PUPD0C						(PFC_BASE + 0x1C60)	/* PU/PD switch register */
+#define PFC_PUPD16						(PFC_BASE + 0x1CB0)	/* PU/PD switch register */
+#define PFC_PUPD18						(PFC_BASE + 0x1CD8)	/* PU/PD switch register */
 #define PFC_PUPD22						(PFC_BASE + 0x1D10)	/* PU/PD switch register */
 #define PFC_PUPD23						(PFC_BASE + 0x1D18)	/* PU/PD switch register */
 #define PFC_PUPD36						(PFC_BASE + 0x1DB0)	/* PU/PD switch register */
@@ -677,9 +681,10 @@
 #define	PFC_OFF				(0)
 #define PFC_ON				(1)
 
-#define PFC_MUX_TBL_NUM		(4)
+#define PFC_MUX_TBL_NUM		(2)
 #define PFC_QSPI_TBL_NUM	(3)
 #define PFC_SD_TBL_NUM		(4)
+#define PFC_SCIF_TBL_NUM	(3)
 
 typedef struct {
 	int			flg;

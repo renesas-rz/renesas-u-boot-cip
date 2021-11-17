@@ -24,15 +24,17 @@
 #define RZF_TZC_DDR_BASE          (0x11070000)
 #define RZF_DDR_PHY_BASE          (0x11400000)
 #define RZF_DDR_MEMC_BASE         (0x11410000)
-#define RZF_GIC_BASE              (0x11900000)
+#define RZF_OTP_REG               (0x11860000)
 #define RZF_SD0_BASE              (0x11C00000)
 #define RZF_SPIROM_BASE           (0x20000000)
 #define RZF_DDR1_BASE             (0x40000000)
 #define RZF_DDR2_BASE             (0x80000000)
 #define RZF_DDR3_BASE             (0x100000000)
 
-#define RZF_GICD_BASE             (RZF_GIC_BASE)
-#define RZF_GICR_BASE             (RZF_GIC_BASE + 0x00040000)
+#define RZF_OTP_OTPTMPA1          (RZF_OTP_REG + 0x1178)
+#define OTPTMPA1_DEVICE_ID_FIVE_1 (0x00000000)
+#define OTPTMPA1_DEVICE_ID_FIVE_2 (0x00000001)
+#define OTPTMPA1_DEVICE_ID_MASK   (0x0000000F)
 
 #define RZF_SRAM_BASE             (RZF_MSRAM_BASE)
 
