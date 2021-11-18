@@ -35,6 +35,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_CLKON_BASE				(CPG_BASE + 0x500)
 #define CPG_RESET_BASE				(CPG_BASE + 0x800)
 #define CPG_RESET_ETH				(CPG_RESET_BASE + 0x7C)
+#define CPG_PL2_SDHI_DSEL                           (CPG_BASE + 0x218)
+#define CPG_CLK_STATUS                           (CPG_BASE + 0x280)
 
 void s_init(void)
 {
@@ -44,6 +46,10 @@ void s_init(void)
 	*(volatile u32 *)(ETH_MII_RGMII) = (*(volatile u32 *)(ETH_MII_RGMII) & 0xFFFFFFFC);
 	/* ETH CLK */
 	*(volatile u32 *)(CPG_RESET_ETH) = 0x30001;
+	/* SD CLK */
+	*(volatile u32 *)(CPG_PL2_SDHI_DSEL) = 0x00110011;
+	while (*(volatile u32 *)(CPG_CLK_STATUS) != 0)
+		;
 }
 
 int board_early_init_f(void)
