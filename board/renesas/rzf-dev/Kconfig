@@ -22,10 +22,10 @@ config ENV_OFFSET
 	default 0x140000 if ENV_IS_IN_SPI_FLASH
 
 config SPL_TEXT_BASE
-	default 0x0001D000
+	default 0x00012000
 
 config SPL_OPENSBI_LOAD_ADDR
-	default 0x44000000
+	default 0x20100000
 
 config BOARD_SPECIFIC_OPTIONS # dummy
 	def_bool y
@@ -76,7 +76,7 @@ config RZF_DDR_PLL4
 	int "DDR PLL clock"
 	default 1600
 
-config DEBUG_RZG2L_FPGA
+config DEBUG_RZF_FPGA
 	bool "FPGA DEBUG option"
 
 endif

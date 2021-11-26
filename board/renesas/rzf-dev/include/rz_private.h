@@ -7,8 +7,6 @@
 #ifndef __RZ_PRIVATE_H__
 #define __RZ_PRIVATE_H__
 
-//#include <common/bl_common.h>
-
 /* plat_gic.c */
 void plat_gic_driver_init(void);
 void plat_gic_init(void);

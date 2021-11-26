@@ -15,6 +15,7 @@
 #include <linux/io.h>
 #include <faraday/ftsmc020.h>
 #include <fdtdec.h>
+#include <asm/gpio.h>
 #include <dm.h>
 #include <spl.h>
 #include <asm/sections.h>
@@ -31,13 +32,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#ifdef CONFIG_OF_PRIOR_STAGE
-extern phys_addr_t prior_stage_fdt_address;
-#endif
+void spl_early_board_init_f(void);
 
-/*
- * Miscellaneous platform dependent initializations
- */
 
 #define PFC_BASE	0x11030000
 
@@ -70,7 +66,6 @@ void s_init(void)
 	/* I2C pin non GPIO enable */
 	*(volatile u32 *)(I2C_CH1) = 0x01010101;
 }
-
 
 /* PFC */
 #define PFC_P37						(PFC_BASE + 0x037)
@@ -110,27 +105,32 @@ int board_mmc_init(struct bd_info *bis)
 	return ret;
 }
 
+
 int board_init(void)
 {
-	gd->bd->bi_boot_params = PHYS_SDRAM_0 + 0x400;
+	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
 
 	return 0;
 }
+
 
 int dram_init(void)
 {
 	return fdtdec_setup_mem_size_base();
 }
 
+
 int dram_init_banksize(void)
 {
 	return fdtdec_setup_memory_banksize();
 }
 
+
 ulong board_flash_get_legacy(ulong base, int banknum, flash_info_t *info)
 {
 	return 0;
 }
+
 
 void *board_fdt_blob_setup(void)
 {
@@ -143,7 +143,9 @@ void *board_fdt_blob_setup(void)
 		fdt_blob = (ulong *)&__bss_end;
 #else
 #ifdef CONFIG_OF_PRIOR_STAGE
-         fdt_blob = (void *)prior_stage_fdt_address;
+extern phys_addr_t prior_stage_fdt_address;
+
+        fdt_blob = (void *)prior_stage_fdt_address;
 #else
         /* FDT is at end of image */
     	fdt_blob = (ulong *)&_end;
@@ -152,6 +154,7 @@ void *board_fdt_blob_setup(void)
 	return fdt_blob;
 }
 
+#ifdef CONFIG_BOARD_EARLY_INIT_F
 #ifdef CONFIG_V5L2_CACHE
 static void v5l2_init(void)
 {
@@ -161,17 +164,24 @@ static void v5l2_init(void)
 }
 #endif
 
-
-#ifdef CONFIG_BOARD_EARLY_INIT_F
 int board_early_init_f(void)
 {
 #ifdef CONFIG_V5L2_CACHE
 	v5l2_init();
 #endif
-
 	return 0;
 }
 #endif
+
+
+#ifdef CONFIG_SPL_LOAD_FIT
+int board_fit_config_name_match(const char *name)
+{
+	/* boot using first FIT config */
+	return 0;
+}
+#endif
+
 
 #ifdef CONFIG_SPL
 void board_boot_order(u32 *spl_boot_list)
@@ -191,17 +201,9 @@ void board_boot_order(u32 *spl_boot_list)
 }
 #endif
 
-#ifdef CONFIG_SPL_LOAD_FIT
-int board_fit_config_name_match(const char *name)
-{
-	/* boot using first FIT config */
-	return 0;
-}
-#endif
 
-void spl_eary_board_init_f(void);
-
-void spl_eary_board_init_f(void)
+#ifdef CONFIG_SPL_BUILD
+void spl_early_board_init_f(void)
 {
 	/* setup PFC */
 	pfc_setup();
@@ -214,11 +216,10 @@ int spl_board_init_f(void)
 {
 	uint16_t boot_dev;
 
-//#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* initialize DDR */
 	ddr_setup();
-//#endif /* DEBUG_FPGA */
 
+    /* initisalize SPI Multi when SPI BOOT */
 	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
 	if (boot_dev == BOOT_MODE_SPI_1_8 ||
 		boot_dev == BOOT_MODE_SPI_3_3) {
@@ -228,21 +229,25 @@ int spl_board_init_f(void)
 	return 0;
 }
 
-#ifdef CONFIG_SPL_BUILD
 void board_init_f(ulong dummy)
 {
 	int ret;
 
+    /* Initialize SPL*/
 	ret = spl_early_init();
 	if (ret)
 		panic("spl_early_init() failed: %d\n", ret);
 
+    /* Initialize CPU Architecure */
 	arch_cpu_init_dm();
 
-    spl_eary_board_init_f();
+    /* Initialixe Bord part */
+    spl_early_board_init_f();
     
+    /* Initialize console */
 	preloader_console_init();
 
+    /* Initialize Board part */
 	ret = spl_board_init_f();
 	if (ret)
 		panic("spl_board_init_f() failed: %d\n", ret);

@@ -61,8 +61,6 @@ static void spi_multi_timing_set(void)
 	/* Timing adjustment register setting */
 	mmio_write_32(SPIM_PHYADJ2, 0x00000030);
 	mmio_write_32(SPIM_PHYADJ1, 0x80000032);
-
-	///dmbsy();
 }
 
 int spi_multi_setup(uint32_t addr_width, uint32_t dq_width, uint32_t dummy_cycle)
