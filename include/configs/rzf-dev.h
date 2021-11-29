@@ -12,10 +12,11 @@
 #define CONFIG_SPL_MAX_SIZE		    0x00010D00
 #ifndef CONFIG_DEBUG_RZF_FPGA
 #define CONFIG_SPL_BSS_START_ADDR	0x60000000
+#define CONFIG_SPL_BSS_MAX_SIZE		0x00100000
 #else
 #define CONFIG_SPL_BSS_START_ADDR	0x200F0000
+#define CONFIG_SPL_BSS_MAX_SIZE		0x00010000
 #endif
-#define CONFIG_SPL_BSS_MAX_SIZE		0x00100000
 
 #ifdef CONFIG_SPL_MMC_SUPPORT
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME		"u-boot.itb"
@@ -47,8 +48,6 @@
  */
 #define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
 
-/* DT blob (fdt) address */
-#define CONFIG_SYS_FDT_BASE		0x20020000
 
 /* Init Stack Pointer */
 #define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_TEXT_BASE - GENERATED_GBL_DATA_SIZE)
@@ -58,11 +57,6 @@
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_INITRD_TAG
-
-/* For board */
-/* Ethernet RAVB */
-/* Ethernet RAVB */
-#define CONFIG_BITBANGMII_MULTI
 
 /* PHY needs a longer autoneg timeout */
 #define PHY_ANEG_TIMEOUT		20000
@@ -85,5 +79,9 @@
 
 /* The HF/QSPI layout permits up to 1 MiB large bootloader blob */
 #define CONFIG_BOARD_SIZE_LIMIT		1048576
+
+/* For board */
+/* Ethernet RAVB */
+#define CONFIG_BITBANGMII_MULTI
 
 #endif /* __CONFIG_H */
