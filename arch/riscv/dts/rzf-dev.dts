@@ -19,7 +19,6 @@
 		};
 
 		chosen {
-				bootargs = "console=ttyS0,115200n8	debug loglevel=7";
 				stdout-path = "serial0:115200n8";
 		};
 
@@ -27,7 +26,7 @@
 				u-boot,dm-spl;
 				#address-cells = <1>;
 				#size-cells = <0>;
-				timebase-frequency = <100000000>;
+				timebase-frequency = <1000000000>;
 				CPU0: cpu@0 {
 						u-boot,dm-spl;
 						device_type = "cpu";
@@ -38,7 +37,7 @@
 						riscv,priv-major = <1>;
 						riscv,priv-minor = <10>;
 						mmu-type = "riscv,sv39";
-						clock-frequency = <100000000>;
+						clock-frequency = <1000000000>;
 						i-cache-size = <0x8000>;
 						i-cache-line-size = <32>;
 						d-cache-size = <0x8000>;
@@ -73,11 +72,6 @@
 				reg = <0 0x48000000 0 0x78000000>;
 		};
 
-		pmu {
-				compatible = "riscv,base-pmu";
-		};
-
-
 		/*
 		 * The external audio clocks are configured as 0 Hz fixed frequency
 		 * clocks by default.
@@ -87,8 +81,7 @@
 				u-boot,dm-spl;
 				compatible = "fixed-clock";
 				#clock-cells = <0>;
-				/* This value must be overridden by the board */
-				clock-frequency = <0>;
+				clock-frequency = <24000000>;
 		};
 
 		soc: soc {
@@ -106,7 +99,6 @@
 						#interrupt-cells = <2>;
 						interrupt-controller;
 						reg = <0x0 0x12c00000 0x0 0x2000000>;
-						riscv,ndev=<71>;
 						interrupts-extended = <&CPU0_intc 11 &CPU0_intc 9>;
 				};
 
@@ -117,7 +109,6 @@
 						#interrupt-cells = <2>;
 						interrupt-controller;
 						reg = <0x0 0x13000000 0x0 0x400000>;
-						riscv,ndev=<2>;
 						interrupts-extended = <&CPU0_intc 3>;
 				};
 
@@ -153,27 +144,14 @@
 						u-boot,dm-spl;
 						compatible = "renesas,scif-r9a07g044l", "renesas,scif";
 						reg = <0 0x1004b800 0 0x400>;
-						interrupts = <380 4>, <382 4>, <383 4>, <381 4>, <384 4>, <384 4>;
 						clocks = <&cpg 1 13>;
 						clock-names = "fck";
 						resets = <&cpg 13>;
 						power-domains = <&cpg>;
-						status = "disable";
+						status = "okay";
+						clock = <100000000>;
 				};
 		};
 
 };
-
-
-&xinclk {
-		u-boot,dm-spl;
-		clock-frequency = <24000000>;
-};
-
-&scif0 {
-	u-boot,dm-spl;
-	status = "okay";
-	clock = <100000000>;
-};
-
 

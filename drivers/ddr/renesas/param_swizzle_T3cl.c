@@ -5,7 +5,7 @@
  */
 
 #include <common.h>
-#include "../../include/ddr_internal.h"
+#include "include/ddr_internal.h"
 
 const uint32_t mc_odt_pins_tbl[4] = {
 	2,

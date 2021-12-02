@@ -18,6 +18,10 @@
 #define CONFIG_SPL_BSS_MAX_SIZE		0x00010000
 #endif
 
+#ifdef CONFIG_SPL_NOR_SUPPORT
+#define CONFIG_SYS_UBOOT_BASE       0x20020000
+#endif
+
 #ifdef CONFIG_SPL_MMC_SUPPORT
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME		"u-boot.itb"
 #endif
@@ -83,5 +87,9 @@
 /* For board */
 /* Ethernet RAVB */
 #define CONFIG_BITBANGMII_MULTI
+
+/* select DDR clock */
+/*#define CONFIG_RZF_DDR_PLL4 1333 */
+#define RZF_DDR_PLL4 1600
 
 #endif /* __CONFIG_H */

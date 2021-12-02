@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include <common.h>
-#include "../../include/rzf_def.h"
-#include "../../include/ddr_internal.h"
+#include "include/rzf_def.h"
+#include "include/ddr_internal.h"
 
 #define	SYS_LSI_DEVID	(0x11020A04)
 

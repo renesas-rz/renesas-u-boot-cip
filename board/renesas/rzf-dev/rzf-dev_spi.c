@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include <common.h>
-#include "../include/rzf_def.h"
-#include "../include/spi_multi.h"
-#include "../include/spi_multi_regs.h"
-#include "../include/mmio.h"
+#include "include/rzf_def.h"
+#include "include/spi_multi.h"
+#include "include/spi_multi_regs.h"
+#include "include/mmio.h"
 #include <linux/delay.h>
 
 static uint32_t spi_multi_cmd_tbl[2][3] = {

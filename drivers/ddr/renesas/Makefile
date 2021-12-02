@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: GPL-2.0+
+#
+# Copyright (C) 2017 Andes Technology Corporation.
+# Rick Chen, Andes Technology Corporation <rick@andestech.com>
+
+ifdef CONFIG_SPL_BUILD
+obj-$(CONFIG_TARGET_RZF_DEV)		:= ddr.o ddr_rzf.o
+
+obj-$(CONFIG_RZF_DDR_C_010_D3_02_2)	+= param_mc_C-010_D3-02-2.o
+obj-$(CONFIG_RZF_DDR_C_010_D4_01_1)	+= param_mc_C-010_D4-01-1.o
+obj-$(CONFIG_RZF_DDR_C_010_D4_01_2)	+= param_mc_C-010_D4-01-2.o
+obj-$(CONFIG_RZF_DDR_C_011_D4_01_1)	+= param_mc_C-011_D4-01-1.o
+
+obj-$(CONFIG_RZF_DDR_SWIZZLE_T1BC)	+= param_swizzle_T1bc.o
+obj-$(CONFIG_RZF_DDR_SWIZZLE_T1C)	+= param_swizzle_T1c.o
+obj-$(CONFIG_RZF_DDR_SWIZZLE_T2C)	+= param_swizzle_T2c.o
+obj-$(CONFIG_RZF_DDR_SWIZZLE_T3CL)	+= param_swizzle_T3cl.o
+endif

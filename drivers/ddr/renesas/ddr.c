@@ -6,11 +6,11 @@
 
 // include
 #include <common.h>
-#include "../../include/rzf_def.h"
+#include "include/rzf_def.h"
 #include <linux/delay.h>
 
-#include "../../include/ddr_internal.h"
-#include "../../include/cpg.h"
+#include "include/ddr_internal.h"
+#include "include/cpg.h"
 
 
 #define	CEIL(a, div)	(((a) + ((div) - 1)) / (div))

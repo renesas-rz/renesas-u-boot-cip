@@ -5,10 +5,10 @@
  */
 
 #include <common.h>
-#include "../include/rzf_def.h"
-#include "../include/cpg_regs.h"
-#include "../include/cpg.h"
-#include "../include/mmio.h"
+#include "include/rzf_def.h"
+#include "include/cpg_regs.h"
+#include "include/cpg.h"
+#include "include/mmio.h"
 #include <linux/delay.h>
 
 #define	CPG_OFF			(0)
@@ -45,10 +45,10 @@ typedef struct {
 } CPG_PLL_SETDATA_235;
 
 static CPG_PLL_SETDATA_146 cpg_pll4_setdata = {
-#if (CONFIG_RZF_DDR_PLL4 ==1600)
+#if (RZF_DDR_PLL4 ==1600)
 	{ CPG_PLL4_CLK1, 0xFAE13203 },
 	{ CPG_PLL4_CLK2, 0x00081000 },
-#elif (CONFIG_RZF_DDR_PLL4 == 1333)
+#elif (RZF_DDR_PLL4 == 1333)
 	{ CPG_PLL4_CLK1, 0xA66629C3 },
 	{ CPG_PLL4_CLK2, 0x00080D00 },
 #else

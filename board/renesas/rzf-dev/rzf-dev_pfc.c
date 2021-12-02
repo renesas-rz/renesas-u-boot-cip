@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include <common.h>
-#include "../include/rzf_def.h"
-#include "../include/pfc_regs.h"
-#include "../include/mmio.h"
+#include "include/rzf_def.h"
+#include "include/pfc_regs.h"
+#include "include/mmio.h"
 
 
 static PFC_REGS pfc_scif_type1_reg_tbl[PFC_SCIF_TBL_NUM] = {
