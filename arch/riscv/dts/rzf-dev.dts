@@ -3,7 +3,7 @@
  * Device Tree Source for the GR-Peach board
  *
  * Copyright (C) 2017 Jacopo Mondi <jacopo+renesas@jmondi.org>
- * Copyright (C) 2016 Renesas Electronics
+ * Copyright (C) 2021 Renesas Electronics
  */
 
 /dts-v1/;
@@ -115,8 +115,8 @@
 				plmt0@110c0000 {
 						u-boot,dm-spl;
 						compatible = "riscv,plmt0";
-						interrupts-extended = <&CPU0_intc 7>;
 						reg = <0x0 0x110c0000 0x0 0x100000>;
+						interrupts-extended = <&CPU0_intc 7>;
 				};
 
 				cpg: clock-controller@11010000 {
@@ -148,10 +148,9 @@
 						clock-names = "fck";
 						resets = <&cpg 13>;
 						power-domains = <&cpg>;
-						status = "okay";
 						clock = <100000000>;
+						status = "okay";
 				};
 		};
-
 };
 
