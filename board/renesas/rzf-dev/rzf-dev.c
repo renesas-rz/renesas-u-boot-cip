@@ -43,29 +43,6 @@ int board_fit_config_name_match(const char *name)
 #endif
 
 
-void *board_fdt_blob_setup(void)
-{
-	void *fdt_blob = NULL;
-#ifdef CONFIG_SPL_BUILD
-	/* FDT is at end of BSS unless it is in a different memory region */
-	if (IS_ENABLED(CONFIG_SPL_SEPARATE_BSS))
-		fdt_blob = (ulong *)&_image_binary_end;
-	else
-		fdt_blob = (ulong *)&__bss_end;
-#else
-#ifdef CONFIG_OF_PRIOR_STAGE
-extern phys_addr_t prior_stage_fdt_address;
-
-        fdt_blob = (void *)prior_stage_fdt_address;
-#else
-        /* FDT is at end of image */
-    	fdt_blob = (ulong *)&_end;
-#endif
-#endif
-	return fdt_blob;
-}
-
-
 #ifdef CONFIG_SPL
 u32 spl_boot_device(void)
 {
