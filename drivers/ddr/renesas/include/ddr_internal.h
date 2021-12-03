@@ -1,15 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef __DDR_INTERNAL_H__
 #define __DDR_INTERNAL_H__
 
-#include "mmio.h"
 #include "ddr_mc_if.h"
 #include "ddr_phy_regs.h"
+#include "mmio.h"
 
 #define MC_PHYSET_NUM       (4)
 #define SWIZZLE_MC_NUM      (9)

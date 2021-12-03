@@ -1,6 +1,0 @@
-AX25-AE350 BOARD
-M:	Rick Chen <rick@andestech.com>
-S:	Maintained
-F:	board/renesas/rzf-dev/
-F:	include/configs/rzf-dev.h
-F:	configs/rzf-dev_spl_defconfig

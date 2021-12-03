@@ -1,7 +1,6 @@
-/* SPDX-License-Identifier: GPL-2.0+ */
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (C) 2017 Andes Technology Corporation
- * Rick Chen, Andes Technology Corporation <rick@andestech.com>
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
 #ifndef __CONFIG_H
@@ -25,6 +24,14 @@
 #ifdef CONFIG_SPL_MMC_SUPPORT
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME		"u-boot.itb"
 #endif
+#endif
+
+#ifndef CONFIG_DEBUG_RZF_FPGA
+#define CONFIG_SYS_TEXT_BASE            0x50000000
+#define CONFIG_SPL_OPENSBI_LOAD_ADDR    0x44000000
+#else
+#define CONFIG_SYS_TEXT_BASE            0x20160000
+#define CONFIG_SPL_OPENSBI_LOAD_ADDR    0x20100000
 #endif
 
 /*

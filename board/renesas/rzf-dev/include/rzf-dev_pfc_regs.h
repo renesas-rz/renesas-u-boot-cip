@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
-#ifndef __PFC_REGS_H__
-#define __PFC_REGS_H__
+#ifndef __RZF_DEV_PFC_REGS_H__
+#define __RZF_DEV_PFC_REGS_H__
 
 #define	PFC_BASE					(0x11030000)			/* PFC base address */
 
@@ -713,5 +712,4 @@ typedef struct {
 	PFC_REG_UINT64	ien;
 } PFC_REGS;
 
-
-#endif	/* __PFC_REGS_H__ */
+#endif	/* __RZF_DEV_PFC_REGS_H__ */

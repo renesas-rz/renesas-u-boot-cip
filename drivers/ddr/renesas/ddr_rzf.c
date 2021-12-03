@@ -1,10 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
  */
+
 #include <common.h>
-#include "include/rzf_def.h"
+#include "include/rzf-dev_def.h"
 #include "include/ddr_internal.h"
 
 #define	SYS_LSI_DEVID	(0x11020A04)

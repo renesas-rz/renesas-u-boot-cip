@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
-#ifndef __CPG_REGS_H__
-#define __CPG_REGS_H__
+#ifndef __RZF_DEV_CPG_REGS_H__
+#define __RZF_DEV_CPG_REGS_H__
 
 #define	CPG_BASE					(0x11010000)		/* CPG base address */
 
@@ -706,4 +705,4 @@
 #define BIT30_ON									(1 << 30)
 #define BIT31_ON									(1 << 31)
 
-#endif	/* __CPG_REGS_H__ */
+#endif	/* __RZF_DEV_CPG_REGS_H__ */

@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
-#ifndef __RZF_DEF_H__
-#define __RZF_DEF_H__
+#ifndef __RZF_DEV_DEF_H__
+#define __RZF_DEV_DEF_H__
 
 #define RZF_BOOT_ROM_BASE         (0x00000000)
 #define RZF_MSRAM_BASE            (0x00010000)
@@ -61,4 +60,4 @@
 #define PARAMS_BASE                 (RZF_SRAM_BASE + 0x0001F000)
 #define PARAMS_SIZE                 (0x1000)
 
-#endif /* __RZF_DEF_H__ */
+#endif /* __RZF_DEV_DEF_H__ */

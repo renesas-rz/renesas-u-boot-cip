@@ -1,16 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
 // include
 #include <common.h>
-#include "include/rzf_def.h"
-#include <linux/delay.h>
-
+#include "include/rzf-dev_def.h"
+#include "include/rzf-dev_cpg.h"
 #include "include/ddr_internal.h"
-#include "include/cpg.h"
+#include <linux/delay.h>
 
 
 #define	CEIL(a, div)	(((a) + ((div) - 1)) / (div))

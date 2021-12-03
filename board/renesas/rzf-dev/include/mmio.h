@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2013-2014, ARM Limited and Contributors. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
-#ifndef MMIO_H
-#define MMIO_H
+#ifndef _MMIO_H
+#define _MMIO_H
 
 #include <stdint.h>
 
@@ -73,4 +72,4 @@ static inline void mmio_clrsetbits_32(uintptr_t addr,
 	mmio_write_32(addr, (mmio_read_32(addr) & ~clear) | set);
 }
 
-#endif /* MMIO_H */
+#endif /* _MMIO_H */

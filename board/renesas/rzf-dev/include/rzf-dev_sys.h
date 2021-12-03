@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
-#ifndef __SYS_H__
-#define __SYS_H__
+#ifndef __RZF_DEV_SYS_H__
+#define __RZF_DEV_SYS_H__
 
 #define MASK_BOOTM_DEVICE		(0x0F)
 #define MASK_BOOTM_SECURE		(0x10)
@@ -17,4 +16,4 @@
 #define BOOT_MODE_SPI_3_3       (4)
 #define BOOT_MODE_SCIF          (5)
 
-#endif	/* __SYS_H__ */
+#endif	/* __RZF_DEV_SYS_H__ */

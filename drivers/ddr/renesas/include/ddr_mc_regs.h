@@ -1,13 +1,12 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
 #ifndef __DDR_MC_REGS_H__
 #define __DDR_MC_REGS_H__
 
-#include "rzf_def.h"
+#include "rzf-dev_def.h"
 
 #define DDR_MC_BASE			RZF_DDR_MEMC_BASE
 #define MC_INIT_NUM			(436)

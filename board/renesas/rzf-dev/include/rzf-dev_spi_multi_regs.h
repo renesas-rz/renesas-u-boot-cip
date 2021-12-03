@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
-#ifndef _SPI_MULTI_REG_H_
-#define _SPI_MULTI_REG_H_
+#ifndef _RZF_DEV_SPI_MULTI_REG_H_
+#define _RZF_DEV_SPI_MULTI_REG_H_
 
 #define	SPI_MULTI_BASE				(0x10060000)
 #define	SPI_MULTI_BUF				(0x10070000)
@@ -241,5 +240,5 @@
 #define DRCMR_CMD_QUAD_OUTPUT_FAST_READ_4B			(0x6C << 16)
 #define DRCMR_CMD_QUAD_INPUT_OUTPUT_FAST_READ_4B	(0xEC << 16)
 
-#endif	/* _SPI_MULTI_REG_H_ */
+#endif	/* _RZF_DEV_SPI_MULTI_REG_H_ */
 

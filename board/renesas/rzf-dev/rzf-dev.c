@@ -1,33 +1,19 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (C) 2017 Andes Technology Corporation
- * Rick Chen, Andes Technology Corporation <rick@andestech.com>
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
 #include <common.h>
-#include <flash.h>
-#include <image.h>
-#include <init.h>
-#include <net.h>
-#if defined(CONFIG_FTMAC100) && !defined(CONFIG_DM_ETH)
-#include <netdev.h>
-#endif
-#include <linux/io.h>
-#include <faraday/ftsmc020.h>
-#include <fdtdec.h>
-#include <asm/gpio.h>
-#include <dm.h>
 #include <spl.h>
+#include <init.h>
 #include <asm/sections.h>
 
-#include "include/rzf_def.h"
-#include "include/mmio.h"
-#include "include/pfc.h"
-#include "include/cpg.h"
-#include "include/ddr.h"
-#include "include/sys.h"
-#include "include/sys_regs.h"
-#include "include/spi_multi.h"
+#include "include/rzf-dev_def.h"
+#include "include/rzf-dev_pfc.h"
+#include "include/rzf-dev_cpg.h"
+#include "include/rzf-dev_ddr.h"
+#include "include/rzf-dev_sys.h"
+#include "include/rzf-dev_spi_multi.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -46,6 +32,15 @@ int dram_init(void)
 {
 	return fdtdec_setup_mem_size_base();
 }
+
+
+#ifdef CONFIG_SPL_LOAD_FIT
+int board_fit_config_name_match(const char *name)
+{
+	/* boot using first FIT config */
+	return 0;
+}
+#endif
 
 
 void *board_fdt_blob_setup(void)
@@ -71,25 +66,16 @@ extern phys_addr_t prior_stage_fdt_address;
 }
 
 
-#ifdef CONFIG_SPL_LOAD_FIT
-int board_fit_config_name_match(const char *name)
-{
-	/* boot using first FIT config */
-	return 0;
-}
-#endif
-
-
 #ifdef CONFIG_SPL
 u32 spl_boot_device(void)
 {
-    uint16_t boot_dev;
 
 #ifdef CONFIG_DEBUG_RZF_FPGA
-	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
+    return BOOT_DEVICE_NOR;
 #else
-    boot_dev = BOOT_MODE_SPI_1_8;
-#endif
+    uint16_t boot_dev;
+    
+	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
     switch (boot_dev)
     {
     case BOOT_MODE_SPI_1_8:
@@ -105,6 +91,7 @@ u32 spl_boot_device(void)
     default:
         return BOOT_DEVICE_NONE;
     }
+#endif
 }
 #endif
 

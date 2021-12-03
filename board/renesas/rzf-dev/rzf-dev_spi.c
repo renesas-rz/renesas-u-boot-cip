@@ -1,12 +1,12 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
+
 #include <common.h>
-#include "include/rzf_def.h"
-#include "include/spi_multi.h"
-#include "include/spi_multi_regs.h"
+#include "include/rzf-dev_def.h"
+#include "include/rzf-dev_spi_multi.h"
+#include "include/rzf-dev_spi_multi_regs.h"
 #include "include/mmio.h"
 #include <linux/delay.h>
 

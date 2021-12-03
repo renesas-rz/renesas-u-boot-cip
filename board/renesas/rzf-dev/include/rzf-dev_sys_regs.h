@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
  */
 
-#ifndef __SYS_REGS_H__
-#define __SYS_REGS_H__
+#ifndef __RZF_DEV_SYS_REGS_H__
+#define __RZF_DEV_SYS_REGS_H__
 
 #define	SYS_BASE							(0x11020000)
 
@@ -852,4 +851,4 @@
 #define LP_GPU_CTL_QDENY_ACE_SLV			(1 << 27)
 #define LP_GPU_CTL_QDENY_ACE_MST			(1 << 28)
 
-#endif	/* __SYS_REGS_H__ */
+#endif	/* __RZF_DEV_SYS_REGS_H__ */
