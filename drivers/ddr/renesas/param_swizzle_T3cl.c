@@ -7,35 +7,35 @@
 #include "include/ddr_internal.h"
 
 const uint32_t mc_odt_pins_tbl[4] = {
-	2,
-	1,
-	2,
-	1
+	0x00000002,
+	0x00000001,
+	0x00000002,
+	0x00000001
 };
 
 const uint32_t mc_mr1_tbl[2] = {
-	0x0266,
-	0x0206
+	0x00000266,
+	0x00000206
 };
 
 const uint32_t mc_mr2_tbl[2] = {
-	0x0600,
-	0x0200
+	0x00000600,
+	0x00000200
 };
 
 const uint32_t mc_mr5_tbl[2] = {
-	0x0000,
-	0x0000
+	0x00000000,
+	0x00000000
 };
 
 const uint32_t mc_mr6_tbl[2] = {
-	0x0000,
-	0x0000
+	0x00000000,
+	0x00000000
 };
 
 const uint32_t mc_phy_settings_tbl[MC_PHYSET_NUM][2] = {
-	{DDRMC_R040,	0x4F7F06E8},
-	{DDRMC_R041,	0x00002822},
+	{DDRMC_R040,	0x4F7F01E8},
+	{DDRMC_R041,	0x00007822},
 	{DDRMC_R042,	0x1E1E3C22},
 	{DDRMC_R043,	0x00000000}
 };

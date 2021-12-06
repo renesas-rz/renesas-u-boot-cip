@@ -45,5 +45,7 @@ static inline void rmw_phy_reg(uint32_t offset, uint32_t mask, uint32_t val)
 }
 
 void ddr_ctrl_reten_en_n(uint8_t val);
+char *ddr_get_version(void);
+
 
 #endif	/* __DDR_INTERNAL_H__ */

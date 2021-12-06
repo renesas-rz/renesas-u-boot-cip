@@ -8,8 +8,11 @@
 #include "include/rzf-dev_def.h"
 #include "include/rzf-dev_cpg.h"
 #include "include/ddr_internal.h"
+#ifndef CONFIG_DEBUG_RZF_FPGA
 #include <linux/delay.h>
-
+#else
+#define udelay(usec)    
+#endif
 
 #define	CEIL(a, div)	(((a) + ((div) - 1)) / (div))
 #define	_MIN(a, b)		((a) < (b) ? (a) : (b))
@@ -53,6 +56,7 @@ void ddr_setup(void)
 	uint32_t	tmp;
 	int i;
 
+	//INFO("BL2: setup DDR (Rev. %s)\n", ddr_get_version());
 	// Step2 - Step11
 	cpg_active_ddr(disable_phy_clk);
 
