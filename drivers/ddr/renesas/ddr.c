@@ -558,26 +558,21 @@ static void exec_trainingVREF(uint32_t sl_lanes, uint32_t byte_lanes)
 		// Step5.3
 		for (i = 0; i < byte_lanes; i++) {
 			if (((read_phy_reg(DDRPHY_R59) >> (14 + i)) & 0x1) == 0x0) {
-				//INFO("BL2: PHY side VREF training passed on lane %0d, current_vref = %0d\n", i, current_vref);
 				write_phy_reg(DDRPHY_R29, i * 6);
 				window_0 = read_phy_reg(DDRPHY_R69) & 0x3F;
 				window_1 = (read_phy_reg(DDRPHY_R69) >> 8) & 0x3F;
 				window_diff = (window_0 > window_1) ?
 								window_0 - window_1 : window_1 - window_0;
-				//INFO("BL2: window_0 = %0d, window_1 = %0d, window_diff = %0d\n", window_0, window_1, window_diff);
 				if (window_diff < best_window_diff_so_far[i]) {
 					best_window_diff_so_far[i] = window_diff;
 					all_best_vref_matches[i][0] = current_vref;
 					num_best_vref_matches[i] = 1;
-					//INFO("BL2: CURRENT BEST VREF PHY side :%d\n", current_vref);
 				} else if ((window_diff == best_window_diff_so_far[i]) &&
 						(num_best_vref_matches[i] < MAX_BEST_VREF_SAVED)) {
 					all_best_vref_matches[i][num_best_vref_matches[i]] = current_vref;
 					num_best_vref_matches[i] += 1;
 				}
 			} else {
-				//INFO("BL2: PHY side VREF training failed lane %d, current_vref = %d\n",
-				//	i, current_vref);
 			}
 		}
 		// Step5.4
@@ -666,25 +661,21 @@ static void exec_trainingVREF(uint32_t sl_lanes, uint32_t byte_lanes)
 		tmp = (read_phy_reg(DDRPHY_R64) >> 20) & sl_lanes;
 		for (i = 0; i < byte_lanes; i++) {
 			if ((tmp ^ sl_lanes) == sl_lanes) {
-				//INFO("BL2: VREF training passed during VrefDQ training DRAM side, current_vref = %d\n", current_vref);
 				write_phy_reg(DDRPHY_R29, i * 6);
 				window_0 = read_phy_reg(DDRPHY_R69) & 0x3F;
 				window_1 = (read_phy_reg(DDRPHY_R69) >> 8) & 0x3F;
 				window_diff = (window_0 > window_1) ?
 								window_0 - window_1 : window_1 - window_0;
-				//INFO("BL2: window_0 = %0d, window_1 = %0d, window_diff = %0d\n", window_0, window_1, window_diff);
 				if (window_diff < best_window_diff_so_far[i]) {
 					best_window_diff_so_far[i] = window_diff;
 					all_best_vref_matches[i][0] = current_vref;
 					num_best_vref_matches[i] = 1;
-					//INFO("BL2: CURRENT BEST VREF DRAM side :%d\n", current_vref);
 				} else if ((window_diff == best_window_diff_so_far[i]) &&
 						(num_best_vref_matches[i] < MAX_BEST_VREF_SAVED)) {
 					all_best_vref_matches[i][num_best_vref_matches[i]] = current_vref;
 					num_best_vref_matches[i] += 1;
 				}
 			} else {
-				//INFO("BL2: VREF training failed during VrefDQ training DRAM side, current_vref = %d\n", current_vref);
 			}
 		}
 		// Step16.4
