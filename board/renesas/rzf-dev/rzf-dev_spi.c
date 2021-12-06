@@ -4,11 +4,11 @@
  */
 
 #include <common.h>
-#include "include/rzf-dev_def.h"
-#include "include/rzf-dev_spi_multi.h"
-#include "include/rzf-dev_spi_multi_regs.h"
-#include "include/mmio.h"
-#include <linux/delay.h>
+#include <renesas/rzf-dev/rzf-dev_def.h>
+#include "rzf-dev_spi_multi.h"
+#include <renesas/rzf-dev/rzf-dev_spi_multi_regs.h>
+#include <renesas/rzf-dev/mmio.h>
+#include <asm/io.h>
 
 static uint32_t spi_multi_cmd_tbl[2][3] = {
 	{
@@ -46,7 +46,6 @@ static SPI_MULTI_ADDR_WIDE_PTN spi_multi_addr_ptn[2] = {
 
 static void spi_multi_timing_set(void)
 {
-
 	/* Timing adjustment register setting */
 	mmio_write_32(SPIM_PHYADJ2, 0xA5390000);
 	mmio_write_32(SPIM_PHYADJ1, 0x80000000);
@@ -61,6 +60,8 @@ static void spi_multi_timing_set(void)
 	/* Timing adjustment register setting */
 	mmio_write_32(SPIM_PHYADJ2, 0x00000030);
 	mmio_write_32(SPIM_PHYADJ1, 0x80000032);
+    
+    wmb();
 }
 
 int spi_multi_setup(uint32_t addr_width, uint32_t dq_width, uint32_t dummy_cycle)

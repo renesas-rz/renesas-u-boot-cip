@@ -5,9 +5,8 @@
 
 // include
 #include <common.h>
-#include "include/rzf-dev_def.h"
-#include "include/rzf-dev_cpg.h"
-#include "include/ddr_internal.h"
+#include <renesas/rzf-dev/rzf-dev_def.h>
+#include "ddr_internal.h"
 #ifndef CONFIG_DEBUG_RZF_FPGA
 #include <linux/delay.h>
 #else
@@ -47,6 +46,9 @@ static void exec_trainingSL(uint32_t sl_lanes);
 static void program_phy2(void);
 static void program_mc2(void);
 
+extern void cpg_active_ddr(void (*disable_phy)(void));
+extern void cpg_reset_ddr_mc(void);
+
 // main
 void ddr_setup(void)
 {
@@ -56,7 +58,7 @@ void ddr_setup(void)
 	uint32_t	tmp;
 	int i;
 
-	//INFO("BL2: setup DDR (Rev. %s)\n", ddr_get_version());
+
 	// Step2 - Step11
 	cpg_active_ddr(disable_phy_clk);
 

@@ -4,7 +4,7 @@
  */
 
 #include <common.h>
-#include "include/ddr_mc_regs.h"
+#include <renesas/rzf-dev/ddr_mc_regs.h>
 
 const uint32_t mc_init_tbl[MC_INIT_NUM][2] = {
 	{	DENALI_CTL_00,	0x00000A00	},

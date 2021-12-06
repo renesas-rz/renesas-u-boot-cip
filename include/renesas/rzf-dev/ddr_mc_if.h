@@ -6,7 +6,7 @@
 #ifndef __DDR_MC_IF_H__
 #define __DDR_MC_IF_H__
 
-#include "ddr_mc_regs.h"
+#include <renesas/rzf-dev/ddr_mc_regs.h>
 
 #define	AN_VERSION		"2.09"
 #define	AN_VERSION_0		"1.12"

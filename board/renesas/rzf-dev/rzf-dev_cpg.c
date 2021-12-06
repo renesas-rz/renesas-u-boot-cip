@@ -4,15 +4,16 @@
  */
 
 #include <common.h>
-#include "include/rzf-dev_def.h"
-#include "include/rzf-dev_cpg.h"
-#include "include/rzf-dev_cpg_regs.h"
-#include "include/mmio.h"
+#include <renesas/rzf-dev/rzf-dev_def.h>
+#include <renesas/rzf-dev/rzf-dev_cpg_regs.h>
+#include <renesas/rzf-dev/mmio.h>
 #ifndef CONFIG_DEBUG_RZF_FPGA
 #include <linux/delay.h>
 #else
 #define udelay(usec)    
 #endif
+
+#define CPG_RST_DDR_OPT_VALUE		(0x00000000)
 
 #define	CPG_OFF			(0)
 #define	CPG_ON			(1)
@@ -99,7 +100,7 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 	{		/* WDT */
 		(uintptr_t)CPG_CLKON_WDT,
 		(uintptr_t)CPG_CLKMON_WDT,
-		0x003C0000,
+		0x00300000,
 		CPG_T_CLK
 	},
 #ifndef CONFIG_DEBUG_RZF_FPGA
@@ -237,7 +238,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 	{		/* WDT */
 		(uintptr_t)CPG_RST_WDT,
 		(uintptr_t)CPG_RSTMON_WDT,
-		0x00060000,
+		0x00040000,
 		CPG_T_RST
 	},
 #ifndef CONFIG_DEBUG_RZF_FPGA
@@ -566,7 +567,7 @@ static void cpg_reset_setup(void)
 void cpg_active_ddr(void (*disable_phy)(void))
 {
 	/* Assert the reset of DDRTOP */
-	mmio_write_32(CPG_RST_DDR, 0x005F0000);
+	mmio_write_32(CPG_RST_DDR, 0x005F0000 | (CPG_RST_DDR_OPT_VALUE << 16));
 	mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
 #ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005F) != 0x0000005F)
@@ -599,7 +600,7 @@ void cpg_active_ddr(void (*disable_phy)(void))
 	disable_phy();
 
 	/* De-assert axiY_ARESETn, regARESETn, reset_n */
-	mmio_write_32(CPG_RST_DDR, 0x005D005D);
+	mmio_write_32(CPG_RST_DDR, 0x005D005D | (CPG_RST_DDR_OPT_VALUE << 16) | CPG_RST_DDR_OPT_VALUE);
 #ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005D) != 0x00000000)
 		;
@@ -611,7 +612,7 @@ void cpg_active_ddr(void (*disable_phy)(void))
 void cpg_reset_ddr_mc(void)
 {
 	/* Assert rst_n, axiY_ARESETn, regARESETn */
-	mmio_write_32(CPG_RST_DDR, 0x005C0000);
+	mmio_write_32(CPG_RST_DDR, 0x005C0000 | (CPG_RST_DDR_OPT_VALUE << 16));
 	mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
 #ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005C) != 0x0000005C)
@@ -626,7 +627,7 @@ void cpg_reset_ddr_mc(void)
 	udelay(1);
 
 	/* De-assert axiY_ARESETn, regARESETn */
-	mmio_write_32(CPG_RST_DDR, 0x005C005C);
+	mmio_write_32(CPG_RST_DDR, 0x005C005C | (CPG_RST_DDR_OPT_VALUE << 16) | CPG_RST_DDR_OPT_VALUE);
 #ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005C) != 0x00000000)
 		;

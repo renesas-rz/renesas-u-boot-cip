@@ -6,7 +6,7 @@
 #ifndef __DDR_PHY_REGS_H__
 #define __DDR_PHY_REGS_H__
 
-#include "rzf-dev_def.h"
+#include <renesas/rzf-dev/rzf-dev_def.h>
 
 #define DDR_PHY_BASE		RZF_DDR_PHY_BASE
 

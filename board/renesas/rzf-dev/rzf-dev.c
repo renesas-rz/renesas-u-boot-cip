@@ -8,12 +8,15 @@
 #include <init.h>
 #include <asm/sections.h>
 
-#include "include/rzf-dev_def.h"
-#include "include/rzf-dev_pfc.h"
-#include "include/rzf-dev_cpg.h"
-#include "include/rzf-dev_ddr.h"
-#include "include/rzf-dev_sys.h"
-#include "include/rzf-dev_spi_multi.h"
+#include <renesas/rzf-dev/rzf-dev_def.h>
+#include <renesas/rzf-dev/rzf-dev_sys.h>
+#include "rzf-dev_spi_multi.h"
+
+extern void cpg_setup(void);
+extern void pfc_setup(void);
+extern void ddr_setup(void);
+extern int spi_multi_setup(uint32_t addr_width, uint32_t dq_width, uint32_t dummy_cycle);
+
 
 DECLARE_GLOBAL_DATA_PTR;
 

@@ -6,9 +6,9 @@
 #ifndef __DDR_INTERNAL_H__
 #define __DDR_INTERNAL_H__
 
-#include "ddr_mc_if.h"
-#include "ddr_phy_regs.h"
-#include "mmio.h"
+#include <renesas/rzf-dev/ddr_mc_if.h>
+#include <renesas/rzf-dev/ddr_phy_regs.h>
+#include <renesas/rzf-dev/mmio.h>
 
 #define MC_PHYSET_NUM       (4)
 #define SWIZZLE_MC_NUM      (9)

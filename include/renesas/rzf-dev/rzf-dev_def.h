@@ -49,10 +49,6 @@
 #define RZF_SPIROM_FIP_BASE       (RZF_SPIROM_BASE + 0x0001D200)
 #define RZF_SPIROM_FIP_SIZE       (0x30000000 - RZF_SPIROM_FIP_BASE)
 
-#define RZF_SYC_INCK_HZ           (24000000)
-#define RZF_UART_INCK_HZ          (100000000)
-#define RZF_UART_BARDRATE         (115200)
-
 /* Boot Info base address */
 #define RZF_BOOTINFO_BASE         (RZF_SRAM_BASE)
 

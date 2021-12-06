@@ -4,9 +4,9 @@
  */
 
 #include <common.h>
-#include "include/rzf-dev_def.h"
-#include "include/ddr_internal.h"
-#include "include/rzf-dev_sys_regs.h"
+#include <renesas/rzf-dev/rzf-dev_def.h>
+#include <renesas/rzf-dev/rzf-dev_sys_regs.h>
+#include "ddr_internal.h"
 
 void ddr_ctrl_reten_en_n(uint8_t val)
 {

@@ -4,11 +4,9 @@
  */
 
 #include <common.h>
-#include "include/rzf-dev_def.h"
-#include "include/rzf-dev_pfc.h"
-#include "include/rzf-dev_pfc_regs.h"
-#include "include/mmio.h"
-
+#include <renesas/rzf-dev/rzf-dev_def.h>
+#include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
+#include <renesas/rzf-dev/mmio.h>
 
 static PFC_REGS pfc_scif_type1_reg_tbl[PFC_SCIF_TBL_NUM] = {
 	{
@@ -56,8 +54,8 @@ static PFC_REGS  pfc_qspi_reg_tbl[PFC_QSPI_TBL_NUM] = {
 static PFC_REGS  pfc_sd_reg_tbl[PFC_SD_TBL_NUM] = {
 	/* SD0_CLK */
 	{
-		{ PFC_ON,  (uintptr_t)PFC_PMC22,  0x0003 },					/* PMC */
-		{ PFC_ON,  (uintptr_t)PFC_PFC22,  0x00000003 },				/* PFC */
+		{ PFC_ON,  (uintptr_t)PFC_PMC10,  0x0F },					/* PMC */
+		{ PFC_ON,  (uintptr_t)PFC_PFC10,  0x00001111 },				/* PFC */
 		{ PFC_ON,  (uintptr_t)PFC_IOLH06, 0x0000000000020202 },		/* IOLH */
 		{ PFC_ON,  (uintptr_t)PFC_PUPD06, 0x0000000000000000 },		/* PUPD */
 		{ PFC_ON,  (uintptr_t)PFC_SR06,   0x0000000000010101 },		/* SR */
@@ -74,8 +72,8 @@ static PFC_REGS  pfc_sd_reg_tbl[PFC_SD_TBL_NUM] = {
 	},
 	/* SD1_CLK */
 	{
-		{ PFC_ON,  (uintptr_t)PFC_PMC23,  0x0003 },					/* PMC */
-		{ PFC_ON,  (uintptr_t)PFC_PFC23,  0x00000003 },				/* PFC */
+		{ PFC_OFF, (uintptr_t)NULL,       0 },						/* PMC */
+		{ PFC_OFF, (uintptr_t)NULL,       0 },						/* PFC */
 		{ PFC_ON,  (uintptr_t)PFC_IOLH08, 0x0000000000000202 },		/* IOLH */
 		{ PFC_ON,  (uintptr_t)PFC_PUPD08, 0x0000000000000000 },		/* PUPD */
 		{ PFC_ON,  (uintptr_t)PFC_SR08,   0x0000000000000101 },		/* SR */
