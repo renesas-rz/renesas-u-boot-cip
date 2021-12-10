@@ -5,3 +5,7 @@
 
 obj-y	:= cpu.o
 obj-y	+= cache.o
+
+ifdef CONFIG_SPL_BUILD
+obj-$(CONFIG_TARGET_RZF_DEV)		+= $(SOC)/
+endif

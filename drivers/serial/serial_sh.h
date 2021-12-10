@@ -92,7 +92,7 @@ struct uart_port {
 # define SCIF_ORER 0x0001  /* overrun error bit */
 #elif defined(CONFIG_RCAR_GEN2) || defined(CONFIG_RCAR_GEN3) || \
       defined(CONFIG_R7S72100) || defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || \
-      defined(CONFIG_R9A07G054L)
+      defined(CONFIG_R9A07G054L) || defined(CONFIG_TARGET_RZF_DEV)
 # if defined(CONFIG_SCIF_A)
 #  define SCIF_ORER	0x0200
 # else

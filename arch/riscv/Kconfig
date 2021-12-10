@@ -23,6 +23,9 @@ config TARGET_SIFIVE_FU540
 config TARGET_SIPEED_MAIX
 	bool "Support Sipeed Maix Board"
 
+config TARGET_RZF_DEV
+	bool "Support Renesas RZ/Five"
+
 endchoice
 
 config SYS_ICACHE_OFF
@@ -57,9 +60,11 @@ source "board/emulation/qemu-riscv/Kconfig"
 source "board/microchip/mpfs_icicle/Kconfig"
 source "board/sifive/fu540/Kconfig"
 source "board/sipeed/maix/Kconfig"
+source "board/renesas/rzf-dev/Kconfig"
 
 # platform-specific options below
 source "arch/riscv/cpu/ax25/Kconfig"
+source "arch/riscv/cpu/ax25/rzmpu/Kconfig"
 source "arch/riscv/cpu/fu540/Kconfig"
 source "arch/riscv/cpu/generic/Kconfig"
 
