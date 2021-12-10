@@ -90,8 +90,10 @@ int spl_board_init_f(void)
 {
 	uint16_t boot_dev;
 
+#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* initialize DDR */
 	ddr_setup();
+#endif
 
     /* initisalize SPI Multi when SPI BOOT */
 	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
