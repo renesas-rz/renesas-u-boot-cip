@@ -217,4 +217,201 @@ void sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
 		  (unsigned long)hart_mask, start, size, asid, 0, 0);
 }
 
+#define SBI_EXT_VENDOR 0x09000000
+#define SBI_EXT_ANDES_GET_MCACHE_CTL_STATUS   0
+#define SBI_EXT_ANDES_GET_MMISC_CTL_STATUS    1
+#define SBI_EXT_ANDES_SET_MCACHE_CTL          2
+#define SBI_EXT_ANDES_SET_MMISC_CTL           3
+#define SBI_EXT_ANDES_ICACHE_OP               4
+#define SBI_EXT_ANDES_DCACHE_OP               5
+#define SBI_EXT_ANDES_L1CACHE_I_PREFETCH      6
+#define SBI_EXT_ANDES_L1CACHE_D_PREFETCH      7
+#define SBI_EXT_ANDES_NON_BLOCKING_LOAD_STORE 8
+#define SBI_EXT_ANDES_WRITE_AROUND            9
+
+#define SBI_VENDOR_ENABLE 1
+#define SBI_VENDOR_DISABLE 0
+
+void sbi_vender_get_mcache_ctl_status(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_GET_MCACHE_CTL_STATUS,
+			0, 0, 0, 0, 0, 0);
+}
+
+void sbi_vender_get_mmisc_ctl_status(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_GET_MMISC_CTL_STATUS,
+			0, 0, 0, 0, 0, 0);
+}
+
+int sbi_vender_set_mcache_ctl(uint64_t status){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_SET_MCACHE_CTL,
+			status, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_set_mmisc_ctl(uint64_t status){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_SET_MMISC_CTL,
+			status, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_icache_en(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_ICACHE_OP,
+			SBI_VENDOR_ENABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_icache_dis(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_ICACHE_OP,
+			SBI_VENDOR_DISABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+
+int sbi_vender_dcache_en(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_DCACHE_OP,
+			SBI_VENDOR_ENABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_dcache_dis(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_DCACHE_OP,
+			SBI_VENDOR_DISABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_l1_i_pre_en(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_L1CACHE_I_PREFETCH,
+			SBI_VENDOR_ENABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_l1_i_pre_dis(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_L1CACHE_I_PREFETCH,
+			SBI_VENDOR_DISABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_l1_d_pre_en(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_L1CACHE_D_PREFETCH,
+			SBI_VENDOR_ENABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_l1_d_pre_dis(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_L1CACHE_D_PREFETCH,
+			SBI_VENDOR_DISABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_non_blo_en(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_NON_BLOCKING_LOAD_STORE,
+			SBI_VENDOR_ENABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_non_blo_dis(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_NON_BLOCKING_LOAD_STORE,
+			SBI_VENDOR_DISABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_wri_aro_en(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_WRITE_AROUND,
+			SBI_VENDOR_ENABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
+
+int sbi_vender_wri_aro_dis(void){
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_WRITE_AROUND,
+			SBI_VENDOR_DISABLE, 0, 0, 0, 0, 0);
+	if (!ret.error)
+		if (ret.value)
+			return ret.value;
+
+	return -ENOTSUPP;
+}
 #endif /* CONFIG_SBI_V01 */

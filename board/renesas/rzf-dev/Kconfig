@@ -1,0 +1,85 @@
+if TARGET_RZF_DEV
+
+config SYS_CPU
+	default "ax25"
+
+config SYS_BOARD
+	default "rzf-dev"
+
+config SYS_VENDOR
+	default "renesas"
+
+config SYS_SOC
+	default "rzmpu"
+
+config SYS_CONFIG_NAME
+	default "rzf-dev"
+
+config ENV_SIZE
+	default 0x2000 if ENV_IS_IN_SPI_FLASH
+
+config ENV_OFFSET
+	default 0x140000 if ENV_IS_IN_SPI_FLASH
+
+config SPL_TEXT_BASE
+	default 0x0001D000
+
+config SYS_TEXT_BASE
+	default 0x50000000
+
+config SPL_OPENSBI_LOAD_ADDR
+	default 0x44000000
+
+config BOARD_SPECIFIC_OPTIONS # dummy
+	def_bool y
+	select RISCV_NDS
+	select SUPPORT_SPL
+	imply SMP
+	imply SPL_RAM_SUPPORT
+	imply SPL_RAM_DEVICE
+
+
+choice
+	prompt "DDR type select"
+	default RZF_DDR_C_011_D4_01_1
+
+config RZF_DDR_C_010_D3_02_2
+	bool "param_mc_C-010_D3-02-2"
+
+config RZF_DDR_C_010_D4_01_1
+	bool "param_mc_C-010_D4-01-1"
+
+config RZF_DDR_C_010_D4_01_2
+	bool "param_mc_C-010_D4-01-2"
+
+config RZF_DDR_C_011_D4_01_1
+	bool "param_mc_C-011_D4-01-1"
+
+endchoice
+
+choice
+	prompt "DDR type select"
+	default RZF_DDR_SWIZZLE_T3CL
+
+config RZF_DDR_SWIZZLE_T1BC
+	bool "param_swizzle_T1bc"
+
+config RZF_DDR_SWIZZLE_T1C
+	bool "param_swizzle_T1c"
+
+config RZF_DDR_SWIZZLE_T2C
+	bool "param_swizzle_T2c"
+
+config RZF_DDR_SWIZZLE_T3CL
+	bool "param_swizzle_T3cl"
+
+endchoice
+
+config RZF_DDR_PLL4
+	int "DDR PLL clock"
+	default 1600
+
+config DEBUG_RZG2L_FPGA
+	bool "FPGA DEBUG option"
+
+endif

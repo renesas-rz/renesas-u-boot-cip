@@ -1,8 +1,6 @@
-if ARCH_RMOBILE
-
 config PINCTRL_PFC
 	bool "Renesas pin control drivers"
-	depends on DM && ARCH_RMOBILE
+	depends on DM
 	default n if CPU_RZA1
 	help
 	  Enable support for clock present on Renesas RCar SoCs.
@@ -157,4 +155,3 @@ config PINCTRL_PFC_RZG2L
 	  the GPIO definitions and pin control functions for each available
 	  multiplex function.
 
-endif
