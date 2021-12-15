@@ -26,14 +26,12 @@
 #endif
 #endif
 
-#if 0
 #ifndef CONFIG_DEBUG_RZF_FPGA
 #define CONFIG_SYS_TEXT_BASE            0x50000000
 #define CONFIG_SPL_OPENSBI_LOAD_ADDR    0x44000000
 #else
-#define CONFIG_SYS_TEXT_BASE            0x20050000
+#define CONFIG_SYS_TEXT_BASE            0x20130000
 #define CONFIG_SPL_OPENSBI_LOAD_ADDR    0x20100000
-#endif
 #endif
 
 /*

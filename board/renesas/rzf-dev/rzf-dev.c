@@ -9,9 +9,6 @@
 #include <image.h>
 #include <init.h>
 #include <net.h>
-#if defined(CONFIG_FTMAC100) && !defined(CONFIG_DM_ETH)
-#include <netdev.h>
-#endif
 #include <linux/io.h>
 #include <faraday/ftsmc020.h>
 #include <fdtdec.h>
@@ -107,66 +104,3 @@ int dram_init(void)
 {
 	return fdtdec_setup_mem_size_base();
 }
-
-int dram_init_banksize(void)
-{
-	return fdtdec_setup_memory_banksize();
-}
-
-ulong board_flash_get_legacy(ulong base, int banknum, flash_info_t *info)
-{
-	return 0;
-}
-
-#ifdef CONFIG_V5L2_CACHE
-static void v5l2_init(void)
-{
-	struct udevice *dev;
-
-	uclass_get_device(UCLASS_CACHE, 0, &dev);
-}
-#endif
-
-#ifdef CONFIG_SPL
-void board_boot_order(u32 *spl_boot_list)
-{
-	u8 i;
-	u32 boot_devices[] = {
-#ifdef CONFIG_SPL_RAM_SUPPORT
-		BOOT_DEVICE_RAM,
-#endif
-#ifdef CONFIG_SPL_MMC_SUPPORT
-		BOOT_DEVICE_MMC1,
-#endif
-	};
-
-	for (i = 0; i < ARRAY_SIZE(boot_devices); i++)
-		spl_boot_list[i] = boot_devices[i];
-}
-#endif
-
-#ifdef CONFIG_SPL_LOAD_FIT
-int board_fit_config_name_match(const char *name)
-{
-	/* boot using first FIT config */
-	return 0;
-}
-#endif
-
-void rzf_early_platform_setup(void);
-void rzf_platform_setup(void);
-
-int spl_board_init_f(void)
-{
-    // initialize pinconfig,clock,reset control
-    rzf_early_platform_setup();
-    
-    // initialize DDR, setup IO
-    rzf_platform_setup();
-    
-	return 0;
-}
-
-
-
-

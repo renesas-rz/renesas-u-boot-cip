@@ -276,10 +276,6 @@ config CMD_SBI
 	help
 	  Display information about the SBI implementation.
 
-config DEBUG_OPENSBI
-	bool "debug OpenSBI"
-	depends on CMD_SBI
-
 endmenu
 
 menu "Boot commands"
