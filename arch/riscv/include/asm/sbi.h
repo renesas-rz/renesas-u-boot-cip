@@ -119,4 +119,18 @@ long sbi_get_spec_version(void);
 int sbi_get_impl_id(void);
 int sbi_probe_extension(int ext);
 
+#ifdef CONFIG_OPENSBI_DEBUG
+
+struct sbiret sbi_vender_get_mcache_ctl_status(void);
+struct sbiret sbi_vender_get_mmisc_ctl_status(void);
+int sbi_vender_set_mcache_ctl(uint64_t);
+int sbi_vender_set_mmisc_ctl(uint64_t);
+int sbi_vender_icache(uint64_t);
+int sbi_vender_dcache(uint64_t);
+int sbi_vender_l1_i_pre(uint64_t);
+int sbi_vender_l1_d_pre(uint64_t);
+int sbi_vender_non_blo(uint64_t);
+int sbi_vender_wri_aro(uint64_t);
+
+#endif
 #endif

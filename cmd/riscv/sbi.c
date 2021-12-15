@@ -101,252 +101,190 @@ enum sbi_ext_renesas_fid {
 #define SBI_EN 1
 #define SBI_DI 0
 
+
+
 int do_sbi_get_mcache_ctl_status(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
 	struct sbiret ret;
 
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_GET_MCACHE_CTL_STATUS,
-			0, 0, 0, 0, 0, 0);
-	printf("  %ld\n", ret.value);
+	ret = sbi_vender_get_mcache_ctl_status();
+	printf("sbi_get_mcache_ctl_status/n");
+	printf("value :  %ld\n", ret.value);
+	printf("error :  %ld\n", ret.error);
+
 	return 0;
 }
 
-int sbi_get_mmisc_ctl_status(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_get_mmisc_ctl_status(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
 	struct sbiret ret;
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_GET_MMISC_CTL_STATUS,
-			0, 0, 0, 0, 0, 0);
-	printf("  %ld\n", ret.value);
+
+	ret = sbi_vender_get_mmisc_ctl_status();
+	printf("sbi_get_mmisc_ctl_status/n");
+	printf("value :  %ld\n", ret.value);
+	printf("error :  %ld\n", ret.error);
+
 	return 0;
 }
 
-int sbi_set_mcache_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_set_mcache_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
-	struct sbiret ret;
+	unsigned int value;
+	int ret;
+
+	if (argc < 2)
+		return CMD_RET_USAGE;
+
+	value = atoi(argv[1]);
+	sbi_vender_set_mcache_ctl(value);
+	printf("sbi_get_mmisc_ctl_status/n");
+	printf("error :  %ld\n", ret);
 	
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_SET_MCACHE_CTL,
-			0, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
-
-	return -ENOTSUPP;
+	return 0;
 }
 
-int sbi_set_mmisc_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_set_mmisc_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
-	struct sbiret ret;
+	unsigned int value;
+	int ret;
 
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_SET_MMISC_CTL,
-			0, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
+	if (argc < 2)
+		return CMD_RET_USAGE;
 
-	return -ENOTSUPP;
+	value = atoi(argv[1]);
+	sbi_vender_set_mmisc_ctl(value);
+	printf("sbi_get_mmisc_ctl_status/n");
+	printf("error :  %ld\n", ret);
+
+	return 0;
 }
 
-int sbi_icache_op_en(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_icache_op(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
-	struct sbiret ret;
-	
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_ICACHE_OP,
-			SBI_EN, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
+	int ret;
 
-	return -ENOTSUPP;
+	if (argc < 2)
+		return CMD_RET_USAGE;
+
+	value = atoi(argv[1]);
+	ret = sbi_vender_icache(value);
+	printf("sbi_get_mmisc_ctl_status/n");
+	printf("error :  %ld\n", ret);
+
+	return 0;
 }
 
-int sbi_icache_op_dis(struct cmd_tbl *cmdtp, int flag, int argc,
+
+int do_sbi_dcache_op(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
-	struct sbiret ret;
-	
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_ICACHE_OP,
-			SBI_DI, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
+	int ret;
+
+	if (argc < 2)
+		return CMD_RET_USAGE;
+
+	ret = sbi_vender_dcache(value);
+	printf("sbi_get_mmisc_ctl_status/n");
+	printf("error :  %ld\n", ret);
 
 	return -ENOTSUPP;
 }
 
-int sbi_dcache_op_en(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_l1cache_i_prefetch(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
-	struct sbiret ret;
+	int ret;
 
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_DCACHE_OP,
-			SBI_EN, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
+	if (argc < 2)
+		return CMD_RET_USAGE;
+
+
+	ret = sbi_vender_l1_i_pre(value);
+	printf("sbi_get_mmisc_ctl_status/n");
+	printf("error :  %ld\n", ret);
 
 	return -ENOTSUPP;
 }
 
-int sbi_dcache_op_dis(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_l1cache_d_prefetch_en(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
-	struct sbiret ret;
+	int ret;
 
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_DCACHE_OP,
-			SBI_DI, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
+	if (argc < 2)
+		return CMD_RET_USAGE;
+
+	ret = sbi_vender_l1_d_pre(value);
+	printf("sbi_get_mmisc_ctl_status/n");
+	printf("error :  %ld\n", ret);
 
 	return -ENOTSUPP;
 }
 
-int sbi_l1cache_i_prefetch_en(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_non_blocking_load_store_en(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
-	struct sbiret ret;
+	int ret;
 
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_L1CACHE_I_PREFETCH,
-			SBI_EN, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
+	if (argc < 2)
+		return CMD_RET_USAGE;
+
+	ret = sbi_vender_non_blo(value);
+	printf("sbi_get_mmisc_ctl_status/n");
+	printf("error :  %ld\n", ret);
 
 	return -ENOTSUPP;
 }
 
-int sbi_l1cache_i_prefetch_dis(struct cmd_tbl *cmdtp, int flag, int argc,
+
+int do_sbi_write_around_en(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
-	struct sbiret ret;
+	int ret;
 
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_L1CACHE_I_PREFETCH,
-			SBI_DI, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
+	if (argc < 2)
+		return CMD_RET_USAGE;
 
-	return -ENOTSUPP;
-}
-
-int sbi_l1cache_d_prefetch_en(struct cmd_tbl *cmdtp, int flag, int argc,
-			 char *const argv[])
-{
-	struct sbiret ret;
-
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_L1CACHE_D_PREFETCH,
-			SBI_EN, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
+	ret = sbi_vender_wri_aro(value);
+	printf("sbi_get_mmisc_ctl_status/n");
+	printf("error :  %ld\n", ret);
 
 	return -ENOTSUPP;
 }
 
-int sbi_l1cache_d_prefetch_dis(struct cmd_tbl *cmdtp, int flag, int argc,
-			 char *const argv[])
-{
-	struct sbiret ret;
 
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_L1CACHE_D_PREFETCH,
-			SBI_DI, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
+U_BOOT_CMD_COMPLETE(sbi_get_mcache_ctl_status, 1, 0, do_sbi_get_mcache_ctl_status,"OpenSBI DEBUG:GET_MCACHE_CTL_STATUS",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_get_mmisc_ctl_status, 1, 0, do_sbi_get_mmisc_ctl_status,"OpenSBI DEBUG:GET_MMISC_CTL_STATUS",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_set_mcache_ctl, 2, 0, do_sbi_set_mcache_ctl,"OpenSBI DEBUG:SET_MCACHE_CTL",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_set_mmisc_ctl, 2, 0, do_sbi_set_mmisc_ctl,"OpenSBI DEBUG:SET_MMISC_CTL",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_icache_op_en, 2, 0, do_sbi_icache_op,"OpenSBI DEBUG:ICACHE_OP_EN",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_icache_op_dis, 2, 0, do_sbi_dcache_op,"OpenSBI DEBUG:ICACHE_OP_DIS",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_l1cache_i_prefetch_en, 2, 0,do_ sbi_l1cache_i_prefetch,"OpenSBI DEBUG:L1CACHE_I_PREFETCH_EN",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_l1cache_d_prefetch_en, 2, 0, do_sbi_l1cache_d_prefetch,"OpenSBI DEBUG:L1CACHE_D_PREFETCH_EN",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_non_blocking_load_store_en, 2, 0, do_sbi_non_blocking_load_store,"OpenSBI DEBUG:NON_BLOCKING_LOAD_STORE_EN",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_write_around_en, 2, 0, do_sbi_write_around,"OpenSBI DEBUG:WRITE_AROUND_EN",NULL, NULL);
 
-	return -ENOTSUPP;
-}
-
-int sbi_non_blocking_load_store_en(struct cmd_tbl *cmdtp, int flag, int argc,
-			 char *const argv[])
-{
-	struct sbiret ret;
-
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_NON_BLOCKING_LOAD_STORE,
-			SBI_EN, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
-
-	return -ENOTSUPP;
-}
-
-int sbi_non_blocking_load_store_dis(struct cmd_tbl *cmdtp, int flag, int argc,
-			 char *const argv[])
-{
-	struct sbiret ret;
-
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_NON_BLOCKING_LOAD_STORE,
-			SBI_DI, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
-
-	return -ENOTSUPP;
-}
-
-int sbi_write_around_en(struct cmd_tbl *cmdtp, int flag, int argc,
-			 char *const argv[])
-{
-	struct sbiret ret;
-
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_WRITE_AROUND,
-			SBI_EN, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
-
-	return -ENOTSUPP;
-}
-
-int sbi_write_around_dis(struct cmd_tbl *cmdtp, int flag, int argc,
-			 char *const argv[])
-{
-	struct sbiret ret;
-
-	ret = sbi_ecall(SBI_EXT_RENESAS, SBI_EXT_RENESAS_WRITE_AROUND,
-			SBI_DI, 0, 0, 0, 0, 0);
-	if (!ret.error)
-		if (ret.value)
-			return ret.value;
-
-	return -ENOTSUPP;
-}
-
-U_BOOT_CMD_COMPLETE(sbi_get_mcache_ctl_status, 0, 0, do_sbi_get_mcache_ctl_status,"OpenSBI DEBUG:GET_MCACHE_CTL_STATUS",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_get_mmisc_ctl_status, 0, 0, sbi_get_mmisc_ctl_status,"OpenSBI DEBUG:GET_MMISC_CTL_STATUS",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_set_mcache_ctl, 1, 0, sbi_set_mcache_ctl,"OpenSBI DEBUG:SET_MCACHE_CTL",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_set_mmisc_ctl, 1, 0, sbi_set_mmisc_ctl,"OpenSBI DEBUG:SET_MMISC_CTL",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_icache_op_en, 1, 0, sbi_icache_op_en,"OpenSBI DEBUG:ICACHE_OP_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_icache_op_dis, 1, 0, sbi_icache_op_en,"OpenSBI DEBUG:ICACHE_OP_DIS",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_dcache_op_en, 1, 0, sbi_dcache_op_dis,"OpenSBI DEBUG:DCACHE_OP_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_dcache_op_dis, 1, 0, sbi_dcache_op_dis,"OpenSBI DEBUG:DCACHE_OP_DIS",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_l1cache_i_prefetch_en, 1, 0, sbi_l1cache_i_prefetch_en,"OpenSBI DEBUG:L1CACHE_I_PREFETCH_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_l1cache_i_prefetch_dis, 1, 0, sbi_l1cache_i_prefetch_dis,"OpenSBI DEBUG:L1CACHE_I_PREFETCH_DIS",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_l1cache_d_prefetch_en, 1, 0, sbi_l1cache_d_prefetch_en,"OpenSBI DEBUG:L1CACHE_D_PREFETCH_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_l1cache_d_prefetch_dis, 1, 0, sbi_l1cache_d_prefetch_dis,"OpenSBI DEBUG:L1CACHE_D_PREFETCH_DIS",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_non_blocking_load_store_en, 1, 0, sbi_non_blocking_load_store_en,"OpenSBI DEBUG:NON_BLOCKING_LOAD_STORE_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_non_blocking_load_store_dis, 1, 0, sbi_non_blocking_load_store_dis,"OpenSBI DEBUG:NON_BLOCKING_LOAD_STORE_DIS",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_write_around_en, 1, 0, sbi_write_around_en,"OpenSBI DEBUG:WRITE_AROUND_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_write_around_dis, 1, 0, sbi_write_around_dis,"OpenSBI DEBUG:WRITE_AROUND_DIS",NULL, NULL);
-
-
-int sbi_ext_set_timer(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_ext_set_timer(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
 	int ret = 0;
-	
-	sbi_set_timer(0);
+	unsigned long value;
+
+	if (argc < 2)
+	return CMD_RET_USAGE;
+
+	value = atol(argv[1]);
+	sbi_set_timer(value);
 	
 	return ret;
 }
 
-int sbi_ext_get_spec_version(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_ext_get_spec_version(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
 	int ret = 0;
@@ -358,7 +296,7 @@ int sbi_ext_get_spec_version(struct cmd_tbl *cmdtp, int flag, int argc,
 	return ret;
 }
 
-int sbi_ext_get_impl_id(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_ext_get_impl_id(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
 	int value,ret = 0;
@@ -369,21 +307,25 @@ int sbi_ext_get_impl_id(struct cmd_tbl *cmdtp, int flag, int argc,
 	return ret;
 }
 #ifdef CONFIG_SBI_V01
-int sbi_ext_console_putchar(struct cmd_tbl *cmdtp, int flag, int argc,
+int do_sbi_ext_console_putchar(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
 	int ret = 0;
-	int ch = 0;
-	
-	sbi_console_putchar(ch);
+	unsigned int value;
+
+	if (argc < 2)
+	return CMD_RET_USAGE;
+
+	value = atoi(argv[1]);
+	sbi_console_putchar(value);
 	
 	return ret;
 }
 #endif
-U_BOOT_CMD_COMPLETE(sbi_set_timer, 0, 0, sbi_ext_set_timer,"OpenSBI DEBUG:SET_TIMER",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_get_spec_version, 0, 0, sbi_ext_get_spec_version,"OpenSBI DEBUG:",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_get_impl_id, 0, 0, sbi_ext_get_impl_id,"OpenSBI DEBUG:",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_console_putchar, 0, 0, sbi_ext_console_putchar,"OpenSBI DEBUG:",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_set_timer, 2, 0, do_sbi_ext_set_timer,"OpenSBI DEBUG:SET_TIMER",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_get_spec_version, 1, 0, do_sbi_ext_get_spec_version,"OpenSBI DEBUG:",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_get_impl_id, 1, 0, do_sbi_ext_get_impl_id,"OpenSBI DEBUG:",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_console_putchar, 2, 0, do_sbi_ext_console_putchar,"OpenSBI DEBUG:",NULL, NULL);
 
 
 #endif
