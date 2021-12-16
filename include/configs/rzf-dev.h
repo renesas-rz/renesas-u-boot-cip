@@ -24,7 +24,10 @@
 #ifdef CONFIG_SPL_MMC_SUPPORT
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME		"u-boot.itb"
 #endif
-#endif
+
+/* use CONFIG_XIP configuration for Elimination of atomic instructions */
+#define CONFIG_XIP  y
+#endif /*CONFIG_SPL */
 
 #ifndef CONFIG_DEBUG_RZF_FPGA
 #define CONFIG_SYS_TEXT_BASE            0x50000000
