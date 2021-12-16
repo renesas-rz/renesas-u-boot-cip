@@ -1,6 +1,6 @@
 if TARGET_RZF_DEV
 
-config ARC_RZMPU
+config ARCH_RZMPU
 	bool "RZFMPU architecture"
 	default y
 

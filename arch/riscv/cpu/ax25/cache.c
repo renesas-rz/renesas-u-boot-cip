@@ -70,19 +70,11 @@ void icache_enable(void)
 #if !CONFIG_IS_ENABLED(SYS_ICACHE_OFF)
 #ifdef CONFIG_RISCV_NDS_CACHE
 #if CONFIG_IS_ENABLED(RISCV_MMODE)
-#if !defined(CONFIG_ARC_RZMPU)
     asm volatile (
 		"csrr t1, mcache_ctl\n\t"
 		"ori t0, t1, 0x1\n\t"
 		"csrw mcache_ctl, t0\n\t"
 	);
-#else
-    asm volatile (
-		"csrr t1, 0x7CA\n\t"
-		"ori t0, t1, 0x1\n\t"
-		"csrw 0x7CA, t0\n\t"
-	);
-#endif
 #endif
 #endif
 #endif
@@ -93,21 +85,12 @@ void icache_disable(void)
 #if !CONFIG_IS_ENABLED(SYS_ICACHE_OFF)
 #ifdef CONFIG_RISCV_NDS_CACHE
 #if CONFIG_IS_ENABLED(RISCV_MMODE)
-#if !defined(CONFIG_ARC_RZMPU)
 	asm volatile (
 		"fence.i\n\t"
 		"csrr t1, mcache_ctl\n\t"
 		"andi t0, t1, ~0x1\n\t"
 		"csrw mcache_ctl, t0\n\t"
 	);
-#else
-	asm volatile (
-		"fence.i\n\t"
-		"csrr t1, 0x7CA\n\t"
-		"andi t0, t1, ~0x1\n\t"
-		"csrw 0x7CA, t0\n\t"
-	);
-#endif
 #endif
 #endif
 #endif
@@ -118,19 +101,11 @@ void dcache_enable(void)
 #if !CONFIG_IS_ENABLED(SYS_DCACHE_OFF)
 #ifdef CONFIG_RISCV_NDS_CACHE
 #if CONFIG_IS_ENABLED(RISCV_MMODE)
-#if !defined(CONFIG_ARC_RZMPU)
 	asm volatile (
 		"csrr t1, mcache_ctl\n\t"
 		"ori t0, t1, 0x2\n\t"
 		"csrw mcache_ctl, t0\n\t"
 	);
-#else
-	asm volatile (
-		"csrr t1, 0x7CA\n\t"
-		"ori t0, t1, 0x2\n\t"
-		"csrw 0x7CA, t0\n\t"
-	);
-#endif
 #endif
 #ifdef CONFIG_V5L2_CACHE
 	_cache_enable();
@@ -145,19 +120,11 @@ void dcache_disable(void)
 #ifdef CONFIG_RISCV_NDS_CACHE
 #if CONFIG_IS_ENABLED(RISCV_MMODE)
 	csr_write(CCTL_REG_MCCTLCOMMAND_NUM, CCTL_L1D_WBINVAL_ALL);
-#if !defined(CONFIG_ARC_RZMPU)
 	asm volatile (
 		"csrr t1, mcache_ctl\n\t"
 		"andi t0, t1, ~0x2\n\t"
 		"csrw mcache_ctl, t0\n\t"
 	);
-#else
-	asm volatile (
-		"csrr t1, 0x7CA\n\t"
-		"andi t0, t1, ~0x2\n\t"
-		"csrw 0x7CA, t0\n\t"
-	);
-#endif
 #endif
 #ifdef CONFIG_V5L2_CACHE
 	_cache_disable();
@@ -172,7 +139,6 @@ int icache_status(void)
 
 #ifdef CONFIG_RISCV_NDS_CACHE
 #if CONFIG_IS_ENABLED(RISCV_MMODE)
-#if !defined(CONFIG_ARC_RZMPU)
 	asm volatile (
 		"csrr t1, mcache_ctl\n\t"
 		"andi	%0, t1, 0x01\n\t"
@@ -180,15 +146,6 @@ int icache_status(void)
 		:
 		: "memory"
 	);
-#else
-	asm volatile (
-		"csrr t1, 0x7CA\n\t"
-		"andi	%0, t1, 0x01\n\t"
-		: "=r" (ret)
-		:
-		: "memory"
-	);
-#endif
 #endif
 #endif
 
@@ -201,7 +158,6 @@ int dcache_status(void)
 
 #ifdef CONFIG_RISCV_NDS_CACHE
 #if CONFIG_IS_ENABLED(RISCV_MMODE)
-#if !defined(CONFIG_ARC_RZMPU)
 	asm volatile (
 		"csrr t1, mcache_ctl\n\t"
 		"andi	%0, t1, 0x02\n\t"
@@ -209,15 +165,6 @@ int dcache_status(void)
 		:
 		: "memory"
 	);
-#else
-	asm volatile (
-		"csrr t1, 0x7CA\n\t"
-		"andi	%0, t1, 0x02\n\t"
-		: "=r" (ret)
-		:
-		: "memory"
-	);
-#endif
 #endif
 #endif
 

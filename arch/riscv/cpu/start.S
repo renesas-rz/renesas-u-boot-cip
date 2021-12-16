@@ -101,7 +101,7 @@ call_board_init_f_0:
 	mv	sp, a0
 #endif
 
-#if !defined(CONFIG_XIP) && !defined(CONFIG_RZF_DEV)
+#ifndef CONFIG_XIP
 	/*
 	 * Pick hart to initialize global data and run U-Boot. The other harts
 	 * wait for initialization to complete.
@@ -125,7 +125,7 @@ call_board_init_f_0:
 	/* save the boot hart id to global_data */
 	SREG	tp, GD_BOOT_HART(gp)
 
-#if !defined(CONFIG_XIP) && !defined(CONFIG_RZF_DEV)
+#ifndef CONFIG_XIP
 	la	t0, available_harts_lock
 	fence	rw, w
 	amoswap.w zero, zero, 0(t0)
