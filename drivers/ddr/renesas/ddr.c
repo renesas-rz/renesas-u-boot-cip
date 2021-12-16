@@ -7,11 +7,7 @@
 #include <common.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include "ddr_internal.h"
-#ifndef CONFIG_DEBUG_RZF_FPGA
 #include <linux/delay.h>
-#else
-#define udelay(usec)    
-#endif
 
 #define	CEIL(a, div)	(((a) + ((div) - 1)) / (div))
 #define	_MIN(a, b)		((a) < (b) ? (a) : (b))
