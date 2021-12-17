@@ -1,8 +1,8 @@
-if ( ARCH_RMOBILE || RZF )
+if ( ARCH_RMOBILE || RZF_DEV )
 
 config PINCTRL_PFC
 	bool "Renesas pin control drivers"
-	depends on DM && ( ARCH_RMOBILE || RZF )
+	depends on DM && ( ARCH_RMOBILE || RZF_DEV )
 	default n if CPU_RZA1
 	help
 	  Enable support for clock present on Renesas RCar SoCs.

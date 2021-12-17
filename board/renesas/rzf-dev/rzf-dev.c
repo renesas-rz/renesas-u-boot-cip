@@ -7,9 +7,12 @@
 #include <spl.h>
 #include <init.h>
 #include <asm/sections.h>
+#include <asm/arch/sh_sdhi.h>
 
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_sys.h>
+#include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
+#include <renesas/rzf-dev/rzf-dev_cpg_regs.h>
 #include "rzf-dev_spi_multi.h"
 
 extern void cpg_setup(void);
@@ -25,22 +28,6 @@ extern phys_addr_t prior_stage_fdt_address;
 /*
  * Miscellaneous platform dependent initializations
  */
-#define PFC_BASE	0x11030000
-
-#define ETH_CH0		(PFC_BASE + 0x300c)
-#define ETH_CH1		(PFC_BASE + 0x3010)
-#define I2C_CH1 	(PFC_BASE + 0x1870)
-#define ETH_PVDD_3300	0x00
-#define ETH_PVDD_1800	0x01
-#define ETH_PVDD_2500	0x02
-#define ETH_MII_RGMII	(PFC_BASE + 0x3018)
-
-/* CPG */
-#define CPG_BASE					0x11010000
-#define CPG_CLKON_BASE				(CPG_BASE + 0x500)
-#define CPG_RST_BASE				(CPG_BASE + 0x800)
-#define CPG_RST_ETH				(CPG_RST_BASE + 0x7C)
-#define CPG_RST_I2C				(CPG_RST_BASE + 0x80)
 
 #ifdef CONFIG_BOARD_EARLY_INIT_F
 int board_early_init_f(void)
@@ -50,34 +37,20 @@ int board_early_init_f(void)
 #endif
 
 	/* can go in board_eht_init() once enabled */
-	*(volatile u32 *)(ETH_CH0) = (*(volatile u32 *)(ETH_CH0) & 0xFFFFFFFC) | ETH_PVDD_1800;
-	*(volatile u32 *)(ETH_CH1) = (*(volatile u32 *)(ETH_CH1) & 0xFFFFFFFC) | ETH_PVDD_1800;
+	*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_1_8;
+	*(volatile u32 *)(PFC_ETH_ch1) = (*(volatile u32 *)(PFC_ETH_ch1) & 0xFFFFFFFC) | ETH_ch1_1_8;
 	/* Enable RGMII for both ETH{0,1} */
-	*(volatile u32 *)(ETH_MII_RGMII) = (*(volatile u32 *)(ETH_MII_RGMII) & 0xFFFFFFFC);
+	*(volatile u32 *)(PFC_ETH_MII) = (*(volatile u32 *)(PFC_ETH_MII) & 0xFFFFFFFC);
 	/* ETH CLK */
-	*(volatile u32 *)(CPG_RST_ETH) = 0x30003;
+	*(volatile u32 *)(CPG_CLKON_ETH) = 0x30003;
 	/* I2C CLK */
-	*(volatile u32 *)(CPG_RST_I2C) = 0xF000F;
+	*(volatile u32 *)(CPG_CLKON_I2C) = 0xF000F;
 	/* I2C pin non GPIO enable */
-	*(volatile u32 *)(I2C_CH1) = 0x01010101;
+	*(volatile u32 *)(PFC_IEN0E) = 0x01010101;
 
 	return 0;
 }
 #endif
-
-/* PFC */
-#define PFC_P22						(PFC_BASE + 0x0022)
-#define PFC_PM22					(PFC_BASE + 0x0144)
-#define PFC_PMC22					(PFC_BASE + 0x0222)
-
-/* SDHI */
-#define CONFIG_SYS_SH_SDHI0_BASE	0x11C00000
-#define CONFIG_SYS_SH_SDHI1_BASE	0x11C10000
-
-#define BIT(nr)			(1UL << (nr))
-#define SH_SDHI_QUIRK_64BIT_BUF		BIT(1)
-
-int sh_sdhi_init(unsigned long addr, int ch, unsigned long quirks);
 
 int board_mmc_init(struct bd_info *bis)
 {
@@ -89,10 +62,10 @@ int board_mmc_init(struct bd_info *bis)
 	*(volatile u32 *)(PFC_P22) = (*(volatile u32 *)(PFC_P22) & 0xFFFFFFDF) | 0x20;	/* Port 13[2:1] output value 0b1*/
 
 
-	ret |= sh_sdhi_init(CONFIG_SYS_SH_SDHI0_BASE,
+	ret |= sh_sdhi_init(RZF_SD0_BASE,
 						0,
 						SH_SDHI_QUIRK_64BIT_BUF);
-	ret |= sh_sdhi_init(CONFIG_SYS_SH_SDHI1_BASE,
+	ret |= sh_sdhi_init(RZF_SD1_BASE,
 						1,
 						SH_SDHI_QUIRK_64BIT_BUF);
 

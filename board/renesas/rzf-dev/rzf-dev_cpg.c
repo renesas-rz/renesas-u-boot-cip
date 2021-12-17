@@ -7,11 +7,7 @@
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_cpg_regs.h>
 #include <renesas/rzf-dev/mmio.h>
-#ifndef CONFIG_DEBUG_RZF_FPGA
 #include <linux/delay.h>
-#else
-#define udelay(usec)    
-#endif
 
 #define CPG_RST_DDR_OPT_VALUE		(0x00000000)
 
@@ -114,6 +110,18 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 	{		/* DDR */
 		(uintptr_t)CPG_CLKON_DDR,
 		(uintptr_t)CPG_CLKMON_DDR,
+		0x00030003,
+		CPG_T_CLK
+	},
+	{		/* SYSC */
+		(uintptr_t)CPG_CLKON_SYSC,
+		(uintptr_t)CPG_CLKMON_SYSC,
+		0x00010001,
+		CPG_T_CLK
+	},
+	{		/* SPI Multi */
+		(uintptr_t)CPG_CLKON_SPI_MULTI,
+		(uintptr_t)CPG_CLKMON_SPI_MULTI,
 		0x00030003,
 		CPG_T_CLK
 	},
@@ -253,6 +261,18 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		(uintptr_t)CPG_RST_DDR,
 		(uintptr_t)CPG_RSTMON_DDR,
 		0x007F007F,
+		CPG_T_RST
+	},
+	{		/* SYSC */
+		(uintptr_t)CPG_RST_SYSC,
+		(uintptr_t)CPG_RSTMON_SYSC,
+		0x00010001,
+		CPG_T_RST
+	},
+	{		/* SPI Multi */
+		(uintptr_t)CPG_RST_SPI,
+		(uintptr_t)CPG_RSTMON_SPI,
+		0x00030003,
 		CPG_T_RST
 	},
 #endif

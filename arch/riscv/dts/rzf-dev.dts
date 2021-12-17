@@ -112,6 +112,28 @@
 						interrupts-extended = <&CPU0_intc 3>;
 				};
 
+				sdhi0: sd@11c00000 {
+						u-boot,dm-spl;
+						compatible = "renesas,sdhi-r9a07g044l",
+								     "renesas,rcar-gen3-sdhi";
+						reg = <0 0x11c00000 0 0x10000>;
+						clocks = <&cpg 1 22>;
+						resets = <&cpg 22>;
+						power-domains = <&cpg>;
+						status = "okay";
+					};
+
+				sdhi1: sd@11c10000 {
+						u-boot,dm-spl;
+						compatible = "renesas,sdhi-r9a07g044l",
+								     "renesas,rcar-gen3-sdhi";
+						reg = <0x0 0x11c10000 0 0x10000>;
+						clocks = <&cpg 1 22>;
+						resets = <&cpg 22>;
+						power-domains = <&cpg>;
+						status = "okay";
+				};
+
 				plmt0@110c0000 {
 						u-boot,dm-spl;
 						compatible = "riscv,plmt0";

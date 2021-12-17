@@ -271,6 +271,7 @@
 #define PFC_IEN07						(PFC_BASE + 0x1838)	/* IEN switch register */
 #define PFC_IEN08						(PFC_BASE + 0x1840)	/* IEN switch register */
 #define PFC_IEN09						(PFC_BASE + 0x1848)	/* IEN switch register */
+#define PFC_IEN0E						(PFC_BASE + 0x1870)	/* IEN switch register */
 #define PFC_PUPD06						(PFC_BASE + 0x1C30)	/* PU/PD switch register */
 #define PFC_PUPD07						(PFC_BASE + 0x1C38)	/* PU/PD switch register */
 #define PFC_PUPD08						(PFC_BASE + 0x1C40)	/* PU/PD switch register */
