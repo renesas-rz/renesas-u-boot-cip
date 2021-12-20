@@ -9,13 +9,14 @@
 #ifdef CONFIG_SPL
 #define CONFIG_SPL_STACK	    	0x00030000
 #define CONFIG_SPL_MAX_SIZE		    0x00010D00
+
 #ifndef CONFIG_DEBUG_RZF_FPGA
 #define CONFIG_SPL_BSS_START_ADDR	0x60000000
 #define CONFIG_SPL_BSS_MAX_SIZE		0x00100000
 #else
 #define CONFIG_SPL_BSS_START_ADDR	0x200F0000
 #define CONFIG_SPL_BSS_MAX_SIZE		0x00010000
-#endif
+#endif /* CONFIG_DEBUG_RZF_FPGA */
 
 #ifdef CONFIG_SPL_NOR_SUPPORT
 #define CONFIG_SYS_UBOOT_BASE       0x20020000
@@ -27,15 +28,8 @@
 
 /* use CONFIG_XIP configuration for Elimination of atomic instructions */
 #define CONFIG_XIP  y
-#endif /*CONFIG_SPL */
 
-#ifndef CONFIG_DEBUG_RZF_FPGA
-#define CONFIG_SYS_TEXT_BASE            0x50000000
-#define CONFIG_SPL_OPENSBI_LOAD_ADDR    0x44000000
-#else
-#define CONFIG_SYS_TEXT_BASE            0x20130000
-#define CONFIG_SPL_OPENSBI_LOAD_ADDR    0x20100000
-#endif
+#endif /*CONFIG_SPL */
 
 /*
  * CPU and Board Configuration Options
