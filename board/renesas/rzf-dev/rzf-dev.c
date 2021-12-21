@@ -6,6 +6,7 @@
 #include <common.h>
 #include <spl.h>
 #include <init.h>
+#include <dm.h>
 #include <asm/sections.h>
 #include <asm/arch/sh_sdhi.h>
 
@@ -28,6 +29,12 @@ extern phys_addr_t prior_stage_fdt_address;
 /*
  * Miscellaneous platform dependent initializations
  */
+static void v5l2_init(void)
+{
+	struct udevice *dev;
+
+	uclass_get_device(UCLASS_CACHE, 0, &dev);
+}
 
 #ifdef CONFIG_BOARD_EARLY_INIT_F
 int board_early_init_f(void)

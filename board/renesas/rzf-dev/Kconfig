@@ -1,7 +1,7 @@
 if TARGET_RZF_DEV
 
 config SYS_CPU
-	default "ax25"
+	default "rzfive"
 
 config SYS_BOARD
 	default "rzf-dev"
