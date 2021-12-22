@@ -30,9 +30,11 @@ struct ostm_priv {
 static int ostm_get_count(struct udevice *dev, u64 *count)
 {
 	struct ostm_priv *priv = dev_get_priv(dev);
-
+#ifndef CONFIG_RZF_DEV
 	*count = timer_conv_64(readl(priv->regs + OSTM_CNT));
-
+#else
+	*count = timer_conv_64(readq((void __iomem *)priv->regs + OSTM_CNT));
+#endif
 	return 0;
 }
 
@@ -55,12 +57,19 @@ static int ostm_probe(struct udevice *dev)
 	uc_priv->clock_rate = CONFIG_SYS_CLK_FREQ / 2;
 #endif
 
+#ifndef CONFIG_RZF_DEV
 	readb(priv->regs + OSTM_CTL);
 	writeb(OSTM_CTL_D, priv->regs + OSTM_CTL);
-
 	setbits_8(priv->regs + OSTM_TT, BIT(0));
 	writel(0xffffffff, priv->regs + OSTM_CMP);
 	setbits_8(priv->regs + OSTM_TS, BIT(0));
+#else
+	readq((void __iomem *)priv->regs + OSTM_CTL);
+	writeb(OSTM_CTL_D,(void __iomem *)priv->regs + OSTM_CTL);
+	setbits_8(priv->regs + OSTM_TT, BIT(0));
+	writel(0xffffffff, (void __iomem *)priv->regs + OSTM_CMP);
+	setbits_8(priv->regs + OSTM_TS, BIT(0));
+#endif
 
 	return 0;
 }

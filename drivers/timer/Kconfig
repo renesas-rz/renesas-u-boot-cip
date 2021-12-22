@@ -144,7 +144,7 @@ config OMAP_TIMER
 
 config RISCV_TIMER
 	bool "RISC-V timer support"
-	depends on TIMER && RISCV
+	depends on TIMER && RISCV && !RZF_DEV
 	help
 	  Select this to enable support for the timer as defined
 	  by the RISC-V privileged architecture spec.
