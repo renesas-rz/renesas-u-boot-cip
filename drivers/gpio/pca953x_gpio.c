@@ -409,7 +409,7 @@ static const struct udevice_id pca953x_ids[] = {
 	{ .compatible = "ti,tca9539", .data = OF_953X(16, PCA_INT), },
 	{ .compatible = "ti,tca9554", .data = OF_953X(8, PCA_INT), },
 
-	{ .compatible = "onsemi,pca9654", .data = OF_953X(8, PCA_INT), },
+	{ .compatible = "onnn,pca9654", .data = OF_953X(8, PCA_INT), },
 
 	{ .compatible = "exar,xra1202", .data = OF_953X(8, 0), },
 	{ }
