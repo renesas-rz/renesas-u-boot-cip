@@ -112,13 +112,22 @@
 						interrupts-extended = <&CPU0_intc 3>;
 				};
 
+				ostm0: timer@12801000 {
+						u-boot,dm-spl;
+						compatible = "renesas,ostm";
+						reg = <0x0 0x12801000 0x0 0x400>;
+						clocks = <&cpg 1 31>;
+						resets = <&cpg 31>;
+						status = "okay";
+					};
+
 				sdhi0: sd@11c00000 {
 						u-boot,dm-spl;
 						compatible = "renesas,sdhi-r9a07g044l",
 								     "renesas,rcar-gen3-sdhi";
 						reg = <0 0x11c00000 0 0x10000>;
-						clocks = <&cpg 1 22>;
-						resets = <&cpg 22>;
+						clocks = <&cpg 1 21>;
+						resets = <&cpg 21>;
 						power-domains = <&cpg>;
 						status = "okay";
 					};
