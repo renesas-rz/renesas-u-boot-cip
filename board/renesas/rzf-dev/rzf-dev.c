@@ -87,6 +87,10 @@ int board_init(void)
 
 int dram_init(void)
 {
+#ifdef CONFIG_DEBUG_RZF_FPGA
+	gd->ram_size = CONFIG_SYS_SDRAM_SIZE;
+	return 0;
+#endif
 	return fdtdec_setup_mem_size_base();
 }
 

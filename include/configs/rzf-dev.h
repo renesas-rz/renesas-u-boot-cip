@@ -26,6 +26,8 @@
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME		"u-boot.itb"
 #endif
 
+#define CONFIG_SYS_OSTIMER_FREQ     100000000
+
 /* use CONFIG_XIP configuration for Elimination of atomic instructions */
 #define CONFIG_XIP  y
 
@@ -77,11 +79,13 @@
 #define CONFIG_SYS_SDRAM_BASE		(0x40000000 + DRAM_RSV_SIZE)
 #define CONFIG_SYS_SDRAM_SIZE		(0x80000000u - DRAM_RSV_SIZE) //total 2GB
 #define CONFIG_MAX_MEM_MAPPED		(0x80000000u - DRAM_RSV_SIZE)
+#define CONFIG_SYS_MALLOC_LEN		(64 * 1024 * 1024)
 #else
 #define DRAM_RSV_SIZE			0x00060000
 #define CONFIG_SYS_SDRAM_BASE		(0x20000000 + DRAM_RSV_SIZE)
-#define CONFIG_SYS_SDRAM_SIZE		(0x00200000u - DRAM_RSV_SIZE) //total 2MB
-#define CONFIG_MAX_MEM_MAPPED		(0x00200000u - DRAM_RSV_SIZE)
+#define CONFIG_SYS_SDRAM_SIZE		(0x001E0000u - DRAM_RSV_SIZE) //total 2MB
+#define CONFIG_MAX_MEM_MAPPED		(0x001E0000u - DRAM_RSV_SIZE)
+#define CONFIG_SYS_MALLOC_LEN		0xa0000
 #endif
 #define CONFIG_SYS_LOAD_ADDR		0x58000000
 #define CONFIG_LOADADDR			CONFIG_SYS_LOAD_ADDR // Default load address for tfpt,bootp...
@@ -89,7 +93,6 @@
 
 #define CONFIG_SYS_MONITOR_BASE		0x00000000
 #define CONFIG_SYS_MONITOR_LEN		(1 * 1024 * 1024)
-#define CONFIG_SYS_MALLOC_LEN		(64 * 1024 * 1024)
 #define CONFIG_SYS_BOOTM_LEN		(64 << 20)
 
 /* The HF/QSPI layout permits up to 1 MiB large bootloader blob */

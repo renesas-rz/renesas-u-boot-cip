@@ -112,15 +112,6 @@
 						interrupts-extended = <&CPU0_intc 3>;
 				};
 
-				ostm0: timer@12801000 {
-						u-boot,dm-spl;
-						compatible = "renesas,ostm";
-						reg = <0x0 0x12801000 0x0 0x400>;
-						clocks = <&cpg 1 31>;
-						resets = <&cpg 31>;
-						status = "okay";
-					};
-
 				sdhi0: sd@11c00000 {
 						u-boot,dm-spl;
 						compatible = "renesas,sdhi-r9a07g044l",
@@ -130,7 +121,7 @@
 						resets = <&cpg 21>;
 						power-domains = <&cpg>;
 						status = "okay";
-					};
+				};
 
 				sdhi1: sd@11c10000 {
 						u-boot,dm-spl;
@@ -148,6 +139,15 @@
 						compatible = "riscv,plmt0";
 						reg = <0x0 0x110c0000 0x0 0x100000>;
 						interrupts-extended = <&CPU0_intc 7>;
+				};
+
+				ostm0: timer@12801000 {
+						u-boot,dm-spl;
+						compatible = "renesas,ostm";
+						reg = <0x0 0x12801000 0x0 0x400>;
+						clocks = <&cpg 1 31>;
+						resets = <&cpg 31>;
+						status = "okay";
 				};
 
 				cpg: clock-controller@11010000 {
