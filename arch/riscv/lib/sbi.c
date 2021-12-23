@@ -216,5 +216,5 @@ void sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
 		  SBI_FID_REMOTE_SFENCE_VMA_ASID,
 		  (unsigned long)hart_mask, start, size, asid, 0, 0);
 }
-#endif /* CONFIG_SBI_V01 */
 
+#endif /* CONFIG_SBI_V01 */

@@ -70,7 +70,7 @@ void icache_enable(void)
 #if !CONFIG_IS_ENABLED(SYS_ICACHE_OFF)
 #ifdef CONFIG_RISCV_NDS_CACHE
 #if CONFIG_IS_ENABLED(RISCV_MMODE)
-	asm volatile (
+    asm volatile (
 		"csrr t1, mcache_ctl\n\t"
 		"ori t0, t1, 0x1\n\t"
 		"csrw mcache_ctl, t0\n\t"

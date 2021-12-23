@@ -78,7 +78,7 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 	{		/* OSTM */
 		(uintptr_t)CPG_CLKON_OSTM,
 		(uintptr_t)CPG_CLKMON_OSTM,
-		0x00060000,
+		0x00060006,
 		CPG_T_CLK
 	},
 	{		/* MTU */
@@ -117,12 +117,6 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		(uintptr_t)CPG_CLKON_SYSC,
 		(uintptr_t)CPG_CLKMON_SYSC,
 		0x00010001,
-		CPG_T_CLK
-	},
-	{		/* SPI Multi */
-		(uintptr_t)CPG_CLKON_SPI_MULTI,
-		(uintptr_t)CPG_CLKMON_SPI_MULTI,
-		0x00030003,
 		CPG_T_CLK
 	},
 #endif
@@ -228,7 +222,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 	{		/* OSTM */
 		(uintptr_t)CPG_RST_OSTM,
 		(uintptr_t)CPG_RSTMON_OSTM,
-		0x00060000,
+		0x00060006,
 		CPG_T_RST
 	},
 	{		/* MTU */
@@ -269,17 +263,12 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x00010001,
 		CPG_T_RST
 	},
-	{		/* SPI Multi */
-		(uintptr_t)CPG_RST_SPI,
-		(uintptr_t)CPG_RSTMON_SPI,
-		0x00030003,
-		CPG_T_RST
-	},
+
 #endif
 	{		/* SPI_MULTI */
 		(uintptr_t)CPG_RST_SPI,
 		(uintptr_t)CPG_RSTMON_SPI,
-		0x00010001,
+		0x00030003,
 		CPG_T_RST
 	},
 	{		/* SDHI */
