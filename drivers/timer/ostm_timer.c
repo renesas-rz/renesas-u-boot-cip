@@ -27,7 +27,7 @@ struct ostm_priv {
 	fdt_addr_t	regs;
 };
 
- int ostm_get_count(struct udevice *dev, u64 *count)
+static int ostm_get_count(struct udevice *dev, u64 *count)
 {
 	struct ostm_priv *priv = dev_get_priv(dev);
 #ifndef CONFIG_RZF_DEV
