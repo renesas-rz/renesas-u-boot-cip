@@ -26,8 +26,6 @@
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME		"u-boot.itb"
 #endif
 
-#define CONFIG_SYS_OSTIMER_FREQ     100000000
-
 #ifdef CONFIG_SPL_BUILD
 /* use CONFIG_XIP configuration for Elimination of atomic instructions */
 #define CONFIG_XIP  1
