@@ -78,7 +78,7 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 	{		/* OSTM */
 		(uintptr_t)CPG_CLKON_OSTM,
 		(uintptr_t)CPG_CLKMON_OSTM,
-		0x00060006,
+		0x00060000,
 		CPG_T_CLK
 	},
 	{		/* MTU */
@@ -222,7 +222,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 	{		/* OSTM */
 		(uintptr_t)CPG_RST_OSTM,
 		(uintptr_t)CPG_RSTMON_OSTM,
-		0x00060006,
+		0x00060000,
 		CPG_T_RST
 	},
 	{		/* MTU */
