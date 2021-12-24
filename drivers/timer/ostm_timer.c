@@ -27,7 +27,7 @@ struct ostm_priv {
 	fdt_addr_t	regs;
 };
 
-static int ostm_get_count(struct udevice *dev, u64 *count)
+int ostm_get_count(struct udevice *dev, u64 *count)
 {
 	struct ostm_priv *priv = dev_get_priv(dev);
 #ifndef CONFIG_RZF_DEV
@@ -54,18 +54,24 @@ static int ostm_probe(struct udevice *dev)
 
 	clk_free(&clk);
 #else
+#ifndef CONFIG_RZF_DEV
 	uc_priv->clock_rate = CONFIG_SYS_CLK_FREQ / 2;
+#else
+	uc_priv->clock_rate = CONFIG_SYS_OSTIMER_FREQ;
+#endif
 #endif
 
 #ifndef CONFIG_RZF_DEV
 	readb(priv->regs + OSTM_CTL);
 	writeb(OSTM_CTL_D, priv->regs + OSTM_CTL);
+
 	setbits_8(priv->regs + OSTM_TT, BIT(0));
 	writel(0xffffffff, priv->regs + OSTM_CMP);
 	setbits_8(priv->regs + OSTM_TS, BIT(0));
 #else
 	readb((void __iomem *)priv->regs + OSTM_CTL);
 	writeb(OSTM_CTL_D,(void __iomem *)priv->regs + OSTM_CTL);
+
 	setbits_8(priv->regs + OSTM_TT, BIT(0));
 	writel(0xffffffff, (void __iomem *)priv->regs + OSTM_CMP);
 	setbits_8(priv->regs + OSTM_TS, BIT(0));
