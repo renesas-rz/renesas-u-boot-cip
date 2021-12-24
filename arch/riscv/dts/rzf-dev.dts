@@ -147,6 +147,7 @@
 						reg = <0x0 0x12801000 0x0 0x400>;
 						clocks = <&cpg 1 31>;
 						resets = <&cpg 31>;
+						clock-frequency = <100000000>;
 						status = "okay";
 				};
 
