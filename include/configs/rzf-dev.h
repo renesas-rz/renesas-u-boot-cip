@@ -49,6 +49,11 @@
 	(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
 
 /*
+ * Cache Configuration
+ */
+#define CONFIG_SYS_CACHELINE_SIZE	64
+
+/*
  * max number of command args
  */
 #define CONFIG_SYS_MAXARGS	64
