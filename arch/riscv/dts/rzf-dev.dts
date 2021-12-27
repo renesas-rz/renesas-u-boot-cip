@@ -113,24 +113,22 @@
 				};
 
 				sdhi0: sd@11c00000 {
-						u-boot,dm-spl;
-						compatible = "renesas,sdhi-r9a07g044l",
-								     "renesas,rcar-gen3-sdhi";
+						compatible = "renesas,sdhi-r9a07g044l";
 						reg = <0 0x11c00000 0 0x10000>;
 						clocks = <&cpg 1 21>;
 						resets = <&cpg 21>;
 						power-domains = <&cpg>;
+						bus-width = <8>;
 						status = "okay";
 				};
 
 				sdhi1: sd@11c10000 {
-						u-boot,dm-spl;
-						compatible = "renesas,sdhi-r9a07g044l",
-								     "renesas,rcar-gen3-sdhi";
+						compatible = "renesas,sdhi-r9a07g044l";
 						reg = <0x0 0x11c10000 0 0x10000>;
 						clocks = <&cpg 1 22>;
 						resets = <&cpg 22>;
 						power-domains = <&cpg>;
+						bus-width = <4>;
 						status = "okay";
 				};
 
