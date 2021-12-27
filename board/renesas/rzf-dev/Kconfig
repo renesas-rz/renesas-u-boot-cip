@@ -39,4 +39,9 @@ config DEBUG_RZF_FPGA
 	help
 		DEBUG Flag on FPGA Board
 
+config DEBUG_OPENSBI
+	bool "debug OpenSBI"
+	default n
+	depends on CMD_SBI
+
 endif

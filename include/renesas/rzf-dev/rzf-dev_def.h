@@ -25,6 +25,7 @@
 #define RZF_DDR_MEMC_BASE         (0x11410000)
 #define RZF_OTP_REG               (0x11860000)
 #define RZF_SD0_BASE              (0x11C00000)
+#define RZF_SD1_BASE              (0x11C10000)
 #define RZF_SPIROM_BASE           (0x20000000)
 #define RZF_DDR1_BASE             (0x40000000)
 #define RZF_DDR2_BASE             (0x80000000)

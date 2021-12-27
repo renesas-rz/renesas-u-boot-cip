@@ -1,6 +1,6 @@
 config CLK_RENESAS
 	bool "Renesas clock drivers"
-	depends on CLK && ARCH_RMOBILE
+	depends on CLK && (ARCH_RMOBILE || RZF_DEV)
 	help
 	  Enable support for clock present on Renesas RCar SoCs.
 
