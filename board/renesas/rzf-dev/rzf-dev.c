@@ -123,11 +123,13 @@ u32 spl_boot_device(void)
     case BOOT_MODE_ESD:
     case BOOT_MODE_EMMC_1_8:
     case BOOT_MODE_EMMC_3_3:
-        return BOOT_DEVICE_MMC1;
+//        return BOOT_DEVICE_MMC1;
+        return BOOT_DEVICE_NOR;
         
     case BOOT_MODE_SCIF:
     default:
-        return BOOT_DEVICE_NONE;
+//        return BOOT_DEVICE_NONE;
+        return BOOT_DEVICE_NOR;
     }
 #endif
 }

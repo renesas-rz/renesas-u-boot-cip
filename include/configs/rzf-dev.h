@@ -19,7 +19,8 @@
 #endif /* CONFIG_DEBUG_RZF_FPGA */
 
 #ifdef CONFIG_SPL_NOR_SUPPORT
-#define CONFIG_SYS_UBOOT_BASE       0x20020000
+//#define CONFIG_SYS_UBOOT_BASE       0x20020000
+#define CONFIG_SYS_UBOOT_BASE       0x70000000
 #endif
 
 #ifdef CONFIG_SPL_MMC_SUPPORT
@@ -121,7 +122,7 @@
 #define CONFIG_BITBANGMII_MULTI
 
 /* select DDR clock */
-/*#define CONFIG_RZF_DDR_PLL4 1333 */
+//#define RZF_DDR_PLL4 1333
 #define RZF_DDR_PLL4 1600
 
 #endif /* __CONFIG_H */
