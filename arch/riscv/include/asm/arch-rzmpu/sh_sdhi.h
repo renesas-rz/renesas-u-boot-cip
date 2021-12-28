@@ -12,11 +12,6 @@
 #define _SH_SDHI_H
 
 #include <linux/bitops.h>
-
-/* SDHI clock freq */
-#define CONFIG_SH_SDHI_FREQ		133000000
-
-
 #define SDHI_CMD			(0x0000 >> 1)
 #define SDHI_PORTSEL			(0x0004 >> 1)
 #define SDHI_ARG0			(0x0008 >> 1)
