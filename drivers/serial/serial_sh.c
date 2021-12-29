@@ -38,13 +38,13 @@ static int scif_rxfill(struct uart_port *port)
 	}
 }
 #else
-static int scif_rxfill(struct uart_port *port)
+ int scif_rxfill(struct uart_port *port)
 {
 	return sci_in(port, SCFDR) & SCIF_RFDC_MASK;
 }
 #endif
 
-static void sh_serial_init_generic(struct uart_port *port)
+ void sh_serial_init_generic(struct uart_port *port)
 {
 	sci_out(port, SCSCR , SCSCR_INIT(port));
 	sci_out(port, SCSCR , SCSCR_INIT(port));
@@ -58,7 +58,7 @@ static void sh_serial_init_generic(struct uart_port *port)
 #endif
 }
 
-static void
+ void
 sh_serial_setbrg_generic(struct uart_port *port, int clk, int baudrate)
 {
 	if (port->clk_mode == EXT_CLK) {
@@ -79,13 +79,16 @@ static void handle_error(struct uart_port *port)
 	sci_out(port, SCLSR, 0x00);
 }
 
-static int serial_raw_putc(struct uart_port *port, const char c)
+ int serial_raw_putc(struct uart_port *port, const char c)
 {
 #ifndef CONFIG_DEBUG_RZF_FPGA
+#if 0           /* #### */
 	/* Tx fifo is empty */
 	if (!(sci_in(port, SCxSR) & SCxSR_TEND(port)))
 		return -EAGAIN;
 #endif
+#endif
+    udelay(1);
 
 	sci_out(port, SCxTDR, c);
 	sci_out(port, SCxSR, sci_in(port, SCxSR) & ~SCxSR_TEND(port));

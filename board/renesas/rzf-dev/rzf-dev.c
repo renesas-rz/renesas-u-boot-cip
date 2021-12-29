@@ -113,7 +113,8 @@ u32 spl_boot_device(void)
 #else
     uint16_t boot_dev;
     
-	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
+    boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
+    
     switch (boot_dev)
     {
     case BOOT_MODE_SPI_1_8:
@@ -123,13 +124,11 @@ u32 spl_boot_device(void)
     case BOOT_MODE_ESD:
     case BOOT_MODE_EMMC_1_8:
     case BOOT_MODE_EMMC_3_3:
-//        return BOOT_DEVICE_MMC1;
-        return BOOT_DEVICE_NOR;
+        return BOOT_DEVICE_MMC1;
         
     case BOOT_MODE_SCIF:
     default:
-//        return BOOT_DEVICE_NONE;
-        return BOOT_DEVICE_NOR;
+        return BOOT_DEVICE_NONE;
     }
 #endif
 }
