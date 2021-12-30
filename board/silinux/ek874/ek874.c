@@ -96,3 +96,21 @@ int board_late_init(void)
 
 	return 0;
 }
+
+#if defined(CONFIG_MULTI_DTB_FIT)
+int board_fit_config_name_match(const char *name)
+{
+	char rev;
+
+	rev = check_rev();
+
+	if (!strcmp(name, "r8a774c0-ek874-revc-u-boot") &&
+	   ((rev == 'C') || (rev == 'B')))
+		return 0;
+
+	if (!strcmp(name, "r8a774c0-ek874-u-boot") && (rev == 'E'))
+		return 0;
+
+	return -1;
+}
+#endif
