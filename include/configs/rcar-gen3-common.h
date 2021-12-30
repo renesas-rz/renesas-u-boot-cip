@@ -33,6 +33,7 @@
 /* ENV setting */
 
 #define CFG_EXTRA_ENV_SETTINGS	\
+	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0"
 
 #endif	/* __RCAR_GEN3_COMMON_H */
