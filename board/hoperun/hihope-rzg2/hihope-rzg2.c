@@ -10,6 +10,7 @@
 #include <env.h>
 #include <asm/global_data.h>
 #include <asm/io.h>
+#include <asm/system.h>
 #include <asm/gpio.h>
 #include <asm/arch/gpio.h>
 #include <asm/processor.h>
@@ -18,6 +19,8 @@
 #include <linux/bitops.h>
 #include <linux/delay.h>
 #include <linux/libfdt.h>
+
+#include "../../renesas/rzg-common/common.h"
 
 #define RST_BASE	0xE6160000
 #define RST_CA57RESCNT	(RST_BASE + 0x40)
@@ -200,4 +203,150 @@ int board_late_init(void)
 	env_set_hex("board_rev", board_rev);
 
 	return 0;
+}
+
+static const char * const rzg2h_dt_ecc_partial[] = {
+	"/memory@500000000", NULL, NULL,
+	"/memory@600000000", "reg", "<0x6 0x00000000 0x0 0x80000000>",
+	"/memory@600000000", "device_type", "memory",
+};
+
+static const char * const rzg2h_dt_ecc_full_single[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x4C000000>",
+	"/memory@500000000", NULL, NULL,
+	"/memory@600000000", "reg", "<0x6 0x00000000 0x0 0x40000000>",
+	"/memory@600000000", "device_type", "memory",
+	"/reserved-memory/linux,lossy_decompress", NULL, NULL,
+	"/reserved-memory/linux,cma", "reg", "<0x0 0x50000000 0x0 0x20000000>",
+	"/reserved-memory/linux,multimedia", "reg",
+					     "<0x0 0x70000000 0x0 0x10000000>",
+	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia>",
+};
+
+static const char * const rzg2h_dt_ecc_full_dual[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
+	"/memory@500000000", NULL, NULL,
+	"/memory@600000000", NULL, NULL,
+	"/reserved-memory/linux,lossy_decompress", NULL, NULL,
+	"/reserved-memory/linux,cma", "reg", "<0x0 0x50000000 0x0 0x20000000>",
+	"/reserved-memory/linux,multimedia", "reg",
+					     "<0x0 0x70000000 0x0 0x10000000>",
+	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia>",
+	"/soc/iommu@e67b0000", "status", "okay",
+	"/soc/iommu@fd800000", "status", "okay",
+	"/soc/iommu@fd950000", "status", "okay",
+	"/soc/iommu@fd960000", "status", "okay",
+	"/soc/iommu@fd970000", "status", "okay",
+};
+
+static const char * const rzg2m_dt_ecc_full_single[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x4C000000>",
+	"/memory@600000000", "reg", "<0x6 0x00000000 0x0 0x40000000>",
+	"/memory@600000000", "device_type", "memory",
+	"/reserved-memory/linux,lossy_decompress", NULL, NULL,
+	"/reserved-memory/linux,cma", "reg", "<0x0 0x50000000 0x0 0x20000000>",
+	"/reserved-memory/linux,multimedia", "reg",
+					     "<0x0 0x70000000 0x0 0x10000000>",
+	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia>",
+};
+
+static const char * const rzg2m_dt_ecc_full_dual[] = {
+	"/memory@600000000", NULL, NULL,
+	"/reserved-memory/linux,lossy_decompress", NULL, NULL,
+	"/reserved-memory/linux,cma", "reg", "<0x0 0x50000000 0x0 0x20000000>",
+	"/reserved-memory/linux,multimedia", "reg",
+					     "<0x0 0x70000000 0x0 0x10000000>",
+	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia>",
+	"/soc/mmu@e67b0000", "status", "okay",
+	"/soc/mmu@fd800000", "status", "okay",
+	"/soc/mmu@fd950000", "status", "okay",
+};
+
+static const char * const rzg2n_dt_ecc_full_single[] = {
+	"/memory@480000000", "reg", "<0x4 0x80000000 0x0 0x14000000>",
+	"/reserved-memory/linux,lossy_decompress", NULL, NULL,
+	"/reserved-memory/linux,cma", "reg", "<0x0 0x50000000 0x0 0x20000000>",
+	"/reserved-memory/linux,multimedia", "reg",
+					     "<0x0 0x70000000 0x0 0x10000000>",
+	"/mmngr", "memory-region", "<&/reserved-memory/linux,multimedia>",
+};
+
+int ft_verify_fdt(void *fdt)
+{
+	const char **fdt_dt = NULL;
+	int use_ecc, ecc_mode, size;
+	struct pt_regs regs;
+
+	size = 0;
+	/* Setting SiP Service GET_ECC_MODE command*/
+	regs.regs[0] = RZG_SIP_SVC_GET_ECC_MODE;
+	smc_call(&regs);
+	/* First result is USE ECC or not, Second result is ECC MODE*/
+	use_ecc = regs.regs[0];
+	ecc_mode = regs.regs[1];
+
+	if (use_ecc == 1) {
+		switch (rmobile_get_cpu_type()) {
+		case RMOBILE_CPU_TYPE_R8A7795:
+			switch (ecc_mode) {
+			case 0:
+				fdt_dt = (const char **)rzg2h_dt_ecc_partial;
+				size = ARRAY_SIZE(rzg2h_dt_ecc_partial);
+				break;
+			case 1:
+				fdt_dt = (const char **)rzg2h_dt_ecc_full_dual;
+				size = ARRAY_SIZE(rzg2h_dt_ecc_full_dual);
+				break;
+			case 2:
+				fdt_dt = (const char **)rzg2h_dt_ecc_full_single;
+				size = ARRAY_SIZE(rzg2h_dt_ecc_full_single);
+				break;
+			default:
+				printf("Not support changing device-tree to ");
+				printf("compatible with ECC_MODE = %d\n", ecc_mode);
+				return 1;
+			};
+			break;
+		case RMOBILE_CPU_TYPE_R8A7796:
+			switch (ecc_mode) {
+			case 1:
+				fdt_dt = (const char **)rzg2m_dt_ecc_full_dual;
+				size = ARRAY_SIZE(rzg2m_dt_ecc_full_dual);
+				break;
+			case 2:
+				/* ECC Single only configurate in RZ/G2M rev.3.0 */
+				if (rmobile_get_cpu_rev_integer() == 3) {
+					fdt_dt = (const char **)rzg2m_dt_ecc_full_single;
+					size = ARRAY_SIZE(rzg2m_dt_ecc_full_single);
+				} else {
+					return 1;
+				}
+				break;
+			default:
+				printf("Not support changing device-tree to ");
+				printf("compatible with ECC_MODE = %d\n", ecc_mode);
+				return 1;
+			};
+			break;
+		case RMOBILE_CPU_TYPE_R8A77965:
+			switch (ecc_mode) {
+			case 2:
+				fdt_dt = (const char **)rzg2n_dt_ecc_full_single;
+				size = ARRAY_SIZE(rzg2n_dt_ecc_full_single);
+				break;
+			default:
+				printf("Not support changing device-tree to ");
+				printf("compatible with ECC_MODE = %d\n", ecc_mode);
+				return 1;
+			};
+			break;
+		default:
+			printf("Invalid Platform\n");
+			return 1;
+		}
+	} else {
+		return 1;
+	}
+
+	return update_fdt(fdt, fdt_dt, size);
 }
