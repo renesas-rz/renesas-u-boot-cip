@@ -11,4 +11,7 @@
 
 #include "rcar-gen3-common.h"
 
+/* Reserved mem for Kernel/dtb ECC area */
+#define CONFIG_PRAM		(32 * 1024)
+
 #endif /* __SILINUX_EK874_H */
