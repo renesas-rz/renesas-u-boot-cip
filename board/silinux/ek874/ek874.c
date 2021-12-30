@@ -13,6 +13,8 @@
 #include <asm/io.h>
 #include <asm/system.h>
 #include <asm/ptrace.h>
+#include <renesas_wdt.h>
+
 #include "../../renesas/rzg-common/common.h"
 
 #define RST_BASE	0xE6160000
@@ -93,6 +95,9 @@ void reset_cpu(void)
 }
 int board_late_init(void)
 {
+#ifdef CONFIG_WDT_RENESAS
+	reinitr_wdt();
+#endif
 	env_set("board_rev", &board_rev);
 	return 0;
 }
