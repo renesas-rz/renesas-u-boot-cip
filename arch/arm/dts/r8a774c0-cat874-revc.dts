@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the Silicon Linux RZ/G2E 96board platform (CAT874)
+ * Device Tree Source for the Silicon Linux RZ/G2E 96board platform (CAT874) Rev.C
  *
- * Copyright (C) 2019 Renesas Electronics Corp.
+ * Copyright (C) 2021 Renesas Electronics Corp.
  */
 
 /dts-v1/;
@@ -17,8 +17,6 @@
 	aliases {
 		serial0 = &scif2;
 		serial1 = &hscif2;
-		mmc0 = &sdhi0;
-		mmc1 = &sdhi3;
 	};
 
 	chosen {
@@ -51,7 +49,7 @@
 		};
 
 		led2 {
-			gpios = <&gpio5 16 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio4 10 GPIO_ACTIVE_HIGH>;
 			label = "LED2";
 		};
 
@@ -65,24 +63,6 @@
 		device_type = "memory";
 		/* first 128MB is reserved for secure area. */
 		reg = <0x0 0x48000000 0x0 0x78000000>;
-	};
-
-	reg_1p8v: regulator0 {
-		compatible = "regulator-fixed";
-		regulator-name = "fixed-1.8V";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-boot-on;
-		regulator-always-on;
-	};
-
-	reg_3p3v: regulator1 {
-		compatible = "regulator-fixed";
-		regulator-name = "fixed-3.3V";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		regulator-boot-on;
-		regulator-always-on;
 	};
 
 	reg_12p0v: regulator-12p0v {
@@ -150,15 +130,27 @@
 		clock-frequency = <74250000>;
 	};
 
-	vbus0_usb2: regulator-vbus0-usb2 {
-		compatible = "regulator-fixed";
+	connector {
+		compatible = "usb-c-connector";
+		label = "USB-C";
+		data-role = "dual";
 
-		regulator-name = "USB20_VBUS_CN";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-
-		gpio = <&gpio6 5 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			port@0 {
+				reg = <0>;
+				hs_ep: endpoint {
+					remote-endpoint = <&usb3_hs_ep>;
+				};
+			};
+			port@1 {
+				reg = <1>;
+				ss_ep: endpoint {
+					remote-endpoint = <&hd3ss3220_in_ep>;
+				};
+			};
+		};
 	};
 };
 
@@ -178,7 +170,7 @@
 
 	ports {
 		port@0 {
-			du_out_rgb: endpoint {
+			endpoint {
 				remote-endpoint = <&tda19988_in>;
 			};
 		};
@@ -210,6 +202,30 @@
 &i2c0 {
 	status = "okay";
 	clock-frequency = <100000>;
+
+	hd3ss3220@47 {
+		compatible = "ti,hd3ss3220";
+		reg = <0x47>;
+		interrupt-parent = <&gpio6>;
+		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			port@0 {
+				reg = <0>;
+				hd3ss3220_in_ep: endpoint {
+					remote-endpoint = <&ss_ep>;
+				};
+			};
+			port@1 {
+				reg = <1>;
+				hd3ss3220_out_ep: endpoint {
+					remote-endpoint = <&usb3_role_switch>;
+				};
+			};
+		};
+	};
 
 	tda19988: tda19988@70 {
 		compatible = "nxp,tda998x";
@@ -312,14 +328,8 @@
 		power-source = <1800>;
 	};
 
-	sdhi1_pins: sd1 {
-		groups = "sdhi1_data4", "sdhi1_ctrl";
-		function = "sdhi1";
-		power-source = <1800>;
-	};
-
 	sdhi3_pins: sd3 {
-		groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
+		groups = "sdhi3_data4", "sdhi3_ctrl";
 		function = "sdhi3";
 		power-source = <1800>;
 	};
@@ -335,18 +345,13 @@
 	};
 
 	usb30_pins: usb30 {
-		groups = "usb30";
+		groups = "usb30", "usb30_id";
 		function = "usb30";
-	};
-
-	usb0_pins: usb {
-		groups = "usb0_b", "usb0_id";
-		function = "usb0";
 	};
 };
 
 &rcar_sound {
-	pinctrl-0 = <&sound_pins>, <&sound_clk_pins>;
+	pinctrl-0 = <&sound_pins &sound_clk_pins>;
 	pinctrl-names = "default";
 
 	/* Single DAI */
@@ -360,7 +365,7 @@
 
 	rcar_sound,dai {
 		dai0 {
-			playback = <&ssi0>, <&src0>, <&dvc0>;
+			playback = <&ssi0 &src0 &dvc0>;
 		};
 	};
 };
@@ -391,9 +396,9 @@
 	status = "okay";
 };
 
-&sdhi1 {
+&sdhi3 {
 	status = "okay";
-	pinctrl-0 = <&sdhi1_pins>;
+	pinctrl-0 = <&sdhi3_pins>;
 	pinctrl-names = "default";
 
 	vmmc-supply = <&wlan_en_reg>;
@@ -412,37 +417,32 @@
 	};
 };
 
-&sdhi3 {
-	/* used for on-board 8bit eMMC */
-	pinctrl-0 = <&sdhi3_pins>;
-	pinctrl-1 = <&sdhi3_pins>;
-	pinctrl-names = "default", "state_uhs";
-
-	vmmc-supply = <&reg_3p3v>;
-	vqmmc-supply = <&reg_1p8v>;
-	bus-width = <8>;
-	mmc-hs200-1_8v;
-	mmc-hs400-1_8v;
-	non-removable;
-	status = "okay";
-};
-
 &usb2_phy0 {
-	pinctrl-0 = <&usb0_pins>;
-	pinctrl-names = "default";
-	vbus-supply = <&vbus0_usb2>;
-
-	status = "okay";
-};
-
-&hsusb {
-	dr_mode = "otg";
+	renesas,no-otg-pins;
 	status = "okay";
 };
 
 &usb3_peri0 {
 	companion = <&xhci0>;
 	status = "okay";
+	usb-role-switch;
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@0 {
+			reg = <0>;
+			usb3_hs_ep: endpoint {
+				remote-endpoint = <&hs_ep>;
+			};
+		};
+		port@1 {
+			reg = <1>;
+			usb3_role_switch: endpoint {
+				remote-endpoint = <&hd3ss3220_out_ep>;
+			};
+		};
+	};
 };
 
 &xhci0 {
