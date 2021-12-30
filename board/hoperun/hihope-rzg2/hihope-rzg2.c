@@ -19,6 +19,7 @@
 #include <linux/bitops.h>
 #include <linux/delay.h>
 #include <linux/libfdt.h>
+#include <renesas_wdt.h>
 
 #include "../../renesas/rzg-common/common.h"
 
@@ -200,6 +201,10 @@ int board_fit_config_name_match(const char *name)
 
 int board_late_init(void)
 {
+#ifdef CONFIG_WDT_RENESAS
+	reinitr_wdt();
+#endif
+
 	env_set_hex("board_rev", board_rev);
 
 	return 0;
