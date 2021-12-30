@@ -102,11 +102,16 @@ int arch_misc_init(void)
 	const u8 *cpu_name = get_cpu_name(idx);
 	char cpu[10] = { 0 };
 
-	for (i = 0; i < sizeof(cpu); i++)
-		cpu[i] = tolower(cpu_name[i]);
+	if ((renesas_cpuinfo[idx].cpu_type == RENESAS_CPU_TYPE_R8A7796) &&
+	    (renesas_get_cpu_rev_integer() == 3) &&
+	    (renesas_get_cpu_rev_fraction() == 0)) {
+		env_set("platform", "r8a774a3");
+	} else {
+		for (i = 0; i < sizeof(cpu); i++)
+			cpu[i] = tolower(cpu_name[i]);
 
-	env_set("platform", cpu);
-
+		env_set("platform", cpu);
+	}
 	return 0;
 }
 #endif
@@ -115,11 +120,20 @@ int print_cpuinfo(void)
 {
 	int i = renesas_cpuinfo_idx();
 
-	if (renesas_cpuinfo[i].cpu_type == RENESAS_CPU_TYPE_R8A7796 &&
-	    renesas_get_cpu_rev_integer() == 1 &&
-	    renesas_get_cpu_rev_fraction() == 1) {
-		printf("CPU:   Renesas Electronics %s rev 1.1/1.2\n", get_cpu_name(i));
-		return 0;
+	/* Specific cases for RZ/G2M */
+	if (renesas_cpuinfo[i].cpu_type == RENESAS_CPU_TYPE_R8A7796) {
+		if ((renesas_get_cpu_rev_integer() == 1) &&
+		    (renesas_get_cpu_rev_fraction() == 1)) {
+			printf("CPU:   Renesas Electronics %s rev 1.1/rev 1.2\n",
+				get_cpu_name(i));
+			return 0;
+		}
+
+		if ((renesas_get_cpu_rev_integer() == 3) &&
+		    (renesas_get_cpu_rev_fraction() == 0)) {
+			printf("CPU:   Renesas Electronics R8A774A3\n");
+			return 0;
+		}
 	}
 
 	printf("CPU:   Renesas Electronics %s rev %d.%d\n",
