@@ -114,7 +114,6 @@ u32 spl_boot_device(void)
     uint16_t boot_dev;
     
     boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
-    
     switch (boot_dev)
     {
     case BOOT_MODE_SPI_1_8:

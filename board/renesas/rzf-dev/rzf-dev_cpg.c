@@ -502,7 +502,7 @@ static void cpg_pll_start_146(CPG_PLL_SETDATA_146 *pdata)
 }
 
 /* It is assumed that the PLL has stopped by the time this function is executed. */
- void cpg_pll_setup(void)
+static void cpg_pll_setup(void)
 {
 #ifndef CONFIG_DEBUG_RZF_FPGA
 	uint32_t val = 0;

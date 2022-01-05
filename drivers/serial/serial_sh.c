@@ -68,6 +68,9 @@ sh_serial_setbrg_generic(struct uart_port *port, int clk, int baudrate)
 		udelay((1000000 * dl * 16 / clk) * 1000 + 1);
 	} else {
 		sci_out(port, SCBRR, SCBRR_VALUE(baudrate, clk));
+#ifdef CONFIG_RZF_DEV
+    	sci_out(port, SCxTDR, 0x00);
+#endif
 	}
 }
 
@@ -82,13 +85,9 @@ static void handle_error(struct uart_port *port)
 static int serial_raw_putc(struct uart_port *port, const char c)
 {
 #ifndef CONFIG_DEBUG_RZF_FPGA
-#if 0           /* #### */
 	/* Tx fifo is empty */
 	if (!(sci_in(port, SCxSR) & SCxSR_TEND(port)))
 		return -EAGAIN;
-#else /* #### */
-    udelay(100);
-#endif /* #### */
 #endif
 
 	sci_out(port, SCxTDR, c);
