@@ -502,10 +502,9 @@ static void cpg_pll_start_146(CPG_PLL_SETDATA_146 *pdata)
 }
 
 /* It is assumed that the PLL has stopped by the time this function is executed. */
-static void cpg_pll_setup(void)
+ void cpg_pll_setup(void)
 {
 #ifndef CONFIG_DEBUG_RZF_FPGA
-#if 0           /* #### */
 	uint32_t val = 0;
 
 	/* PLL4 startup */
@@ -520,7 +519,6 @@ static void cpg_pll_setup(void)
 		val = mmio_read_32(CPG_PLL6_MON);
 	} while ((val & (PLL6_MON_PLL6_RESETB | PLL6_MON_PLL6_LOCK)) != 0);
 #endif
-#endif
 
 	/* Set PLL4 to normal mode */
 	cpg_pll_start_146(&cpg_pll4_setdata);
@@ -528,7 +526,6 @@ static void cpg_pll_setup(void)
 	cpg_pll_start_146(&cpg_pll6_setdata);
 
 #ifndef CONFIG_DEBUG_RZF_FPGA
-#if 0           /* #### */
 	/* PLL4 normal mode transition confirmation */
 	do {
 		val = mmio_read_32(CPG_PLL4_MON);
@@ -538,7 +535,6 @@ static void cpg_pll_setup(void)
 	do {
 		val = mmio_read_32(CPG_PLL6_MON);
 	} while ((val & (PLL6_MON_PLL6_RESETB | PLL6_MON_PLL6_LOCK)) == 0);
-#endif
 #endif
 }
 
