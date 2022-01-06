@@ -79,19 +79,33 @@ static void handle_error(struct uart_port *port)
 	sci_out(port, SCLSR, 0x00);
 }
 
+#ifndef CONFIG_RZF_DEV
 static int serial_raw_putc(struct uart_port *port, const char c)
 {
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* Tx fifo is empty */
 	if (!(sci_in(port, SCxSR) & SCxSR_TEND(port)))
 		return -EAGAIN;
-#endif
 
 	sci_out(port, SCxTDR, c);
 	sci_out(port, SCxSR, sci_in(port, SCxSR) & ~SCxSR_TEND(port));
 
 	return 0;
 }
+#else /* CONFIG_DEBUG_RZF_FPGA */
+static int serial_raw_putc(struct uart_port *port, const char c)
+{
+#ifndef CONFIG_DEBUG_RZF_FPGA
+	/* Tx fifo is empty */
+	if (!(sci_in(port, SCxSR) & (SCxSR_TEND(port) | SCxSR_TDxE(port))))
+		return -EAGAIN;
+#endif
+
+	sci_out(port, SCxTDR, c);
+	sci_out(port, SCxSR, sci_in(port, SCxSR) & ~(SCxSR_TEND(port) | SCxSR_TDxE(port)));
+
+	return 0;
+}
+#endif /* CONFIG_DEBUG_RZF_FPGA */
 
 static int serial_rx_fifo_level(struct uart_port *port)
 {
