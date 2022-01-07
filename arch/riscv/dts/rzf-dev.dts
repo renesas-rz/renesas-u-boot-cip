@@ -58,11 +58,11 @@
 				cache-level = <2>;
 				cache-size = <0x40000>;
 				reg = <0x0 0x13400000 0x0 0x40000>;
-				andes,inst-prefetch = <3>;
-				andes,data-prefetch = <3>;
+				andes,inst-prefetch = <0>;
+				andes,data-prefetch = <0>;
 				/* The value format is <XRAMOCTL XRAMICTL> */
-				andes,tag-ram-ctl = <0 0>;
-				andes,data-ram-ctl = <0 0>;
+				andes,tag-ram-ctl = <1 0>;
+				andes,data-ram-ctl = <1 0>;
 		};
 
 		memory@48000000 {
