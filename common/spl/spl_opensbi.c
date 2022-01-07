@@ -73,11 +73,11 @@ void spl_invoke_opensbi(struct spl_image_info *spl_image)
 	opensbi_info.next_addr = uboot_entry;
 	opensbi_info.next_mode = FW_DYNAMIC_INFO_NEXT_MODE_S;
 #if 0 /* ##### */
-    opensbi_info.options = SBI_SCRATCH_NO_BOOT_PRINTS;
+	opensbi_info.options = SBI_SCRATCH_NO_BOOT_PRINTS;
 #else
     opensbi_info.options = 0;
 #endif
-    opensbi_info.boot_hart = gd->arch.boot_hart;
+	opensbi_info.boot_hart = gd->arch.boot_hart;
 
 	opensbi_entry = (void (*)(ulong, ulong, ulong))spl_image->entry_point;
 	invalidate_icache_all();
@@ -99,6 +99,10 @@ void spl_invoke_opensbi(struct spl_image_info *spl_image)
 	if (ret)
 		hang();
 #endif
+#if 1 /* ### */
+    printf("Entry to RISC-V OpenSBI[0x%p]", opensbi_entry);
+    printf("(%ld, 0x%p, 0x%p)\n", gd->arch.boot_hart, spl_image->fdt_addr, &opensbi_info);
+#endif /* ### */
 	opensbi_entry(gd->arch.boot_hart, (ulong)spl_image->fdt_addr,
 		      (ulong)&opensbi_info);
 }

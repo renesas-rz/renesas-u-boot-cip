@@ -248,7 +248,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		(uintptr_t)CPG_RST_DDR,
 		(uintptr_t)CPG_RSTMON_DDR,
 	    0x004F0000,
-	    CPG_T_RST
+		CPG_T_RST
 	},
 #else
 	{		/* DDR */
@@ -577,7 +577,7 @@ void cpg_active_ddr(void (*disable_phy)(void))
 {
 	/* Assert the reset of DDRTOP */
 	mmio_write_32(CPG_RST_DDR, 0x004F0000 | (CPG_RST_DDR_OPT_VALUE << 16));
-    mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
+	mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
 #ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000004F) != 0x0000004F)
 		;
