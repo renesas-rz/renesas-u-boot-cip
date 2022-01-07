@@ -42,10 +42,7 @@ int board_early_init_f(void)
 #ifdef CONFIG_V5L2_CACHE
 	v5l2_init();
 #endif
-#if 1   /* ########## */
-    *(uint64_t *)(0x13400008) = 0x0000;
-#endif  /* ########## */
-
+    
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_1_8;
 	*(volatile u32 *)(PFC_ETH_ch1) = (*(volatile u32 *)(PFC_ETH_ch1) & 0xFFFFFFFC) | ETH_ch1_1_8;
@@ -116,7 +113,7 @@ u32 spl_boot_device(void)
 #else
     uint16_t boot_dev;
     
-	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
+    boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
     switch (boot_dev)
     {
     case BOOT_MODE_SPI_1_8:

@@ -121,7 +121,7 @@
 #define CONFIG_BITBANGMII_MULTI
 
 /* select DDR clock */
-/*#define CONFIG_RZF_DDR_PLL4 1333 */
+//#define RZF_DDR_PLL4 1333
 #define RZF_DDR_PLL4 1600
 
 #endif /* __CONFIG_H */

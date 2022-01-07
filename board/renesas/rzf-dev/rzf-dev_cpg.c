@@ -653,5 +653,5 @@ void cpg_setup(void)
 	cpg_pll_setup();
 	cpg_clk_on_setup();
 	cpg_reset_setup();
-	cpg_div_sel_dynamic_setup();
+    cpg_div_sel_dynamic_setup();
 }
