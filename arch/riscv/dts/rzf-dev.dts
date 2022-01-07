@@ -165,7 +165,6 @@
 						compatible = "renesas,scif-r9a07g044l", "renesas,scif";
 						reg = <0 0x1004b800 0 0x400>;
 						clocks = <&cpg 1 13>;
-						clock-names = "fck";
 						resets = <&cpg 13>;
 						power-domains = <&cpg>;
 						clock = <100000000>;
