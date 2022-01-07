@@ -69,7 +69,7 @@
 				u-boot,dm-spl;
 				device_type = "memory";
 				/* first 128MB is reserved for secure area. */
-				reg = <0 0x48000000 0 0x78000000>;
+				reg = <0 0x48000000 0 0x38000000>;
 		};
 
 		/*
@@ -165,7 +165,6 @@
 						compatible = "renesas,scif-r9a07g044l", "renesas,scif";
 						reg = <0 0x1004b800 0 0x400>;
 						clocks = <&cpg 1 13>;
-						clock-names = "fck";
 						resets = <&cpg 13>;
 						power-domains = <&cpg>;
 						clock = <100000000>;
