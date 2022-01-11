@@ -55,6 +55,16 @@ int board_early_init_f(void)
 	/* I2C pin non GPIO enable */
 	*(volatile u32 *)(PFC_IEN0E) = 0x01010101;
 
+	*(volatile u32 *)(PFC_PMC06) = (*(volatile u32 *)(PFC_PMC06) & 0xFFFFFFFF) | 0x0002; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_PMC07) = (*(volatile u32 *)(PFC_PMC07) & 0xFFFFFFFF) | 0x00FF; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_PMC08) = (*(volatile u32 *)(PFC_PMC08) & 0xFFFFFFFF) | 0x0002; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_PMC09) = (*(volatile u32 *)(PFC_PMC09) & 0xFFFFFFFF) | 0x000F; /* Port func mode 0b0 */
+
+	*(volatile u32 *)(PFC_IEN06) = (*(volatile u32 *)(PFC_IEN06) & 0xFFFFFFFF) | 0x0100; /* Port func mode 0b0 */
+	*(volatile u64 *)(PFC_IEN07) = (*(volatile u64 *)(PFC_IEN07) & 0xFFFFFFFFFFFFFFFF) | 0x0101010101010101; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_IEN08) = (*(volatile u32 *)(PFC_IEN08) & 0xFFFFFFFF) | 0x0100; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_IEN09) = (*(volatile u32 *)(PFC_IEN09) & 0xFFFFFFFF) | 0x01010101; /* Port func mode 0b0 */
+
 	return 0;
 }
 #endif
@@ -63,12 +73,12 @@ int board_mmc_init(struct bd_info *bis)
 {
 	int ret = 0;
 
-	/* SD1 power control: P5_4=0,P18_5 = 1; */
-	*(volatile u32 *)(PFC_PMC15) &= 0xFFFFFFEF; /* Port func mode 0b0 */
+	/* SD1 power control: P6_2=0,P18_5 = 1; */
+	*(volatile u32 *)(PFC_PMC16) &= 0xFFFFFFFB; /* Port func mode 0b0 */
 	*(volatile u32 *)(PFC_PMC22) &= 0xFFFFFFDF; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_PM15) = (*(volatile u32 *)(PFC_PM22) & 0xFFFFFCFF) | 0x800; /* Port output mode 0b10 */
+	*(volatile u32 *)(PFC_PM16) = (*(volatile u32 *)(PFC_PM16) & 0xFFFFFFCF) | 0x20; /* Port output mode 0b10 */
 	*(volatile u32 *)(PFC_PM22) = (*(volatile u32 *)(PFC_PM22) & 0xFFFFF3FF) | 0x800; /* Port output mode 0b10 */
-	*(volatile u32 *)(PFC_P15) = (*(volatile u32 *)(PFC_P22) & 0xFFFFFFEF) | 0x20;	/* Port 13[2:1] output value 0b1*/
+	*(volatile u32 *)(PFC_P16) = (*(volatile u32 *)(PFC_P16) & 0xFFFFFFFB) | 0x00;	/* Port 13[2:1] output value 0b0*/
 	*(volatile u32 *)(PFC_P22) = (*(volatile u32 *)(PFC_P22) & 0xFFFFFFDF) | 0x20;	/* Port 13[2:1] output value 0b1*/
 
 
