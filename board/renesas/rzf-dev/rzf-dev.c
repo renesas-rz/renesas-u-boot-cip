@@ -102,9 +102,11 @@ int board_mmc_init(struct bd_info *bis)
 	ret |= sh_sdhi_init(RZF_SD0_BASE,
 						0,
 						SH_SDHI_QUIRK_64BIT_BUF);
+	printf("\nSD0:sh_sdhi_init:ret = %d\n",ret);
 	ret |= sh_sdhi_init(RZF_SD1_BASE,
 						1,
 						SH_SDHI_QUIRK_64BIT_BUF);
+	printf("SD1:sh_sdhi_init:ret = %d\n",ret);
 
 	return ret;
 }

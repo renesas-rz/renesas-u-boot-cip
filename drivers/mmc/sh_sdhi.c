@@ -107,6 +107,7 @@ static int sh_sdhi_intr(void *dev_id)
 	}
 
 	if (state2 & INFO2_ALL_ERR) {
+		printf("%s: state1 = %x, state2 = %x\n", __func__, state1, state2);
 		sh_sdhi_writew(host, SDHI_INFO2,
 			       (unsigned short)~(INFO2_ALL_ERR));
 		sh_sdhi_writew(host, SDHI_INFO2_MASK,
@@ -252,6 +253,8 @@ static int sh_sdhi_error_manage(struct sh_sdhi_host *host)
 			ret = -ETIMEDOUT;
 		else
 			ret = -EILSEQ;
+		printf("%s: ERR_STS2 = %04x\n",
+		      DRIVER_NAME, sh_sdhi_readw(host, SDHI_ERR_STS2));
 		debug("%s: ERR_STS2 = %04x\n",
 		      DRIVER_NAME, sh_sdhi_readw(host, SDHI_ERR_STS2));
 		sh_sdhi_sync_reset(host);
@@ -265,6 +268,8 @@ static int sh_sdhi_error_manage(struct sh_sdhi_host *host)
 	else
 		ret = -ETIMEDOUT;
 
+	printf("%s: ERR_STS1 = %04x\n",
+	      DRIVER_NAME, sh_sdhi_readw(host, SDHI_ERR_STS1));
 	debug("%s: ERR_STS1 = %04x\n",
 	      DRIVER_NAME, sh_sdhi_readw(host, SDHI_ERR_STS1));
 	sh_sdhi_sync_reset(host);
@@ -554,9 +559,13 @@ static int sh_sdhi_start_cmd(struct sh_sdhi_host *host,
 
 		time = sh_sdhi_wait_interrupt_flag(host);
 		if (time == 0 || host->sd_error != 0)
+		{
+			printf("%s:1",__func__);
 			return sh_sdhi_error_manage(host);
+		}
 
 		sh_sdhi_get_response(host, cmd);
+//		printf("%s:2",__func__);
 		return 0;
 	}
 
@@ -604,6 +613,7 @@ static int sh_sdhi_start_cmd(struct sh_sdhi_host *host,
 	time = sh_sdhi_wait_interrupt_flag(host);
 	if (!time) {
 		host->app_cmd = 0;
+		printf("%s:3",__func__);
 		return sh_sdhi_error_manage(host);
 	}
 
@@ -624,11 +634,13 @@ static int sh_sdhi_start_cmd(struct sh_sdhi_host *host,
 		host->sd_error = 0;
 		host->wait_int = 0;
 		host->app_cmd = 0;
+		printf("%s:4",__func__);
 		return ret;
 	}
 
 	if (sh_sdhi_readw(host, SDHI_INFO1) & INFO1_RESP_END) {
 		host->app_cmd = 0;
+		printf("%s:5",__func__);
 		return -EINVAL;
 	}
 
@@ -640,6 +652,15 @@ static int sh_sdhi_start_cmd(struct sh_sdhi_host *host,
 	if (data)
 		ret = sh_sdhi_data_trans(host, data, opc);
 
+	if(ret){
+		printf("\n%s: ",__func__);
+		printf("opc = %d, arg = %x, resp_type = %x\n",
+	      opc, cmd->cmdarg, cmd->resp_type);
+		printf("ret = %d, resp = %08x, %08x, %08x, %08x\n",
+	      ret, cmd->response[0], cmd->response[1],
+	      cmd->response[2], cmd->response[3]);
+	}
+	
 	debug("ret = %d, resp = %08x, %08x, %08x, %08x\n",
 	      ret, cmd->response[0], cmd->response[1],
 	      cmd->response[2], cmd->response[3]);
