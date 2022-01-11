@@ -225,6 +225,11 @@ config TARGET_RZG2UL_TYPE2_DEV
 	help
           Support for Renesas RZ/G2UL Type2 Dev Platform
 
+config TARGET_SMARC_RZG2UL
+	bool "RZ/G2UL SMARC board"
+	help
+          Support for Renesas RZ/G2UL Dev Platform
+
 endchoice
 
 source "board/renesas/condor/Kconfig"
