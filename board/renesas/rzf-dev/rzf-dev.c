@@ -60,25 +60,23 @@ int board_early_init_f(void)
 	*(volatile u8 *)(PFC_PMC08) = 0x03; /* Port func mode 0b0 */
 	*(volatile u8 *)(PFC_PMC09) = 0x0F; /* Port func mode 0b0 */
 
-	*(volatile u32 *)(PFC_IEN06) = (*(volatile u32 *)(PFC_IEN06) & 0xFFFFFFFF) | 0x0100; /* Port func mode 0b0 */
-	*(volatile u64 *)(PFC_IEN07) = (*(volatile u64 *)(PFC_IEN07) & 0xFFFFFFFFFFFFFFFF) | 0x0101010101010101; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_IEN08) = (*(volatile u32 *)(PFC_IEN08) & 0xFFFFFFFF) | 0x0100; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_IEN09) = (*(volatile u32 *)(PFC_IEN09) & 0xFFFFFFFF) | 0x01010101; /* Port func mode 0b0 */
-
-	*(volatile u8 *)(PFC_PIN06) = 0x02; /* Port func mode 0b0 */
-	*(volatile u8 *)(PFC_PIN07) = 0xFF; /* Port func mode 0b0 */
-	*(volatile u8 *)(PFC_PIN08) = 0x02; /* Port func mode 0b0 */
-	*(volatile u8 *)(PFC_PIN09) = 0x0F; /* Port func mode 0b0 */
-
-	*(volatile u32 *)(PFC_IOLH06) = (*(volatile u32 *)(PFC_IOLH06) & 0xFFFFFFFF) | 0x0303; /* Port func mode 0b0 */
-	*(volatile u64 *)(PFC_IOLH07) = (*(volatile u64 *)(PFC_IOLH07) & 0xFFFFFFFFFFFFFFFF) | 0x0303030303030303; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_IOLH08) = (*(volatile u32 *)(PFC_IOLH08) & 0xFFFFFFFF) | 0x0303; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_IOLH09) = (*(volatile u32 *)(PFC_IOLH09) & 0xFFFFFFFF) | 0x03030303; /* Port func mode 0b0 */
+//	*(volatile u32 *)(PFC_IEN06) = (*(volatile u32 *)(PFC_IEN06) & 0xFFFFFFFF) | 0x0100;
+//	*(volatile u64 *)(PFC_IEN07) = (*(volatile u64 *)(PFC_IEN07) & 0xFFFFFFFFFFFFFFFF) | 0x0101010101010101;
+//	*(volatile u32 *)(PFC_IEN08) = (*(volatile u32 *)(PFC_IEN08) & 0xFFFFFFFF) | 0x0100;
+//	*(volatile u32 *)(PFC_IEN09) = (*(volatile u32 *)(PFC_IEN09) & 0xFFFFFFFF) | 0x01010101;
+//
+//	*(volatile u32 *)(PFC_IOLH06) = 0x030303;
+//	*(volatile u64 *)(PFC_IOLH07) = 0x0303030303030303;
+//	*(volatile u32 *)(PFC_IOLH08) = 0x0303;
+//	*(volatile u32 *)(PFC_IOLH09) = 0x03030303;
+//	
+//	*(volatile u32 *)(PFC_SR06) = 0x010101;
+//	*(volatile u64 *)(PFC_SR07) = 0x0101010101010101;
+//	*(volatile u32 *)(PFC_SR08) = 0x0101;
+//	*(volatile u32 *)(PFC_SR09) = 0x01010101;
 	
-	*(volatile u32 *)(PFC_SR08) = (*(volatile u32 *)(PFC_SR08) & 0xFFFFFFFF) | 0x0101; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_SR09) = (*(volatile u32 *)(PFC_SR09) & 0xFFFFFFFF) | 0x01010101; /* Port func mode 0b0 */
-	
-	*(volatile u32 *)(PFC_SD_ch1) = (*(volatile u32 *)(PFC_SD_ch1) & 0xFFFFFFFF) | 0x01; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_SD_ch0) = 0x01;
+	*(volatile u32 *)(PFC_SD_ch1) = 0x01;
 
 	return 0;
 }
@@ -89,12 +87,16 @@ int board_mmc_init(struct bd_info *bis)
 	int ret = 0;
 
 	/* SD1 power control: P6_2=0,P18_5 = 1; */
-	*(volatile u32 *)(PFC_PMC16) &= 0xFFFFFFFB; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_PMC22) &= 0xFFFFFFDF; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PMC16) &= 0xFB; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PMC22) &= 0xDF; /* Port func mode 0b0 */
 	*(volatile u32 *)(PFC_PM16) = (*(volatile u32 *)(PFC_PM16) & 0xFFFFFFCF) | 0x20; /* Port output mode 0b10 */
 	*(volatile u32 *)(PFC_PM22) = (*(volatile u32 *)(PFC_PM22) & 0xFFFFF3FF) | 0x800; /* Port output mode 0b10 */
-	*(volatile u32 *)(PFC_P16) = (*(volatile u32 *)(PFC_P16) & 0xFFFFFFFB) | 0x00;	/* Port 13[2:1] output value 0b0*/
-	*(volatile u32 *)(PFC_P22) = (*(volatile u32 *)(PFC_P22) & 0xFFFFFFDF) | 0x20;	/* Port 13[2:1] output value 0b1*/
+	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFB) | 0x00;	/* Port 6[2:1] output value 0b0*/
+	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & 0xDF) | 0x20;	/* Port 18[2:1] output value 0b1*/
+	/*P5_4=0*/
+	*(volatile u8 *)(PFC_PMC15) &= 0xEF;
+	*(volatile u32 *)(PFC_PM15) = (*(volatile u32 *)(PFC_PM15) & 0xFFFFFCFF) | 0x200;
+	*(volatile u8 *)(PFC_P15) = (*(volatile u8 *)(PFC_P15) & 0xEF) | 0x00;
 
 
 	ret |= sh_sdhi_init(RZF_SD0_BASE,
