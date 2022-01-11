@@ -9,7 +9,7 @@
 #include <dm.h>
 #include <asm/sections.h>
 #include <asm/arch/sh_sdhi.h>
-
+#include <mmc.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_sys.h>
 #include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
@@ -55,15 +55,30 @@ int board_early_init_f(void)
 	/* I2C pin non GPIO enable */
 	*(volatile u32 *)(PFC_IEN0E) = 0x01010101;
 
-	*(volatile u32 *)(PFC_PMC06) = (*(volatile u32 *)(PFC_PMC06) & 0xFFFFFFFF) | 0x0002; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_PMC07) = (*(volatile u32 *)(PFC_PMC07) & 0xFFFFFFFF) | 0x00FF; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_PMC08) = (*(volatile u32 *)(PFC_PMC08) & 0xFFFFFFFF) | 0x0002; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_PMC09) = (*(volatile u32 *)(PFC_PMC09) & 0xFFFFFFFF) | 0x000F; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PMC06) = 0x07; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PMC07) = 0xFF; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PMC08) = 0x03; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PMC09) = 0x0F; /* Port func mode 0b0 */
 
 	*(volatile u32 *)(PFC_IEN06) = (*(volatile u32 *)(PFC_IEN06) & 0xFFFFFFFF) | 0x0100; /* Port func mode 0b0 */
 	*(volatile u64 *)(PFC_IEN07) = (*(volatile u64 *)(PFC_IEN07) & 0xFFFFFFFFFFFFFFFF) | 0x0101010101010101; /* Port func mode 0b0 */
 	*(volatile u32 *)(PFC_IEN08) = (*(volatile u32 *)(PFC_IEN08) & 0xFFFFFFFF) | 0x0100; /* Port func mode 0b0 */
 	*(volatile u32 *)(PFC_IEN09) = (*(volatile u32 *)(PFC_IEN09) & 0xFFFFFFFF) | 0x01010101; /* Port func mode 0b0 */
+
+	*(volatile u8 *)(PFC_PIN06) = 0x02; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PIN07) = 0xFF; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PIN08) = 0x02; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PIN09) = 0x0F; /* Port func mode 0b0 */
+
+	*(volatile u32 *)(PFC_IOLH06) = (*(volatile u32 *)(PFC_IOLH06) & 0xFFFFFFFF) | 0x0303; /* Port func mode 0b0 */
+	*(volatile u64 *)(PFC_IOLH07) = (*(volatile u64 *)(PFC_IOLH07) & 0xFFFFFFFFFFFFFFFF) | 0x0303030303030303; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_IOLH08) = (*(volatile u32 *)(PFC_IOLH08) & 0xFFFFFFFF) | 0x0303; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_IOLH09) = (*(volatile u32 *)(PFC_IOLH09) & 0xFFFFFFFF) | 0x03030303; /* Port func mode 0b0 */
+	
+	*(volatile u32 *)(PFC_SR08) = (*(volatile u32 *)(PFC_SR08) & 0xFFFFFFFF) | 0x0101; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_SR09) = (*(volatile u32 *)(PFC_SR09) & 0xFFFFFFFF) | 0x01010101; /* Port func mode 0b0 */
+	
+	*(volatile u32 *)(PFC_SD_ch1) = (*(volatile u32 *)(PFC_SD_ch1) & 0xFFFFFFFF) | 0x01; /* Port func mode 0b0 */
 
 	return 0;
 }
