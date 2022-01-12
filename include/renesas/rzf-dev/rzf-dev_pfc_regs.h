@@ -106,6 +106,12 @@
 #define PFC_PM3E						(PFC_BASE + 0x017C)	/* Port mode register */
 #define PFC_PM3F						(PFC_BASE + 0x017E)	/* Port mode register */
 #define PFC_PM40						(PFC_BASE + 0x0180)	/* Port mode register */
+#define PFC_PMC06						(PFC_BASE + 0x0206)	/* Port mode control register */
+#define PFC_PMC07						(PFC_BASE + 0x0207)	/* Port mode control register */
+#define PFC_PMC08						(PFC_BASE + 0x0208)	/* Port mode control register */
+#define PFC_PMC09						(PFC_BASE + 0x0209)	/* Port mode control register */
+#define PFC_PMC0A						(PFC_BASE + 0x020A)	/* Port mode control register */
+#define PFC_PMC0C						(PFC_BASE + 0x020C)	/* Port mode control register */
 #define PFC_PMC10						(PFC_BASE + 0x0210)	/* Port mode control register */
 #define PFC_PMC11						(PFC_BASE + 0x0211)	/* Port mode control register */
 #define PFC_PMC12						(PFC_BASE + 0x0212)	/* Port mode control register */
@@ -155,6 +161,12 @@
 #define PFC_PMC3E						(PFC_BASE + 0x023E)	/* Port mode control register */
 #define PFC_PMC3F						(PFC_BASE + 0x023F)	/* Port mode control register */
 #define PFC_PMC40						(PFC_BASE + 0x0240)	/* Port mode control register */
+#define PFC_PFC06						(PFC_BASE + 0x0418)	/* Port function control register */
+#define PFC_PFC07						(PFC_BASE + 0x041C)	/* Port function control register */
+#define PFC_PFC08						(PFC_BASE + 0x0420)	/* Port function control register */
+#define PFC_PFC09						(PFC_BASE + 0x0424)	/* Port function control register */
+#define PFC_PFC0A						(PFC_BASE + 0x0428)	/* Port function control register */
+#define PFC_PFC0C						(PFC_BASE + 0x0430)	/* Port function control register */
 #define PFC_PFC10						(PFC_BASE + 0x0440)	/* Port function control register */
 #define PFC_PFC11						(PFC_BASE + 0x0444)	/* Port function control register */
 #define PFC_PFC12						(PFC_BASE + 0x0448)	/* Port function control register */
@@ -701,7 +713,7 @@
 
 #define PFC_SCIF_TBL_NUM	(1)
 #define PFC_QSPI_TBL_NUM	(2)
-#define PFC_SD_TBL_NUM		(4)
+#define PFC_SD_TBL_NUM		(5)
 
 typedef struct {
 	int			flg;
