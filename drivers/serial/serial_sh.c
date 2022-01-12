@@ -91,7 +91,7 @@ static int serial_raw_putc(struct uart_port *port, const char c)
 
 	return 0;
 }
-#else /* CONFIG_DEBUG_RZF_FPGA */
+#else /* CONFIG_RZF_DEV */
 static int serial_raw_putc(struct uart_port *port, const char c)
 {
 #ifndef CONFIG_DEBUG_RZF_FPGA
@@ -105,7 +105,7 @@ static int serial_raw_putc(struct uart_port *port, const char c)
 
 	return 0;
 }
-#endif /* CONFIG_DEBUG_RZF_FPGA */
+#endif /* CONFIG_RZF_DEV */
 
 static int serial_rx_fifo_level(struct uart_port *port)
 {

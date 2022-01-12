@@ -52,7 +52,7 @@ static PFC_REGS  pfc_qspi_reg_tbl[PFC_QSPI_TBL_NUM] = {
 };
 
 static PFC_REGS  pfc_sd_reg_tbl[PFC_SD_TBL_NUM] = {
-	/* SD0_CLK */
+	/* SD0_CD/SD0_WP/SD1_CD/SD1_WP */
 	{
 		{ PFC_ON,  (uintptr_t)PFC_PMC10,  0x0F },					/* PMC */
 		{ PFC_ON,  (uintptr_t)PFC_PFC10,  0x00001111 },				/* PFC */
@@ -151,7 +151,18 @@ static void pfc_qspi_setup(void)
 {
 	int      cnt;
 
+	mmio_write_32(PFC_SD_ch0, 1);
+	mmio_write_32(PFC_SD_ch1, 0);
+
 	for (cnt = 0; cnt < PFC_QSPI_TBL_NUM; cnt++) {
+		/* PMC */
+		if (pfc_qspi_reg_tbl[cnt].pmc.flg == PFC_ON) {
+			mmio_write_8(pfc_qspi_reg_tbl[cnt].pmc.reg, pfc_qspi_reg_tbl[cnt].pmc.val);
+		}
+		/* PFC */
+		if (pfc_qspi_reg_tbl[cnt].pfc.flg == PFC_ON) {
+			mmio_write_32(pfc_qspi_reg_tbl[cnt].pfc.reg, pfc_qspi_reg_tbl[cnt].pfc.val);
+		}
 		/* IOLH */
 		if (pfc_qspi_reg_tbl[cnt].iolh.flg == PFC_ON) {
 			mmio_write_64(pfc_qspi_reg_tbl[cnt].iolh.reg, pfc_qspi_reg_tbl[cnt].iolh.val);
@@ -165,13 +176,15 @@ static void pfc_qspi_setup(void)
 			mmio_write_64(pfc_qspi_reg_tbl[cnt].sr.reg, pfc_qspi_reg_tbl[cnt].sr.val);
 		}
 	}
+
+	mmio_write_32(PFC_PWPR, 0x0);
+	mmio_write_32(PFC_PWPR, PWPR_B0Wl);
 }
 
 static void pfc_sd_setup(void)
 {
 	int      cnt;
 
-	/* Since SDx is 3.3V, the initial value will be set. */
 	mmio_write_32(PFC_SD_ch0, 1);
 	mmio_write_32(PFC_SD_ch1, 0);
 
@@ -201,6 +214,9 @@ static void pfc_sd_setup(void)
 			mmio_write_64(pfc_sd_reg_tbl[cnt].ien.reg, pfc_sd_reg_tbl[cnt].ien.val);
 		}
 	}
+
+	mmio_write_32(PFC_PWPR, 0x0);
+	mmio_write_32(PFC_PWPR, PWPR_B0Wl);
 }
 
 void pfc_setup(void)
