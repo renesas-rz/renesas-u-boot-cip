@@ -40,10 +40,7 @@ int dm_mmc_send_cmd(struct udevice *dev, struct mmc_cmd *cmd,
 
 	mmmc_trace_before_send(mmc, cmd);
 	if (ops->send_cmd)
-	{
 		ret = ops->send_cmd(dev, cmd, data);
-		printf("%s:%d ",__func__,ret);
-	}
 	else
 		ret = -ENOSYS;
 	mmmc_trace_after_send(mmc, cmd, ret);

@@ -42,7 +42,7 @@ int board_early_init_f(void)
 #ifdef CONFIG_V5L2_CACHE
 	v5l2_init();
 #endif
-
+    
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_1_8;
 	*(volatile u32 *)(PFC_ETH_ch1) = (*(volatile u32 *)(PFC_ETH_ch1) & 0xFFFFFFFC) | ETH_ch1_1_8;
@@ -54,29 +54,6 @@ int board_early_init_f(void)
 	*(volatile u32 *)(CPG_CLKON_I2C) = 0xF000F;
 	/* I2C pin non GPIO enable */
 	*(volatile u32 *)(PFC_IEN0E) = 0x01010101;
-
-	*(volatile u8 *)(PFC_PMC06) = 0x07; /* Port func mode 0b0 */
-	*(volatile u8 *)(PFC_PMC07) = 0xFF; /* Port func mode 0b0 */
-	*(volatile u8 *)(PFC_PMC08) = 0x03; /* Port func mode 0b0 */
-	*(volatile u8 *)(PFC_PMC09) = 0x0F; /* Port func mode 0b0 */
-
-//	*(volatile u32 *)(PFC_IEN06) = (*(volatile u32 *)(PFC_IEN06) & 0xFFFFFFFF) | 0x0100;
-//	*(volatile u64 *)(PFC_IEN07) = (*(volatile u64 *)(PFC_IEN07) & 0xFFFFFFFFFFFFFFFF) | 0x0101010101010101;
-//	*(volatile u32 *)(PFC_IEN08) = (*(volatile u32 *)(PFC_IEN08) & 0xFFFFFFFF) | 0x0100;
-//	*(volatile u32 *)(PFC_IEN09) = (*(volatile u32 *)(PFC_IEN09) & 0xFFFFFFFF) | 0x01010101;
-//
-//	*(volatile u32 *)(PFC_IOLH06) = 0x030303;
-//	*(volatile u64 *)(PFC_IOLH07) = 0x0303030303030303;
-//	*(volatile u32 *)(PFC_IOLH08) = 0x0303;
-//	*(volatile u32 *)(PFC_IOLH09) = 0x03030303;
-//	
-//	*(volatile u32 *)(PFC_SR06) = 0x010101;
-//	*(volatile u64 *)(PFC_SR07) = 0x0101010101010101;
-//	*(volatile u32 *)(PFC_SR08) = 0x0101;
-//	*(volatile u32 *)(PFC_SR09) = 0x01010101;
-	
-	*(volatile u32 *)(PFC_SD_ch0) = 0x01;
-	*(volatile u32 *)(PFC_SD_ch1) = 0x00;
 
 	return 0;
 }
@@ -98,15 +75,12 @@ int board_mmc_init(struct bd_info *bis)
 	*(volatile u32 *)(PFC_PM15) = (*(volatile u32 *)(PFC_PM15) & 0xFFFFFCFF) | 0x200;
 	*(volatile u8 *)(PFC_P15) = (*(volatile u8 *)(PFC_P15) & 0xEF) | 0x00;
 
-
 	ret |= sh_sdhi_init(RZF_SD0_BASE,
 						0,
 						SH_SDHI_QUIRK_64BIT_BUF);
-	printf("\nSD0:sh_sdhi_init:ret = %d\n",ret);
 	ret |= sh_sdhi_init(RZF_SD1_BASE,
 						1,
 						SH_SDHI_QUIRK_64BIT_BUF);
-	printf("SD1:sh_sdhi_init:ret = %d\n",ret);
 
 	return ret;
 }
@@ -145,7 +119,7 @@ u32 spl_boot_device(void)
 #else
     uint16_t boot_dev;
     
-	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
+    boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
     switch (boot_dev)
     {
     case BOOT_MODE_SPI_1_8:
