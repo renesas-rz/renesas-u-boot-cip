@@ -10,7 +10,6 @@
 #include <asm/sections.h>
 #include <asm/arch/sh_sdhi.h>
 #include <mmc.h>
-
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_sys.h>
 #include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
