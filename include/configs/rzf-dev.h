@@ -110,8 +110,8 @@
 			"/dev/mmcblk0p2" \
 		"bootcmd_mmc=" \
 			"setenv bootargs root=/dev/mmcblk0p2 rw rootwait;" \
-			"ext4load mmc 0:1 0x48080000 Image; " \
-			"ext4load mmc 0:1 0x48000000 "CONFIG_DEFAULT_FDT_FILE"; " \
+			"ext4load mmc 1:1 0x48080000 Image; " \
+			"ext4load mmc 1:1 0x48000000 "CONFIG_DEFAULT_FDT_FILE"; " \
 			"booti 0x48080000 - 0x48000000" \
 		"bootcmd=" \
 			"run bootcmd_mmc"

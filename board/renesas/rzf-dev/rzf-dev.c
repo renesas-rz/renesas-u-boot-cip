@@ -9,7 +9,7 @@
 #include <dm.h>
 #include <asm/sections.h>
 #include <asm/arch/sh_sdhi.h>
-
+#include <mmc.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_sys.h>
 #include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
@@ -63,14 +63,17 @@ int board_mmc_init(struct bd_info *bis)
 {
 	int ret = 0;
 
-	/* SD1 power control: P5_4=0,P18_5 = 1; */
-	*(volatile u32 *)(PFC_PMC15) &= 0xFFFFFFEF; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_PMC22) &= 0xFFFFFFDF; /* Port func mode 0b0 */
-	*(volatile u32 *)(PFC_PM15) = (*(volatile u32 *)(PFC_PM22) & 0xFFFFFCFF) | 0x800; /* Port output mode 0b10 */
+	/* SD1 power control: P6_2=0,P18_5 = 1; */
+	*(volatile u8 *)(PFC_PMC16) &= 0xFB; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PMC22) &= 0xDF; /* Port func mode 0b0 */
+	*(volatile u32 *)(PFC_PM16) = (*(volatile u32 *)(PFC_PM16) & 0xFFFFFFCF) | 0x20; /* Port output mode 0b10 */
 	*(volatile u32 *)(PFC_PM22) = (*(volatile u32 *)(PFC_PM22) & 0xFFFFF3FF) | 0x800; /* Port output mode 0b10 */
-	*(volatile u32 *)(PFC_P15) = (*(volatile u32 *)(PFC_P22) & 0xFFFFFFEF) | 0x20;	/* Port 13[2:1] output value 0b1*/
-	*(volatile u32 *)(PFC_P22) = (*(volatile u32 *)(PFC_P22) & 0xFFFFFFDF) | 0x20;	/* Port 13[2:1] output value 0b1*/
-
+	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFB) | 0x04;	/* Port 6[2:1] output value 0b1*/
+	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & 0xDF) | 0x20;	/* Port 18[2:1] output value 0b1*/
+	/*P5_4=0*/
+	*(volatile u8 *)(PFC_PMC15) &= 0xEF;
+	*(volatile u32 *)(PFC_PM15) = (*(volatile u32 *)(PFC_PM15) & 0xFFFFFCFF) | 0x200;
+	*(volatile u8 *)(PFC_P15) = (*(volatile u8 *)(PFC_P15) & 0xEF) | 0x00;
 
 	ret |= sh_sdhi_init(RZF_SD0_BASE,
 						0,
