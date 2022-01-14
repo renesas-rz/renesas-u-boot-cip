@@ -29,4 +29,12 @@ config RZF_DDR_SWIZZLE_T3CL
 	bool "param_swizzle_T3cl"
 endchoice
 
+config RZF_DDR_PLL4
+	int "DDR clock"
+	default 1600
+
+config RZF_DDR_SIZE
+	hex "DDR RAM size"
+	default 0x40000000
+
 endif
