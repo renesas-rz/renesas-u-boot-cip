@@ -48,6 +48,15 @@ static PFC_REGS  pfc_qspi_reg_tbl[PFC_QSPI_TBL_NUM] = {
 		{ PFC_OFF, (uintptr_t)PFC_PUPD0C, 0x0000000000000000 },		/* PUPD */
 		{ PFC_ON,  (uintptr_t)PFC_SR0C,   0x0000000000000101 },		/* SR */
 		{ PFC_OFF, (uintptr_t)NULL,       0 }						/* IEN */
+	},
+	/* QctaRAM */
+	{
+		{ PFC_ON,  (uintptr_t)PFC_PMC0C,  0x3F },					/* PMC */
+		{ PFC_ON,  (uintptr_t)PFC_PFC0C,  0x00000000 },				/* PFC */
+		{ PFC_OFF, (uintptr_t)PFC_IOLH0C, 0x0000000000000000 },		/* IOLH */
+		{ PFC_OFF, (uintptr_t)PFC_PUPD0C, 0x0000000000000000 },		/* PUPD */
+		{ PFC_OFF, (uintptr_t)PFC_SR0C,   0x0000000000000000 },		/* SR */
+		{ PFC_OFF, (uintptr_t)NULL,       0 }						/* IEN */
 	}
 };
 
