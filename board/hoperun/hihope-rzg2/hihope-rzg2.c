@@ -211,6 +211,7 @@ int board_late_init(void)
 }
 
 static const char * const rzg2h_dt_ecc_partial[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
 	"/memory@500000000", NULL, NULL,
 	"/memory@600000000", "reg", "<0x6 0x00000000 0x0 0x80000000>",
 	"/memory@600000000", "device_type", "memory",
@@ -256,6 +257,7 @@ static const char * const rzg2m_dt_ecc_full_single[] = {
 };
 
 static const char * const rzg2m_dt_ecc_full_dual[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
 	"/memory@600000000", NULL, NULL,
 	"/reserved-memory/linux,lossy_decompress", NULL, NULL,
 	"/reserved-memory/linux,cma", "reg", "<0x0 0x50000000 0x0 0x20000000>",
@@ -268,6 +270,7 @@ static const char * const rzg2m_dt_ecc_full_dual[] = {
 };
 
 static const char * const rzg2n_dt_ecc_full_single[] = {
+	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
 	"/memory@480000000", "reg", "<0x4 0x80000000 0x0 0x14000000>",
 	"/reserved-memory/linux,lossy_decompress", NULL, NULL,
 	"/reserved-memory/linux,cma", "reg", "<0x0 0x50000000 0x0 0x20000000>",
