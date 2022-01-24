@@ -204,6 +204,7 @@ int board_late_init(void)
 	env_set_hex("board_rev", board_rev);
 	return 0;
 }
+
 static const char * const rzg2h_dt_ecc_partial[] = {
 	"/memory@48000000", "reg", "<0x0 0x48000000 0x0 0x78000000>",
 	"/memory@500000000", NULL, NULL,
