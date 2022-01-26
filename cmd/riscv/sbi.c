@@ -134,10 +134,12 @@ int do_sbi_get_mcache_ctl_status(struct cmd_tbl *cmdtp, int flag, int argc,
 
 	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_GET_MCACHE_CTL_STATUS,
 			0, 0, 0, 0, 0, 0);
-	printf("sbi_get_mcache_ctl_status/n");
-	printf("value :  %ld\n", ret.value);
-	printf("error :  %ld\n", ret.error);
-
+	printf("sbi_get_mcache_ctl_status\n");
+	printf("value :  0x%lx\n", ret.value);
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 	return 0;
 }
 
@@ -148,12 +150,30 @@ int do_sbi_get_mmisc_ctl_status(struct cmd_tbl *cmdtp, int flag, int argc,
 
 	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_GET_MMISC_CTL_STATUS,
 			0, 0, 0, 0, 0, 0);
-	printf("sbi_get_mmisc_ctl_status/n");
-	printf("value :  %ld\n", ret.value);
-	printf("error :  %ld\n", ret.error);
-
+	printf("sbi_get_mmisc_ctl_status\n");
+	printf("value :  0x%lx\n", ret.value);
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 	return 0;
 }
+
+#define IC_EN 0x1 << 0
+#define DC_EN 0x1 << 1
+#define IC_ECCEN 0x1 << 2
+#define DC_ECCEN 0x1 << 4
+#define IC_RWECC 0x1 << 6
+#define DC_RWECC 0x1 << 7
+#define CCTL_SUEN 0x1 << 8
+#define IPREF_EN 0x1 << 9
+#define DPREF_EN 0x1 << 10
+#define IC_FIRST_WORD 0x1 << 11
+#define DC_FIRST_WORD 0x1 << 12
+#define DC_WAROUND 0x1 << 13
+#define DC_COHEN 0x1 << 19
+#define DC_COHSTA 0x1 << 20
+
 
 int do_sbi_set_mcache_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
@@ -169,13 +189,49 @@ int do_sbi_set_mcache_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
 	cmd = argv[1];
 	switch (*cmd) {
 	case '0':
-		value=0x0;/*all off*/
+		value=IC_EN;
 		break;
 	case '1':
-		value=0x827D7;/*all ON*/
+		value=DC_EN;
 		break;
 	case '2':
-		value=0x103;/*reset*/
+		value=IC_ECCEN;
+		break;
+	case '3':
+		value=DC_ECCEN;
+		break;
+	case '4':
+		value=IC_RWECC;
+		break;
+	case '5':
+		value=DC_RWECC;
+		break;
+	case '6':
+		value=CCTL_SUEN;
+		break;
+	case '7':
+		value=IPREF_EN;
+		break;
+	case '8':
+		value=DPREF_EN;
+		break;
+	case '9':
+		value=IC_FIRST_WORD;
+		break;
+	case 'a':
+		value=DC_FIRST_WORD;
+		break;
+	case 'b':
+		value=DC_WAROUND;
+		break;
+	case 'c':
+		value=DC_COHEN;
+		break;
+	case 'd':
+		value=DC_COHSTA;
+		break;
+	case 'e':
+		value=0x0;
 		break;
 	default:
 		goto mcache_ctl_end;
@@ -183,11 +239,20 @@ int do_sbi_set_mcache_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
 
 	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_SET_MCACHE_CTL,
 			value, 0, 0, 0, 0, 0);
-	printf("sbi_get_mmisc_ctl_status/n");
-	printf("error :  %ld\n", ret.error);
+	printf("sbi_get_mmisc_ctl_status\n");
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 mcache_ctl_end:
 	return 0;
 }
+
+#define VEC_PLIC 0x1 << 1
+#define RVCOMPM  0x1 << 2
+#define BRPE     0x1 << 3
+#define MSA_UNA  0x1 << 6
+#define NBLD_EN  0x1 << 8
 
 int do_sbi_set_mmisc_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
@@ -203,13 +268,25 @@ int do_sbi_set_mmisc_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
 	cmd = argv[1];
 	switch (*cmd) {
 	case '0':
-		value=0x0;/*all off*/
+		value=VEC_PLIC;
 		break;
 	case '1':
-		value=0x14E;/*all ON*/
+		value=RVCOMPM;
 		break;
 	case '2':
-		value=0x48;/*reset*/
+		value=BRPE;
+		break;
+	case '3':
+		value=MSA_UNA;
+		break;
+	case '4':
+		value=NBLD_EN;
+		break;
+	case '5':
+		value=0x48;
+		break;
+	case '6':
+		value=0x00;
 		break;
 	default:
 		goto mmisc_ctl_end;
@@ -217,8 +294,11 @@ int do_sbi_set_mmisc_ctl(struct cmd_tbl *cmdtp, int flag, int argc,
 
 	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_SET_MMISC_CTL,
 		value, 0, 0, 0, 0, 0);
-	printf("sbi_get_mmisc_ctl_status/n");
-	printf("error :  %ld\n", ret.error);
+	printf("sbi_get_mmisc_ctl_status\n");
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 mmisc_ctl_end:
 	return 0;
 }
@@ -247,8 +327,11 @@ int do_sbi_icache(struct cmd_tbl *cmdtp, int flag, int argc,
 	}
 	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_ICACHE_OP,
 			value, 0, 0, 0, 0, 0);
-	printf("sbi_get_mmisc_ctl_status/n");
-	printf("error :  %ld\n", ret.error);
+	printf("sbi_get_mmisc_ctl_status\n");
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 icache_end:
 	return 0;
 }
@@ -277,8 +360,11 @@ int do_sbi_dcache(struct cmd_tbl *cmdtp, int flag, int argc,
 	}
 	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_DCACHE_OP,
 			value, 0, 0, 0, 0, 0);
-	printf("sbi_get_mmisc_ctl_status/n");
-	printf("error :  %ld\n", ret.error);
+	printf("sbi_get_mmisc_ctl_status\n");
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 dcache_end:
 	return 0;
 }
@@ -306,8 +392,11 @@ int do_sbi_l1cache_i_prefetch(struct cmd_tbl *cmdtp, int flag, int argc,
 	}
 	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_L1CACHE_I_PREFETCH,
 			value, 0, 0, 0, 0, 0);
-	printf("sbi_get_mmisc_ctl_status/n");
-	printf("error :  %ld\n", ret.error);
+	printf("sbi_get_mmisc_ctl_status\n");
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 i_prefetch_end:
 	return 0;
 }
@@ -336,8 +425,11 @@ int do_sbi_l1cache_d_prefetch(struct cmd_tbl *cmdtp, int flag, int argc,
 
 	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_L1CACHE_D_PREFETCH,
 		value, 0, 0, 0, 0, 0);
-	printf("sbi_get_mmisc_ctl_status/n");
-	printf("error :  %ld\n", ret.error);
+	printf("sbi_get_mmisc_ctl_status\n");
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 d_prefetch_end:
 	return 0;
 }
@@ -365,8 +457,11 @@ int do_sbi_non_blocking_load_store(struct cmd_tbl *cmdtp, int flag, int argc,
 	}
 	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_NON_BLOCKING_LOAD_STORE,
 		value, 0, 0, 0, 0, 0);
-	printf("sbi_get_mmisc_ctl_status/n");
-	printf("error :  %ld\n", ret.error);
+	printf("sbi_get_mmisc_ctl_status\n");
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 non_blocking_end:
 	return 0;
 }
@@ -393,10 +488,13 @@ int do_sbi_write_around(struct cmd_tbl *cmdtp, int flag, int argc,
 	default:
 		goto write_around_end;
 	}
-	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_NON_BLOCKING_LOAD_STORE,
+	ret = sbi_ecall(SBI_EXT_VENDOR, SBI_EXT_ANDES_WRITE_AROUND,
 		value, 0, 0, 0, 0, 0);
-	printf("sbi_get_mmisc_ctl_status/n");
-	printf("error :  %ld\n", ret.error);
+	printf("sbi_get_mmisc_ctl_status\n");
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 write_around_end:
 	return 0;
 }
@@ -406,12 +504,12 @@ U_BOOT_CMD_COMPLETE(sbi_get_mcache_ctl_status, 1, 0, do_sbi_get_mcache_ctl_statu
 U_BOOT_CMD_COMPLETE(sbi_get_mmisc_ctl_status, 1, 0, do_sbi_get_mmisc_ctl_status,"OpenSBI DEBUG:GET_MMISC_CTL_STATUS",NULL, NULL);
 U_BOOT_CMD_COMPLETE(sbi_set_mcache_ctl, 2, 0, do_sbi_set_mcache_ctl,"OpenSBI DEBUG:SET_MCACHE_CTL",NULL, NULL);
 U_BOOT_CMD_COMPLETE(sbi_set_mmisc_ctl, 2, 0, do_sbi_set_mmisc_ctl,"OpenSBI DEBUG:SET_MMISC_CTL",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_icache_op_en, 2, 0, do_sbi_icache,"OpenSBI DEBUG:ICACHE_OP_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_icache_op_dis, 2, 0, do_sbi_dcache,"OpenSBI DEBUG:ICACHE_OP_DIS",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_l1cache_i_prefetch_en, 2, 0,do_sbi_l1cache_i_prefetch,"OpenSBI DEBUG:L1CACHE_I_PREFETCH_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_l1cache_d_prefetch_en, 2, 0, do_sbi_l1cache_d_prefetch,"OpenSBI DEBUG:L1CACHE_D_PREFETCH_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_non_blocking_load_store_en, 2, 0, do_sbi_non_blocking_load_store,"OpenSBI DEBUG:NON_BLOCKING_LOAD_STORE_EN",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_write_around_en, 2, 0, do_sbi_write_around,"OpenSBI DEBUG:WRITE_AROUND_EN",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_icache_op, 2, 0, do_sbi_icache,"OpenSBI DEBUG:ICACHE_OP",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_dcache_op, 2, 0, do_sbi_dcache,"OpenSBI DEBUG:DCACHE_OP",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_l1cache_i_prefetch, 2, 0,do_sbi_l1cache_i_prefetch,"OpenSBI DEBUG:L1CACHE_I_PREFETCH",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_l1cache_d_prefetch, 2, 0, do_sbi_l1cache_d_prefetch,"OpenSBI DEBUG:L1CACHE_D_PREFETCH",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_non_blocking_load_store, 2, 0, do_sbi_non_blocking_load_store,"OpenSBI DEBUG:NON_BLOCKING_LOAD_STORE",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_write_around, 2, 0, do_sbi_write_around,"OpenSBI DEBUG:WRITE_AROUND",NULL, NULL);
 
 int do_sbi_ext_set_timer(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
@@ -429,7 +527,7 @@ int do_sbi_ext_set_timer(struct cmd_tbl *cmdtp, int flag, int argc,
 		value=0x0;
 		break;
 	case '1':
-		value=0x8000000000000000;
+		value=0x00000000050000000;
 		break;
 	case '2':
 		value=0xfffffffffffffffe;
@@ -458,7 +556,10 @@ int do_sbi_ext_get_spec_version(struct cmd_tbl *cmdtp, int flag, int argc,
 	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_SPEC_VERSION,
 			0, 0, 0, 0, 0, 0);
 	printf("value :  %ld\n", ret.value);
-	printf("error :  %ld\n", ret.error);
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 
 	return 0;
 }
@@ -471,7 +572,10 @@ int do_sbi_ext_get_impl_id(struct cmd_tbl *cmdtp, int flag, int argc,
 	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_IMP_ID,
 			0, 0, 0, 0, 0, 0);
 	printf("value :  %ld\n", ret.value);
-	printf("error :  %ld\n", ret.error);
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 
 	return 0;
 }
@@ -502,15 +606,18 @@ int do_sbi_ext_console_putchar(struct cmd_tbl *cmdtp, int flag, int argc,
 	}
 	ret = sbi_ecall(SBI_EXT_0_1_CONSOLE_PUTCHAR, 0, value, 0, 0, 0, 0, 0);
 	printf("value :  %ld\n", ret.value);
-	printf("error :  %ld\n", ret.error);
+	if(ret.error)
+	{
+		printf("error :  %ld\n", ret.error);
+	}
 ext_console_putchar_end:
 	return 0;
 }
 
 U_BOOT_CMD_COMPLETE(sbi_set_timer, 2, 0, do_sbi_ext_set_timer,"OpenSBI DEBUG:SET_TIMER",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_get_spec_version, 1, 0, do_sbi_ext_get_spec_version,"OpenSBI DEBUG:",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_get_impl_id, 1, 0, do_sbi_ext_get_impl_id,"OpenSBI DEBUG:",NULL, NULL);
-U_BOOT_CMD_COMPLETE(sbi_console_putchar, 2, 0, do_sbi_ext_console_putchar,"OpenSBI DEBUG:",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_get_spec_version, 1, 0, do_sbi_ext_get_spec_version,"OpenSBI DEBUG:SPEC VERDION",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_get_impl_id, 1, 0, do_sbi_ext_get_impl_id,"OpenSBI DEBUG:GET IMP ID",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_console_putchar, 2, 0, do_sbi_ext_console_putchar,"OpenSBI DEBUG:PUT CHAR",NULL, NULL);
 
 
 #endif
