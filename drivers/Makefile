@@ -57,6 +57,7 @@ obj-$(CONFIG_$(SPL_)ALTERA_SDRAM) += ddr/altera/
 obj-$(CONFIG_ARCH_IMX8M) += ddr/imx/imx8m/
 obj-$(CONFIG_IMX8ULP_DRAM) += ddr/imx/imx8ulp/
 obj-$(CONFIG_TARGET_RZF_DEV) += ddr/renesas/
+obj-$(CONFIG_TARGET_SMARC_RZF) += ddr/renesas/
 obj-$(CONFIG_ARCH_IMX9) += ddr/imx/imx9/
 obj-$(CONFIG_DRAM_SUN20I_D1) += ram/
 obj-$(CONFIG_SPL_DM_RESET) += reset/

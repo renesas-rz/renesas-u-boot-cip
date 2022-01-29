@@ -48,6 +48,9 @@ config TARGET_XILINX_MBV
 config TARGET_RZF_DEV
 	bool "Support Renesas RZ/Five"
 
+config TARGET_SMARC_RZF
+        bool "Support Renesas RZ/Five"
+
 endchoice
 
 config SYS_ICACHE_OFF
