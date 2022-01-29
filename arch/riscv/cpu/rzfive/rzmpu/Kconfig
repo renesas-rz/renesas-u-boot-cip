@@ -1,4 +1,4 @@
-if TARGET_RZF_DEV
+if TARGET_RZF_DEV || TARGET_SMARC_RZF
 
 config ARCH_RZMPU
 	bool "RZFMPU architecture"

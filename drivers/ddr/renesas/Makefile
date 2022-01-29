@@ -4,6 +4,7 @@
 
 ifdef CONFIG_SPL_BUILD
 obj-$(CONFIG_TARGET_RZF_DEV)		:= ddr.o ddr_rzf.o
+obj-$(CONFIG_TARGET_SMARC_RZF)		:= ddr.o ddr_rzf.o
 
 obj-$(CONFIG_RZF_DDR_SWIZZLE_T1BC)	+= param_swizzle_T1bc.o
 obj-$(CONFIG_RZF_DDR_SWIZZLE_T1C)	+= param_swizzle_T1c.o
