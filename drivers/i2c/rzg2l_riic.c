@@ -10,7 +10,9 @@
 #include <errno.h>
 #include <common.h>
 #include <asm/io.h>
+#ifdef CONFIG_ARCH_RMOBILE
 #include <asm/arch/rmobile.h>
+#endif
 #include <clk.h>
 #include <dm.h>
 #include <i2c.h>
@@ -133,6 +135,8 @@
 #define ICBRL_BRL_MASK	0x1f
 
 #define RIIC_TIMEOUT	(100)	/* 100 msec */
+
+static bool probe_hack;
 
 struct riic_priv {
 	void __iomem *base;
@@ -322,7 +326,7 @@ static int riic_i2c_raw_write_addr(struct udevice *dev, u8 *buf, int len)
 			return -1;
 
 		riic_write(priv, buf[index++], RIIC_ICDRT);
-	} while (len > index);
+	} while ((len > index) || (probe_hack && (len >= index)));
 
 	return ret;
 }
@@ -589,7 +593,13 @@ static int riic_xfer(struct udevice *dev, struct i2c_msg *msg, int nmsgs)
 
 static int riic_probe_chip(struct udevice *dev, uint addr, uint flags)
 {
-	return riic_set_addr(dev, addr, 1);
+	int ret;
+
+	probe_hack = true;
+	ret = riic_set_addr(dev, addr, 1);
+	probe_hack = false;
+
+	return ret;
 }
 
 
@@ -597,6 +607,9 @@ static int riic_probe(struct udevice *dev)
 {
 	struct riic_priv *priv = dev_get_priv(dev);
 	int ret;
+
+	writel(0x000F000F, 0x11010880);
+	writel(0x01010101, 0x11031870);
 
 	priv->base = dev_read_addr_ptr(dev);
 
@@ -620,6 +633,7 @@ static const struct dm_i2c_ops riic_ops = {
 
 static const struct udevice_id riic_ids[] = {
 	{ .compatible = "renesas,riic-r9a07g044l", },
+	{ .compatible = "renesas,riic-rz", },
 	{ }
 };
 
