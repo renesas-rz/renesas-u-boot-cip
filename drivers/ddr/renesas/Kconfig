@@ -1,4 +1,4 @@
-if TARGET_RZF_DEV
+if TARGET_RZF_DEV || TARGET_SMARC_RZF
 
 choice
 	prompt "DDR type select"

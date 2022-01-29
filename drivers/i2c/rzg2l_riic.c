@@ -10,7 +10,9 @@
 #include <errno.h>
 #include <common.h>
 #include <asm/io.h>
+#ifdef CONFIG_ARCH_RMOBILE
 #include <asm/arch/rmobile.h>
+#endif
 #include <clk.h>
 #include <dm.h>
 #include <i2c.h>
@@ -598,6 +600,9 @@ static int riic_probe(struct udevice *dev)
 	struct riic_priv *priv = dev_get_priv(dev);
 	int ret;
 
+	writel(0x000F000F, 0x11010880);
+	writel(0x01010101, 0x11031870);
+
 	priv->base = dev_read_addr_ptr(dev);
 
 	ret = clk_get_by_index(dev, 0, &priv->clk);
@@ -623,6 +628,7 @@ static const struct udevice_id riic_ids[] = {
 	{ .compatible = "renesas,riic-r9a07g044c", },
 	{ .compatible = "renesas,riic-r9a07g054l", },
 	{ .compatible = "renesas,riic-r9a07g043u", },
+	{ .compatible = "renesas,riic-r9a07g043f", },
 	{ .compatible = "renesas,riic-rz", },
 	{ }
 };
