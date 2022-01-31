@@ -34,15 +34,14 @@ static void v5l2_init(void)
 	struct udevice *dev;
 
 	uclass_get_device(UCLASS_CACHE, 0, &dev);
+
+	if (dev)
+		cache_enable(dev);
 }
 
 #ifdef CONFIG_BOARD_EARLY_INIT_F
 int board_early_init_f(void)
 {
-#ifdef CONFIG_V5L2_CACHE
-	v5l2_init();
-#endif
-
 	/* can go in board_eht_init() once enabled */
 //	*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_1_8;
 //	*(volatile u32 *)(PFC_ETH_ch1) = (*(volatile u32 *)(PFC_ETH_ch1) & 0xFFFFFFFC) | ETH_ch1_1_8;
@@ -97,6 +96,10 @@ int board_mmc_init(struct bd_info *bis)
 
 int board_init(void)
 {
+#ifdef CONFIG_V5L2_CACHE
+	v5l2_init();
+#endif
+
 	return 0;
 }
 
