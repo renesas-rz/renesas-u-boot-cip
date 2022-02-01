@@ -111,6 +111,7 @@
 #define PFC_PMC08						(PFC_BASE + 0x0208)	/* Port mode control register */
 #define PFC_PMC09						(PFC_BASE + 0x0209)	/* Port mode control register */
 #define PFC_PMC0A						(PFC_BASE + 0x020A)	/* Port mode control register */
+#define PFC_PMC0B						(PFC_BASE + 0x020B)	/* Port mode control register */
 #define PFC_PMC0C						(PFC_BASE + 0x020C)	/* Port mode control register */
 #define PFC_PMC10						(PFC_BASE + 0x0210)	/* Port mode control register */
 #define PFC_PMC11						(PFC_BASE + 0x0211)	/* Port mode control register */
@@ -166,6 +167,7 @@
 #define PFC_PFC08						(PFC_BASE + 0x0420)	/* Port function control register */
 #define PFC_PFC09						(PFC_BASE + 0x0424)	/* Port function control register */
 #define PFC_PFC0A						(PFC_BASE + 0x0428)	/* Port function control register */
+#define PFC_PFC0B						(PFC_BASE + 0x042C)	/* Port function control register */
 #define PFC_PFC0C						(PFC_BASE + 0x0430)	/* Port function control register */
 #define PFC_PFC10						(PFC_BASE + 0x0440)	/* Port function control register */
 #define PFC_PFC11						(PFC_BASE + 0x0444)	/* Port function control register */

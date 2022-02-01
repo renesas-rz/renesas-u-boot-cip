@@ -50,14 +50,16 @@ int board_early_init_f(void)
 	*(volatile u32 *)(PFC_ETH_ch1) = (*(volatile u32 *)(PFC_ETH_ch1) & 0xFFFFFFFC) | ETH_ch1_3_3;
 	/* Enable RGMII for both ETH{0,1} */
 	*(volatile u32 *)(PFC_ETH_MII) = (*(volatile u32 *)(PFC_ETH_MII) & 0xFFFFFFFC);
-	/* ETH CLK */
-	*(volatile u32 *)(CPG_CLKON_ETH) = 0x30003;
 	/* ETH RST */
 	*(volatile u32 *)(CPG_RST_ETH) = 0x30003;
 	/* I2C CLK */
 	*(volatile u32 *)(CPG_CLKON_I2C) = 0xF000F;
 	/* I2C pin non GPIO enable */
 	*(volatile u32 *)(PFC_IEN0E) = 0x01010101;
+	/* SD CLK */
+	*(volatile u32 *)(CPG_PL2SDHI_DSEL) = 0x00110011;
+	while (*(volatile u32 *)(CPG_CLKSTATUS) != 0)
+		;
 
 	return 0;
 }
