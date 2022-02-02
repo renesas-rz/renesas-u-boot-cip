@@ -351,6 +351,7 @@ int do_sbi_dcache(struct cmd_tbl *cmdtp, int flag, int argc,
 	unsigned int value;
 	struct sbiret ret;
 	const char *cmd;
+	uint32_t count=0;
 	uint32_t *l2c_command = (void *)RZF_L2C_ADDR + V5_L2C_COMMAND_OFFSET;
 	uint32_t l2c_command_val = *l2c_command;
 	uint32_t *l2c_cctl_status = (void *)RZF_L2C_ADDR + V5_L2C_STATUS_OFFSET;
@@ -373,9 +374,13 @@ int do_sbi_dcache(struct cmd_tbl *cmdtp, int flag, int argc,
 		while(l2c_cctl_status_val & 0xf){
 			if(l2c_cctl_status_val & 0x2){
 				printf("L2 flush illegal!\n");
+				goto dcache_end;
+			}
+			else{
+				count++;
 			}
 		}
-		
+		printf("L2C flush :%d\n",count);
 		l2c_ctl_val &= ~V5_L2C_CTL_ENABLE_MASK;
 		*l2c_ctl_base = l2c_ctl_val;
 		break;
