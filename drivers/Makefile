@@ -44,6 +44,7 @@ obj-$(CONFIG_ARMADA_XP) += ddr/marvell/axp/
 obj-$(CONFIG_$(SPL_)ALTERA_SDRAM) += ddr/altera/
 obj-$(CONFIG_ARCH_IMX8M) += ddr/imx/imx8m/
 obj-$(CONFIG_TARGET_RZF_DEV) += ddr/renesas/
+obj-$(CONFIG_TARGET_SMARC_RZF) += ddr/renesas/
 obj-$(CONFIG_SPL_POWER_SUPPORT) += power/ power/pmic/
 obj-$(CONFIG_SPL_POWER_SUPPORT) += power/regulator/
 obj-$(CONFIG_SPL_POWER_DOMAIN) += power/domain/
