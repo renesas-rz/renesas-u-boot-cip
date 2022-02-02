@@ -148,6 +148,15 @@ enum sbi_ext_id_v01 {
 
 #define MTIME 0x110C0000
 
+#define RZF_L2C_ADDR 0x13400000
+#define V5_L2C_CTL_OFFSET 0x08
+#define V5_L2C_COMMAND_OFFSET 0x40
+#define V5_L2C_STATUS_OFFSET 0x80
+
+#define V5_L2C_CTL_ENABLE_OFFSET    0
+#define V5_L2C_CTL_ENABLE_MASK      (1UL << V5_L2C_CTL_ENABLE_OFFSET)
+
+
 int do_sbi_get_mcache_ctl_status(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
@@ -342,7 +351,13 @@ int do_sbi_dcache(struct cmd_tbl *cmdtp, int flag, int argc,
 	unsigned int value;
 	struct sbiret ret;
 	const char *cmd;
-	
+	uint32_t *l2c_command = (void *)RZF_L2C_ADDR + V5_L2C_COMMAND_OFFSET;
+	uint32_t l2c_command_val = *l2c_command;
+	uint32_t *l2c_cctl_status = (void *)RZF_L2C_ADDR + V5_L2C_STATUS_OFFSET;
+	uint32_t l2c_cctl_status_val = *l2c_cctl_status;
+	uint32_t *l2c_ctl_base = (void *)RZF_L2C_ADDR + V5_L2C_CTL_OFFSET;
+	uint32_t l2c_ctl_val = *l2c_ctl_base;
+
 	if (argc < 2)
 		return CMD_RET_USAGE;
 	
@@ -350,9 +365,26 @@ int do_sbi_dcache(struct cmd_tbl *cmdtp, int flag, int argc,
 	switch (*cmd) {
 	case '0':
 		value=0x0;/*off*/
+
+		/* disable L2 cache */
+		l2c_command_val = 0x12;
+		*l2c_command = l2c_command_val;
+		
+		while(l2c_cctl_status_val & 0xf){
+			if(l2c_cctl_status_val & 0x2){
+				printf("L2 flush illegal!\n");
+			}
+		}
+		
+		l2c_ctl_val &= ~V5_L2C_CTL_ENABLE_MASK;
+		*l2c_ctl_base = l2c_ctl_val;
 		break;
 	case '1':
 		value=0x1;/*on*/
+
+		/* enable L2 cache */
+		l2c_ctl_val &= ~V5_L2C_CTL_ENABLE_MASK;
+		*l2c_ctl_base = l2c_ctl_val;
 		break;
 	default:
 		goto dcache_end;
