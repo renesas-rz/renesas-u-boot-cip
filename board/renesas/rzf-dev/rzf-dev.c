@@ -96,7 +96,7 @@ int board_early_init_f(void)
 
 int board_init(void)
 {
-#if CONFIG_TARGET_SMARC_RZF
+#if 0
 	struct udevice *dev;
 	const u8 pmic_bus = 0;
 	const u8 pmic_addr = 0x58;
