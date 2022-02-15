@@ -84,12 +84,12 @@ int board_mmc_init(struct bd_info *bis)
 	*(volatile u8 *)(PFC_P10) = (*(volatile u8 *)(PFC_P10) & 0xF7) | 0x08; /* P0_3  output 1	*/
 	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFD) | 0x02; /* P6_1  output 1	*/
 #else
-	/* SD0 power control: P5_4=1,P18_4 = 1; */
+	/* SD0 power control: P5_4=0,P18_4 = 1; */
 	*(volatile u8 *)(PFC_PMC15) &= 0xEF;
 	*(volatile u8 *)(PFC_PMC22) &= 0xEF; /* Port func mode 0b0 */
 	*(volatile u16 *)(PFC_PM15) = (*(volatile u16 *)(PFC_PM15) & 0xFCFF) | 0x200;
 	*(volatile u16 *)(PFC_PM22) = (*(volatile u16 *)(PFC_PM22) & 0xFCFF) | 0x200; /* Port output mode 0b10 */
-	*(volatile u8 *)(PFC_P15) = (*(volatile u8 *)(PFC_P15) & 0xEF) | 0x10;
+	*(volatile u8 *)(PFC_P15) = (*(volatile u8 *)(PFC_P15) & 0xEF);
 	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & 0xEF) | 0x10;	/* Port 18[2:1] output value 0b1*/
 
 	/* SD1 power control: P6_2=1,P18_5 = 1; */
