@@ -18,7 +18,6 @@
 #include <linux/bitops.h>
 
 #include <dt-bindings/clock/renesas-cpg-mssr.h>
-#include <dt-bindings/clock/r9a07g044l-cpg.h>
 #include "renesas-rzg2l-cpg.h"
 
 static int mod_clk_get(struct clk *clk, struct cpg_mssr_info *info,
