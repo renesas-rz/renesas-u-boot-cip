@@ -93,3 +93,14 @@ config DEBUG_OPENSBI
 	depends on CMD_SBI
 
 endif
+
+choice
+	prompt "SPI FLASH type select"
+	default RZF_SPI_FLASH_AT25QL128A
+
+config RZF_SPI_FLASH_AT25QL128A
+	bool "Dialog AT25QL128A"
+
+config RZF_SPI_FLASH_MT25QU512ABB
+	bool "MICRON MT25QU512ABB"
+endchoice

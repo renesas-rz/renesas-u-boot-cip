@@ -12,16 +12,16 @@
 #include <mmc.h>
 #include <i2c.h>
 #include <hang.h>
+#include <cache.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_sys.h>
 #include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
 #include <renesas/rzf-dev/rzf-dev_cpg_regs.h>
-#include "rzf-dev_spi_multi.h"
 
 extern void cpg_setup(void);
 extern void pfc_setup(void);
 extern void ddr_setup(void);
-extern int spi_multi_setup(uint32_t addr_width, uint32_t dq_width, uint32_t dummy_cycle);
+extern int spi_multi_setup(void);
 
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -216,11 +216,7 @@ int spl_board_init_f(void)
 	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
 	if (boot_dev == BOOT_MODE_SPI_1_8 ||
 		boot_dev == BOOT_MODE_SPI_3_3) {
-#if CONFIG_TARGET_SMARC_RZF
-		spi_multi_setup(SPI_MULTI_ADDR_WIDES_24, SPI_MULTI_DQ_WIDES_1_1_1, SPI_MULTI_DUMMY_8CYCLE);
-#else
-		spi_multi_setup(SPI_MULTI_ADDR_WIDES_24, SPI_MULTI_DQ_WIDES_1_4_4, SPI_MULTI_DUMMY_10CYCLE);
-#endif
+		spi_multi_setup();
 	}
     
 	return 0;
