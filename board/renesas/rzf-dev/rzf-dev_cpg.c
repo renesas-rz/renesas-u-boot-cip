@@ -569,6 +569,8 @@ static void cpg_reset_setup(void)
 static void cpg_sd_clk_setup(void)
 {
 	cpg_div_sel_setup(cpg_sd_clk_select_tbl, ARRAY_SIZE(cpg_sd_clk_select_tbl));
+	while (*(volatile u32 *)(CPG_CLKSTATUS) != 0)
+		;
 }
 
 void cpg_active_ddr(void (*disable_phy)(void))
@@ -647,10 +649,10 @@ void cpg_setup(void)
 {
 	cpg_selector_on_off(CPG_SEL_PLL3_3_ON_OFF, CPG_OFF);
 	cpg_div_sel_static_setup();
+	cpg_sd_clk_setup();
 	cpg_selector_on_off(CPG_SEL_PLL3_3_ON_OFF, CPG_ON);
 	cpg_pll_setup();
 	cpg_clk_on_setup();
 	cpg_reset_setup();
     cpg_div_sel_dynamic_setup();
-	cpg_sd_clk_setup();
 }
