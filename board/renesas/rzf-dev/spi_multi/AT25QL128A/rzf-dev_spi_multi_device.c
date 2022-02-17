@@ -5,27 +5,13 @@
 
 #include <common.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
-#include <renesas/rzf-dev/rzf-dev_spi_multi.h>
-#include <renesas/rzf-dev/rzf-dev_spi_multi_regs.h>
-#ifdef CONFIG_RZF_SPI_FLASH_AT25QL128A
-#include <renesas/rzf-dev/rzf-dev_spi_multi_reg_values_AT25QL128A.h>
-#endif
-#ifdef CONFIG_RZF_SPI_FLASH_MT25QU512ABB
-#include <renesas/rzf-dev/rzf-dev_spi_multi_reg_values_MT25QU512ABB.h>
-#endif
+#include <renesas/rzf-dev/spi_multi/rzf-dev_spi_multi.h>
+#include <renesas/rzf-dev/spi_multi/rzf-dev_spi_multi_regs.h>
+#include <renesas/rzf-dev/spi_multi/AT25QL128A/rzf-dev_spi_multi_reg_values.h>
 #include <renesas/rzf-dev/mmio.h>
 #include <asm/io.h>
 #include <linux/delay.h>
 
-
-#ifdef CONFIG_RZF_SPI_FLASH_MT25QU512ABB
-void spi_multi_setup_device( void )
-{
-	return;
-}
-#endif
-
-#ifdef CONFIG_RZF_SPI_FLASH_AT25QL128A
 void spi_multi_setup_device( void )
 {
 
@@ -65,4 +51,3 @@ void spi_multi_setup_device( void )
 	}
 	return;
 }
-#endif
