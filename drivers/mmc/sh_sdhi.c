@@ -775,6 +775,7 @@ int sh_sdhi_init(unsigned long addr, int ch, unsigned long quirks)
 		goto error;
 	}
 
+	memset(host,0x00,sizeof(struct sh_sdhi_host));
 	host->ch = ch;
 	host->addr = (void __iomem *)addr;
 	host->quirks = quirks;

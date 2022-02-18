@@ -159,10 +159,9 @@ static void pfc_scif_setup(void)
 static void pfc_qspi_setup(void)
 {
 	int      cnt;
-
-	mmio_write_32(PFC_SD_ch0, 0);
-	mmio_write_32(PFC_SD_ch1, 0);
-
+#if 0
+	mmio_write_32(PFC_QSPI, 0);
+#endif
 	for (cnt = 0; cnt < PFC_QSPI_TBL_NUM; cnt++) {
 		/* PMC */
 		if (pfc_qspi_reg_tbl[cnt].pmc.flg == PFC_ON) {

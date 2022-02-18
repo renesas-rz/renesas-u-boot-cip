@@ -358,7 +358,7 @@ static CPG_REG_SETTING cpg_static_select_tbl[] = {
 
 static CPG_REG_SETTING cpg_dynamic_select_tbl[] = {
 	{ (uintptr_t)CPG_PL4_DSEL,              0x00010001 },
-	{ (uintptr_t)CPG_PL2SDHI_DSEL, 		0x00110022 },
+	{ (uintptr_t)CPG_PL2SDHI_DSEL, 		0x00110011 },
 };
 
 #define CPG_SEL_PLL1_ON_OFF					(0)
@@ -417,9 +417,6 @@ static CPG_REG_SETTING cpg_sel_pll3_3_on_off[] = {
 	{(uintptr_t)CPG_CLKON_AXI_MCPU_BUS, 0x02080208 },
 };
 
-static CPG_REG_SETTING cpg_sd_clk_select_tbl[] = {
-	{(uintptr_t)CPG_PL2SDHI_DSEL, 0x00110011 },
-};
 
 static void cpg_ctrl_clkrst(CPG_SETUP_DATA const *array, uint32_t num)
 {
@@ -566,13 +563,6 @@ static void cpg_reset_setup(void)
 	cpg_ctrl_clkrst(&cpg_reset_tbl[0], ARRAY_SIZE(cpg_reset_tbl));
 }
 
-static void cpg_sd_clk_setup(void)
-{
-	cpg_div_sel_setup(cpg_sd_clk_select_tbl, ARRAY_SIZE(cpg_sd_clk_select_tbl));
-	while (*(volatile u32 *)(CPG_CLKSTATUS) != 0)
-		;
-}
-
 void cpg_active_ddr(void (*disable_phy)(void))
 {
 	/* Assert the reset of DDRTOP */
@@ -649,7 +639,6 @@ void cpg_setup(void)
 {
 	cpg_selector_on_off(CPG_SEL_PLL3_3_ON_OFF, CPG_OFF);
 	cpg_div_sel_static_setup();
-	cpg_sd_clk_setup();
 	cpg_selector_on_off(CPG_SEL_PLL3_3_ON_OFF, CPG_ON);
 	cpg_pll_setup();
 	cpg_clk_on_setup();
