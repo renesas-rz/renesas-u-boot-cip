@@ -4,9 +4,12 @@
  */
 
 #include <common.h>
+#include <fdtdec.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
 #include <renesas/rzf-dev/mmio.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 static PFC_REGS pfc_scif_type1_reg_tbl[PFC_SCIF_TBL_NUM] = {
 	{
@@ -192,8 +195,17 @@ static void pfc_qspi_setup(void)
 static void pfc_sd_setup(void)
 {
 	int      cnt;
+	int offset,sd_vol;
+	
+	offset = fdt_path_offset(gd->fdt_blob, "/soc/sd@11c00000");
+	sd_vol = fdtdec_get_int(gd->fdt_blob, offset,"power-source", 1800);
 
-	mmio_write_32(PFC_SD_ch0, 0);
+	if(sd_vol == 3300){
+		mmio_write_32(PFC_SD_ch0, 0);
+	}
+	else{
+		mmio_write_32(PFC_SD_ch0, 1);
+	}
 	mmio_write_32(PFC_SD_ch1, 0);
 
 	for (cnt = 0; cnt < PFC_SD_TBL_NUM; cnt++) {
