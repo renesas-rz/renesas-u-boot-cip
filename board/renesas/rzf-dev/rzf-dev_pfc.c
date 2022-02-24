@@ -195,18 +195,17 @@ static void pfc_qspi_setup(void)
 static void pfc_sd_setup(void)
 {
 	int      cnt;
-	int offset,sd_vol;
 	
-	offset = fdt_path_offset(gd->fdt_blob, "/soc/sd@11c00000");
-	sd_vol = fdtdec_get_int(gd->fdt_blob, offset,"power-source", 1800);
-
-	if(sd_vol == 3300){
-		mmio_write_32(PFC_SD_ch0, 0);
-	}
-	else{
-		mmio_write_32(PFC_SD_ch0, 1);
-	}
-	mmio_write_32(PFC_SD_ch1, 0);
+#ifdef CONFIG_TARGET_SMARC_RZF
+	mmio_write_32(PFC_SD_ch0, SD0_PVDD_1_8);
+#else
+#if (CONFIG_RZF_SDHI0_VOLTAGE == 3300)
+	mmio_write_32(PFC_SD_ch0, SD0_PVDD_3_3);
+#else
+	mmio_write_32(PFC_SD_ch0, SD0_PVDD_1_8);
+#endif
+#endif
+	mmio_write_32(PFC_SD_ch1, SD1_PVDD_3_3);
 
 	for (cnt = 0; cnt < PFC_SD_TBL_NUM; cnt++) {
 		/* PMC */

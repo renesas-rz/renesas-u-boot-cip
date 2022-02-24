@@ -63,10 +63,6 @@ int board_early_init_f(void)
 	/* ETH CLK */
 	*(volatile u32 *)(CPG_RST_ETH) = 0x30003;
 #endif
-	/* SD CLK */
-	*(volatile u32 *)(CPG_PL2SDHI_DSEL) = 0x00110011;
-	while (*(volatile u32 *)(CPG_CLKSTATUS) != 0)
-		;
 
 	return 0;
 }
@@ -78,42 +74,33 @@ int board_mmc_init(struct bd_info *bis)
 
 #if CONFIG_TARGET_SMARC_RZF
 	/* SD1 power control : P0_3 = 1 P6_1 = 1	*/
-	*(volatile u8 *)(PFC_PMC10) &= 0xF7;	/* Port func mode 0b00	*/
-	*(volatile u8 *)(PFC_PMC16) &= 0xFD;	/* Port func mode 0b00	*/
-	*(volatile u16 *)(PFC_PM10) = (*(volatile u16 *)(PFC_PM10) & 0xFF3F) | 0x0080; /* Port output mode 0b10 */
-	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & 0xFFF3) | 0x0008; /* Port output mode 0b10 */
-	*(volatile u8 *)(PFC_P10) = (*(volatile u8 *)(PFC_P10) & 0xF7) | 0x08; /* P0_3  output 1	*/
-	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFD) | 0x02; /* P6_1  output 1	*/
+	*(volatile u8 *)(PFC_PMC10) &= PMC_PMC3_MASK;	/* Port func mode 0b00	*/
+	*(volatile u8 *)(PFC_PMC16) &= PMC_PMC1_MASK;	/* Port func mode 0b00	*/
+	*(volatile u16 *)(PFC_PM10) = (*(volatile u16 *)(PFC_PM10) & PM3_MASK) | PM3_OUT_DIS; /* Port output mode 0b10 */
+	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & PM1_MASK) | PM1_OUT_DIS; /* Port output mode 0b10 */
+	*(volatile u8 *)(PFC_P10) = (*(volatile u8 *)(PFC_P10) & P_P3_MASK) | P_P3; /* P0_3  output 1	*/
+	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & P_P1_MASK) | P_P1; /* P6_1  output 1	*/
 #else
-	int offset,sd_vol;
-	
-	offset = fdt_path_offset(gd->fdt_blob, "/soc/sd@11c00000");
-	sd_vol = fdtdec_get_int(gd->fdt_blob, offset,"power-source", 1800);
-
 	/* SD0 power control: P18_4 = 1; */
-	*(volatile u8 *)(PFC_PMC15) &= 0xEF;
-	*(volatile u8 *)(PFC_PMC22) &= 0xEF; /* Port func mode 0b0 */
-	*(volatile u16 *)(PFC_PM15) = (*(volatile u16 *)(PFC_PM15) & 0xFCFF) | 0x200;
-	*(volatile u16 *)(PFC_PM22) = (*(volatile u16 *)(PFC_PM22) & 0xFCFF) | 0x200; /* Port output mode 0b10 */
-	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & 0xEF) | 0x10;	/* Port 18[2:1] output value 0b1*/
-
-	if(sd_vol == 3300){
-	/* SD0 3.3V power control: P5_4=1; */
-	*(volatile u8 *)(PFC_P15) = (*(volatile u8 *)(PFC_P15) & 0xEF) | 0x10;;
-	}
-	else{
-	/* SD0 1.8V power control: P5_4=0; */
-	*(volatile u8 *)(PFC_P15) = (*(volatile u8 *)(PFC_P15) & 0xEF);
-	} 
-
-	
+	*(volatile u8 *)(PFC_PMC15) &= PMC_PMC4_MASK;
+	*(volatile u8 *)(PFC_PMC22) &= PMC_PMC4_MASK; /* Port func mode 0b0 */
+	*(volatile u16 *)(PFC_PM15) = (*(volatile u16 *)(PFC_PM15) & PM4_MASK) | PM4_OUT_DIS; /* Port output mode 0b10 */
+	*(volatile u16 *)(PFC_PM22) = (*(volatile u16 *)(PFC_PM22) & PM4_MASK) | PM4_OUT_DIS; /* Port output mode 0b10 */
+	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & P_P4_MASK) | P_P4;	/* P18_4 output 1 */
+#if (CONFIG_RZF_SDHI0_VOLTAGE == 3300)
+	/* SD0 1.8V power control: P5_4=1; */
+	*(volatile u8 *)(PFC_P15) = (*(volatile u8 *)(PFC_P15) & P_P4_MASK) | P_P4;	/* P5_4 output 1 */
+#else
+	/* SD0 3.3V power control: P5_4=0; */
+	*(volatile u8 *)(PFC_P15) = (*(volatile u8 *)(PFC_P15) & P_P4_MASK);	/* P5_4 output 0 */
+#endif
 	/* SD1 power control: P6_2=1,P18_5 = 1; */
-	*(volatile u8 *)(PFC_PMC16) &= 0xFB; /* Port func mode 0b0 */
-	*(volatile u8 *)(PFC_PMC22) &= 0xDF; /* Port func mode 0b0 */
-	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & 0xFFCF) | 0x20; /* Port output mode 0b10 */
-	*(volatile u16 *)(PFC_PM22) = (*(volatile u16 *)(PFC_PM22) & 0xF3FF) | 0x800; /* Port output mode 0b10 */
-	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFB) | 0x04;	/* Port 6[2:1] output value 0b1*/
-	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & 0xDF) | 0x20;	/* Port 18[2:1] output value 0b1*/
+	*(volatile u8 *)(PFC_PMC16) &= PMC_PMC2_MASK; /* Port func mode 0b0 */
+	*(volatile u8 *)(PFC_PMC22) &= PMC_PMC5_MASK; /* Port func mode 0b0 */
+	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & PM2_MASK) | PM2_OUT_DIS; /* Port output mode 0b10 */
+	*(volatile u16 *)(PFC_PM22) = (*(volatile u16 *)(PFC_PM22) & PM5_MASK) | PM5_OUT_DIS; /* Port output mode 0b10 */
+	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & P_P2_MASK) | P_P2;	/* P6_2 output 1 */
+	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & P_P5_MASK) | P_P5;	/* P18_5 output 1 */
 #endif
 
 	ret |= sh_sdhi_init(RZF_SD0_BASE,
