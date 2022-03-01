@@ -8,6 +8,8 @@
 #include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
 #include <renesas/rzf-dev/mmio.h>
 
+DECLARE_GLOBAL_DATA_PTR;
+
 static PFC_REGS pfc_scif_type1_reg_tbl[PFC_SCIF_TBL_NUM] = {
 	{
 		{ PFC_ON,  (uintptr_t)PFC_PMC16,  0x18 },					/* PMC */
@@ -159,10 +161,9 @@ static void pfc_scif_setup(void)
 static void pfc_qspi_setup(void)
 {
 	int      cnt;
-
-	mmio_write_32(PFC_SD_ch0, 1);
-	mmio_write_32(PFC_SD_ch1, 0);
-
+#if 0
+	mmio_write_32(PFC_QSPI, 0);
+#endif
 	for (cnt = 0; cnt < PFC_QSPI_TBL_NUM; cnt++) {
 		/* PMC */
 		if (pfc_qspi_reg_tbl[cnt].pmc.flg == PFC_ON) {
@@ -193,9 +194,17 @@ static void pfc_qspi_setup(void)
 static void pfc_sd_setup(void)
 {
 	int      cnt;
-
-	mmio_write_32(PFC_SD_ch0, 1);
-	mmio_write_32(PFC_SD_ch1, 0);
+	
+#ifdef CONFIG_TARGET_SMARC_RZF
+	mmio_write_32(PFC_SD_ch0, SD0_PVDD_1_8);
+#else
+#if (CONFIG_RZF_SDHI0_VOLTAGE == 3300)
+	mmio_write_32(PFC_SD_ch0, SD0_PVDD_3_3);
+#else
+	mmio_write_32(PFC_SD_ch0, SD0_PVDD_1_8);
+#endif
+#endif
+	mmio_write_32(PFC_SD_ch1, SD1_PVDD_3_3);
 
 	for (cnt = 0; cnt < PFC_SD_TBL_NUM; cnt++) {
 		/* PMC */

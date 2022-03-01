@@ -358,7 +358,7 @@ static CPG_REG_SETTING cpg_static_select_tbl[] = {
 
 static CPG_REG_SETTING cpg_dynamic_select_tbl[] = {
 	{ (uintptr_t)CPG_PL4_DSEL,              0x00010001 },
-	{ (uintptr_t)CPG_PL2SDHI_DSEL, 		0x00110022 },
+	{ (uintptr_t)CPG_PL2SDHI_DSEL, 		0x00110011 },
 };
 
 #define CPG_SEL_PLL1_ON_OFF					(0)

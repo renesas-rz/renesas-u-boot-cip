@@ -769,6 +769,8 @@ int sh_sdhi_init(unsigned long addr, int ch, unsigned long quirks)
 	if (!host)
 		return -ENOMEM;
 
+	memset(host,0x00,sizeof(struct sh_sdhi_host));
+
 	mmc = mmc_create(&sh_sdhi_cfg, host);
 	if (!mmc) {
 		ret = -1;

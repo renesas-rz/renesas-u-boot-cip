@@ -32,6 +32,11 @@ config BOARD_SPECIFIC_OPTIONS # dummy
 	select RISCV_NDS
 	select SUPPORT_SPL
 
+#SDHI0 voltage select
+config RZF_SDHI0_VOLTAGE
+	int "Set the SDHI0 voltage(mV) to 1800 or 3300"
+	default 1800
+
 
 config DEBUG_RZF_FPGA
 	bool "FPGA DEBUG option"

@@ -476,6 +476,15 @@
 #define P_P5				(1 << 5)
 #define P_P6				(1 << 6)
 #define P_P7				(1 << 7)
+/* Definition for port register mask */
+#define P_P0_MASK			~(1 << 0)
+#define P_P1_MASK			~(1 << 1)
+#define P_P2_MASK			~(1 << 2)
+#define P_P3_MASK			~(1 << 3)
+#define P_P4_MASK			~(1 << 4)
+#define P_P5_MASK			~(1 << 5)
+#define P_P6_MASK			~(1 << 6)
+#define P_P7_MASK			~(1 << 7)
 /* Definition for port mode register */
 #define PM0_HIZ				(0 << 0)
 #define PM0_IN				(1 << 0)
@@ -497,6 +506,17 @@
 #define PM4_IN				(1 << 8)
 #define PM4_OUT_DIS			(2 << 8)
 #define PM4_OUT_EN			(3 << 8)
+#define PM5_HIZ				(0 << 10)
+#define PM5_IN				(1 << 10)
+#define PM5_OUT_DIS			(2 << 10)
+#define PM5_OUT_EN			(3 << 10)
+/* Definition for port mode register mask */
+#define PM0_MASK			~(3 << 0)
+#define PM1_MASK			~(3 << 2)
+#define PM2_MASK			~(3 << 4)
+#define PM3_MASK			~(3 << 6)
+#define PM4_MASK			~(3 << 8)
+#define PM5_MASK			~(3 << 10)
 /* Definition for port mode control register */
 #define PMC_PMC0			(1 << 0)
 #define PMC_PMC1			(1 << 1)
@@ -506,6 +526,15 @@
 #define PMC_PMC5			(1 << 5)
 #define PMC_PMC6			(1 << 6)
 #define PMC_PMC7			(1 << 7)
+/* Definition for port mode control register mask*/
+#define PMC_PMC0_MASK		~(1 << 0)
+#define PMC_PMC1_MASK		~(1 << 1)
+#define PMC_PMC2_MASK		~(1 << 2)
+#define PMC_PMC3_MASK		~(1 << 3)
+#define PMC_PMC4_MASK		~(1 << 4)
+#define PMC_PMC5_MASK		~(1 << 5)
+#define PMC_PMC6_MASK		~(1 << 6)
+#define PMC_PMC7_MASK		~(1 << 7)
 /* Definition for port function control register */
 #define PFC0_MODE0			(0 << 0)
 #define PFC0_MODE1			(1 << 0)
@@ -614,9 +643,11 @@
 #define PUPD7_UP			(1 << 56)
 #define PUPD7_DOWN			(2 << 56)
 /* SD ch0 IO Definition for voltage control register */
-#define SD0_PVDD			(1 << 0)
+#define SD0_PVDD_3_3			(0 << 0)
+#define SD0_PVDD_1_8			(1 << 0)
 /* SD ch1 IO Definition for voltage control register */
-#define SD1_PVDD			(1 << 0)
+#define SD1_PVDD_3_3			(0 << 0)
+#define SD1_PVDD_1_8			(1 << 0)
 /* Definition for QSPI IO voltage control register */
 #define QSPI_PVDD			(1 << 0)
 /* ETH ch0 voltage control register */
