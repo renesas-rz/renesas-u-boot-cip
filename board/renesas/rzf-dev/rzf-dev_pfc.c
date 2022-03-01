@@ -4,7 +4,6 @@
  */
 
 #include <common.h>
-#include <fdtdec.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
 #include <renesas/rzf-dev/mmio.h>

@@ -11,7 +11,6 @@
 #include <asm/arch/sh_sdhi.h>
 #include <mmc.h>
 #include <i2c.h>
-#include <fdtdec.h>
 #include <hang.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_sys.h>
