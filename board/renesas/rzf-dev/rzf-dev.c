@@ -147,10 +147,6 @@ int board_init(void)
 
 int dram_init(void)
 {
-#ifdef CONFIG_DEBUG_RZF_FPGA
-	gd->ram_size = CONFIG_SYS_SDRAM_SIZE;
-	return 0;
-#endif
 	return fdtdec_setup_mem_size_base();
 }
 
@@ -167,10 +163,6 @@ int board_fit_config_name_match(const char *name)
 #ifdef CONFIG_SPL
 u32 spl_boot_device(void)
 {
-
-#ifdef CONFIG_DEBUG_RZF_FPGA
-    return BOOT_DEVICE_NOR;
-#else
     uint16_t boot_dev;
     
     boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;
@@ -189,7 +181,6 @@ u32 spl_boot_device(void)
     default:
         return BOOT_DEVICE_NONE;
     }
-#endif
 }
 #endif
 
@@ -208,10 +199,8 @@ int spl_board_init_f(void)
 {
 	uint16_t boot_dev;
 
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* initialize DDR */
 	ddr_setup();
-#endif
 
     /* initisalize SPI Multi when SPI BOOT */
 	boot_dev = *((uint16_t *)RZF_BOOTINFO_BASE) & MASK_BOOTM_DEVICE;

@@ -93,27 +93,12 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x00010000,
 		CPG_T_CLK
 	},
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	{		/* DDR */
 		(uintptr_t)CPG_CLKON_DDR,
 		(uintptr_t)CPG_CLKMON_DDR,
 		0x00030000,
 		CPG_T_CLK
 	},
-#else
-	{		/* DDR */
-		(uintptr_t)CPG_CLKON_DDR,
-		(uintptr_t)CPG_CLKMON_DDR,
-		0x00030003,
-		CPG_T_CLK
-	},
-	{		/* SYSC */
-		(uintptr_t)CPG_CLKON_SYSC,
-		(uintptr_t)CPG_CLKMON_SYSC,
-		0x00010001,
-		CPG_T_CLK
-	},
-#endif
 	{		/* SPI_MULTI */
 		(uintptr_t)CPG_CLKON_SPI_MULTI,
 		(uintptr_t)CPG_CLKMON_SPI_MULTI,
@@ -237,28 +222,12 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x00040000,
 		CPG_T_RST
 	},
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	{		/* DDR */
 		(uintptr_t)CPG_RST_DDR,
 		(uintptr_t)CPG_RSTMON_DDR,
 	    0x004F0000,
 		CPG_T_RST
 	},
-#else
-	{		/* DDR */
-		(uintptr_t)CPG_RST_DDR,
-		(uintptr_t)CPG_RSTMON_DDR,
-		0x007F007F,
-		CPG_T_RST
-	},
-	{		/* SYSC */
-		(uintptr_t)CPG_RST_SYSC,
-		(uintptr_t)CPG_RSTMON_SYSC,
-		0x00010001,
-		CPG_T_RST
-	},
-
-#endif
 	{		/* SPI_MULTI */
 		(uintptr_t)CPG_RST_SPI,
 		(uintptr_t)CPG_RSTMON_SPI,
@@ -432,10 +401,8 @@ static void cpg_ctrl_clkrst(CPG_SETUP_DATA const *array, uint32_t num)
 		if (array->type == CPG_T_RST) {
 			cmp = ~(cmp);
 		}
-#ifndef CONFIG_DEBUG_RZF_FPGA
 		while ((mmio_read_32(array->mon) & mask) != (cmp & mask))
 			;
-#endif
 	}
 }
 
@@ -494,7 +461,6 @@ static void cpg_pll_start_146(CPG_PLL_SETDATA_146 *pdata)
 /* It is assumed that the PLL has stopped by the time this function is executed. */
 static void cpg_pll_setup(void)
 {
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	uint32_t val = 0;
 
 	/* PLL4 startup */
@@ -508,14 +474,12 @@ static void cpg_pll_setup(void)
 	do {
 		val = mmio_read_32(CPG_PLL6_MON);
 	} while ((val & (PLL6_MON_PLL6_RESETB | PLL6_MON_PLL6_LOCK)) != 0);
-#endif
 
 	/* Set PLL4 to normal mode */
 	cpg_pll_start_146(&cpg_pll4_setdata);
 	/* Set PLL6 to normal mode */
 	cpg_pll_start_146(&cpg_pll6_setdata);
 
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* PLL4 normal mode transition confirmation */
 	do {
 		val = mmio_read_32(CPG_PLL4_MON);
@@ -525,7 +489,6 @@ static void cpg_pll_setup(void)
 	do {
 		val = mmio_read_32(CPG_PLL6_MON);
 	} while ((val & (PLL6_MON_PLL6_RESETB | PLL6_MON_PLL6_LOCK)) == 0);
-#endif
 }
 
 static void cpg_div_sel_setup(CPG_REG_SETTING *tbl, uint32_t size)
@@ -536,11 +499,9 @@ static void cpg_div_sel_setup(CPG_REG_SETTING *tbl, uint32_t size)
 		mmio_write_32(tbl->reg, tbl->val);
 	}
 
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* Wait for completion of settings */
 	while (mmio_read_32(CPG_CLKSTATUS) != 0)
 		;
-#endif
 }
 
 static void cpg_div_sel_static_setup(void)
@@ -568,17 +529,13 @@ void cpg_active_ddr(void (*disable_phy)(void))
 	/* Assert the reset of DDRTOP */
 	mmio_write_32(CPG_RST_DDR, 0x004F0000 | (CPG_RST_DDR_OPT_VALUE << 16));
 	mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000004F) != 0x0000004F)
 		;
-#endif
 
 	/* Start the clocks of DDRTOP */
 	mmio_write_32(CPG_CLKON_DDR, 0x00030003);
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_CLKMON_DDR) & 0x00000003) != 0x00000003)
 		;
-#endif
 
 	udelay(1);
 
@@ -589,10 +546,8 @@ void cpg_active_ddr(void (*disable_phy)(void))
 
 	/* De-assert PRESETN */
 	mmio_write_32(CPG_RST_DDR, 0x00020002);
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x00000002) != 0x00000000)
 		;
-#endif
 
 	udelay(1);
 
@@ -600,10 +555,8 @@ void cpg_active_ddr(void (*disable_phy)(void))
 
 	/* De-assert axiY_ARESETn, regARESETn, reset_n */
 	mmio_write_32(CPG_RST_DDR, 0x004D004D | (CPG_RST_DDR_OPT_VALUE << 16) | CPG_RST_DDR_OPT_VALUE);
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000004D) != 0x00000000)
 		;
-#endif
 
 	udelay(1);
 }
@@ -613,10 +566,8 @@ void cpg_reset_ddr_mc(void)
 	/* Assert rst_n, axiY_ARESETn, regARESETn */
 	mmio_write_32(CPG_RST_DDR, 0x004C0000 | (CPG_RST_DDR_OPT_VALUE << 16));
 	mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000004C) != 0x0000004C)
 		;
-#endif
 
 	udelay(1);
 
@@ -627,10 +578,8 @@ void cpg_reset_ddr_mc(void)
 
 	/* De-assert axiY_ARESETn, regARESETn */
 	mmio_write_32(CPG_RST_DDR, 0x004C004C | (CPG_RST_DDR_OPT_VALUE << 16) | CPG_RST_DDR_OPT_VALUE);
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000004C) != 0x00000000)
 		;
-#endif
 
 	udelay(1);
 }
