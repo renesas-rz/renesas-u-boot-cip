@@ -94,11 +94,9 @@ static int serial_raw_putc(struct uart_port *port, const char c)
 #else /* CONFIG_RZF_DEV */
 static int serial_raw_putc(struct uart_port *port, const char c)
 {
-#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* Tx fifo is empty */
 	if (!(sci_in(port, SCxSR) & (SCxSR_TEND(port) | SCxSR_TDxE(port))))
 		return -EAGAIN;
-#endif
 
 	sci_out(port, SCxTDR, c);
 	sci_out(port, SCxSR, sci_in(port, SCxSR) & ~(SCxSR_TEND(port) | SCxSR_TDxE(port)));
