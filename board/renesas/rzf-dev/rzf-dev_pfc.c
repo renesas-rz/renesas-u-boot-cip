@@ -161,6 +161,11 @@ static void pfc_scif_setup(void)
 static void pfc_qspi_setup(void)
 {
 	int      cnt;
+
+	/* multiplexer terminal switching */
+	mmio_write_32(PFC_PWPR, 0x0);
+	mmio_write_32(PFC_PWPR, PWPR_PFCWE);
+
 #if 0
 	mmio_write_32(PFC_QSPI, 0);
 #endif
@@ -194,7 +199,11 @@ static void pfc_qspi_setup(void)
 static void pfc_sd_setup(void)
 {
 	int      cnt;
-	
+
+	/* multiplexer terminal switching */
+	mmio_write_32(PFC_PWPR, 0x0);
+	mmio_write_32(PFC_PWPR, PWPR_PFCWE);
+
 #ifdef CONFIG_TARGET_SMARC_RZF
 	mmio_write_32(PFC_SD_ch0, SD0_PVDD_1_8);
 #else
