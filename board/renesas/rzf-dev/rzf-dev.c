@@ -119,6 +119,7 @@ int board_init(void)
 #endif
 
 #if CONFIG_TARGET_SMARC_RZF
+#if 0
 	struct udevice *dev;
 	const u8 pmic_bus = 0;
 	const u8 pmic_addr = 0x58;
@@ -140,6 +141,7 @@ int board_init(void)
 		printf("SW_ET0_EN: OFF\n");
 		*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_3_3;
 	}
+#endif
 #endif
 	return 0;
 }
