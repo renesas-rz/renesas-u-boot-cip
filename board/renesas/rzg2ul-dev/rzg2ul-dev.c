@@ -39,8 +39,47 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_PL2_SDHI_DSEL			(CPG_BASE + 0x218)
 #define CPG_CLK_STATUS				(CPG_BASE + 0x280)
 
+/* PFC */
+#define	PFC_P10				(PFC_BASE + 0x0010)
+#define	PFC_PM10			(PFC_BASE + 0x0120)
+#define	PFC_PMC10			(PFC_BASE + 0x0210)
+
+#define	PFC_P16				(PFC_BASE + 0x0016)
+#define	PFC_P22				(PFC_BASE + 0x0022)
+#define	PFC_PM16			(PFC_BASE + 0x012C)
+#define	PFC_PM22			(PFC_BASE + 0x0144)
+#define	PFC_PMC16			(PFC_BASE + 0x0216)
+#define	PFC_PMC22			(PFC_BASE + 0x0222)
+
+#define	PFC_P1D				(PFC_BASE + 0x001D)
+#define	PFC_PM1D			(PFC_BASE + 0x013A)
+#define	PFC_PMC1D			(PFC_BASE + 0x021D)
+
 void s_init(void)
 {
+#if CONFIG_TARGET_SMARC_RZG2UL
+	/* SD1 power control : P0_3 = 1 P6_1 = 1	*/
+	*(volatile u8 *)(PFC_PMC10) &= 0xF7;	/* Port func mode 0b00	*/
+	*(volatile u8 *)(PFC_PMC16) &= 0xFD;	/* Port func mode 0b00	*/
+	*(volatile u16 *)(PFC_PM10) = (*(volatile u16 *)(PFC_PM10) & 0xFF3F) | 0x0080; /* Port output mode 0b10 */
+	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & 0xFFF3) | 0x0008; /* Port output mode 0b10 */
+	*(volatile u8 *)(PFC_P10) = (*(volatile u8 *)(PFC_P10) & 0xF7) | 0x08; /* P0_3  output 1	*/
+	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFD) | 0x02; /* P6_1  output 1	*/
+#elif CONFIG_TARGET_RZG2UL_TYPE2_DEV
+	/* SD1 power control : P13_4 = 1 P13_3 = 0 */
+	*(volatile u8 *)(PFC_PMC1D) &= 0xE7;	/* Port func mode 0b0000	*/
+	*(volatile u16 *)(PFC_PM1D) = (*(volatile u16 *)(PFC_PM1D) & 0xFC3F) | 0x0280; /* Port output mode 0b1010 */
+	*(volatile u8 *)(PFC_P1D) = (*(volatile u8 *)(PFC_P1D) & 0xE7) | 0x10; /* P13_4 output 1, P13_3 output 0 */
+#else
+	/* SD1 power control : P18_5 = 1 P6_2 = 1 */
+	*(volatile u8 *)(PFC_PMC16) &= 0xFB;	/* Port func mode 0b00	*/
+	*(volatile u8 *)(PFC_PMC22) &= 0xDF;	/* Port func mode 0b00	*/
+	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & 0xFFCF) | 0x0020; /* Port output mode 0b10 */
+	*(volatile u16 *)(PFC_PM22) = (*(volatile u16 *)(PFC_PM22) & 0xF3FF) | 0x0800; /* Port output mode 0b10 */
+	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFB) | 0x04; /* P6_2  output 1	*/
+	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & 0xDF) | 0x20; /* P18_5 output 1	*/
+#endif
+
 #if CONFIG_TARGET_SMARC_RZG2UL
 	/********************************************************************/
 	/* TODO: Change the voltage setting according to the SW1-3 setting	*/
@@ -80,65 +119,6 @@ int board_early_init_f(void)
 
 	return 0;
 }
-
-/* PFC */
-
-#define	PFC_P10				(PFC_BASE + 0x0010)
-#define	PFC_PM10			(PFC_BASE + 0x0120)
-#define	PFC_PMC10			(PFC_BASE + 0x0210)
-
-#define	PFC_P16				(PFC_BASE + 0x0016)
-#define	PFC_P22				(PFC_BASE + 0x0022)
-#define	PFC_PM16			(PFC_BASE + 0x012C)
-#define	PFC_PM22			(PFC_BASE + 0x0144)
-#define	PFC_PMC16			(PFC_BASE + 0x0216)
-#define	PFC_PMC22			(PFC_BASE + 0x0222)
-
-#define	PFC_P1D				(PFC_BASE + 0x001D)
-#define	PFC_PM1D			(PFC_BASE + 0x013A)
-#define	PFC_PMC1D			(PFC_BASE + 0x021D)
-
-
-#define CONFIG_SYS_SH_SDHI0_BASE	0x11C00000
-#define CONFIG_SYS_SH_SDHI1_BASE	0x11C10000
-
-int board_mmc_init(struct bd_info *bis)
-{
-	int ret = 0;
-
-#if CONFIG_TARGET_SMARC_RZG2UL
-	/* SD1 power control : P0_3 = 1 P6_1 = 1	*/
-	*(volatile u8 *)(PFC_PMC10) &= 0xF7;	/* Port func mode 0b00	*/
-	*(volatile u8 *)(PFC_PMC16) &= 0xFD;	/* Port func mode 0b00	*/
-	*(volatile u16 *)(PFC_PM10) = (*(volatile u16 *)(PFC_PM10) & 0xFF3F) | 0x0080; /* Port output mode 0b10 */
-	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & 0xFFF3) | 0x0008; /* Port output mode 0b10 */
-	*(volatile u8 *)(PFC_P10) = (*(volatile u8 *)(PFC_P10) & 0xF7) | 0x08; /* P0_3  output 1	*/
-	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFD) | 0x02; /* P6_1  output 1	*/
-#elif CONFIG_TARGET_RZG2UL_TYPE2_DEV
-	/* SD1 power control : P13_4 = 1 P13_3 = 0 */
-	*(volatile u8 *)(PFC_PMC1D) &= 0xE7;	/* Port func mode 0b0000	*/
-	*(volatile u16 *)(PFC_PM1D) = (*(volatile u16 *)(PFC_PM1D) & 0xFC3F) | 0x0280; /* Port output mode 0b1010 */
-	*(volatile u8 *)(PFC_P1D) = (*(volatile u8 *)(PFC_P1D) & 0xE7) | 0x10; /* P13_4 output 1, P13_3 output 0 */
-#else
-	/* SD1 power control : P18_5 = 1 P6_2 = 1 */
-	*(volatile u8 *)(PFC_PMC16) &= 0xFB;	/* Port func mode 0b00	*/
-	*(volatile u8 *)(PFC_PMC22) &= 0xDF;	/* Port func mode 0b00	*/
-	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & 0xFFCF) | 0x0020; /* Port output mode 0b10 */
-	*(volatile u16 *)(PFC_PM22) = (*(volatile u16 *)(PFC_PM22) & 0xF3FF) | 0x0800; /* Port output mode 0b10 */
-	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFB) | 0x04; /* P6_2  output 1	*/
-	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & 0xDF) | 0x20; /* P18_5 output 1	*/
-#endif
-		
-	ret |= sh_sdhi_init(CONFIG_SYS_SH_SDHI0_BASE,
-						0,
-						SH_SDHI_QUIRK_64BIT_BUF);
-	ret |= sh_sdhi_init(CONFIG_SYS_SH_SDHI1_BASE,
-						1,
-						SH_SDHI_QUIRK_64BIT_BUF);
-
-	return ret;
-}
-
 
 int board_init(void)
 {
