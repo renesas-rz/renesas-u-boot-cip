@@ -39,8 +39,24 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_PL2_SDHI_DSEL                           (CPG_BASE + 0x218)
 #define CPG_CLK_STATUS                           (CPG_BASE + 0x280)
 
+/* PFC */
+#define PFC_P37						(PFC_BASE + 0x037)
+#define PFC_PM37					(PFC_BASE + 0x16E)
+#define PFC_PMC37					(PFC_BASE + 0x237)
+
 void s_init(void)
 {
+
+	/* SD1 power control: P39_1 = 0; P39_2 = 1; */
+	*(volatile u32 *)(PFC_PMC37) &= 0xFFFFFFF9; /* Port func mode 0b00 */
+	*(volatile u32 *)(PFC_PM37) = (*(volatile u32 *)(PFC_PM37) & 0xFFFFFFC3) | 0x28; /* Port output mode 0b1010 */
+#if CONFIG_TARGET_SMARC_RZV2L
+	*(volatile u32 *)(PFC_P37) = (*(volatile u32 *)(PFC_P37) & 0xFFFFFFF9) | 0x6;	/* Port 39[2:1] output value 0b11*/
+#else
+
+	*(volatile u32 *)(PFC_P37) = (*(volatile u32 *)(PFC_P37) & 0xFFFFFFF9) | 0x4;	/* Port 39[2:1] output value 0b10*/
+#endif
+
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(ETH_CH0) = (*(volatile u32 *)(ETH_CH0) & 0xFFFFFFFC) | ETH_PVDD_1800;
 	*(volatile u32 *)(ETH_CH1) = (*(volatile u32 *)(ETH_CH1) & 0xFFFFFFFC) | ETH_PVDD_1800;
@@ -59,38 +75,6 @@ int board_early_init_f(void)
 
 	return 0;
 }
-
-/* PFC */
-#define PFC_P37						(PFC_BASE + 0x037)
-#define PFC_PM37					(PFC_BASE + 0x16E)
-#define PFC_PMC37					(PFC_BASE + 0x237)
-
-#define CONFIG_SYS_SH_SDHI0_BASE	0x11C00000
-#define CONFIG_SYS_SH_SDHI1_BASE	0x11C10000
-int board_mmc_init(struct bd_info *bis)
-{
-	int ret = 0;
-	
-	/* SD1 power control: P39_1 = 0; P39_2 = 1; */
-	*(volatile u32 *)(PFC_PMC37) &= 0xFFFFFFF9; /* Port func mode 0b00 */
-	*(volatile u32 *)(PFC_PM37) = (*(volatile u32 *)(PFC_PM37) & 0xFFFFFFC3) | 0x28; /* Port output mode 0b1010 */
-#if CONFIG_TARGET_SMARC_RZV2L
-	*(volatile u32 *)(PFC_P37) = (*(volatile u32 *)(PFC_P37) & 0xFFFFFFF9) | 0x6;	/* Port 39[2:1] output value 0b11*/
-#else
-
-	*(volatile u32 *)(PFC_P37) = (*(volatile u32 *)(PFC_P37) & 0xFFFFFFF9) | 0x4;	/* Port 39[2:1] output value 0b10*/
-#endif
-		
-	ret |= sh_sdhi_init(CONFIG_SYS_SH_SDHI0_BASE,
-						0,
-						SH_SDHI_QUIRK_64BIT_BUF);
-	ret |= sh_sdhi_init(CONFIG_SYS_SH_SDHI1_BASE,
-						1,
-						SH_SDHI_QUIRK_64BIT_BUF);
-
-	return ret;
-}
-
 
 int board_init(void)
 {
