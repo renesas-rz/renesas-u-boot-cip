@@ -31,3 +31,5 @@
 		reg = <0>;
 	};
 };
+
+/delete-node/ &sdhi3;
