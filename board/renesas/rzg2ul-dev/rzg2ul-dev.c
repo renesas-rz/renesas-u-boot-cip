@@ -27,6 +27,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define ETH_CH0		(PFC_BASE + 0x300c)
 #define ETH_CH1		(PFC_BASE + 0x3010)
+#define I2C_CH1                (PFC_BASE + 0x1870)
 #define ETH_PVDD_3300	0x00
 #define ETH_PVDD_1800	0x01
 #define ETH_PVDD_2500	0x02
@@ -37,6 +38,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_CLKON_BASE				(CPG_BASE + 0x500)
 #define CPG_RESET_BASE				(CPG_BASE + 0x800)
 #define CPG_RESET_ETH				(CPG_RESET_BASE + 0x7C)
+#define CPG_RESET_I2C                           (CPG_RESET_BASE + 0x80)
 #define CPG_PL2_SDHI_DSEL			(CPG_BASE + 0x218)
 #define CPG_CLK_STATUS				(CPG_BASE + 0x280)
 
@@ -109,6 +111,10 @@ void s_init(void)
 	/* ETH CLK */
 	*(volatile u32 *)(CPG_RESET_ETH) = 0x30003;
 #endif
+	/* I2C CLK */
+	*(volatile u32 *)(CPG_RESET_I2C) = 0xF000F;
+	/* I2C pin non GPIO enable */
+	*(volatile u32 *)(I2C_CH1) = 0x01010101;
 	/* SD CLK */
 	*(volatile u32 *)(CPG_PL2_SDHI_DSEL) = 0x00110011;
 	while (*(volatile u32 *)(CPG_CLK_STATUS) != 0)
