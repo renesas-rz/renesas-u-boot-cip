@@ -624,6 +624,7 @@ static const struct dm_i2c_ops riic_ops = {
 static const struct udevice_id riic_ids[] = {
 	{ .compatible = "renesas,riic-r9a07g044l", },
 	{ .compatible = "renesas,riic-r9a07g044c", },
+	{ .compatible = "renesas,riic-r9a07g054l", },
 	{ .compatible = "renesas,riic-rz", },
 	{ }
 };
