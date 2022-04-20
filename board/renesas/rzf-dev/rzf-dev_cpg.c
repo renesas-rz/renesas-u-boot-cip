@@ -645,6 +645,14 @@ void cpg_reset_ddr_mc(void)
 	udelay(1);
 }
 
+void cpg_wdtrst_sel_setup(void)
+{
+	uint32_t reg;
+	reg = mmio_read_32(CPG_WDTRST_SEL);
+	reg |= WDTRST_SEL_WDTRSTSEL0 | WDTRST_SEL_WDTRSTSEL0_WEN;
+	mmio_write_32(CPG_WDTRST_SEL, reg);
+}
+
 void cpg_setup(void)
 {
 	cpg_selector_on_off(CPG_SEL_PLL3_3_ON_OFF, CPG_OFF);
@@ -653,5 +661,6 @@ void cpg_setup(void)
 	cpg_pll_setup();
 	cpg_clk_on_setup();
 	cpg_reset_setup();
-    cpg_div_sel_dynamic_setup();
+	cpg_div_sel_dynamic_setup();
+	cpg_wdtrst_sel_setup();
 }
