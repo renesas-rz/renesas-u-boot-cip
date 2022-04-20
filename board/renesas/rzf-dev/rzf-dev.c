@@ -96,14 +96,19 @@ int board_early_init_f(void)
 
 int board_init(void)
 {
-#if 0
+#if CONFIG_TARGET_SMARC_RZF
 	struct udevice *dev;
+	struct udevice *bus;
 	const u8 pmic_bus = 0;
 	const u8 pmic_addr = 0x58;
 	u8 data;
 	int ret;
 
-	ret = i2c_get_chip_for_busnum(pmic_bus, pmic_addr, 1, &dev);
+	ret = uclass_get_device_by_seq(UCLASS_I2C, pmic_bus, &bus);
+	if (ret)
+		hang();
+
+	ret = i2c_get_chip(bus, pmic_addr, 1, &dev);
 	if (ret)
 		hang();
 
@@ -113,11 +118,12 @@ int board_init(void)
 
 	if ((data & 0x08) == 0) {
 		printf("SW_ET0_EN: ON\n");
-		*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch1_1_8;
+		*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_1_8;
 	} else {
 		printf("SW_ET0_EN: OFF\n");
 		*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_3_3;
 	}
+	udelay(10);
 #endif
 	return 0;
 }
