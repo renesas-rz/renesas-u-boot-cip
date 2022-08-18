@@ -662,11 +662,11 @@ void iwg21m_fdt_update(void *fdt)
 	if (gpio_get_value(GPIO_GP_5_21)) {
 		/* VIN0 camera selection */
 		if (!strcmp("ov7725", getenv ("vin0_camera"))) {
-			off = fdt_path_offset(fdt, "/soc/i2c@e6508000/ov7725@0");
+			off = fdt_path_offset(fdt, "/soc/i2c@e6508000/ov7725@21");
 			fdt_status_okay(fdt, off);
-			do_fixup_by_path(fdt, "/soc/i2c@e6508000/ov5640@0", "status", status_disabled, sizeof(status_disabled), 1);
+			do_fixup_by_path(fdt, "/soc/i2c@e6508000/ov5640@3c", "status", status_disabled, sizeof(status_disabled), 1);
 
-			nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6508000/ov7725@0/port/endpoint");
+			nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6508000/ov7725@21/port/endpoint");
 			ret = fdt_create_phandle (fdt, nodeoffset);
 			if (ret < 0) {
 				printf ("Error creating camera node in FDT\n");
@@ -679,7 +679,7 @@ void iwg21m_fdt_update(void *fdt)
 		/* AVB selected */
 		do_fixup_by_path(fdt, "/soc/ethernet@e6800000", "status", status_ok, sizeof(status_ok), 0);
 		do_fixup_by_path(fdt, "/soc/video@e6ef0000", "status", status_disabled, sizeof(status_disabled), 0);
-		do_fixup_by_path(fdt, "/soc/i2c@e6508000/ov5640@0", "status", status_disabled, sizeof(status_disabled), 1);
+		do_fixup_by_path(fdt, "/soc/i2c@e6508000/ov5640@3c", "status", status_disabled, sizeof(status_disabled), 1);
 	} 
 
 	/* Update the VI1 or MMC-8bit selection
@@ -689,11 +689,11 @@ void iwg21m_fdt_update(void *fdt)
 	if( sw1_val ){
 		/* VIN1 camera selection */
 		if (!strcmp("ov7725", getenv ("vin1_camera"))) {
-			off = fdt_path_offset(fdt, "/soc/i2c@e6518000/ov7725@1");
+			off = fdt_path_offset(fdt, "/soc/i2c@e6518000/ov7725@21");
 			fdt_status_okay(fdt, off);
-			do_fixup_by_path(fdt, "/soc/i2c@e6518000/ov5640@1", "status", status_disabled, sizeof(status_disabled), 1);
+			do_fixup_by_path(fdt, "/soc/i2c@e6518000/ov5640@3c", "status", status_disabled, sizeof(status_disabled), 1);
 
-			nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6518000/ov7725@1/port/endpoint");
+			nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6518000/ov7725@21/port/endpoint");
 			ret = fdt_create_phandle (fdt, nodeoffset);
 			if (ret < 0) {
 				printf ("Error creating camera node in FDT\n");
@@ -704,7 +704,7 @@ void iwg21m_fdt_update(void *fdt)
 		}
 	}else{
 		do_fixup_by_path(fdt, "/soc/video@e6ef1000", "status", status_disabled, sizeof(status_disabled), 0);
-		do_fixup_by_path(fdt, "/soc/i2c@e6518000/ov5640@1", "status", status_disabled, sizeof(status_disabled), 1);
+		do_fixup_by_path(fdt, "/soc/i2c@e6518000/ov5640@3c", "status", status_disabled, sizeof(status_disabled), 1);
 
 		/*Enabling Pull-ups for MMC1_D4-PUPR3_30, MMC1_D5-PUPR3_31, MMC1_D6-PUPR3_14, MMC1_D7-PUPR3_15*/ 
 		val = readl(PUPR3);
@@ -721,11 +721,11 @@ void iwg21m_fdt_update(void *fdt)
 
 	/* VIN2 camera selection */
 	if (!strcmp("ov7725", getenv ("vin2_camera"))) {
-		off = fdt_path_offset(fdt, "/soc/i2c@e6530000/ov7725@2");
+		off = fdt_path_offset(fdt, "/soc/i2c@e6530000/ov7725@21");
 		fdt_status_okay(fdt, off);
-		do_fixup_by_path(fdt, "/soc/i2c@e6530000/ov5640@2", "status", status_disabled, sizeof(status_disabled), 1);
+		do_fixup_by_path(fdt, "/soc/i2c@e6530000/ov5640@3c", "status", status_disabled, sizeof(status_disabled), 1);
 
-		nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6530000/ov7725@2/port/endpoint");
+		nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6530000/ov7725@21/port/endpoint");
 		ret = fdt_create_phandle (fdt, nodeoffset);
 		if (ret < 0) {
 			printf ("Error creating camera node in FDT\n");
@@ -737,11 +737,11 @@ void iwg21m_fdt_update(void *fdt)
 
 	/* VIN3 camera selection */
 	if (!strcmp("ov7725", getenv ("vin3_camera"))) {
-		off = fdt_path_offset(fdt, "/soc/i2c@e6540000/ov7725@3");
+		off = fdt_path_offset(fdt, "/soc/i2c@e6540000/ov7725@21");
 		fdt_status_okay(fdt, off);
-		do_fixup_by_path(fdt, "/soc/i2c@e6540000/ov5640@3", "status", status_disabled, sizeof(status_disabled), 1);
+		do_fixup_by_path(fdt, "/soc/i2c@e6540000/ov5640@3c", "status", status_disabled, sizeof(status_disabled), 1);
 
-		nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6540000/ov7725@3/port/endpoint");
+		nodeoffset = fdt_path_offset (fdt, "/soc/i2c@e6540000/ov7725@21/port/endpoint");
 		ret = fdt_create_phandle (fdt, nodeoffset);
 		if (ret < 0) {
 			printf ("Error creating camera node in FDT\n");
