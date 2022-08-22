@@ -23,6 +23,7 @@ extern void pfc_setup(void);
 extern void ddr_setup(void);
 extern int spi_multi_setup(uint32_t addr_width, uint32_t dq_width, uint32_t dummy_cycle);
 
+void cpu_cpg_setup(void);
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -212,6 +213,8 @@ int spl_board_init_f(void)
 void board_init_f(ulong dummy)
 {
 	int ret;
+
+	cpu_cpg_setup();
 
 	/* Initialize SPL*/
 	ret = spl_early_init();
