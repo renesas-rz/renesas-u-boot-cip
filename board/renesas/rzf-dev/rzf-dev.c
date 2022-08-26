@@ -102,6 +102,7 @@ int board_init(void)
 	struct udevice *bus;
 	const u8 pmic_bus = 0;
 	const u8 pmic_addr = 0x58;
+	int i = 0;
 	u8 data;
 	int ret;
 
@@ -113,9 +114,18 @@ int board_init(void)
 	if (ret)
 		hang();
 
+	/*
+	 * Disabling L1 data cache causes dm_i2c_read()
+	 * to fail occasionally so just retry before
+	 * giving up.
+	 */
+re_read:
 	ret = dm_i2c_read(dev, 0x2, &data, 1);
-	if (ret)
+	if (ret) {
+		if (i++ < 20)
+			goto re_read;
 		hang();
+	}
 
 	if ((data & 0x08) == 0) {
 		printf("SW_ET0_EN: ON\n");

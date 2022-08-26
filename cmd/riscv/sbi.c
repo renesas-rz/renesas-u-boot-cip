@@ -193,6 +193,27 @@ int do_sbi_get_mcache_ctl_status(struct cmd_tbl *cmdtp, int flag, int argc,
 	return 0;
 }
 
+int do_sbi_enable_l1_dcache(struct cmd_tbl *cmdtp, int flag, int argc,
+			 char *const argv[])
+{
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, 18,
+			0, 0, 0, 0, 0, 0);
+	return 0;
+}
+
+int do_sbi_disable_l1_dcache(struct cmd_tbl *cmdtp, int flag, int argc,
+			 char *const argv[])
+{
+	struct sbiret ret;
+
+	ret = sbi_ecall(SBI_EXT_VENDOR, 19,
+			0, 0, 0, 0, 0, 0);
+
+	return 0;
+}
+
 int do_sbi_get_mmisc_ctl_status(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
@@ -464,6 +485,8 @@ U_BOOT_CMD_COMPLETE(sbi_l1cache_i_prefetch_en, 2, 0,do_sbi_l1cache_i_prefetch,"O
 U_BOOT_CMD_COMPLETE(sbi_l1cache_d_prefetch_en, 2, 0, do_sbi_l1cache_d_prefetch,"OpenSBI DEBUG:L1CACHE_D_PREFETCH_EN",NULL, NULL);
 U_BOOT_CMD_COMPLETE(sbi_non_blocking_load_store_en, 2, 0, do_sbi_non_blocking_load_store,"OpenSBI DEBUG:NON_BLOCKING_LOAD_STORE_EN",NULL, NULL);
 U_BOOT_CMD_COMPLETE(sbi_write_around_en, 2, 0, do_sbi_write_around,"OpenSBI DEBUG:WRITE_AROUND_EN",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_enable_l1_dcache, 1, 0, do_sbi_enable_l1_dcache,"OpenSBI DEBUG:ENABLE_L1_DCACHE",NULL, NULL);
+U_BOOT_CMD_COMPLETE(sbi_disable_l1_dcache, 1, 0, do_sbi_disable_l1_dcache,"OpenSBI DEBUG:DISABLE_L1_DCACHE",NULL, NULL);
 
 int do_sbi_ext_set_timer(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
