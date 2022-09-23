@@ -415,4 +415,12 @@ config WDT_RENESAS
 	  Select this to enable Renesas watchdog timer, which can be found on some
 	  RZ/G2 Platforms.
 
+config RENESAS_RZG2LWDT
+	tristate "Renesas RZ/G2L WDT Watchdog"
+	depends on WDT
+	imply WATCHDOG
+	help
+	 Select this to enable Renesas watchdog timer, which can be found on some
+	 RZ/G2L Platforms.
+
 endmenu
