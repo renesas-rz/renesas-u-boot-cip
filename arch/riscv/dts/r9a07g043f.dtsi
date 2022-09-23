@@ -83,6 +83,22 @@
 		interrupt-parent = <&plic0>;
 		ranges;
 
+		wdt0: watchdog@12800800 {
+			compatible = "renesas,r9a07g043f-wdt";
+			reg = <0 0x12800800 0 0x400>;
+			clocks = <&xinclk>;
+			power-domains = <&cpg>;
+			status = "disabled";
+		};
+
+		wdt2: watchdog@12800400 {
+			compatible = "renesas,r9a07g043f-wdt";
+			reg = <0 0x12800400 0 0x400>;
+			clocks = <&xinclk>;
+			power-domains = <&cpg>;
+			status = "disabled";
+		};
+
 		plic0: interrupt-controller@12c00000 {
 			u-boot,dm-spl;
 			compatible = "riscv,plic0";
