@@ -64,3 +64,8 @@
 		reg = <7>;
 	};
 };
+
+&wdt0 {
+	status = "okay";
+	timeout-sec = <60>;
+};
