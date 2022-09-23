@@ -108,3 +108,8 @@
 		reg = <0x3d>;
 	};
 };
+
+&wdt0 {
+	status = "okay";
+	timeout-sec = <60>;
+};
