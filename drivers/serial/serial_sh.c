@@ -87,12 +87,22 @@ static void handle_error(struct uart_port *port)
 
 static int serial_raw_putc(struct uart_port *port, const char c)
 {
+#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* Tx fifo is empty */
+#ifdef CONFIG_RZF_DEV
+	if (!(sci_in(port, SCxSR) & (SCxSR_TEND(port) | SCxSR_TDxE(port))))
+#else
 	if (!(sci_in(port, SCxSR) & SCxSR_TEND(port)))
+#endif
 		return -EAGAIN;
+#endif
 
 	sci_out(port, SCxTDR, c);
+#ifdef CONFIG_RZF_DEV
+	sci_out(port, SCxSR, sci_in(port, SCxSR) & ~(SCxSR_TEND(port) | SCxSR_TDxE(port)));
+#else
 	sci_out(port, SCxSR, sci_in(port, SCxSR) & ~SCxSR_TEND(port));
+#endif
 
 	return 0;
 }
