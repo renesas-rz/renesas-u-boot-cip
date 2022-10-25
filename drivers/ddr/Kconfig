@@ -37,6 +37,7 @@ config SYS_SPD_BUS_NUM
 
 source "drivers/ddr/altera/Kconfig"
 source "drivers/ddr/imx/Kconfig"
+source "drivers/ddr/renesas/Kconfig"
 
 config SPD_EEPROM
 	bool "DDR controller makes use of an SPD EEPROM for JEDEC information"
