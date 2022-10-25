@@ -59,7 +59,8 @@ static void sh_serial_init_generic(struct uart_port *port)
 	sci_out(port, SCSPTR, 0x0003);
 #endif
 
-#if !(defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U))
+#if !(defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U)  \
+|| defined(CONFIG_RZF_DEV))
 #if IS_ENABLED(CONFIG_RCAR_GEN2) || IS_ENABLED(CONFIG_RCAR_GEN3) || IS_ENABLED(CONFIG_RCAR_GEN4)
 	if (port->type == PORT_HSCIF)
 		sci_out(port, HSSRR, HSSRR_SRE | HSSRR_SRCYC8);
@@ -102,12 +103,22 @@ static void handle_error(struct uart_port *port)
 
 static int serial_raw_putc(struct uart_port *port, const char c)
 {
+#ifndef CONFIG_DEBUG_RZF_FPGA
 	/* Tx fifo is empty */
+#ifdef CONFIG_RZF_DEV
+	if (!(sci_in(port, SCxSR) & (SCxSR_TEND(port) | SCxSR_TDxE(port))))
+#else
 	if (!(sci_in(port, SCxSR) & SCxSR_TEND(port)))
+#endif
 		return -EAGAIN;
+#endif
 
 	sci_out(port, SCxTDR, c);
+#ifdef CONFIG_RZF_DEV
+	sci_out(port, SCxSR, sci_in(port, SCxSR) & ~(SCxSR_TEND(port) | SCxSR_TDxE(port)));
+#else
 	sci_out(port, SCxSR, sci_in(port, SCxSR) & ~SCxSR_TEND(port));
+#endif
 
 	return 0;
 }
