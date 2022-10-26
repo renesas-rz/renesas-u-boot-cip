@@ -26,6 +26,70 @@
 #include <openssl/ec.h>
 #include <openssl/bn.h>
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || \
+	(defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x02070000fL)
+#include <openssl/err.h>
+
+static int EC_GROUP_order_bits(const EC_GROUP *group)
+{
+	int ret = 0;
+	BIGNUM *order;
+
+	if (!group)
+		return ret;
+
+	order = BN_new();
+
+	if (!order) {
+		ERR_clear_error();
+		return ret;
+	}
+
+	if (!EC_GROUP_get_order(group, order, NULL)) {
+		ERR_clear_error();
+		BN_free(order);
+		return ret;
+	}
+
+	ret = BN_num_bits(order);
+	BN_free(order);
+	return ret;
+}
+
+static void ECDSA_SIG_get0(const ECDSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps)
+{
+	if (pr != NULL)
+		*pr = sig->r;
+	if (ps != NULL)
+		*ps = sig->s;
+}
+
+static int ECDSA_SIG_set0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+{
+	if (r == NULL || s == NULL)
+		return 0;
+	BN_clear_free(sig->r);
+	BN_clear_free(sig->s);
+	sig->r = r;
+	sig->s = s;
+	return 1;
+}
+
+int BN_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen)
+{
+	int n = BN_num_bytes(a);
+
+	if (n < 0 || n > tolen)
+		return -1;
+
+	memset(to, 0, tolen - n);
+	if (BN_bn2bin(a, to + tolen - n) < 0)
+		return -1;
+
+	return tolen;
+}
+#endif
+
 /* Image signing context for openssl-libcrypto */
 struct signer {
 	EVP_PKEY *evp_key;	/* Pointer to EVP_PKEY object */
@@ -36,9 +100,18 @@ struct signer {
 
 static int alloc_ctx(struct signer *ctx, const struct image_sign_info *info)
 {
+	int ret = 0;
+
 	memset(ctx, 0, sizeof(*ctx));
 
-	if (!OPENSSL_init_ssl(0, NULL)) {
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || \
+(defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x02070000fL)
+	ret = SSL_library_init();
+#else
+	ret = OPENSSL_init_ssl(0, NULL);
+#endif
+
+	if (!ret) {
 		fprintf(stderr, "Failure to init SSL library\n");
 		return -1;
 	}
@@ -301,7 +374,12 @@ static int do_add(struct signer *ctx, void *fdt, const char *key_node_name)
 	x = BN_new();
 	y = BN_new();
 	point = EC_KEY_get0_public_key(ctx->ecdsa_key);
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || \
+(defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x02070000fL)
+	EC_POINT_get_affine_coordinates_GFp(group, point, x, y, NULL);
+#else
 	EC_POINT_get_affine_coordinates(group, point, x, y, NULL);
+#endif
 
 	ret = fdt_setprop_string(fdt, key_node, "ecdsa,curve", curve_name);
 	if (ret < 0)
