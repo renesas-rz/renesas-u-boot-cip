@@ -1,4 +1,4 @@
-if ARCH_RMOBILE
+if ( ARCH_RMOBILE || RZF_DEV )
 
 config PINCTRL_PFC
 	bool "Renesas pin control drivers"
