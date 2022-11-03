@@ -16,6 +16,7 @@ obj-$(CONFIG_ARCH_NPCM)         += nuvoton/
 obj-$(CONFIG_PINCTRL_QCOM) += qcom/
 obj-$(CONFIG_ARCH_RENESAS) += renesas/
 obj-$(CONFIG_ARCH_RZN1) += renesas/
+obj-$(CONFIG_RZF_DEV) += renesas/
 obj-$(CONFIG_PINCTRL_SANDBOX)	+= pinctrl-sandbox.o
 obj-$(CONFIG_PINCTRL_SUNXI)	+= sunxi/
 obj-$(CONFIG_$(SPL_)PINCTRL_TEGRA)	+= tegra/
