@@ -16,6 +16,7 @@
 #include <wait_bit.h>
 #include <asm/io.h>
 #include <linux/bitops.h>
+#include <linux/io.h>
 
 #include <dt-bindings/clock/renesas-cpg-mssr.h>
 #include <dt-bindings/clock/r9a07g054l-cpg.h>
@@ -75,7 +76,7 @@ static int rzv2l_clk_disable(struct clk *clk)
 	
 	mod_clk_get(clk, priv->info, &clock);
 	value = MSSR_ON(clock->bit) << 16;
-	setbits_le32(priv->base +0x500 + MSSR_OFF(clock->bit) * 4, value);
+	iowrite32(value, priv->base + 0x500 + MSSR_OFF(clock->bit) * 4);
 	ret = wait_for_bit_le32(priv->base + CLK_MON_R(MSSR_OFF(clock->bit) * 4),
 					MSSR_ON(clock->bit), 0, 100, 0);
 
