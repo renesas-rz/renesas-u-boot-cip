@@ -46,6 +46,7 @@
 /* ENV setting */
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000 \0" \
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p1 \0" \
 	"prodemmcbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p1 \0" \
