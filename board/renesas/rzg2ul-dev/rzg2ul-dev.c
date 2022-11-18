@@ -41,6 +41,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_RESET_I2C                           (CPG_RESET_BASE + 0x80)
 #define CPG_PL2_SDHI_DSEL			(CPG_BASE + 0x218)
 #define CPG_CLK_STATUS				(CPG_BASE + 0x280)
+#define CPG_RST_USB				(CPG_BASE + 0x878)
+#define CPG_CLKON_USB				(CPG_BASE + 0x578)
 
 /* PFC */
 #define	PFC_P10				(PFC_BASE + 0x0010)
@@ -57,6 +59,20 @@ DECLARE_GLOBAL_DATA_PTR;
 #define	PFC_P1D				(PFC_BASE + 0x001D)
 #define	PFC_PM1D			(PFC_BASE + 0x013A)
 #define	PFC_PMC1D			(PFC_BASE + 0x021D)
+
+#define PFC_PWPR			(PFC_BASE + 0x3014)
+#define PFC_PMC15			(PFC_BASE + 0x0215)
+#define PFC_PFC15			(PFC_BASE + 0x0454)
+#define PFC_PFC16			(PFC_BASE + 0x0458)
+
+#define USBPHY_BASE		0x11c40000
+#define USB0_BASE		0x11c50000
+#define USB1_BASE		0x11c70000
+#define USBF_BASE		0x11c60000
+#define USBPHY_RESET		(USBPHY_BASE + 0x000u)
+#define COMMCTRL		0x800
+#define HcRhDescriptorA		0x048
+#define LPSTS			0x102
 
 void s_init(void)
 {
@@ -121,6 +137,54 @@ void s_init(void)
 		;
 }
 
+static void board_usb_init(void)
+{
+	/*Enable USB*/
+	(*(volatile u32 *)CPG_RST_USB) = 0x000f000f;
+	(*(volatile u32 *)CPG_CLKON_USB) = 0x000f000f;
+
+	/* Setup  */
+	/* Disable GPIO Write Protect */
+	(*(volatile u32 *)PFC_PWPR) &= ~(0x1u << 7);    /* PWPR.BOWI = 0 */
+	(*(volatile u32 *)PFC_PWPR) |= (0x1u << 6);     /* PWPR.PFCWE = 1 */
+
+	/* set P5_0 as Func.1 for VBUSEN */
+	(*(volatile u8 *)PFC_PMC15) |= (0x1u << 0);
+	(*(volatile u8 *)PFC_PFC15) &= ~(0x7u << 0);
+	(*(volatile u8 *)PFC_PFC15) |= (0x1u << 0);
+
+	/* set P5_2 as Func.1 for OVERCUR */
+	(*(volatile u8 *)PFC_PMC15) |= 0x4;
+	(*(volatile u8 *)PFC_PFC15) &= ~(0x7u << 8);
+	(*(volatile u8 *)PFC_PFC15) |= (0x1u << 8);
+
+	/* set P6_0 as Func.1 for VBUSEN */
+	(*(volatile u8 *)PFC_PMC16) |= (0x1u << 0);
+	(*(volatile u8 *)PFC_PFC16) &= ~(0x7u << 0);
+	(*(volatile u8 *)PFC_PFC16) |= (0x1u << 0);
+
+	/* set P5_4 as Func.5 for OVERCUR */
+	(*(volatile u8 *)PFC_PMC15) = (*(volatile u8 *)PFC_PMC15 & 0xEF) | 0x10;
+	(*(volatile u32 *)PFC_PFC15) &= ~(0x7u << 16);
+	(*(volatile u32 *)PFC_PFC15) |= (0x5u << 16);
+
+	/* Enable write protect */
+	(*(volatile u32 *)PFC_PWPR) &= ~(0x1u << 6);    /* PWPR.PFCWE = 0 */
+	(*(volatile u32 *)PFC_PWPR) |= (0x1u << 7);     /* PWPR.BOWI = 1 */
+
+	/*Enable 2 USB ports*/
+	(*(volatile u32 *)USBPHY_RESET) = 0x00001000u;
+	/*USB0 is HOST*/
+	(*(volatile u32 *)(USB0_BASE + COMMCTRL)) = 0;
+	/*USB1 is HOST*/
+	(*(volatile u32 *)(USB1_BASE + COMMCTRL)) = 0;
+	/* Set USBPHY normal operation (Function only) */
+	(*(volatile u16 *)(USBF_BASE + LPSTS)) |= (0x1u << 14);		/* USBPHY.SUSPM = 1 (func only) */
+	/* Overcurrent is not supported */
+	(*(volatile u32 *)(USB0_BASE + HcRhDescriptorA)) |= (0x1u << 12);       /* NOCP = 1 */
+	(*(volatile u32 *)(USB1_BASE + HcRhDescriptorA)) |= (0x1u << 12);       /* NOCP = 1 */
+}
+
 int board_early_init_f(void)
 {
 
@@ -159,6 +223,7 @@ int board_init(void)
 #endif
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_TEXT_BASE + 0x50000;
+	board_usb_init();
 
 	return 0;
 }
