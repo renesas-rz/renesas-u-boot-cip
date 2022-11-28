@@ -269,6 +269,7 @@ struct ip_hdr {
 #define IP_FLAGS_MFRAG	0x2000 /* more fragments */
 
 #define IP_HDR_SIZE		(sizeof(struct ip_hdr))
+#define IP_MIN_FRAG_DATAGRAM_SIZE	(IP_HDR_SIZE + 8)
 
 /*
  *	Internet Protocol (IP) + UDP header.
