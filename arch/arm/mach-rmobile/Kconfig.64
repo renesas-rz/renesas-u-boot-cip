@@ -77,6 +77,9 @@ config R9A07G054L
 config R9A07G043U
 	bool "Renesas SoC RZ/G2UL"
 
+config R9A08G045S
+	bool "Renesas SoC RZ/G3S"
+
 endmenu
 
 choice
@@ -222,6 +225,11 @@ config TARGET_SMARC_RZG2UL
 	help
           Support for Renesas RZ/G2UL Dev Platform
 
+config TARGET_RZG3S_DEV
+	bool "RZ/G3S Dev board"
+	help
+          Support for Renesas RZ/G3S Dev Platform
+
 endchoice
 
 config SYS_SOC
@@ -241,6 +249,7 @@ source "board/renesas/rzg2l-dev/Kconfig"
 source "board/renesas/rzv2l-dev/Kconfig"
 source "board/renesas/rzg2lc-dev/Kconfig"
 source "board/renesas/rzg2ul-dev/Kconfig"
+source "board/renesas/rzg3s-dev/Kconfig"
 
 config MULTI_DTB_FIT_UNCOMPRESS_SZ
 	default 0x80000 if TARGET_HIHOPE_RZG2
