@@ -1,0 +1,269 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source for the RZ/G3S (r9a08g045s) SoC
+ *
+ * Copyright (C) 2022 Renesas Electronics Corp.
+ */
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/r9a08g045s-cpg.h>
+
+/ {
+	compatible = "renesas,r9a08g045s";
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	cpus {
+		#address-cells = <0x2>;
+		#size-cells = <0x0>;
+
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a55";
+			reg = <0x0 0x0>;
+			enable-method = "psci";
+			next-level-cache = <&l3>;
+			#cooling-cells = <2>;
+		};
+
+		l3: l3-cache {
+			compatible = "cache";
+			cache-unified;
+			cache-level = <3>;
+		};
+	};
+
+	psci {
+		compatible = "arm,psci-1.0", "arm,psci-0.2";
+		method = "smc";
+	};
+
+	xinclk: xinclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <0>;
+	};
+
+	soc: soc {
+		compatible = "simple-bus";
+		interrupt-parent = <&gic>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		cpg: clock-controller@11010000 {
+			compatible = "renesas,r9a08g045s-cpg";
+			reg = <0 0x11010000 0 0x10000>;
+			clocks = <&xinclk>;
+			clock-names = "xinclk";
+			#clock-cells = <2>;
+			#reset-cells = <1>;
+			#power-domain-cells = <0>;
+		};
+
+		pinctrl: pin-controller@11030000 {
+			compatible = "renesas,r9a08g045s-pinctrl";
+			reg = <0 0x11030000 0 0x10000>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			gpio-ranges = <&pinctrl 0 0 392>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_GPIO>;
+		};
+
+		gic: interrupt-controller@12400000 {
+			compatible = "arm,gic-v3";
+			#interrupt-cells = <3>;
+			#address-cells = <0>;
+			interrupt-controller;
+			reg = <0x0 0x12400000 0 0x40000>,
+			      <0x0 0x12440000 0 0x60000>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_GIC600>;
+			clock-names = "gic6000";
+			interrupts = <GIC_PPI 9
+				(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>;
+		};
+
+		scif0: serial@1004b800 {
+			compatible = "renesas,scif-r9a08g045s", "renesas,scif";
+			reg = <0 0x1004b800 0 0x400>;
+			interrupts =
+				<GIC_SPI 320 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 321 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 322 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 323 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 324 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 324 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SCIF0>;
+			clock-names = "fck";
+			resets = <&cpg R9A08G045S_CLK_SCIF0>;
+			power-domains = <&cpg>;
+			status = "disable";
+		};
+
+		scif1: serial@1004bc00 {
+			compatible = "renesas,scif-r9a08g045s", "renesas,scif";
+			reg = <0 0x1004bc00 0 0x400>;
+			interrupts =
+				<GIC_SPI 325 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 326 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 327 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 328 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 329 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 329 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SCIF1>;
+			clock-names = "fck";
+			resets = <&cpg R9A08G045S_CLK_SCIF1>;
+			power-domains = <&cpg>;
+			status = "disable";
+		};
+
+		scif2: serial@1004c000 {
+			compatible = "renesas,scif-r9a08g045s", "renesas,scif";
+			reg = <0 0x1004c000 0 0x400>;
+			interrupts =
+				<GIC_SPI 330 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 331 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 332 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 333 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 334 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 334 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SCIF2>;
+			clock-names = "fck";
+			resets = <&cpg R9A08G045S_CLK_SCIF2>;
+			power-domains = <&cpg>;
+			status = "disable";
+		};
+
+		scif3: serial@1004c400 {
+			compatible = "renesas,scif-r9a08g045s", "renesas,scif";
+			reg = <0 0x1004c400 0 0x400>;
+			interrupts =
+				<GIC_SPI 335 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 336 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 337 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 338 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 339 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 339 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SCIF3>;
+			clock-names = "fck";
+			resets = <&cpg R9A08G045S_CLK_SCIF3>;
+			power-domains = <&cpg>;
+			status = "disable";
+		};
+
+		scif4: serial@1004c800 {
+			compatible = "renesas,scif-r9a08g045s", "renesas,scif";
+			reg = <0 0x1004c800 0 0x400>;
+			interrupts =
+				<GIC_SPI 340 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 341 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 342 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 343 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 344 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 344 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SCIF4>;
+			clock-names = "fck";
+			resets = <&cpg R9A08G045S_CLK_SCIF4>;
+			power-domains = <&cpg>;
+			status = "disable";
+		};
+
+		scif5: serial@1004e000 {
+			compatible = "renesas,scif-r9a08g045s", "renesas,scif";
+			reg = <0 0x1004e000 0 0x400>;
+			interrupts =
+				<GIC_SPI 345 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 346 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 347 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 348 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 349 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 349 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SCIF5>;
+			clock-names = "fck";
+			resets = <&cpg R9A08G045S_CLK_SCIF5>;
+			power-domains = <&cpg>;
+			status = "disable";
+		};
+
+		sdhi0: sd@11c00000 {
+			compatible = "renesas,sdhi-r9a08g045s",
+				     "renesas,rcar-gen3-sdhi";
+			reg = <0 0x11c00000 0 0x10000>;
+			interrupts = <GIC_SPI 88 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SDHI0>;
+			resets = <&cpg R9A08G045S_CLK_SDHI0>;
+			power-domains = <&cpg>;
+			status = "disabled";
+		};
+
+		sdhi1: sd@11c10000 {
+			compatible = "renesas,sdhi-r9a08g045s",
+				     "renesas,rcar-gen3-sdhi";
+			reg = <0x0 0x11c10000 0 0x10000>;
+			interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SDHI1>;
+			resets = <&cpg R9A08G045S_CLK_SDHI1>;
+			power-domains = <&cpg>;
+			status = "disabled";
+		};
+
+		sdhi2: sd@11c20000 {
+			compatible = "renesas,sdhi-r9a08g045s",
+				     "renesas,rcar-gen3-sdhi";
+			reg = <0x0 0x11c20000 0 0x10000>;
+			interrupts = <GIC_SPI 92 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SDHI2>;
+			resets = <&cpg R9A08G045S_CLK_SDHI2>;
+			power-domains = <&cpg>;
+			status = "disabled";
+		};
+
+		eth0: ethernet@11c30000 {
+			compatible = "renesas,etheravb-r9a08g045s";
+			reg = <0 0x11c30000 0 0x10000>;
+			interrupts = <GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_ETH0>;
+			resets = <&cpg R9A08G045S_CLK_ETH0>;
+			power-domains = <&cpg>;
+			phy-mode = "rgmii";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			eth-pin-mode-switch = <&pinctrl 0>;
+			status = "disabled";
+		};
+
+		eth1: ethernet@11c40000 {
+			compatible = "renesas,etheravb-r9a08g045s";
+			reg = <0 0x11c40000 0 0x10000>;
+			interrupts = <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_ETH1>;
+			resets = <&cpg R9A08G045S_CLK_ETH1>;
+			power-domains = <&cpg>;
+			phy-mode = "rgmii";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			eth-pin-mode-switch = <&pinctrl 1>;
+			status = "disabled";
+		};
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts-extended =
+		<&gic GIC_PPI 13
+			(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
+		<&gic GIC_PPI 14
+			(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
+		<&gic GIC_PPI 11
+			(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
+		<&gic GIC_PPI 10
+			(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>;
+	};
+};
