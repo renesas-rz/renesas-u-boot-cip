@@ -21,6 +21,7 @@
 #define PIN(n)	(0x0800 + 0x10 + (n))	  /* Port Input Register */
 #define PFC(n)	(0x0400 + 0x40 + (n) * 4) /* Port Function Control Register */
 #define PWPR	(0x3014)		  /* Port Write Protection Register */
+#define PWPR_G3S	(0x3000)
 
 #define PWPR_B0WI	BIT(7)		  /* Bit Write Disable */
 #define PWPR_PFCWE	BIT(6)		  /* PFC Register Write Enable */
@@ -31,13 +32,45 @@ DECLARE_GLOBAL_DATA_PTR;
 
 struct rzg2l_pinctrl_priv {
 	void __iomem	*regs;
+	struct udevice	*dev;
 };
+
+/* specific RZ/G3S port IDs with offset starting from 0x20 */
+static const unsigned int port_id_g3s[] = {
+        0, 5, 6, 11, 12, 13, 14, 15, 16, 17, 18,
+        1, 2, 3, 4, 7, 8, 9, 10
+};
+
+static int rzg3s_find_port_index(unsigned int port)
+{
+        int idx = 0;
+
+        for (idx = 0; idx < ARRAY_SIZE(port_id_g3s); idx++)
+                if(port_id_g3s[idx] == port)
+                        break;
+
+        return idx;
+}
+
+static int rzg3s_find_port_offset(unsigned int port)
+{
+        int idx = rzg3s_find_port_index(port);
+
+        if (idx > 10)
+                return (idx + 0x15);
+
+        return (idx + 0x10);
+}
 
 static void rzg2l_pinctrl_set_function(struct rzg2l_pinctrl_priv *priv,
 				       u16 port, u8 pin, u8 func)
 {
 	u32 reg32;
 	u8 reg8;
+	ofnode cur_node  = dev_ofnode(priv->dev);
+
+	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl"))
+		port = rzg3s_find_port_offset(port);
 
 	/* Set GPIO or Func in PMC, then set Func in PFC */
 	reg8 = readb(priv->regs + PMC(port));
@@ -53,6 +86,7 @@ static void rzg2l_pinctrl_set_function(struct rzg2l_pinctrl_priv *priv,
 static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 {
 	struct rzg2l_pinctrl_priv *priv = dev_get_plat(dev);
+	ofnode cur_node  = dev_ofnode(dev);
 	u16 port;
 	u16 port_max = (u16)dev_get_driver_data(dev);
 	u8 pin, func;
@@ -72,8 +106,15 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 		      __func__, count);
 		return -EINVAL;
 	}
-	writel(0, priv->regs + PWPR);
-	writel(PWPR_PFCWE, priv->regs + PWPR);
+
+	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
+		writel(0, priv->regs + PWPR_G3S);
+		writel(PWPR_PFCWE, priv->regs + PWPR_G3S);
+	}
+	else {
+		writel(0, priv->regs + PWPR);
+		writel(PWPR_PFCWE, priv->regs + PWPR);
+	}
 
 	for (i = 0 ; i < count; i++) {
 		cells[i] = fdt32_to_cpu(data[i]);
@@ -89,8 +130,14 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 		rzg2l_pinctrl_set_function(priv, port, pin, func);
 	}
 
-	writel(0, priv->regs + PWPR);
-	writel(PWPR_B0WI, priv->regs + PWPR);
+	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
+		writel(0, priv->regs + PWPR_G3S);
+		writel(PWPR_B0WI, priv->regs + PWPR_G3S);
+	}
+	else {
+		writel(0, priv->regs + PWPR);
+		writel(PWPR_B0WI, priv->regs + PWPR);
+	}
 	return 0;
 }
 
@@ -102,6 +149,8 @@ static int rzg2l_pinctrl_probe(struct udevice *dev)
 {
 	struct rzg2l_pinctrl_priv *priv = dev_get_plat(dev);
 	ofnode node;
+
+	priv->dev = dev;
 
 	priv->regs = dev_read_addr_ptr(dev);
 	if (!priv->regs) {
@@ -129,6 +178,7 @@ static const struct udevice_id rzg2l_pinctrl_match[] = {
 	{ .compatible = "renesas,r9a07g054l-pinctrl", .data = 49 },
 	{ .compatible = "renesas,r9a07g043u-pinctrl", .data = 19 },
 	{ .compatible = "renesas,r9a07g043f-pinctrl", .data = 19 },
+	{ .compatible = "renesas,r9a08g045s-pinctrl", .data = 19 }, //19 Port
 	{}
 };
 
