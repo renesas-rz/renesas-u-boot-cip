@@ -22,3 +22,4 @@ obj-$(CONFIG_CLK_R9A07G044L) += clk-rzg2l.o r9a07g044l-cpg-mssr.o
 obj-$(CONFIG_CLK_R9A07G054L) += clk-rzv2l.o r9a07g054l-cpg-mssr.o
 obj-$(CONFIG_CLK_R9A07G043U) += clk-rzg2l.o r9a07g043u-cpg-mssr.o
 obj-$(CONFIG_CLK_R9A07G043F) += clk-rzg2l.o r9a07g043f-cpg-mssr.o
+obj-$(CONFIG_CLK_R9A08G045S) += clk-rzg2l.o r9a08g045s-cpg-mssr.o
