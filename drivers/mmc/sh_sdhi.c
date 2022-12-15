@@ -600,6 +600,16 @@ static int sh_sdhi_start_cmd(struct sh_sdhi_host *host,
 		       sh_sdhi_readw(host, SDHI_INFO2_MASK));
 
 	sh_sdhi_writew(host, SDHI_CMD, (unsigned short)(shcmd & CMD_MASK));
+
+	if ((opc == 18) || (opc == 25)) {
+		timeout = 100000;
+		while (timeout--) {
+			if (sh_sdhi_readw(host, SDHI_INFO1) & INFO1_RESP_END)
+				break;
+			udelay(1);
+		}
+	}
+
 	time = sh_sdhi_wait_interrupt_flag(host);
 	if (!time) {
 		host->app_cmd = 0;
