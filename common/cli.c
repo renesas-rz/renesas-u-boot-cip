@@ -132,7 +132,7 @@ int run_command_list(const char *cmd, int len, int flag)
 #if defined(CONFIG_CMD_RUN)
 int do_run(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 {
-	int i;
+	int i, ret;
 
 	if (argc < 2)
 		return CMD_RET_USAGE;
@@ -146,8 +146,9 @@ int do_run(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 			return 1;
 		}
 
-		if (run_command(arg, flag | CMD_FLAG_ENV) != 0)
-			return 1;
+		ret = run_command(arg, flag | CMD_FLAG_ENV);
+		if (ret)
+			return ret;
 	}
 	return 0;
 }
