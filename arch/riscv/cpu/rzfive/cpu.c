@@ -9,6 +9,9 @@
 #include <cpu_func.h>
 #include <irq_func.h>
 #include <asm/cache.h>
+#include <asm/sbi.h>
+
+#define SBI_EXT_VENDOR 0x09000000
 
 /*
  * cleanup_before_linux() is called just before we call linux
@@ -24,6 +27,9 @@ int cleanup_before_linux(void)
 	cache_flush();
 	icache_disable();
 	dcache_disable();
+
+	/* Enable L1 D-cache before going to Linux */
+	sbi_ecall(SBI_EXT_VENDOR, 18, 0, 0, 0, 0, 0, 0);
 
 	return 0;
 }
