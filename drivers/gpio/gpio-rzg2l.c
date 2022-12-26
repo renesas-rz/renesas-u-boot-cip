@@ -20,6 +20,7 @@
 #define PFC(n)	(0x0400 + 0x40 + (n) * 4) /* Port Function Control Register */
 #define PIN(n)	(0x0800 + 0x10 + (n))	  /* Port Input Register */
 #define PWPR	(0x3014)		  /* Port Write Protection Register */
+#define PWPR_G3S	(0x3000)
 
 #define PM_INPUT			0x1 /* Input Mode */
 #define PM_OUTPUT			0x2 /* Output Mode (disable Input) */
@@ -32,21 +33,59 @@ DECLARE_GLOBAL_DATA_PTR;
 struct rzg2l_gpio_priv {
 	void __iomem	*regs;
 	int		bank;
+	struct udevice	*dev;
 };
+
+/* specific RZ/G3S port IDs with offset starting from 0x20 */
+static const unsigned int port_id_g3s[] = {
+        0, 5, 6, 11, 12, 13, 14, 15, 16, 17, 18,
+        1, 2, 3, 4, 7, 8, 9, 10
+};
+
+static int rzg3s_find_port_index(unsigned int port)
+{
+        int idx = 0;
+
+        for (idx = 0; idx < ARRAY_SIZE(port_id_g3s); idx++)
+                if(port_id_g3s[idx] == port)
+                        break;
+
+        return idx;
+}
+
+static int rzg3s_find_port_offset(unsigned int port)
+{
+        int idx = rzg3s_find_port_index(port);
+
+        if (idx > 10)
+                return (idx + 0x15);
+
+        return (idx + 0x10);
+}
 
 static int rzg2l_gpio_get_value(struct udevice *dev, unsigned int offset)
 {
 	struct rzg2l_gpio_priv *priv = dev_get_priv(dev);
+	struct udevice *parent_dev = dev_get_parent(dev);
+	ofnode cur_node  = dev_ofnode(parent_dev);
 	const u8 bit = BIT(offset);
 	u16 reg16;
+	int port_offset;
 
-	reg16 = readw(priv->regs + PM(priv->bank));
+	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
+		port_offset = rzg3s_find_port_offset(priv->bank);
+	}
+	else {
+		port_offset = priv->bank;
+	}
+
+	reg16 = readw(priv->regs + PM(port_offset));
 	reg16 = (reg16 >> offset * 2) & PM_MASK;
 
 	if (reg16 == PM_INPUT || reg16 == PM_OUTPUT_INPUT)
-		return !!(readb(priv->regs + PIN(priv->bank)) & bit);
+		return !!(readb(priv->regs + PIN(port_offset)) & bit);
 	else if (reg16 == PM_OUTPUT)
-		return !!(readb(priv->regs + P(priv->bank)) & bit);
+		return !!(readb(priv->regs + P(port_offset)) & bit);
 	else
 		return 0;
 }
@@ -55,12 +94,22 @@ static int rzg2l_gpio_set_value(struct udevice *dev, unsigned int offset,
 				int value)
 {
 	struct rzg2l_gpio_priv *priv = dev_get_priv(dev);
+	struct udevice *parent_dev = dev_get_parent(dev);
+	ofnode cur_node  = dev_ofnode(parent_dev);
 	const u8 bit = BIT(offset);
+	int port_offset;
+
+	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
+		port_offset = rzg3s_find_port_offset(priv->bank);
+	}
+	else {
+		port_offset = priv->bank;
+	}
 
 	if (value)
-		setbits_8(priv->regs + P(priv->bank), bit);
+		setbits_8(priv->regs + P(port_offset), bit);
 	else
-		clrbits_8(priv->regs + P(priv->bank), bit);
+		clrbits_8(priv->regs + P(port_offset), bit);
 
 	return 0;
 }
@@ -69,19 +118,29 @@ static void rzg2l_gpio_set_direction(struct rzg2l_gpio_priv *priv,
 				     unsigned int offset, bool output)
 {
 	u16 reg16;
+	int port_offset;
+	struct udevice *parent_dev = dev_get_parent(priv->dev);
+	ofnode cur_node  = dev_ofnode(parent_dev);
+
+	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
+		port_offset = rzg3s_find_port_offset(priv->bank);
+	}
+	else {
+		port_offset = priv->bank;
+	}
 
 	/* Select GPIO mode in PMC Register */
-	clrbits_8(priv->regs + PMC(priv->bank), BIT(offset));
+	clrbits_8(priv->regs + PMC(port_offset), BIT(offset));
 
-	reg16 = readw(priv->regs + PM(priv->bank));
+	reg16 = readw(priv->regs + PM(port_offset));
 	reg16 = reg16 & ~(PM_MASK << (offset * 2));
 
 	if (output)
 		writew(reg16 | (PM_OUTPUT << (offset * 2)),
-		       priv->regs + PM(priv->bank));
+		       priv->regs + PM(port_offset));
 	else
 		writew(reg16 | (PM_INPUT << (offset * 2)),
-		       priv->regs + PM(priv->bank));
+		       priv->regs + PM(port_offset));
 }
 
 static int rzg2l_gpio_direction_input(struct udevice *dev, unsigned int offset)
@@ -108,12 +167,22 @@ static int rzg2l_gpio_direction_output(struct udevice *dev, unsigned int offset,
 static int rzg2l_gpio_get_function(struct udevice *dev, unsigned int offset)
 {
 	struct rzg2l_gpio_priv *priv = dev_get_priv(dev);
+	struct udevice *parent_dev = dev_get_parent(dev);
+	ofnode cur_node  = dev_ofnode(parent_dev);
 	const u8 bit = BIT(offset);
+	int port_offset;
 
-	if (!(readb(priv->regs + PMC(priv->bank)) & bit)) {
+	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
+		port_offset = rzg3s_find_port_offset(priv->bank);
+	}
+	else {
+		port_offset = priv->bank;
+	}
+
+	if (!(readb(priv->regs + PMC(port_offset)) & bit)) {
 		u16 reg16;
 
-		reg16 = readw(priv->regs + PM(priv->bank));
+		reg16 = readw(priv->regs + PM(port_offset));
 		reg16 = (reg16 >> offset * 2) & PM_MASK;
 		if (reg16 == PM_OUTPUT || reg16 == PM_OUTPUT_INPUT)
 			return GPIOF_OUTPUT;
@@ -140,6 +209,8 @@ static int rzg2l_gpio_probe(struct udevice *dev)
 	struct rzg2l_gpio_priv *priv = dev_get_priv(dev);
 	int ret;
 	struct ofnode_phandle_args args;
+
+	priv->dev = dev;
 
 	priv->regs = dev_read_addr_ptr(dev_get_parent(dev));
 	if (!priv->regs) {
