@@ -1103,7 +1103,8 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	rzg2ul-type1-dev.dtb \
 	rzg2ul-type1-ddr3l-dev.dtb \
 	rzg2ul-type2-dev.dtb \
-	smarc-rzg2ul.dtb 
+	smarc-rzg2ul.dtb \
+	rzv2h-dev.dtb \
 
 dtb-$(CONFIG_RCAR_GEN4) += \
 	r8a779a0-falcon-u-boot.dtb \
