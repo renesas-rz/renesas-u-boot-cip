@@ -23,8 +23,8 @@
 /* Generic Interrupt Controller Definitions */
 /* RZ/V2H use GIC-v3 */
 #define CONFIG_GICV3
-#define GICD_BASE	0x11900000
-#define GICR_BASE	0x11960000
+#define GICD_BASE	0x14900000
+#define GICR_BASE	0x14940000
 
 /* console */
 #define CONFIG_SYS_CBSIZE		2048
