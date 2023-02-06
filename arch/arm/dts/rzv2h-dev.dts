@@ -52,6 +52,10 @@
 #endif
 	};
 
+        chosen {
+                stdout-path = "serial0:115200n8";
+        };
+
 	memory@48000000 {
 		device_type = "memory";
 		/* first 128MB is reserved for secure area. */
