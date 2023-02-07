@@ -166,8 +166,11 @@
 #define SH_SDHI_QUIRK_64BIT_BUF		BIT(1)
 
 /* SDHI channel number defined based on specific SoC */
-#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A09G057)
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G043U)
 #define CONFIG_SYS_SH_SDHI_NR_CHANNEL 2
+#endif
+#if defined(CONFIG_R9A09G057)
+#define CONFIG_SYS_SH_SDHI_NR_CHANNEL 3
 #endif
 
 int sh_sdhi_init(unsigned long addr, int ch, unsigned long quirks);
