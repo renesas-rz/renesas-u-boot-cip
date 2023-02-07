@@ -847,6 +847,7 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 	if (!host->addr)
 		return -ENOMEM;
 
+#if !defined(CONFIG_R9A09G057)
 	ret = clk_get_by_index(dev, 0, &sh_sdhi_clk);
 	if (ret) {
 		debug("failed to get clock, ret=%d\n", ret);
@@ -858,6 +859,7 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 		debug("failed to enable clock, ret=%d\n", ret);
 		return ret;
 	}
+#endif
 
 	host->quirks = quirks;
 
