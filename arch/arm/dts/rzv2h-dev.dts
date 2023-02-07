@@ -47,6 +47,7 @@
 		serial0 = &scif0;
 #if (!SEL_SD0_SD1)
 		mmc0 = &sdhi0;
+		mmc1 = &sdhi2;
 #else
 		mmc1 = &sdhi1;
 #endif
@@ -97,6 +98,17 @@
 
 };
 
+&pinctrl {
+	sdhi2_pins: sdhi2 {
+		pinmux = <RZV2H_PINMUX(11, 0, 1)>,	/* SD2CLK	*/
+			 <RZV2H_PINMUX(11, 1, 1)>,	/* SD2DAT0	*/
+			 <RZV2H_PINMUX(11, 2, 1)>,	/* SD2DAT1	*/
+			 <RZV2H_PINMUX(11, 3, 1)>,	/* SD2DAT2	*/
+			 <RZV2H_PINMUX(11, 4, 1)>,	/* SD2DAT3	*/
+			 <RZV2H_PINMUX(11, 5, 1)>;	/* SD2CMD	*/
+	};
+};
+
 &extal_clk {
 	clock-frequency = <24000000>;
 };
@@ -107,10 +119,10 @@
 };
 
 #if (!SEL_SD0_SD1)
-#if (SW12)
+#if (SW2)
 &sdhi0 {
 	bus-width = <8>;
-	mmc-hs200-1_8v;
+//	mmc-hs200-1_8v;
 	non-removable;
 	fixed-emmc-driver-type = <1>;
 	status = "okay";
@@ -124,6 +136,12 @@
 	status = "okay";
 };
 #endif
+&sdhi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdhi2_pins>;
+	bus-width = <4>;
+	status = "okay";
+};
 #else
 &sdhi1 {
 
