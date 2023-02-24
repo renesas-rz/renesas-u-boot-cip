@@ -18,6 +18,7 @@
 
 	aliases {
 		serial0 = &scif0;
+		spi0 = &spibsc;
 	};
 
 	chosen {
@@ -91,6 +92,24 @@
 
 &i2c0 {
 	status = "okay";
+};
+
+&spibsc {
+        num-cs = <1>;
+        status = "okay";
+        spi-max-frequency = <40000000>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        flash0: spi-flash@0 {
+                #address-cells = <1>;
+                #size-cells = <1>;
+                compatible = "spi-flash", "jedec,spi-nor";
+                spi-max-frequency = <40000000>;
+                spi-tx-bus-width = <1>;
+                spi-rx-bus-width = <1>;
+                reg = <0>;
+                status = "okay";
+        };
 };
 
 &ehci0 {
