@@ -269,6 +269,7 @@ static int rpc_spi_mem_exec_op(struct spi_slave *spi,
 	int ret = 0;
 	u32 offset = 0;
 	u32 smenr, smcr;
+	u32 wlen = dout ? op->data.nbytes : 0;
 
 	smenr = 0;
 	offset = op->addr.val;
@@ -334,6 +335,7 @@ static int rpc_spi_mem_exec_op(struct spi_slave *spi,
 
 		if (dout && op->data.nbytes) {
 			u32 *datout = (u32 *)dout;
+			u32 data;
 			u32 wloop = DIV_ROUND_UP(op->data.nbytes, 4);
 
 			smenr |= RPC_SMENR_SPIDE(0xF);
@@ -342,8 +344,29 @@ static int rpc_spi_mem_exec_op(struct spi_slave *spi,
 				smcr = RPC_SMCR_SPIWE | RPC_SMCR_SPIE;
 				if (wloop >= 1)
 					smcr |= RPC_SMCR_SSLKP;
+
+				smenr &= ~(RPC_SMENR_SPIDE(0xf));
+				switch(wlen)
+				{
+					case 1:
+						smenr |= RPC_SMENR_SPIDE(0x8);
+						data = (*datout & 0x0ff) << 24;
+					break;
+					case 2:
+						smenr |= RPC_SMENR_SPIDE(0xc);
+						data = (*datout & 0x0ffff) << 16;
+					break;
+					case 3:
+						smenr |= RPC_SMENR_SPIDE(0xe);
+						data = (*datout & 0x0ffffff) << 8;
+					break;
+					default:
+						smenr |= RPC_SMENR_SPIDE(0xf);
+						data = *datout;
+					break;
+				}
 				writel(smenr, priv->regs + RPC_SMENR);
-				writel(*datout, priv->regs + RPC_SMWDR0);
+				writel(data, priv->regs + RPC_SMWDR0);
 				writel(smcr, priv->regs + RPC_SMCR);
 				ret = rpc_spi_wait_tend(spi->dev);
 				if (ret) {
@@ -352,6 +375,8 @@ static int rpc_spi_mem_exec_op(struct spi_slave *spi,
 				}
 				datout++;
 				smenr &= (~RPC_SMENR_CDE & ~RPC_SMENR_ADE(0xF));
+				wlen -= 4;
+				smenr = RPC_SMENR_SPIDE(0xf);
 			}
 
 			ret = rpc_spi_wait_sslf(spi->dev);
@@ -464,6 +489,11 @@ static const struct dm_spi_ops rpc_spi_ops = {
 static const struct udevice_id rpc_spi_ids[] = {
 	{ .compatible = "renesas,r7s72100-rpc-if" },
 	{ .compatible = "renesas,rcar-gen3-rpc-if" },
+	{ .compatible = "renesas,r9a07g044l-spibsc" },
+	{ .compatible = "renesas,r9a07g043u-spibsc" },
+	{ .compatible = "renesas,r9a07g044c-spibsc" },
+	{ .compatible = "renesas,r9a07g054l-spibsc" },
+	{ .compatible = "renesas,r9a07g043g-spibsc" },
 	{ }
 };
 
