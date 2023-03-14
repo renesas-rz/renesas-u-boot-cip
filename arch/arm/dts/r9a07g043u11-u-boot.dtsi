@@ -6,76 +6,76 @@
  */
 
 &pinctrl {
-	P0: gpio-0 {
+	P0: gpio-00 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 0 2>;
+		gpio-ranges = <&pinctrl 0 0 4>;
 	};
 
-	P1: gpio-1 {
+	P1: gpio-01 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 8 2>;
+		gpio-ranges = <&pinctrl 0 8 5>;
 	};
 
-	P2: gpio-2 {
+	P2: gpio-02 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 16 2>;
+		gpio-ranges = <&pinctrl 0 16 4>;
 	};
 
-	P3: gpio-3 {
+	P3: gpio-03 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 24 2>;
+		gpio-ranges = <&pinctrl 0 24 4>;
 	};
 
-	P4: gpio-4 {
+	P4: gpio-04 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 32 2>;
+		gpio-ranges = <&pinctrl 0 32 6>;
 	};
 
-	P5: gpio-5 {
+	P5: gpio-05 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 40 3>;
+		gpio-ranges = <&pinctrl 0 40 5>;
 	};
 
-	P6: gpio-6 {
+	P6: gpio-06 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 48 2>;
+		gpio-ranges = <&pinctrl 0 48 5>;
 	};
 
-	P7: gpio-7 {
+	P7: gpio-07 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 56 3>;
+		gpio-ranges = <&pinctrl 0 56 5>;
 	};
 
-	P8: gpio-8 {
+	P8: gpio-08 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 64 3>;
+		gpio-ranges = <&pinctrl 0 64 5>;
 	};
 
-	P9: gpio-9 {
+	P9: gpio-09 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 72 2>;
+		gpio-ranges = <&pinctrl 0 72 4>;
 	};
 
 	P10: gpio-10 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 80 2>;
+		gpio-ranges = <&pinctrl 0 80 5>;
 	};
 
 	P11: gpio-11 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 88 2>;
+		gpio-ranges = <&pinctrl 0 88 4>;
 	};
 
 	P12: gpio-12 {
@@ -87,19 +87,19 @@
 	P13: gpio-13 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 104 3>;
+		gpio-ranges = <&pinctrl 0 104 5>;
 	};
 
 	P14: gpio-14 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 112 2>;
+		gpio-ranges = <&pinctrl 0 112 3>;
 	};
 
 	P15: gpio-15 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 120 2>;
+		gpio-ranges = <&pinctrl 0 120 4>;
 	};
 
 	P16: gpio-16 {
@@ -111,12 +111,12 @@
 	P17: gpio-17 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 136 3>;
+		gpio-ranges = <&pinctrl 0 136 4>;
 	};
 
 	P18: gpio-18 {
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-ranges = <&pinctrl 0 144 2>;
+		gpio-ranges = <&pinctrl 0 144 6>;
 	};
 };
