@@ -26,6 +26,8 @@
 #include "tzc_common.h"
 #include "plat_tzc_def.h"
 
+#define RPC_CMNCR		0x10060000
+
 /* WDT */
 #define WDT_INDEX		0
 
@@ -123,6 +125,7 @@ int board_early_init_f(void)
 		;
 
 	sd_power_setup();
+	*(volatile u32 *)(RPC_CMNCR) = 0x01FFF300;
 
 	return 0;
 }
