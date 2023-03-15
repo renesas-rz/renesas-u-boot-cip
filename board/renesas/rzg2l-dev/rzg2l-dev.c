@@ -64,6 +64,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define HcRhDescriptorA		0x048
 #define LPSTS			0x102
 
+#define RPC_CMNCR		0x10060000
+
 /* WDT */
 #define WDT_INDEX		0
 
@@ -90,6 +92,8 @@ void s_init(void)
 	*(volatile u32 *)(CPG_RESET_I2C) = 0xF000F;
 	/* I2C pin non GPIO enable */
 	*(volatile u32 *)(I2C_CH1) = 0x01010101;
+
+	*(volatile u32 *)(RPC_CMNCR) = 0x01FFF300;
 }
 
 static void board_usb_init(void)
