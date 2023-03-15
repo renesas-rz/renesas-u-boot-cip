@@ -20,6 +20,8 @@
 #include <renesas/rzf-dev/rzf-dev_cpg_regs.h>
 #include "rzf-dev_spi_multi.h"
 
+#define RPC_CMNCR		0x10060000
+
 /* WDT */
 #define WDT_INDEX		0
 
@@ -95,6 +97,8 @@ int board_early_init_f(void)
 	*(volatile u32 *)(CPG_PL2SDHI_DSEL) = 0x00110011;
 	while (*(volatile u32 *)(CPG_CLKSTATUS) != 0)
 		;
+
+	*(volatile u32 *)(RPC_CMNCR) = 0x01FFF300;
 
 	return 0;
 }
