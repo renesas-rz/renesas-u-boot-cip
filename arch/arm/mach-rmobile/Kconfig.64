@@ -230,6 +230,11 @@ config TARGET_RZG3S_DEV
 	help
           Support for Renesas RZ/G3S Dev Platform
 
+config TARGET_SMARC_RZG3S
+	bool "RZ/G3S SMARC board"
+	help
+          Support for Renesas RZ/G3S SMARC Platform
+
 endchoice
 
 config SYS_SOC
