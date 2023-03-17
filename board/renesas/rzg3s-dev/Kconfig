@@ -13,3 +13,19 @@ config SYS_CONFIG_NAME
 	default "rzg3s-dev"
 
 endif
+
+if TARGET_SMARC_RZG3S
+
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "rzg3s-dev"
+
+config SYS_VENDOR
+	default "renesas"
+
+config SYS_CONFIG_NAME
+	default "smarc-rzg3s"
+
+endif
