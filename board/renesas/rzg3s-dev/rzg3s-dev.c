@@ -46,6 +46,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_CLKSEL_STATUS		(CPG_BASE + 0x284)
 
 /* PFC */
+#define	PFC_P20				(PFC_BASE + 0x20)
+#define	PFC_PM20			(PFC_BASE + 0x0140)
+#define	PFC_PMC20			(PFC_BASE + 0x0220)
+
 #define	PFC_P25				(PFC_BASE + 0x25)
 #define	PFC_PM25			(PFC_BASE + 0x014A)
 #define	PFC_PMC25			(PFC_BASE + 0x0225)
@@ -61,14 +65,21 @@ DECLARE_GLOBAL_DATA_PTR;
 
 void s_init(void)
 {
-#if CONFIG_TARGET_RZG3S_DEV
 	*(volatile u32 *)(PFC_PWPR) = 0;
 	*(volatile u32 *)(PFC_PWPR) = PWPR_PFCWE;
 
+#if CONFIG_TARGET_RZG3S_DEV
 	/* SD1 power control : P13_4 = 1 P13_0 = 1 */
 	*(volatile u8 *)(PFC_PMC25) &= 0xEE;	/* Set P13_4(bit4) and P13_0(bit0) to Port Mode */
 	*(volatile u16 *)(PFC_PM25) = (*(volatile u16 *)(PFC_PM25) & 0xFCFC) | 0x0202; /* Set P13_4(bit[9:8]) and P13_0(bit[1:0]) to Output mode */
 	*(volatile u8 *)(PFC_P25) = (*(volatile u8 *)(PFC_P25) & 0xEE) | 0x11; /* Set P13_4(bit4) and P13_0(bit0) to High output */
+#elif CONFIG_TARGET_SMARC_RZG3S
+	/* SD power enable: SD0_PWR_EN - P0_1 = 1, SDIO_PWR_EN - P0_3 = 1 */
+	*(volatile u8 *)(PFC_PMC20) &= 0xF5; /* Set P0_1(bit1) and P0_3(bit3) to GPIO Mode */
+	*(volatile u16 *)(PFC_PM20) |= 0x0088; /* Set P0_1(bit[3:2]) and P0_3(bit[7:6]) to Output mode */
+	*(volatile u8 *)(PFC_P20) |= 0x0A; /* Set P0_1(bit1) and P0_3(bit3) to High output */
+#endif
+
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(ETH0_POC) = (*(volatile u32 *)(ETH0_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
 	*(volatile u32 *)(ETH1_POC) = (*(volatile u32 *)(ETH1_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
@@ -88,7 +99,6 @@ void s_init(void)
 	while(*(volatile u32 *)(CPG_CLKMON_ETH) != 0x00000101)
 		;
 	*(volatile u32 *)(CPG_RESET_ETH) = 0x00010001;
-#endif
 	/*
 	 * Setting SD CLKs.
 	 * Currently, we use IMCLKs with output CLK rate 133 MHz, HSCLK will be considered to support later.
