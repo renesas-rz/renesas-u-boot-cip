@@ -34,7 +34,10 @@ DECLARE_GLOBAL_DATA_PTR;
 /* CPG */
 #define CPG_BASE			0x11010000
 #define CPG_CLKON_BASE			(CPG_BASE + 0x500)
+#define CPG_CLKMON_BASE			(CPG_BASE + 0x680)
 #define CPG_RESET_BASE			(CPG_BASE + 0x800)
+#define CPG_CLKON_ETH			(CPG_CLKON_BASE + 0x7C)
+#define CPG_CLKMON_ETH			(CPG_CLKMON_BASE + 0x7C)
 #define CPG_RESET_ETH			(CPG_RESET_BASE + 0x7C)
 #define CPG_RESET_I2C			(CPG_RESET_BASE + 0x80)
 #define CPG_SDHI_DDIV			(CPG_BASE + 0x218)
@@ -47,20 +50,44 @@ DECLARE_GLOBAL_DATA_PTR;
 #define	PFC_PM25			(PFC_BASE + 0x014A)
 #define	PFC_PMC25			(PFC_BASE + 0x0225)
 
+#define	PFC_IOLH_30_L			(PFC_BASE + 0x1180)
+#define	PFC_IOLH_34_L			(PFC_BASE + 0x11A0)
+#define	PFC_IEN_30			(PFC_BASE + 0x1980)
+#define	PFC_IEN_34			(PFC_BASE + 0x19A0)
+
+#define PFC_PWPR			(PFC_BASE + 0x3000)
+#define PWPR_B0WI			BIT(7)	 /* Bit Write Disable */
+#define PWPR_PFCWE			BIT(6)	/* PFC Register Write Enable */
+
 void s_init(void)
 {
 #if CONFIG_TARGET_RZG3S_DEV
+	*(volatile u32 *)(PFC_PWPR) = 0;
+	*(volatile u32 *)(PFC_PWPR) = PWPR_PFCWE;
+
 	/* SD1 power control : P13_4 = 1 P13_0 = 1 */
 	*(volatile u8 *)(PFC_PMC25) &= 0xEE;	/* Set P13_4(bit4) and P13_0(bit0) to Port Mode */
 	*(volatile u16 *)(PFC_PM25) = (*(volatile u16 *)(PFC_PM25) & 0xFCFC) | 0x0202; /* Set P13_4(bit[9:8]) and P13_0(bit[1:0]) to Output mode */
 	*(volatile u8 *)(PFC_P25) = (*(volatile u8 *)(PFC_P25) & 0xEE) | 0x11; /* Set P13_4(bit4) and P13_0(bit0) to High output */
 	/* can go in board_eht_init() once enabled */
-	*(volatile u32 *)(ETH0_POC) = (*(volatile u32 *)(ETH0_POC) & 0xFFFFFFFC) | ETH_PVDD_3300;
-	*(volatile u32 *)(ETH1_POC) = (*(volatile u32 *)(ETH1_POC) & 0xFFFFFFFC) | ETH_PVDD_3300;
+	*(volatile u32 *)(ETH0_POC) = (*(volatile u32 *)(ETH0_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
+	*(volatile u32 *)(ETH1_POC) = (*(volatile u32 *)(ETH1_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
 	/* Enable RGMII for both ETH{0,1} */
 	*(volatile u32 *)(ETH_MODE) = (*(volatile u32 *)(ETH_MODE) & 0xFFFFFFF0);
+	/* Driving Ability Control */
+	*(volatile u32 *)(PFC_IOLH_30_L) &= ~(0x03);	/* P1_0=b'00	*/
+	*(volatile u32 *)(PFC_IOLH_34_L) &= ~(0x03);	/* P7_0=b'00	*/
+	/* Input Enable Control */
+	*(volatile u32 *)(PFC_IEN_30) = 0x01;
+	*(volatile u32 *)(PFC_IEN_34) = 0x01;
+
+	*(volatile u32 *)(PFC_PWPR) = 0;
+	*(volatile u32 *)(PFC_PWPR) = PWPR_B0WI;
 	/* ETH CLK */
-	*(volatile u32 *)(CPG_RESET_ETH) = 0x00030003;
+	*(volatile u32 *)(CPG_CLKON_ETH) = 0x01010101;
+	while(*(volatile u32 *)(CPG_CLKMON_ETH) != 0x00000101)
+		;
+	*(volatile u32 *)(CPG_RESET_ETH) = 0x00010001;
 #endif
 	/*
 	 * Setting SD CLKs.
