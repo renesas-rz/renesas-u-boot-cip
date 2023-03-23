@@ -78,7 +78,12 @@ static void rzg2l_pinctrl_set_function(struct rzg2l_pinctrl_priv *priv,
 	writeb(reg8, priv->regs + PMC(port));
 
 	reg32 = readl(priv->regs + PFC(port));
-	reg32 = (reg32 & ~(0x07 << (pin * 4))) | (func << (pin * 4));
+	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
+		reg32 = (reg32 & ~(0x07 << (pin * 4))) | ((func - 1) << (pin * 4));
+	}
+	else {
+		reg32 = (reg32 & ~(0x07 << (pin * 4))) | (func << (pin * 4));
+	}
 	writel(reg32, priv->regs + PFC(port));
 
 }
