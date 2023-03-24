@@ -85,6 +85,7 @@ struct eqos_mac_regs {
 #define EQOS_MAC_MDIO_ADDRESS_CR_100_150		1
 #define EQOS_MAC_MDIO_ADDRESS_CR_20_35			2
 #define EQOS_MAC_MDIO_ADDRESS_CR_250_300		5
+#define EQOS_MAC_MDIO_ADDRESS_CR_150_250		4
 #define EQOS_MAC_MDIO_ADDRESS_SKAP			BIT(4)
 #define EQOS_MAC_MDIO_ADDRESS_GOC_SHIFT			2
 #define EQOS_MAC_MDIO_ADDRESS_GOC_READ			3
@@ -192,6 +193,12 @@ struct eqos_tegra186_regs {
 #define EQOS_AUTO_CAL_CONFIG_ENABLE			BIT(29)
 
 #define EQOS_AUTO_CAL_STATUS_ACTIVE			BIT(31)
+
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_RZV2H)
+/* These registers are rzv2h-specific */
+#define CPG_BASE					0x10420000
+#define CPG_CSDIV0					(CPG_BASE + 0x0500)
+#endif
 
 /* Descriptors */
 #define EQOS_DESCRIPTORS_TX	4
