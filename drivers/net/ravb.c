@@ -438,11 +438,12 @@ static int ravb_dmac_init(struct udevice *dev)
 
 	/* FIFO size set */
 	writel(0x00222210, eth->iobase + RAVB_REG_TGC);
-
+#if 0
 	/* Delay CLK: 2ns (not applicable on R-Car E3/D3) */
 	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A77990) ||
 	    (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A77995))
 		return 0;
+#endif
 
 	if ((pdata->phy_interface == PHY_INTERFACE_MODE_RGMII_ID) ||
 	    (pdata->phy_interface == PHY_INTERFACE_MODE_RGMII_TXID))
@@ -576,12 +577,12 @@ static int ravb_probe(struct udevice *dev)
 		goto err_mdio_register;
 
 	eth->bus = miiphy_get_dev_by_name(dev->name);
-
+#if 0
 	/* Bring up PHY */
 	ret = clk_enable(&eth->clk);
 	if (ret)
 		goto err_mdio_register;
-
+#endif
 	ret = ravb_reset(dev);
 	if (ret)
 		goto err_mdio_reset;
@@ -744,6 +745,7 @@ static const struct udevice_id ravb_ids[] = {
 	{ .compatible = "renesas,etheravb-r9a07g054l" },
 	{ .compatible = "renesas,etheravb-r9a07g043u" },
 	{ .compatible = "renesas,etheravb-r9a07g043f" },
+	{ .compatible = "renesas,etheravb-rzv2m" },
 	{ }
 };
 

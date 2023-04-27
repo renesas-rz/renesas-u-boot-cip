@@ -564,6 +564,8 @@ void ecc_help(void)
  * argc : number of parameters
  * argv : array of parameters
  */
+
+#if 0
 int do_ecc(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
 {
 	int mode_process = 0;
@@ -707,3 +709,5 @@ U_BOOT_CMD(
 	ecc,	7,	0,	do_ecc,
 	"Enable/disable ECC for a memory area\n", NULL
 );
+
+#endif

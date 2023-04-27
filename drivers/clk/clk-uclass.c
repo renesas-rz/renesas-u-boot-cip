@@ -384,7 +384,7 @@ int clk_set_defaults(struct udevice *dev, enum clk_defaults_stage stage)
 		if (stage != CLK_DEFAULTS_POST_FORCE)
 			return 0;
 
-	debug("%s(%s)\n", __func__, dev_read_name(dev));
+	/*debug("%s(%s)\n", __func__, dev_read_name(dev));*/
 
 	ret = clk_set_default_parents(dev, stage);
 	if (ret)

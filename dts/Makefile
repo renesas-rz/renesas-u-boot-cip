@@ -10,6 +10,9 @@ ifeq ($(DEVICE_TREE),)
 DEVICE_TREE := unset
 endif
 
+ARCH_PATH := arch/$(ARCH)/dts
+dtb_depends := arch-dtbs
+
 ifneq ($(EXT_DTB),)
 DTB := $(EXT_DTB)
 else
@@ -28,6 +31,10 @@ $(obj)/dt.dtb: $(DTB) FORCE
 	$(call if_changed,shipped)
 endif
 
+dtb-$(CONFIG_ARCH_RMOBILE) += \
+       r9a09g011gbg-rzv2m-u-boot.dtb \
+       r9a09g011gbg-rzv2m.dtb
+
 targets += dt.dtb
 
 $(DTB): arch-dtbs
@@ -41,7 +48,7 @@ $(DTB): arch-dtbs
 
 PHONY += arch-dtbs
 arch-dtbs:
-	$(Q)$(MAKE) $(build)=arch/$(ARCH)/dts dtbs
+	$(Q)$(MAKE)  $(build)=arch/$(ARCH)/dts dtbs
 
 ifeq ($(CONFIG_SPL_BUILD),y)
 obj-$(CONFIG_OF_EMBED) := dt-spl.dtb.o
