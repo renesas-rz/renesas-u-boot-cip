@@ -162,25 +162,20 @@ uint32_t uart_trx_ready_poll(struct uart_port *port)
 	uint32_t sts;
 	uint32_t res = UART_STAT_NONE;
 
-	sts = uart_in(port,UART_LSR);					/** Read Line Status */
-	if((sts & UART_LSR_BRK_ERROR_BITS) != 0)		/** Error(FE/PE/OV) ? */
-	{
-		if((sts & UART_LSR_DR) != 0)	/** Rx rdy ? */
-		{
-			res = (UART_STAT_ERROR | UART_STAT_RX_READY);
-		}
-		else
-		{
-			res = (UART_STAT_ERROR);
-		}
+       sts = uart_in(port,UART_LSR);           /** Read Line Status */
+        if(sts & UART_LSR_ERROR_BITS)           /** Error(FE/PE/OV) ? */
+
+        { 
+               uart_in(port,UART_RX);                  /*Dummy read*/
+               res = (UART_STAT_ERROR);	
 	}
 	else
 	{
-		if((sts & UART_LSR_DR))				/** Rx rdy */
+		if((sts & UART_LSR_DR))                 /** Rx ready **/
 		{
 			res = (UART_STAT_RX_READY);
 		}
-		else if((sts & (UART_LSR_TEMT |UART_LSR_THRE)) == (UART_LSR_TEMT |UART_LSR_THRE))		/** Tx & Rx rdy */
+		else if((sts & (UART_LSR_TEMT |UART_LSR_THRE)) == (UART_LSR_TEMT |UART_LSR_THRE))       /** Tx & Rx ready **/
 		{
 			res = (UART_STAT_TX_READY);
 		}
@@ -197,11 +192,11 @@ static int rzv2m_serial_getc_generic(struct uart_port *port)
 	if(sts & UART_STAT_ERROR){
 		return -EAGAIN;
 	}
-	if(0 != (sts & UART_STAT_RX_READY))   /** Rxrdy ? */
+	if(sts & UART_STAT_RX_READY)   /** Rx ready ? */
     {
         return  uart_in(port,UART_RX);  /** Read Rx data */
     }
-    else
+    else /*UART_STAT_ERROR or UART_STAT_TX_READY or UART_STAT_NONE*/
     {
 		return -EAGAIN;
     }
