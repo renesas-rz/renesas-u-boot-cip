@@ -92,6 +92,7 @@
         #address-cells = <1>;
         #size-cells = <0>;
         flash0: spi-flash@0 {
+		u-boot,dm-spl;
                 #address-cells = <1>;
                 #size-cells = <1>;
                 compatible = "spi-flash", "jedec,spi-nor";
