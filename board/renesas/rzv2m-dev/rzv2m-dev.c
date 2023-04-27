@@ -33,6 +33,35 @@
 #include "rdk_psc.h"
 #include <init.h>
 
+/*
+TARGET_BANK0_UNIT_LINUX settings as follows:
+               BA_WE00 | BA00  //EMM
+               BA_WE02 | BA02  //SDI0
+               BA_WE04 | BA04  //SDI1
+               BA_WE08 | BA08  //USB HOST
+               BA_WE10 | BA10  //USB PERI
+               BA_WE12 | BA12  //PCI
+*/
+#define TARGET_BANK0_UNIT_LINUX        (BA_WE00 | BA00 | \
+                                                                       BA_WE02 | BA02 | \
+                                                                       BA_WE04 | BA04 | \
+                                                                       BA_WE08 | BA08 | \
+                                                                       BA_WE10 | BA10 | \
+                                                                       BA_WE12 | BA12)
+
+
+#define TARGET_BANK1_UNIT_LINUX        (BA_WE00 | BA00)       //ETH0 BANK
+/*
+       TARGET_DRP_UNIT_LINUX settings as follows:
+               BA_WE00 | BA00  //DRPA M0
+               BA_WE02 | BA02  //DRPA M1
+               BA_WE04 | BA04  //DRPA M2
+               BA_WE06 | BA06  //DRPA M3
+*/
+#define TARGET_DRP_UNIT_LINUX  (BA_WE00 | BA00 | \
+                                                                       BA_WE02 | BA02 | \
+                                                                       BA_WE04 | BA04 | \
+                                                                       BA_WE06 | BA06)
 
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -433,3 +462,13 @@ void reset_cpu(ulong addr)
 {
 }
 
+void board_cleanup_before_linux(void)
+{
+       //PERI0 BANK SETTING
+       SYS_WriteReg(SYS_PERI0_BANK, TARGET_BANK0_UNIT_LINUX);
+       //PERI1 BANK SETTING
+       SYS_WriteReg(SYS_PERI1_BANK, TARGET_BANK1_UNIT_LINUX);
+       //DRP BANK SETTING
+       SYS_WriteReg(SYS_DRP_BANK, TARGET_DRP_UNIT_LINUX);
+
+}
