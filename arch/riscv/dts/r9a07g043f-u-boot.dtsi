@@ -7,114 +7,133 @@
 
 &pinctrl {
 	P0: gpio-00 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 0 4>;
 	};
 
 	P1: gpio-01 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 8 5>;
 	};
 
 	P2: gpio-02 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 16 4>;
 	};
 
 	P3: gpio-03 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 24 4>;
 	};
 
 	P4: gpio-04 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 32 6>;
 	};
 
 	P5: gpio-05 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 40 5>;
 	};
 
 	P6: gpio-06 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 48 5>;
 	};
 
 	P7: gpio-07 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 56 5>;
 	};
 
 	P8: gpio-08 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 64 5>;
 	};
 
 	P9: gpio-09 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 72 4>;
 	};
 
 	P10: gpio-10 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 80 5>;
 	};
 
 	P11: gpio-11 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 88 4>;
 	};
 
 	P12: gpio-12 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 96 2>;
 	};
 
 	P13: gpio-13 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 104 5>;
 	};
 
 	P14: gpio-14 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 112 3>;
 	};
 
 	P15: gpio-15 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 120 4>;
 	};
 
 	P16: gpio-16 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 128 2>;
 	};
 
 	P17: gpio-17 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 136 4>;
 	};
 
 	P18: gpio-18 {
+		u-boot,dm-spl;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-ranges = <&pinctrl 0 144 6>;
