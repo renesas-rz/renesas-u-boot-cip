@@ -585,7 +585,7 @@ static const st_pfc_select_port_info_t gl_pfc_select_emm[] = {
      .pin_map = 0x0CFFU,
      .pin_oe = 0x0000U,
      .pin_ie = 0x0000U,
-     .pin_pupd = 0x00000059,
+     .pin_pupd = 0x00505555,
      .pin_drv = 0x00505555,
      .pin_sr = 0x0CFFU},
 };
