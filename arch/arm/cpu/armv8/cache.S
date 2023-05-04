@@ -87,7 +87,7 @@ loop_level:
 	add	x12, x12, x0		/* x0 <- tripled cache level */
 	lsr	x12, x10, x12
 	and	x12, x12, #7		/* x12 <- cache type */
-	cmp	x12, #2
+	cmp	x12, #1
 	b.lt	skip			/* skip if no cache or icache */
 	bl	__asm_dcache_level	/* x1 = 0 flush, 1 invalidate */
 skip:
