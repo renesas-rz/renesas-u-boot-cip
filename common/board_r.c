@@ -777,9 +777,9 @@ static init_fnc_t init_sequence_r[] = {
 	INIT_FUNC_WATCHDOG_RESET
 	initr_scsi,
 #endif
-#ifdef CONFIG_BITBANGMII
-	bb_miiphy_init,
-#endif
+//#ifdef CONFIG_BITBANGMII
+//	bb_miiphy_init,
+//#endif
 #ifdef CONFIG_PCI_ENDPOINT
 	pci_ep_init,
 #endif

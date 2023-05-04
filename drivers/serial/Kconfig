@@ -939,4 +939,8 @@ config SYS_SDMR
 	depends on MPC8XX_CONS
 	default 0
 
+config RZV2M_SERIAL
+       bool "Renesas RZ/V2M UART support"
+       depends on TARGET_RZV2M
+
 endmenu

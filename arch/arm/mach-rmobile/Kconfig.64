@@ -256,3 +256,33 @@ config SYS_MALLOC_F_LEN
 	default 0x8000 if RCAR_GEN3
 
 endif
+
+if RCAR_64
+
+choice
+       prompt "Select Target SoC"
+
+config R9A09G011GBG
+       bool "Renesas RZV2M r9a09g011gbg"
+
+endchoice
+
+
+choice
+       prompt "Renesus ARM64 (not Gen3) SoCs board select"
+       optional
+
+config TARGET_RZV2M
+       bool "RZV2M board"
+       help
+          Support for Renesas RZV2M platform
+
+
+endchoice
+
+config SYS_SOC
+       default "rmobile"
+
+source "board/renesas/rzv2m-dev/Kconfig"
+
+endif

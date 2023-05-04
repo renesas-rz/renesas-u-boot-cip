@@ -1,0 +1,6 @@
+RZV2M BOARD
+M:	Naoya Kawakami <naoya.kawakami+renesas@gmail.com>
+S:	Maintained
+F:	board/renesas/rzv2m-dev/
+F:	include/configs/rzv2m.h
+F:	configs/r9a09g011gbg_rzv2m_defconfig

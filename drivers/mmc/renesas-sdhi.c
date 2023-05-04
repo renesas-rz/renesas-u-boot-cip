@@ -379,9 +379,10 @@ static int renesas_sdhi_hs400(struct udevice *dev)
 		ret = clk_set_rate(&priv->clk, 400000000);
 	else
 		ret = clk_set_rate(&priv->clk, 200000000);
+#if 0
 	if (ret < 0)
 		return ret;
-
+#endif
 	reg = tmio_sd_readl(priv, RENESAS_SDHI_SCC_RVSCNTL);
 	reg &= ~RENESAS_SDHI_SCC_RVSCNTL_RVSEN;
 	tmio_sd_writel(priv, reg, RENESAS_SDHI_SCC_RVSCNTL);
@@ -852,6 +853,7 @@ static const struct udevice_id renesas_sdhi_match[] = {
 	{ .compatible = "renesas,sdhi-r8a77970", .data = RENESAS_GEN3_QUIRKS },
 	{ .compatible = "renesas,sdhi-r8a77990", .data = RENESAS_GEN3_QUIRKS },
 	{ .compatible = "renesas,sdhi-r8a77995", .data = RENESAS_GEN3_QUIRKS },
+	{ .compatible = "renesas,sdhi-r9a09g011gbg", .data = RENESAS_GEN3_QUIRKS },
 	{ /* sentinel */ }
 };
 
@@ -866,7 +868,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 
 	if (!(priv->caps & TMIO_SD_CAP_RCAR_GEN3))
 		return;
-
+#if 0
 	if (priv->caps & TMIO_SD_CAP_DMA_INTERNAL)
 		priv->idma_bus_width = TMIO_SD_DMA_MODE_BUS_WIDTH;
 
@@ -946,9 +948,11 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	    (rmobile_get_cpu_rev_fraction() <= 2)))
 		priv->nrtaps = 4;
 	else
+#endif
 		priv->nrtaps = 8;
 #endif
 	/* H3 ES1.x and M3W ES1.0 uses bit 17 for DTRAEND */
+#if 0
 	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
 	    (rmobile_get_cpu_rev_integer() <= 1)) ||
 	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7796) &&
@@ -956,10 +960,11 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	    (rmobile_get_cpu_rev_fraction() == 0)))
 		priv->read_poll_flag = TMIO_SD_DMA_INFO1_END_RD;
 	else
+#endif
 		priv->read_poll_flag = TMIO_SD_DMA_INFO1_END_RD2;
 
 	/* Host need to send stop command during tuning in SD */
-	plat->cfg.host_caps |= MMC_CAP2_STOP_TUNE_SD;
+	//plat->cfg.host_caps |= MMC_CAP2_STOP_TUNE_SD;
 }
 
 static int renesas_sdhi_probe(struct udevice *dev)
@@ -990,7 +995,7 @@ static int renesas_sdhi_probe(struct udevice *dev)
 		dev_err(dev, "failed to get host clock\n");
 		return ret;
 	}
-
+#if 0
 	/* set to max rate */
 	ret = clk_set_rate(&priv->clk, 200000000);
 	if (ret < 0) {
@@ -1006,6 +1011,7 @@ static int renesas_sdhi_probe(struct udevice *dev)
 	}
 
 	priv->quirks = quirks;
+#endif
 	ret = tmio_sd_probe(dev, quirks);
 
 	renesas_sdhi_filter_caps(dev);

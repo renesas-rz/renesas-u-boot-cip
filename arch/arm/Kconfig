@@ -923,7 +923,7 @@ config ARCH_QEMU
 config ARCH_RMOBILE
 	bool "Renesas ARM SoCs"
 	select DM
-	select DM_SERIAL
+	select DM_SERIAL if !TARGET_RZV2M
 	select GPIO_EXTRA_HEADER
 	imply BOARD_EARLY_INIT_F
 	imply CMD_DM
