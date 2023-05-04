@@ -1,0 +1,89 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Device Tree Source for the RZ/V2MA EVK platform
+ *
+ * Copyright (C) 2022 Renesas Electronics Corp.
+ */
+
+/dts-v1/;
+#include "r9a09g055ma3gbg.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	model = "RZ/V2MA";
+	compatible = "evk,evk", "renesas,r9a09g055ma3gbg";
+
+	aliases {
+		ethernet0 = &avb;
+	};
+
+	chosen {
+		bootargs = "ignore_loglevel";
+	};
+
+	memory@0 {
+		device_type = "memory";
+		reg = <0x0 0x00000000 0x0 0x80000000>;
+	};
+	memory@180000000 {
+                device_type = "memory";
+                reg = <0x1 0x80000000 0x0 0x80000000>;
+	};
+
+	reg_3p3v: regulator1 {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-3.3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+	
+	vcc_sdhi0: regulator-vcc-sdhi0 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "SDHI0 Vcc";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	vccq_sdhi0: regulator-vccq-sdhi0 {
+		compatible = "regulator-gpio";
+
+		regulator-name = "SDHI0 VccQ";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+		states = <3300000 1 1800000 0>;
+	};
+
+};
+
+&avb {
+	status = "okay";
+};
+
+&pfc {
+	avb_pins: avb {
+		mux {
+			groups = "avb_link", "avb_mii";
+			function = "avb";
+		};
+	};
+};
+
+&extal_clk {
+	clock-frequency = <48000000>;
+};
+
+&sdhi0 {
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&vccq_sdhi0>;
+	status = "okay";
+};
+
+&eMM {
+	status = "okay";
+};
+

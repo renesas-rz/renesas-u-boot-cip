@@ -265,6 +265,9 @@ choice
 config R9A09G011GBG
        bool "Renesas RZV2M r9a09g011gbg"
 
+config R9A09G055MA3GBG
+       bool "Renesas RZV2MA r9a09g055ma3gbg"
+
 endchoice
 
 
@@ -277,6 +280,10 @@ config TARGET_RZV2M
        help
           Support for Renesas RZV2M platform
 
+config TARGET_RZV2MA
+       bool "RZV2MA EVK board"
+       help
+          Support for Renesas RZV2MA platform
 
 endchoice
 
@@ -284,5 +291,6 @@ config SYS_SOC
        default "rmobile"
 
 source "board/renesas/rzv2m-dev/Kconfig"
+source "board/renesas/rzv2ma-dev/Kconfig"
 
 endif

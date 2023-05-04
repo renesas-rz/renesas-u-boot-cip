@@ -33,8 +33,9 @@ endif
 
 dtb-$(CONFIG_ARCH_RMOBILE) += \
        r9a09g011gbg-rzv2m-u-boot.dtb \
-       r9a09g011gbg-rzv2m.dtb
-
+       r9a09g011gbg-rzv2m.dtb \
+       r9a09g055ma3gbg-rzv2ma-u-boot.dtb \
+       r9a09g055ma3gbg-rzv2ma.dtb \
 targets += dt.dtb
 
 $(DTB): arch-dtbs

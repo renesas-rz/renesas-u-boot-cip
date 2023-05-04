@@ -941,6 +941,6 @@ config SYS_SDMR
 
 config RZV2M_SERIAL
        bool "Renesas RZ/V2M UART support"
-       depends on TARGET_RZV2M
+       depends on TARGET_RZV2M || TARGET_RZV2MA
 
 endmenu
