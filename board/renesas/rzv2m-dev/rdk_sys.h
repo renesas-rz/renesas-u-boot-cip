@@ -30,6 +30,10 @@
 
 #define SYS_BASE_ADDRESS            (0xA3F03000)
 
+#define SYS_PERI0_BANK              (0x0030)
+#define SYS_PERI1_BANK              (0x0034)
+#define SYS_DRP_BANK                (0x0038)
+
 #define SYS_MD_MON                  (0x0100)
 #define SYS_VERSION                 (0x0104)
 #define SYS_RAMA_ECC_CNT            (0x0110)
