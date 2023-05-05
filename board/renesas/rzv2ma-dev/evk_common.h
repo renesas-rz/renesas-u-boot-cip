@@ -62,7 +62,7 @@ unsigned int CMN_GetFreq4SysCnt(void);
 static inline unsigned int CMN_REG_Read32(unsigned int addr)
 {
     /** pointer is (unsigned int *) */
-    return *((volatile unsigned int *)addr);
+    return *((volatile unsigned int *)((unsigned long)addr));
 }
 
 /*******************************************************************************
@@ -79,7 +79,7 @@ static inline unsigned int CMN_REG_Read32(unsigned int addr)
 static inline void CMN_REG_Write32(unsigned int addr, unsigned int value)
 {
     /** sizeof(unsigned int) == sizeof(unsigned int *) */
-    *((volatile unsigned int *)addr) = value;
+    *((volatile unsigned int *)((unsigned long)addr)) = value;
 }
 
 /*******************************************************************************
@@ -94,7 +94,7 @@ static inline void CMN_REG_Write32(unsigned int addr, unsigned int value)
 static inline unsigned long int CMN_REG_Read64(unsigned int addr)
 {
     /** sizeof(unsigned int) == sizeof(unsigned long int *) */
-    return *((volatile unsigned long int *)addr);
+    return *((volatile unsigned long int *)((unsigned long)addr));
 }
 
 /*******************************************************************************
@@ -111,7 +111,7 @@ static inline unsigned long int CMN_REG_Read64(unsigned int addr)
 static inline void CMN_REG_Write64(unsigned int addr, unsigned long int value)
 {
     /** sizeof(unsigned int) == sizeof(unsigned long int *) */
-    *((volatile unsigned long int *)addr) = value;
+    *((volatile unsigned long int *)((unsigned long)addr)) = value;
 }
 
 /*******************************************************************************
