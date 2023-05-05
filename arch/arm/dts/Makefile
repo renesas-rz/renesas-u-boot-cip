@@ -923,7 +923,6 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	r8a77995-draak-u-boot.dtb \
 	r8a779a0-falcon-u-boot.dtb \
 	rzg2l-dev.dtb \
-	r9a09g011gbg-rzv2m-u-boot.dtb \
 	r9a09g055ma3gbg-rzv2ma-u-boot.dtb \
 	smarc-rzg2l.dtb \
 	rzv2l-dev.dtb \
@@ -943,7 +942,6 @@ dtb-$(CONFIG_RZA1) += \
 	r7s72100-gr-peach-u-boot.dtb
 
 dtb-$(CONFIG_RCAR_64) += \
-	r9a09g011gbg-rzv2m-u-boot.dtb \
 	r9a09g055ma3gbg-rzv2ma-u-boot.dtb
 
 dtb-$(CONFIG_SOC_KEYSTONE) += keystone-k2hk-evm.dtb \

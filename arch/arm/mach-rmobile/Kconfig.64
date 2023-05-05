@@ -262,9 +262,6 @@ if RCAR_64
 choice
        prompt "Select Target SoC"
 
-config R9A09G011GBG
-       bool "Renesas RZV2M r9a09g011gbg"
-
 config R9A09G055MA3GBG
        bool "Renesas RZV2MA r9a09g055ma3gbg"
 
@@ -274,11 +271,6 @@ endchoice
 choice
        prompt "Renesus ARM64 (not Gen3) SoCs board select"
        optional
-
-config TARGET_RZV2M
-       bool "RZV2M board"
-       help
-          Support for Renesas RZV2M platform
 
 config TARGET_RZV2MA
        bool "RZV2MA EVK board"
@@ -290,7 +282,6 @@ endchoice
 config SYS_SOC
        default "rmobile"
 
-source "board/renesas/rzv2m-dev/Kconfig"
 source "board/renesas/rzv2ma-dev/Kconfig"
 
 endif
