@@ -550,6 +550,7 @@ static int ravb_probe(struct udevice *dev)
 	if (ret < 0)
 		goto err_mdio_alloc;
 
+#ifndef CONFIG_R9A09G055MA3GBG	
 	ret = dev_read_phandle_with_args(dev, "phy-handle", NULL, 0, 0, &phandle_args);
 	if (!ret) {
 		gpio_request_by_name_nodev(phandle_args.node, "reset-gpios", 0,
@@ -560,7 +561,7 @@ static int ravb_probe(struct udevice *dev)
 		gpio_request_by_name(dev, "reset-gpios", 0, &eth->reset_gpio,
 				     GPIOD_IS_OUT);
 	}
-
+#endif
 	mdiodev = mdio_alloc();
 	if (!mdiodev) {
 		ret = -ENOMEM;
