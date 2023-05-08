@@ -31,6 +31,7 @@
 #include <asm/arch/sh_sdhi.h>
 #include <asm/global_data.h>
 #include <clk.h>
+#include <fdtdec.h>
 
 #define DRIVER_NAME "sh-sdhi"
 
@@ -879,19 +880,24 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 	plat->cfg.name = dev->name;
 	plat->cfg.host_caps = MMC_MODE_HS_52MHz | MMC_MODE_HS;
 
-	switch (fdtdec_get_int(gd->fdt_blob, dev_of_offset(dev), "bus-width",
-			       1)) {
-	case 8:
-		plat->cfg.host_caps |= MMC_MODE_8BIT;
-		break;
-	case 4:
-		plat->cfg.host_caps |= MMC_MODE_4BIT;
-		break;
-	case 1:
-		break;
-	default:
-		dev_err(dev, "Invalid \"bus-width\" value\n");
-		return -EINVAL;
+	if (fdtdec_get_bool(gd->fdt_blob, dev_of_offset(dev),
+				"mutual-channel")) {
+		plat->cfg.host_caps |= MMC_MODE_4BIT | MMC_MODE_8BIT;
+	} else {
+		switch (fdtdec_get_int(gd->fdt_blob, dev_of_offset(dev),
+					"bus-width", 1)) {
+		case 8:
+			plat->cfg.host_caps |= MMC_MODE_8BIT;
+			break;
+		case 4:
+			plat->cfg.host_caps |= MMC_MODE_4BIT;
+			break;
+		case 1:
+			break;
+		default:
+			dev_err(dev, "Invalid \"bus-width\" value\n");
+			return -EINVAL;
+		}
 	}
 
 	sh_sdhi_initialize_common(host);
