@@ -81,6 +81,8 @@
 	*/
 	bus-width = <8>;
 	status = "okay";
+	/* This is used for interface that support both eMMC and SD in board */
+	mutual-channel;
 };
 
 &sdhi1 {
