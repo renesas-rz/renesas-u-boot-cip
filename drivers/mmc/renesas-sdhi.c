@@ -867,7 +867,6 @@ static ulong renesas_sdhi_clk_get_rate(struct tmio_sd_priv *priv)
 static void renesas_sdhi_filter_caps(struct udevice *dev)
 {
 	struct tmio_sd_priv *priv = dev_get_priv(dev);
-	struct tmio_sd_plat *plat = dev_get_plat(dev);
 
 	if (!(priv->caps & TMIO_SD_CAP_RCAR_GEN3))
 		return;
