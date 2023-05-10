@@ -71,6 +71,7 @@
 
 #define CALIB_TABLE_MAX	(RENESAS_SDHI_SCC_TMPPORT_CALIB_CODE_MASK + 1)
 
+#ifndef CONFIG_R9A09G011GBG
 static const u8 r8a7795_calib_table[2][CALIB_TABLE_MAX] = {
 	{ 0,  0,  0,  0,  0,  1,  1,  2,  3,  4,  5,  5,  6,  6,  7, 11,
 	 15, 16, 16, 17, 17, 17, 17, 17, 18, 18, 18, 18, 19, 20, 21, 21 },
@@ -111,6 +112,7 @@ static int rmobile_is_gen3_mmc0(struct tmio_sd_priv *priv)
 	/* On R-Car Gen3, MMC0 is at 0xee140000 */
 	return (uintptr_t)(priv->regbase) == 0xee140000;
 }
+#endif
 
 static u32 sd_scc_tmpport_read32(struct tmio_sd_priv *priv, u32 addr)
 {
@@ -872,12 +874,12 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	if (priv->caps & TMIO_SD_CAP_DMA_INTERNAL)
 		priv->idma_bus_width = TMIO_SD_DMA_MODE_BUS_WIDTH;
 
+#ifndef CONFIG_R9A09G011GBG
 #if CONFIG_IS_ENABLED(MMC_UHS_SUPPORT) || \
     CONFIG_IS_ENABLED(MMC_HS200_SUPPORT) || \
     CONFIG_IS_ENABLED(MMC_HS400_SUPPORT)
 
-#if 0
-//     struct tmio_sd_plat *plat = dev_get_plat(dev);
+     struct tmio_sd_plat *plat = dev_get_plat(dev);
 	
 	/* HS400 is not supported on H3 ES1.x and M3W ES1.0, ES1.1 */
 	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
@@ -953,7 +955,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 #endif		
 #endif
 		priv->nrtaps = 8;
-#if 0	
+#ifndef CONFIG_R9A09G011GBG
 	/* H3 ES1.x and M3W ES1.0 uses bit 17 for DTRAEND */
 	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
 	    (rmobile_get_cpu_rev_integer() <= 1)) ||
@@ -965,8 +967,10 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 #endif		
 		priv->read_poll_flag = TMIO_SD_DMA_INFO1_END_RD2;
 
+#ifndef CONFIG_R9A09G011GBG
 	/* Host need to send stop command during tuning in SD */
-	//plat->cfg.host_caps |= MMC_CAP2_STOP_TUNE_SD;
+	plat->cfg.host_caps |= MMC_CAP2_STOP_TUNE_SD;
+#endif
 }
 
 static int renesas_sdhi_probe(struct udevice *dev)
