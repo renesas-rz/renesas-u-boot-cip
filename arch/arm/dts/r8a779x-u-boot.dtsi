@@ -19,6 +19,3 @@
 	u-boot,dm-pre-reloc;
 };
 
-&prr {
-	u-boot,dm-pre-reloc;
-};
