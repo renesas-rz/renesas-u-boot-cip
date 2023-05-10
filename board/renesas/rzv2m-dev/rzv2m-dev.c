@@ -318,7 +318,6 @@ static void tim_init(void)
 
 static void evk_cpg_init(void)
 {
-	int t;
 	do
 	{
 		/**********************************/
@@ -389,7 +388,7 @@ void s_init(void)
 	if(3 == current_el()){
 
 		armv8_switch_to_el2((u64)NULL, 0, 0, 0,
-							_start,
+							(u64)_start,
 							ES_TO_AARCH64);
 	}
 	
