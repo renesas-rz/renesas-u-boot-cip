@@ -130,11 +130,7 @@ static inline void cpg_write32( uintptr_t addr, uint32_t val )
         *(volatile unsigned int*)(BASE_ADDR_CPG+addr) = val;
 }
 
-
-//static int do_wakeup_secondary_cpu(cmd_tl_t *cmdtp, int flag, int argc, char * const argv[])
-static int do_wakeup_secondary_cpu(caddr_t *cmdtp, int flag, int argc, char * const argv[])
-
-//caddr_t
+static int do_wakeup_secondary_cpu(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
 {
     unsigned int reg;
     unsigned int reset_vector_addr;
@@ -149,7 +145,7 @@ static int do_wakeup_secondary_cpu(caddr_t *cmdtp, int flag, int argc, char * co
     kernel_start_addr = env_get_hex("fdt_addr",0);
     if( reset_vector_addr > kernel_start_addr )
     {
-        printf("[ERROR] ResetVector address[%08x] is greater than Linux area[%08x].\n", \
+        printf("[ERROR] ResetVector address[%08x] is greater than Linux area[%08lx].\n", \
                 reset_vector_addr,kernel_start_addr
         );
         return CMD_RET_USAGE;

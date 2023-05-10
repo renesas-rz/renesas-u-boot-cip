@@ -33,8 +33,7 @@ static inline void psc_write32( uintptr_t addr, uint32_t val )
 }
 
 
-static int do_evk_shutdown(caddr_t *cmdtp, int flag, int argc, char * const argv[])
-
+static int do_evk_shutdown(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
 {
 
     printf("Shutdown the evk board...\n");
