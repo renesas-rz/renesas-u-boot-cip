@@ -193,11 +193,6 @@
 			power-domains = <&sysc RZV2M_PD_ALWAYS_ON>;
 			resets = <&cpg 408>;
 		};
-
-		prr: chipid@fff00044 {
-			compatible = "renesas,prr";
-			reg = <0 0xfff00044 0 4>;
-		};
 	};
 
 	timer {
