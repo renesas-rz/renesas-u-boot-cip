@@ -20,8 +20,11 @@
 #define COUNTER_FREQUENCY	24000000	/* 24MHz from CNT_CLK */
 
 /* Environment in eMMC, at the end of 2nd "boot sector" */
+#undef CONFIG_ENV_OFFSET
 #define CONFIG_ENV_OFFSET		(-CONFIG_ENV_SIZE)
+#undef CONFIG_SYS_MMC_ENV_DEV
 #define CONFIG_SYS_MMC_ENV_DEV		1
+#undef CONFIG_SYS_MMC_ENV_PART
 #define CONFIG_SYS_MMC_ENV_PART		2
 
 
@@ -48,6 +51,7 @@
 
 /* ENV setting */
 #define CONFIG_ENV_SECT_SIZE	(128 * 1024)
+#undef CONFIG_ENV_SIZE
 #define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
 #define CONFIG_ENV_OVERWRITE
 //#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
