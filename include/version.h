@@ -21,7 +21,7 @@
 #else
 
 #define U_BOOT_VERSION_STRING U_BOOT_VERSION " (" U_BOOT_DATE " - " \
-	U_BOOT_TIME " " U_BOOT_TZ ") " "for RZ/V2MA Linux Package V1.1.0" CONFIG_IDENT_STRING
+	U_BOOT_TIME " " U_BOOT_TZ ") " "for RZ/V2MA Linux Package VLP V3.0.4" CONFIG_IDENT_STRING
 #endif
 
 #ifndef __ASSEMBLY__
