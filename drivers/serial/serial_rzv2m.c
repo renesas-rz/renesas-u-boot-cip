@@ -27,14 +27,14 @@
 
 #include <common.h>
 #include <asm/io.h>
+#include <linux/delay.h>
 #include "serial.h"
 
 #include "serial_rzv2m.h"
-DECLARE_GLOBAL_DATA_PTR;
-
 #include <init.h>
 
 /*-----------------------------------------------------------*/
+DECLARE_GLOBAL_DATA_PTR;
 
 struct uart_port *port;
 
@@ -79,7 +79,6 @@ static void rzv2m_serial_init_generic(struct uart_port *port)
 
 static int rzv2m_serial_init(void)
 {
-	unsigned int quot;
 	int ret = 0;
 
 	port = &rzv2m_port;
@@ -108,7 +107,6 @@ static void rzv2m_serial_setbrg_generic(struct uart_port *port, unsigned int bau
 
 static void rzv2m_serial_setbrg(void)
 {
-	DECLARE_GLOBAL_DATA_PTR;
 	struct uart_port *port = &rzv2m_port;
 
 	rzv2m_serial_setbrg_generic(port,gd->baudrate);

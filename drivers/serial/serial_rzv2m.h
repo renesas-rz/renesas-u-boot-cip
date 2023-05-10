@@ -48,6 +48,16 @@ struct uart_port {
 	unsigned long	mapbase;	/* for ioremap */
 };
 
+/* To redefine the register offset for RZ/V2M, the macros already defined are cleared by "UNDEF". */
+#undef UART_FCR
+#undef UART_LCR
+#undef UART_MCR
+#undef UART_LSR
+#undef UART_MSR
+#undef UART_SCR
+#undef UART_DLL
+#undef UART_DLM
+
 #define UART_FCR	(0x03)	/* Out: FIFO Control Register */
 #define UART_LCR	(0x04)	/* Out: Line Control Register */
 
