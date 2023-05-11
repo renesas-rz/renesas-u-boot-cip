@@ -66,6 +66,17 @@
 		pinmux = <RZG2L_PINMUX(6, 0, 1)>,	/* VBUS	*/
 			 <RZG2L_PINMUX(6, 1, 1)>;	/* OVC */
 	};
+
+	sdhi2_pins: sd2 {
+		pinmux = <RZG2L_PINMUX(11, 0, 8)>,	/* SD2_CLK	*/
+			 <RZG2L_PINMUX(11, 1, 8)>,	/* SD2_CMD	*/
+			 <RZG2L_PINMUX(11, 2, 8)>,	/* SD2_DATA0	*/
+			 <RZG2L_PINMUX(11, 3, 8)>,	/* SD2_DATA1	*/
+			 <RZG2L_PINMUX(12, 0, 8)>,	/* SD2_DATA2	*/
+			 <RZG2L_PINMUX(12, 1, 8)>,	/* SD2_DATA3	*/
+			 <RZG2L_PINMUX(14, 1, 7)>,	/* SD2_CD	*/
+			 <RZG2L_PINMUX(14, 2, 7)>;	/* SD2_WP	*/
+	};
 };
 
 &xinclk {
@@ -83,6 +94,14 @@
 };
 
 &sdhi1 {
+	bus-width = <4>;
+	status = "okay";
+};
+
+&sdhi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdhi2_pins>;
+
 	bus-width = <4>;
 	status = "okay";
 };
