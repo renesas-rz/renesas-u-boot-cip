@@ -76,12 +76,12 @@
 #define DIVDSIB		(PL5_SDIV_R << 20	| 8 << 12	| 4 << 8)
 #define DIVDSIA		(PL5_SDIV_R << 20	| 0 << 12	| 2 << 8)
 
-/*16bits register offset, 8bits ON/MON, 8bits RESET*/
-#define MSSR(off, on, res)	((off & 0xffff) << 16	\
-				| (on & 0xff) << 8	\
+/*12bits register offset, 12bits ON/MON, 8bits RESET*/
+#define MSSR(off, on, res)	((off & 0xfff) << 20	\
+				| (on & 0xfff) << 8	\
 				| (res & 0xff))
-#define MSSR_OFF(val)		((val >> 16) & 0xffff)
-#define MSSR_ON(val)		((val >> 8) & 0xff)
+#define MSSR_OFF(val)		((val >> 20) & 0xfff)
+#define MSSR_ON(val)		((val >> 8) & 0xfff)
 #define MSSR_RES(val)		(val & 0xff)
 
 /*
