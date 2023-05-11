@@ -354,6 +354,14 @@
 			status = "disabled";
 		};
 
+                i2c8: i2c@11C01000 {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+                        compatible = "renesas,riic-r9a09g057";
+                        reg = <0 0x11C01000 0 0x400>;
+                        status = "disabled";
+                };
+
 		eth0: ethernet@15c30000 {
 			compatible = "renesas,rzv2h-eqos";
 			reg = <0x0 0x15c30000 0x0 0x10000>;
