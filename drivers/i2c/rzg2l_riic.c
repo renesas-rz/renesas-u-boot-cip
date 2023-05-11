@@ -21,6 +21,23 @@
 #include <linux/bitops.h>
 #include <linux/delay.h>
 
+#if defined(CONFIG_R9A09G057)
+#define RIIC_ICCR1	0x00
+#define RIIC_ICCR2	0x01
+#define RIIC_ICMR1	0x02
+#define RIIC_ICMR2	0x03
+#define RIIC_ICMR3	0x04
+#define RIIC_ICFER	0x05
+#define RIIC_ICSER	0x06
+#define RIIC_ICIER	0x07
+#define RIIC_ICSR1	0x08
+#define RIIC_ICSR2	0x09
+#define RIIC_ICSAR0	0x0A
+#define RIIC_ICBRL	0x10
+#define RIIC_ICBRH	0x11
+#define RIIC_ICDRT	0x12
+#define RIIC_ICDRR	0x13
+#else
 #define RIIC_ICCR1	0x00
 #define RIIC_ICCR2	0x04
 #define RIIC_ICMR1	0x08
@@ -36,6 +53,7 @@
 #define RIIC_ICBRH	0x38
 #define RIIC_ICDRT	0x3c
 #define RIIC_ICDRR	0x40
+#endif
 
 /* ICCR1 */
 #define ICCR1_ICE	0x80
@@ -145,13 +163,21 @@ struct riic_priv {
 
 static unsigned char riic_read(struct riic_priv *priv, unsigned long addr)
 {
+#if defined(CONFIG_R9A09G057)
+	return readb(priv->base + addr);
+#else
 	return readl(priv->base + addr);
+#endif
 }
 
 static void riic_write(struct riic_priv *priv, unsigned char data,
 		       unsigned long addr)
 {
+#if defined(CONFIG_R9A09G057)
+	writeb(data, priv->base + addr);
+#else
 	writel(data, priv->base + addr);
+#endif
 }
 
 static void riic_set_bit(struct riic_priv *priv, unsigned char val,
@@ -600,14 +626,17 @@ static int riic_probe(struct udevice *dev)
 	struct riic_priv *priv = dev_get_priv(dev);
 	int ret;
 
+#if !defined(CONFIG_R9A09G057)
 	writel(0x000F000F, 0x11010880);
 	writel(0x01010101, 0x11031870);
-
+#endif
 	priv->base = dev_read_addr_ptr(dev);
 
+#if !defined(CONFIG_R9A09G057)
 	ret = clk_get_by_index(dev, 0, &priv->clk);
 	if (ret)
 		return ret;
+#endif
 
 	ret = clk_enable(&priv->clk);
 	if (ret)
@@ -629,6 +658,7 @@ static const struct udevice_id riic_ids[] = {
 	{ .compatible = "renesas,riic-r9a07g054l", },
 	{ .compatible = "renesas,riic-r9a07g043u", },
 	{ .compatible = "renesas,riic-r9a07g043f", },
+	{ .compatible = "renesas,riic-r9a09g057",  },
 	{ .compatible = "renesas,riic-rz", },
 	{ }
 };

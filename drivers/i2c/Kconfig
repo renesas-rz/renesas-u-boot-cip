@@ -422,7 +422,7 @@ config SYS_I2C_RCAR_IIC
 
 config SYS_I2C_RZG2L_RIIC
 	bool "Renesas RZG2L RIIC driver"
-	depends on RZF_DEV && DM_I2C
+	depends on DM_I2C
 	help
 	  Support for Renesas RZG2L RIIC controller.
 
