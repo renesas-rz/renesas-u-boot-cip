@@ -16,6 +16,10 @@
 #include <asm/arch/rcar-gen3-base.h>
 #elif defined(CONFIG_RCAR_GEN4)
 #include <asm/arch/rcar-gen4-base.h>
+#elif defined(CONFIG_R9A09G011GBG)
+#include <asm/arch/r9a09g011.h>
+#elif defined(CONFIG_R9A09G055MA3GBG)
+#include <asm/arch/r9a09g055ma3gbg.h>
 #elif defined(CONFIG_R7S72100)
 #elif defined(CONFIG_RZG2L)
 #include <asm/arch/rzg2l.h>
