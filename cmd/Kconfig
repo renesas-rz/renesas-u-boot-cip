@@ -1838,6 +1838,12 @@ config CMD_ECC
 	  Add ecc command for user to add/remove ECC support.
 	  Use 'ecc help' to get usage log.
 
+config CMD_EVK
+        bool "evk"
+        help
+          Add evk command for user to use Wake up and Shut down command on 
+	  RZ/V2{M,MA} SoC.
+
 config CMD_PSTORE
 	bool "pstore"
 	help
