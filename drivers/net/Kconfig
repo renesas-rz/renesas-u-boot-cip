@@ -772,7 +772,7 @@ config RENESAS_ETHER_SWITCH
 config RENESAS_RAVB
 	bool "Renesas Ethernet AVB MAC"
 	depends on RCAR_64
-	depends on DM_ETH && ( RCAR_GEN3 || RZF_DEV )
+	depends on DM_ETH && ( RCAR_GEN3 || RZF_DEV || RZ_V2M )
 	select PHYLIB
 	help
 	  This driver implements support for the Ethernet AVB block in
