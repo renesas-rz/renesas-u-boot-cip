@@ -71,6 +71,7 @@
 
 #define CALIB_TABLE_MAX	(RENESAS_SDHI_SCC_TMPPORT_CALIB_CODE_MASK + 1)
 
+#if !(defined(CONFIG_RZ_V2M))
 static const u8 r8a7796_rev13_calib_table[2][CALIB_TABLE_MAX] = {
 	{ 3,  3,  3,  3,  3,  3,  3,  4,  4,  5,  6,  7,  8,  9, 10, 15,
 	 16, 16, 16, 16, 16, 16, 17, 18, 18, 19, 20, 21, 22, 23, 24, 25 },
@@ -97,6 +98,7 @@ static int rcar_is_gen3_mmc0(struct tmio_sd_priv *priv)
 	/* On R-Car Gen3, MMC0 is at 0xee140000 */
 	return (uintptr_t)(priv->regbase) == 0xee140000;
 }
+#endif
 
 static u32 sd_scc_tmpport_read32(struct tmio_sd_priv *priv, u32 addr)
 {
@@ -379,8 +381,10 @@ static int renesas_sdhi_hs400(struct udevice *dev)
 	}
 
 	ret = clk_set_rate(&priv->clk, sdn_rate);
+#if !(defined(CONFIG_RZ_V2M))
 	if (ret < 0)
 		return ret;
+#endif
 
 	reg = tmio_sd_readl(priv, RENESAS_SDHI_SCC_RVSCNTL);
 	reg &= ~RENESAS_SDHI_SCC_RVSCNTL_RVSEN;
@@ -864,6 +868,7 @@ static const struct udevice_id renesas_sdhi_match[] = {
 	{ .compatible = "renesas,sdhi-r8a77990", .data = RENESAS_GEN3_QUIRKS },
 	{ .compatible = "renesas,sdhi-r8a77995", .data = RENESAS_GEN3_QUIRKS },
 	{ .compatible = "renesas,rcar-gen4-sdhi", .data = RENESAS_GEN3_QUIRKS },
+	{ .compatible = "renesas,sdhi-r9a09g011gbg", .data = RENESAS_GEN3_QUIRKS },
 	{ /* sentinel */ }
 };
 
@@ -882,6 +887,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	if (priv->caps & TMIO_SD_CAP_DMA_INTERNAL)
 		priv->idma_bus_width = TMIO_SD_DMA_MODE_BUS_WIDTH;
 
+#if !(defined(CONFIG_RZ_V2M))
 #if CONFIG_IS_ENABLED(MMC_UHS_SUPPORT) || \
     CONFIG_IS_ENABLED(MMC_HS200_SUPPORT) || \
     CONFIG_IS_ENABLED(MMC_HS400_SUPPORT)
@@ -950,6 +956,11 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	else
 		priv->nrtaps = 8;
 #endif
+#endif
+#if defined(CONFIG_RZ_V2M)
+		priv->nrtaps = 8;
+#endif
+#if !(defined(CONFIG_RZ_V2M))
 	/* H3 ES1.x and M3W ES1.0 uses bit 17 for DTRAEND */
 	if (((renesas_get_cpu_type() == RENESAS_CPU_TYPE_R8A7795) &&
 	    (renesas_get_cpu_rev_integer() <= 1)) ||
@@ -958,8 +969,10 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	    (renesas_get_cpu_rev_fraction() == 0)))
 		priv->read_poll_flag = TMIO_SD_DMA_INFO1_END_RD;
 	else
+#endif
 		priv->read_poll_flag = TMIO_SD_DMA_INFO1_END_RD2;
 
+#if !(defined(CONFIG_RZ_V2M))
 	/* V3M handles SD0H differently than other Gen3 SoCs */
 	if (renesas_get_cpu_type() == RENESAS_CPU_TYPE_R8A77970)
 		priv->needs_clkh_fallback = true;
@@ -968,7 +981,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 
 	/* Host need to send stop command during tuning in SD */
 	plat->cfg.host_caps |= MMC_CAP2_STOP_TUNE_SD;
-
+#endif
 }
 
 static int rzg2l_sdhi_setup(struct udevice *dev)
@@ -1077,6 +1090,7 @@ static int renesas_sdhi_probe(struct udevice *dev)
 		}
 	}
 
+#if !(defined(CONFIG_RZ_V2M))
 	/* set to max rate */
 	ret = clk_set_rate(&priv->clk, 200000000);
 	if (ret < 0) {
@@ -1096,7 +1110,7 @@ static int renesas_sdhi_probe(struct udevice *dev)
 		ret = tmio_sd_probe(dev, priv->quirks);
 	if (ret)
 		goto err_tmio_probe;
-
+#endif
 	renesas_sdhi_filter_caps(dev);
 
 #if CONFIG_IS_ENABLED(MMC_UHS_SUPPORT) || \
