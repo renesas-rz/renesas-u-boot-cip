@@ -69,6 +69,7 @@ obj-$(CONFIG_OCTEON_SERIAL_BOOTCMD) += serial_octeon_bootcmd.o
 obj-$(CONFIG_OCTEON_SERIAL_PCIE_CONSOLE) += serial_octeon_pcie_console.o
 obj-$(CONFIG_OWL_SERIAL) += serial_owl.o
 obj-$(CONFIG_OMAP_SERIAL) += serial_omap.o
+obj-$(CONFIG_RZV2M_SERIAL) += serial_rzv2m.o
 obj-$(CONFIG_MTK_SERIAL) += serial_mtk.o
 obj-$(CONFIG_MT7620_SERIAL) += serial_mt7620.o
 obj-$(CONFIG_SIFIVE_SERIAL) += serial_sifive.o
