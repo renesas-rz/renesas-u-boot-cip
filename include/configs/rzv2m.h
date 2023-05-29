@@ -56,7 +56,7 @@
 	"loadaddr=0x180080000\0" \
 	"fdt_addr=0x180000000\0" \
 	"fdt_file=r9a09g011gbg-evaluation-board.dtb\0" \
-	"fdt_high=0x1B8000000\0" \
+	"fdt_high=0x80000000\0" \
 	"kernel=Image-rzv2m.bin\0" \
 	"rtos=core1_uart.bin\0" \
 	"core1addr=0x0\0" \
