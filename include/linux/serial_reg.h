@@ -129,7 +129,12 @@
 #define UART_LSR_PE		0x04 /* Parity error indicator */
 #define UART_LSR_OE		0x02 /* Overrun error indicator */
 #define UART_LSR_DR		0x01 /* Receiver data ready */
+
+#if !(defined(CONFIG_RZ_V2M))
 #define UART_LSR_BRK_ERROR_BITS	0x1E /* BI, FE, PE, OE bits */
+#else
+#define UART_LSR_ERROR_BITS    0x9E /* FIFOE,BI, FE, PE, OE bits */
+#endif
 
 #define UART_MSR	6	/* In:  Modem Status Register */
 #define UART_MSR_DCD		0x80 /* Data Carrier Detect */
