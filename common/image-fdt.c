@@ -85,8 +85,13 @@ static void boot_fdt_reserve_region(struct lmb *lmb, uint64_t addr,
 		      (unsigned long long)addr,
 		      (unsigned long long)size, flags);
 	} else {
+#if !(defined(CONFIG_RZ_V2M))
 		puts("ERROR: reserving fdt memory region failed ");
 		printf("(addr=%llx size=%llx flags=%x)\n",
+#else
+		debug("ERROR: reserving fdt memory region failed ");
+		debug("(addr=%llx size=%llx flags=%x)\n",
+#endif
 		       (unsigned long long)addr,
 		       (unsigned long long)size, flags);
 	}
@@ -194,9 +199,13 @@ int boot_relocate_fdt(struct lmb *lmb, char **of_flat_tree, ulong *of_size)
 			lmb_reserve(lmb, (ulong)of_start, of_len);
 			disable_relocation = 1;
 		} else if (desired_addr) {
+#if !(defined(CONFIG_RZ_V2M))
 			of_start =
 			    (void *)(ulong) lmb_alloc_base(lmb, of_len, 0x1000,
 							   (ulong)desired_addr);
+#else
+			of_start = (void *)(((ulong)desired_addr-of_len) & (~0x0FFF));
+#endif
 			if (of_start == NULL) {
 				puts("Failed using fdt_high value for Device Tree");
 				goto error;
