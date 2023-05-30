@@ -160,12 +160,13 @@ uint32_t uart_trx_ready_poll(struct uart_port *port)
 	uint32_t sts;
 	uint32_t res = UART_STAT_NONE;
 
-       sts = uart_in(port,UART_LSR);           /** Read Line Status */
+        sts = uart_in(port,UART_LSR);           /** Read Line Status */
         if(sts & UART_LSR_ERROR_BITS)           /** Error(FE/PE/OV) ? */
 
         { 
                uart_in(port,UART_RX);                  /*Dummy read*/
-               res = (UART_STAT_ERROR);	
+                res = (UART_STAT_ERROR);
+	
 	}
 	else
 	{
