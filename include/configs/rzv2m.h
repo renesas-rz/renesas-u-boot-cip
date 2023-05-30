@@ -20,8 +20,11 @@
 #define COUNTER_FREQUENCY	24000000	/* 24MHz from CNT_CLK */
 
 /* Environment in eMMC, at the end of 2nd "boot sector" */
+#undef CONFIG_ENV_OFFSET
 #define CONFIG_ENV_OFFSET		(-CONFIG_ENV_SIZE)
+#undef CONFIG_SYS_MMC_ENV_DEV
 #define CONFIG_SYS_MMC_ENV_DEV		1
+#undef CONFIG_SYS_MMC_ENV_PART
 #define CONFIG_SYS_MMC_ENV_PART		2
 
 
@@ -48,6 +51,7 @@
 
 /* ENV setting */
 #define CONFIG_ENV_SECT_SIZE	(128 * 1024)
+#undef CONFIG_ENV_SIZE
 #define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
 #define CONFIG_ENV_OVERWRITE
 //#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
@@ -60,14 +64,15 @@
 	"loadaddr=0x180080000\0" \
 	"fdt_addr=0x180080000\0" \
 	"fdt_file=r9a09g011gbg-evaluation-board.dtb\0" \
-	"kernel=Image\0" \
+	"fdt_high=0x80000000\0" \
+	"kernel=Image-rzv2m.bin\0" \
 	"rtos=core1_uart.bin\0" \
 	"core1addr=0x0\0" \
 	"core1_vector=0x0\0" \
-	"bootargs_sd=setenv bootargs root=/dev/mmcblk0p2 rootwait rootfstype=ext3 rw\0" \
+	"bootargs_sd=setenv bootargs root=/dev/mmcblk0p2 rootwait rootfstype=ext4 rw\0" \
 	"bootsd=run bootargs_sd;" \
 	"fatload mmc 0:1 ${loadaddr} ${kernel};fatload mmc 0:1 ${fdt_addr} ${fdt_file};booti ${loadaddr} - ${fdt_addr}\0" \
-    "bootargs_nfs=setenv bootargs root=/dev/nfs rw nfsroot=${serverip}:/nfs/rzv2m,nfsvers=3 ip=${ipaddr}:${serverip}::${netmask}:rzv2m:eth0\0" \
+	"bootargs_nfs=setenv bootargs root=/dev/nfs rw nfsroot=${serverip}:/nfs/rzv2m,nfsvers=3 ip=${ipaddr}:${serverip}::${netmask}:rzv2m:eth0\0" \
 	"bootnfs=run bootargs_nfs;" \
 	"tftp ${loadaddr} ${kernel};tftp ${fdt_addr} ${fdt_file};booti ${loadaddr} - ${fdt_addr}\0" \
 	"bootcmd=run bootsd\0" \
