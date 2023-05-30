@@ -57,8 +57,8 @@
 	"serverip=192.168.1.10\0" \
 	"gatewayip=192.168.0.1\0" \
 	"netmask=255.255.255.0\0" \
-	"loadaddr=0x58080000\0" \
-	"fdt_addr=0x58000000\0" \
+	"loadaddr=0x180080000\0" \
+	"fdt_addr=0x180080000\0" \
 	"fdt_file=r9a09g011gbg-evaluation-board.dtb\0" \
 	"kernel=Image\0" \
 	"rtos=core1_uart.bin\0" \
