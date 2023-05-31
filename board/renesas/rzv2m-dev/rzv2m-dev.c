@@ -97,20 +97,11 @@ static void drp_a_init(void){
 		CMN_DelayInUS(1000);
 	}
 
-	CMN_REG_Write32(0xa3600000, 0x00000016);
-	regval = CMN_REG_Read32(0xa3600044);
-	while((regval & 0x1) != 0x1){
-		regval = CMN_REG_Read32(0xa3600044);
-		CMN_DelayInUS(1);
-	}
-
     	//Clear interrupt status with PMC
 	CMN_REG_Write32(0xa3600048, 0x00000001);
 
     	//Clock supply with PD_DRP
 	CMN_REG_Write32(0xa350044c,0x00040004);
-	CMN_DelayInUS(1000);
-	CMN_REG_Write32(0xa3500450,0x00040004);
 	CMN_DelayInUS(1000);
 
     	//Isolation off with DRP
@@ -121,21 +112,11 @@ static void drp_a_init(void){
 		CMN_DelayInUS(1000);
 	}
 
-	CMN_REG_Write32(0xa3600030, 0x00000000);
-	regval = CMN_REG_Read32(0xa3600030);
-	while((regval & 0x8000) != 0x8000){
-		regval = CMN_REG_Read32(0xa360002c);
-		CMN_DelayInUS(1000);
-	}
-
 	//Clock supply and deassert with DRP
 	CMN_REG_Write32(0xa350044c, 0x00030003);
 	CMN_DelayInUS(10000);
-	CMN_REG_Write32(0xa3500450, 0x00030003);
-	CMN_DelayInUS(10000);
 
 	CMN_REG_Write32(0xa3500620, 0x00010001);
-	CMN_REG_Write32(0xa3500624, 0x00010001);
 	CMN_DelayInUS(1);
 
 }
