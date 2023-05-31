@@ -52,7 +52,6 @@ unsigned long int CMN_GetSysCnt(void)
  ******************************************************************************/
 unsigned int CMN_GetFreq4SysCnt(void)
 {
-	unsigned int g_syscnt_base = SYSCNT_BASE_ADDRESS;
     return SYSCNT_FREQUENCY;
 }
 
