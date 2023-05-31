@@ -194,3 +194,7 @@
 		status = "okay";
 };
 
+&hsusb {
+		dr_mode = "otg";
+		status = "okay";
+};
