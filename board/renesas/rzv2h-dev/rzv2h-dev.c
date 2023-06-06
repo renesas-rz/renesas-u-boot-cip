@@ -35,10 +35,14 @@ DECLARE_GLOBAL_DATA_PTR;
 #define	PFC_20				(PFC_BASE + 0x0480)
 #define PMC_23				(PFC_BASE + 0x0223)
 #define PFC_23				(PFC_BASE + 0x048C)
+#define	PMC_24				(PFC_BASE + 0x0224)
+#define	PFC_24				(PFC_BASE + 0x0490)
 
 #define PWPR_REGWE_A			BIT(6)
+#define	PWPR_REGWE_B			BIT(5)
 
 #define	CPG_CLKON_9			(CPG_BASE + 0x0624)
+#define	CPG_RST_9			(CPG_BASE + 0x0924)
 #define	CPG_RST_10			(CPG_BASE + 0x0928)
 
 /* CPG */
@@ -53,7 +57,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 void s_init(void)
 {
-	*(volatile u32 *)PWPR |= PWPR_REGWE_A;
+	*(volatile u32 *)PWPR |= (PWPR_REGWE_A | PWPR_REGWE_B);
 
 #if CONFIG_TARGET_RZV2H_DEV
 	*(volatile u8 *)PMC_2A   &= ~(0x03<<4);	/* PA5,PA4 port	*/
@@ -65,12 +69,34 @@ void s_init(void)
 	*(volatile u8 *)PMC_2A   &= ~(0x03 << 2);/* PA3,PA2 port */
 	*(volatile u8 *)P_2A      = (*(volatile u32 *)P_2A  & ~(0x03<<2)) | (0x01 <<3); /* PA3=1,PA2=0		*/
 	*(volatile u16 *)PM_2A    = (*(volatile u32 *)PM_2A & ~(0x0f<<4)) | (0x0a <<4); /* PA3,PA2 output	*/
+
+	/* I2C3	*/
+	*(volatile u32 *)PFC_23  = (*(volatile u32 *)PFC_23 & 0x00FFFFFF) | (0x01 << 28) | (0x01 << 24);
+	*(volatile u8 *)PMC_23   |= (0x03) << 6;	/* P37,P36 multiplexed function	*/
+
+	/* I2C6	*/
+	*(volatile u32 *)PFC_24  = (*(volatile u32 *)PFC_24 & 0xFF00FFFF) | (0x01 << 20) | (0x01 << 16);
+	*(volatile u8 *)PMC_24   |= (0x03) << 4;	/* P45,P44 multiplexed function	*/
+
+	/* I2C7	*/
+	*(volatile u32 *)PFC_24  = (*(volatile u32 *)PFC_24 & 0x00FFFFFF) | (0x01 << 28) | (0x01 << 24);
+	*(volatile u8 *)PMC_24   |= (0x03) << 6;	/* P45,P44 multiplexed function	*/
+
+	/* I2C3	*/
+	*(volatile u32 *)CPG_CLKON_9 = 0x00800080;
+	*(volatile u32 *)CPG_RST_9   = 0x08000800;
+	/* I2C6	*/
+	*(volatile u32 *)CPG_CLKON_9 = 0x04000400;
+	*(volatile u32 *)CPG_RST_9   = 0x40004000;
+	/* I2C7	*/
+	*(volatile u32 *)CPG_CLKON_9 = 0x08000800;
+	*(volatile u32 *)CPG_RST_9   = 0x80008000;
 #endif
 	/* I2C8 */
 	*(volatile u32 *)PFC_20  = (*(volatile u32 *)PFC_20 & 0x00FFFFFF) | (0x01 << 28) | (0x01 << 24);
 	*(volatile u8 *)PMC_20   |= (0x03) << 6;	/* P07,P06 multiplexed function	*/
 
-	*(volatile u32 *)PWPR &= ~PWPR_REGWE_A;
+	*(volatile u32 *)PWPR &= ~(PWPR_REGWE_A | PWPR_REGWE_B);
 
 	*(volatile u32 *)CPG_CLKON_9 = 0x00080008;
 	*(volatile u32 *)CPG_RST_10  = 0x00010001;
