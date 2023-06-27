@@ -33,7 +33,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define	PMC_2A				(PFC_BASE + 0x022A)
 #define PFC_PMC26			(PFC_BASE + 0x0226)
 #define PFC_PFC26			(PFC_BASE + 0x0498)
-
+#define PFC_PMC29			(PFC_BASE + 0x0229)
+#define PFC_PFC29			(PFC_BASE + 0x04A4)
 
 #define	PMC_20				(PFC_BASE + 0x0220)
 #define	PFC_20				(PFC_BASE + 0x0480)
@@ -50,22 +51,20 @@ DECLARE_GLOBAL_DATA_PTR;
 #define	CPG_RST_10			(CPG_BASE + 0x0928)
 
 /* CPG */
-#define CPG_BASE				0x10420000
+#define CPG_BASE			0x10420000
 #define CPG_CLKON_ETH0			(CPG_BASE + 0x062C)
 #define CPG_CLKMON_ETH0			(CPG_BASE + 0x0814)
 #define CPG_RESET_ETH			(CPG_BASE + 0x092C)
 #define CPG_RESETMON_ETH		(CPG_BASE + 0x0A14)
 
-#define CPG_RST_USB				(CPG_BASE + 0x0928)
+#define CPG_RST_USB			(CPG_BASE + 0x0928)
 #define CPG_RSTMON4_USB			(CPG_BASE + 0x0A10)
 #define CPG_RSTMON5_USB			(CPG_BASE + 0x0A14)
 #define CPG_CLKON_USB			(CPG_BASE + 0x062C)
 #define CPG_CLKMON_USB			(CPG_BASE + 0x0814)
 
-
-#define PFC_BASE				0x10410000
-#define PFC_OEN					(PFC_BASE + 0x3C40)
-#define PFC_PWPR				(PFC_BASE + 0x3C04)
+#define PFC_OEN				(PFC_BASE + 0x3C40)
+#define PFC_PWPR			(PFC_BASE + 0x3C04)
 
 /* USB */
 #define USBPHY20_BASE			(0x15830000)
@@ -73,13 +72,13 @@ DECLARE_GLOBAL_DATA_PTR;
 #define USBPHY20_RESET			(USBPHY20_BASE + 0x000u)
 #define USBPHY21_RESET			(USBPHY21_BASE + 0x000u)
 
-#define USB20_BASE				(0x15800000)
-#define USB21_BASE				(0x15810000)
-#define USBF_BASE				(0x15820000)
+#define USB20_BASE			(0x15800000)
+#define USB21_BASE			(0x15810000)
+#define USBF_BASE			(0x15820000)
 
-#define COMMCTRL				0x800
+#define COMMCTRL			0x800
 #define HcRhDescriptorA			0x048
-#define LPSTS					0x102
+#define LPSTS				0x102
 #define USB2_PHY_UTMICTRL2		0xb04
 #define USB2_PHY_RESET			0x000
 #define USB2_PHY_OTGR			0x600
@@ -205,6 +204,7 @@ static void board_usb_init(void)
 	/* Disable GPIO Write Protect */
 	(*(volatile u32 *)PFC_PWPR) |= (0x1u << 6);
 
+#if CONFIG_TARGET_RZV2H_DEV
 	/* Set P6_0 as Func.15 for VBUSEN */
 	(*(volatile u32 *)PFC_PMC26) |= (0x1u << 0);
 	(*(volatile u32 *)PFC_PFC26) &= ~(0xF << 0);
@@ -228,6 +228,37 @@ static void board_usb_init(void)
 	(*(volatile u32 *)PFC_PFC26) &= ~(0xF << 12);
 	/* Function mode 15 */
 	(*(volatile u32 *)PFC_PFC26) |= (0xF << 12);
+#endif /* CONFIG_TARGET_RZV2H_DEV */
+
+#if CONFIG_TARGET_RZV2H_EVK_ALPHA
+        /* Set P9_5 as Func.14 for VBUSEN */
+        /* Control mode (multiplexed function) */
+        (*(volatile u32 *)PFC_PMC29) |= (0x1u << 5);
+        (*(volatile u32 *)PFC_PFC29) &= ~(0xF << 20);
+        /* Function mode 15 */
+        (*(volatile u32 *)PFC_PFC29) |= (0x0E << 20);
+
+        /* Set P9_6 as Func.14 for OVRCUR */
+        /* Control mode (multiplexed function) */
+        (*(volatile u32 *)PFC_PMC29) |= (0x1u << 6);
+        (*(volatile u32 *)PFC_PFC29) &= ~(0xF << 24);
+        /* Function mode 14 */
+        (*(volatile u32 *)PFC_PFC29) |= (0x0E << 24);
+
+        /* Set P6_6 as Func.14 for VBUSEN */
+        /* Control mode (multiplexed function) */
+         (*(volatile u32 *)PFC_PMC26) |= (0x1u << 6);
+         (*(volatile u32 *)PFC_PFC26) &= ~(0xF << 24);
+        /* Function mode 14 */
+         (*(volatile u32 *)PFC_PFC26) |= (0x0E << 24);
+
+        /* Set P6_7 as Func.14 for OVRCUR */
+        /* Control mode (multiplexed function) */
+        (*(volatile u32 *)PFC_PMC26) |= (0x1u << 7);
+        (*(volatile u32 *)PFC_PFC26) &= ~(0xF << 28);
+        /* Function mode 15 */
+        (*(volatile u32 *)PFC_PFC26) |= (0x0E << 28);
+#endif /* CONFIG_TARGET_RZV2H_EVK_ALPHA */
 
 	/* Enable Write protect */
 	(*(volatile u32 *)PFC_PWPR) &= ~(0x1u << 6);
