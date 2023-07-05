@@ -178,6 +178,7 @@
 		};
 
 		sdhi0: sd@11c00000 {
+			u-boot,dm-spl;
 			compatible = "renesas,sdhi-r9a07g043f";
 			reg = <0 0x11c00000 0 0x10000>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SDHI0>;
@@ -187,6 +188,7 @@
 		};
 
 		sdhi1: sd@11c10000 {
+			u-boot,dm-spl;
 			compatible = "renesas,sdhi-r9a07g043f";
 			reg = <0x0 0x11c10000 0 0x10000>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SDHI1>;
