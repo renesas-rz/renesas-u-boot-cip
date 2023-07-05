@@ -590,11 +590,13 @@ static int sh_sdhi_start_cmd(struct sh_sdhi_host *host,
 		       (unsigned short)((cmd->cmdarg >> 16) & ARG1_MASK));
 
 	timeout = 100000;
-	/* Waiting for SD Bus busy to be cleared */
 	while (timeout--) {
-		if ((sh_sdhi_readw(host, SDHI_INFO2) & 0x2000))
+		if (!(sh_sdhi_readw(host, SDHI_INFO2) & INFO2_CBUSY))
 			break;
 	}
+
+	sh_sdhi_writew(host, SDHI_INFO1, 0);
+	sh_sdhi_writew(host, SDHI_INFO2, 0);
 
 	host->wait_int = 0;
 	sh_sdhi_writew(host, SDHI_INFO1_MASK,
@@ -607,13 +609,11 @@ static int sh_sdhi_start_cmd(struct sh_sdhi_host *host,
 
 	sh_sdhi_writew(host, SDHI_CMD, (unsigned short)(shcmd & CMD_MASK));
 
-	if ((opc == 18) || (opc == 25)) {
-		timeout = 100000;
-		while (timeout--) {
-			if (sh_sdhi_readw(host, SDHI_INFO1) & INFO1_RESP_END)
-				break;
-			udelay(1);
-		}
+	timeout = 100000;
+	while (timeout--) {
+		if (sh_sdhi_readw(host, SDHI_INFO1) & INFO1_RESP_END)
+			break;
+		udelay(1);
 	}
 
 	time = sh_sdhi_wait_interrupt_flag(host);
@@ -658,6 +658,13 @@ static int sh_sdhi_start_cmd(struct sh_sdhi_host *host,
 	debug("ret = %d, resp = %08x, %08x, %08x, %08x\n",
 	      ret, cmd->response[0], cmd->response[1],
 	      cmd->response[2], cmd->response[3]);
+
+	timeout = 100000;
+	while (timeout--) {
+		if (sh_sdhi_readw(host, SDHI_INFO2) & 0x2000)
+			break;
+	}
+
 	return ret;
 }
 
@@ -784,6 +791,7 @@ int sh_sdhi_init(unsigned long addr, int ch, unsigned long quirks)
 	if (!host)
 		return -ENOMEM;
 
+	memset(host, 0, sizeof(struct sh_sdhi_host));
 	mmc = mmc_create(&sh_sdhi_cfg, host);
 	if (!mmc) {
 		ret = -1;
