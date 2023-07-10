@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source extras for U-Boot for the RZV2MA board
+ *
+ * Copyright (C) 2022 Renesas Electronisc Corporation
+ */
+
+#include "r9a09g055ma3gbg-rzv2ma.dts"
+#include "r9a09g055ma3gbg-u-boot.dtsi"
