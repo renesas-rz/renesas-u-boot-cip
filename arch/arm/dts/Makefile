@@ -1118,6 +1118,12 @@ dtb-$(CONFIG_RZA1) += \
 	r7s72100-gr-peach-u-boot.dtb
 
 dtb-$(CONFIG_ARCH_KEYSTONE) += keystone-k2hk-evm.dtb \
+
+dtb-$(CONFIG_RZ_V2M) += \
+	r9a09g011gbg-rzv2m-u-boot.dtb \
+	r9a09g055ma3gbg-rzv2ma-u-boot.dtb
+
+dtb-$(CONFIG_SOC_KEYSTONE) += keystone-k2hk-evm.dtb \
 	keystone-k2l-evm.dtb \
 	keystone-k2e-evm.dtb \
 	keystone-k2g-evm.dtb \
