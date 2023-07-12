@@ -15,15 +15,12 @@
 #define CONFIG_ARMV8_SWITCH_TO_EL1
 
 /* Ethernet RAVB */
-#define CONFIG_BITBANGMII
 #define CONFIG_BITBANGMII_MULTI
 
 /* Generic Timer Definitions (use in assembler source) */
 #define COUNTER_FREQUENCY	24000000	/* 24MHz from CNT_CLK */
 
 /* Environment in eMMC, at the end of 2nd "boot sector" */
-#undef CONFIG_ENV_OFFSET
-#define CONFIG_ENV_OFFSET		(-CONFIG_ENV_SIZE)
 #undef CONFIG_SYS_MMC_ENV_DEV
 #define CONFIG_SYS_MMC_ENV_DEV		1
 #undef CONFIG_SYS_MMC_ENV_PART
@@ -31,7 +28,6 @@
 
 #define CONFIG_REMAKE_ELF
 
-#define CONFIG_ARCH_CPU_INIT
 #undef CONFIG_DISPLAY_CPUINFO
 #define CONFIG_SYS_INIT_SP_ADDR 0x000BFFFC
 
@@ -49,11 +45,7 @@
 
 
 /* ENV setting */
-#undef CONFIG_ENV_SIZE
 #define CONFIG_ENV_SECT_SIZE	(128 * 1024)
-#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
-#define CONFIG_ENV_OVERWRITE
-//#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"ethaddr=02:11:22:33:44:55\0" \
 	"ipaddr=192.168.1.11\0" \
