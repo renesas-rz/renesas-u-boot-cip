@@ -5,4 +5,4 @@
  * Copyright (C) 2018 Marek Vasut <marek.vasut@gmail.com>
  */
 
-#include "r8a779x-u-boot.dtsi"
+#include "rzv2m-rzv2ma-u-boot-extra.dtsi"
