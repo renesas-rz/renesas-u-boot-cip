@@ -144,6 +144,9 @@
 #define RPC_PHYCNT_WBUF		BIT(2)
 #define RPC_PHYCNT_MEM(v)	(((v) & 0x3) << 0)
 
+#define RPC_PHYOFFSET1		0x0080  /* R/W */
+#define RPC_PHYOFFSET1_MASK	BIT(28)
+
 #define RPC_PHYINT		0x0088	/* R/W */
 #define RPC_PHYINT_RSTEN	BIT(18)
 #define RPC_PHYINT_WPEN		BIT(17)
@@ -432,12 +435,19 @@ static int rpc_spi_probe(struct udevice *dev)
 {
 	struct rpc_spi_plat *plat = dev_get_plat(dev);
 	struct rpc_spi_priv *priv = dev_get_priv(dev);
+	u32 value;
 
 	priv->regs = plat->regs;
 	priv->extr = plat->extr;
+
 #if CONFIG_IS_ENABLED(CLK)
 	clk_enable(&priv->clk);
 #endif
+
+	writel(0, priv->regs + RPC_DRDRENR);
+	value = readl(priv->regs + RPC_PHYOFFSET1);
+	writel(value | RPC_PHYOFFSET1_MASK , priv->regs + RPC_PHYOFFSET1);
+
 	return 0;
 }
 
