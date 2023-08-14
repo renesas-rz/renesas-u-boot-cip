@@ -148,6 +148,13 @@ static int do_wakeup_secondary_cpu(struct cmd_tbl *cmdtp, int flag, int argc, ch
     reg &= ( ~TARGET_CORE );    //Enable write access for CP15 secure register
     ca53_write32( OFFSET_REG_CP15SACR, reg );
 
+    reg = ca53_read32( OFFSET_REG_AARCHCR );
+    reg |= ( AARCHCR_AARCH64 << TARGET_CORE );
+    ca53_write32( OFFSET_REG_AARCHCR, reg );
+
+    ca53_write32( OFFSET_REG_RVA1CRL, reset_vector_addr );  //Set reset vector
+    ca53_write32( OFFSET_REG_RVA1CRH, 0x0 );                //Set reset vector
+
     printf("Wakeup for Secondary CPU\n");
 
     /*Assert ca53 core1 processor */
