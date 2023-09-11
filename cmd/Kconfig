@@ -2883,4 +2883,11 @@ config CMD_MESON
 	default y
 	help
 	  Enable useful commands for the Meson Soc family developed by Amlogic Inc.
+
+config CMD_RZG2L_ECC
+	bool "ECC command for RZ/G2L"
+	default n
+	help
+	  Enable the ECC command for Renesas RZ/G2L Series and RZ/Five MPUs.
+
 endmenu
