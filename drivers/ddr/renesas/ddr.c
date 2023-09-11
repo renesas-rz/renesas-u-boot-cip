@@ -8,6 +8,7 @@
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include "ddr_internal.h"
 #include <linux/delay.h>
+#include <asm/io.h>
 
 #define	CEIL(a, div)	(((a) + ((div) - 1)) / (div))
 #define	_MIN(a, b)		((a) < (b) ? (a) : (b))
@@ -45,6 +46,26 @@ static void program_mc2(void);
 extern void cpg_active_ddr(void (*disable_phy)(void));
 extern void cpg_reset_ddr_mc(void);
 
+#ifdef CONFIG_RZF_DDR_ECC
+#define DDR_BASE_ADDRESS	0x40000000
+#define TEST_BIT_NO			0
+#define USER_WORD_DATA		0x5a5a5a5a5a5a5a5a
+#define ECC_ERR_ADDRESS		0x60000000
+static int force_ecc_ce_error(void);
+static void ecc_prog_all0(uint64_t addr_start, uint64_t addr_end);
+static void init_ecc(void);
+char data_synd[] = {
+			0xf4, 0xf1, 0xec, 0xea, 0xe9, 0xe6, 0xe5, 0xe3,
+			0xdc, 0xda, 0xd9, 0xd6, 0xd5, 0xd3, 0xce, 0xcb,
+			0xb5, 0xb0, 0xad, 0xab, 0xa8, 0xa7, 0xa4, 0xa2,
+			0x9d, 0x9b, 0x98, 0x97, 0x94, 0x92, 0x8f, 0x8a,
+			0x75, 0x70, 0x6d, 0x6b, 0x68, 0x67, 0x64, 0x62,
+			0x5e, 0x5b, 0x58, 0x57, 0x54, 0x52, 0x4f, 0x4a,
+			0x34, 0x31, 0x2c, 0x2a, 0x29, 0x26, 0x25, 0x23,
+			0x1c, 0x1a, 0x19, 0x16, 0x15, 0x13, 0x0e, 0x0b
+		  };
+#endif
+
 // main
 void ddr_setup(void)
 {
@@ -53,7 +74,6 @@ void ddr_setup(void)
 	uint8_t		lp_auto_entry_en = 0;
 	uint32_t	tmp;
 	int i;
-
 
 	// Step2 - Step11
 	cpg_active_ddr(disable_phy_clk);
@@ -141,9 +161,49 @@ void ddr_setup(void)
 	program_mc2();
 
 	// Step31 is skipped because ECC is unused.
+#ifdef CONFIG_RZF_DDR_ECC
+	printf("NOTICE:  BL2: ECC MODE: ");
+#ifdef CONFIG_RZF_DDR_ECC_DETECT_CORRECT)
+	printf(" Error Detect and Correct\n");
+#elif CONFIG_RZF_DDR_ECC_DETECT
+	printf(" Error Detect\n");
+#else
+	printf(" Enable\n");
+#endif
+	printf("NOTICE:  BL2: ECC function initializing... ");
+	tmp = read_mc_reg(DENALI_CTL_94);
+	tmp |= (1 << 16);
+	write_mc_reg(DENALI_CTL_94, tmp);
+	mdelay(10);
+
+	init_ecc();
+
+	tmp = read_mc_reg(DENALI_CTL_94);
+	tmp &= ~(1 << 16);
+	write_mc_reg(DENALI_CTL_94, tmp);
+	mdelay(10);
+
+	// Step32
+	// let the auto_exit_en to be value|0x8
+	// recommended value is 0x0
+	tmp = read_mc_reg(DENALI_CTL_60);
+	tmp |= (0x8 << 8);
+	write_mc_reg(DENALI_CTL_60, tmp);
+
+	printf("DONE\n");
+#endif
 
 	// Step32
 	rmw_mc_reg(DDRMC_R006, 0xFFFFFFF0, lp_auto_entry_en & 0xF);
+
+#ifdef CONFIG_RZF_DDR_ECC
+	// Extra step, test ECC CE function
+	printf("NOTICE:  BL2: ECC CE function testing .... ");
+	if (force_ecc_ce_error())
+		printf("FAILED\n");
+	else
+		printf("OK\n");
+#endif
 }
 
 static void disable_phy_clk(void)
@@ -152,6 +212,379 @@ static void disable_phy_clk(void)
 	write_phy_reg(DDRPHY_R77, 0x00000200);
 	write_phy_reg(DDRPHY_R78, 0x00010001);
 }
+
+#ifdef CONFIG_RZF_DDR_ECC
+#ifdef CONFIG_RZF_DDR_ECC_DETECT_CORRECT
+extern void flush_dcache_range(unsigned long start, unsigned long end);
+static int force_ecc_ce_error(void)
+{
+	int ret;
+	uint64_t err_addr;
+	uint64_t *user_word;
+	uint32_t tmp, synd, xor_check_code;
+	uint32_t retry = 0xffffffU;
+	uint32_t bak_DENALI_CTL_94;
+
+	bak_DENALI_CTL_94 = read_mc_reg(DENALI_CTL_94);
+
+	// make checkcode
+	xor_check_code = (data_synd[0] << 8) | 1;
+	user_word = (uint64_t*)ECC_ERR_ADDRESS;
+
+	do{
+		tmp = read_mc_reg(DENALI_CTL_134);
+	} while(tmp & 1);
+
+	tmp = read_mc_reg(DENALI_CTL_94);
+	tmp &= ~((0xff << 8) | 1);
+	tmp |= xor_check_code;
+	write_mc_reg(DENALI_CTL_94, tmp);
+
+	*user_word = USER_WORD_DATA;
+	flush_dcache_range((unsigned long)user_word, sizeof(uint64_t));
+	(*(const volatile uint64_t*)user_word);
+
+	tmp = read_mc_reg(DENALI_CTL_94);
+	tmp &= ~((0xff << 8) | 1);
+	write_mc_reg(DENALI_CTL_94, tmp);
+
+	do {
+		tmp = read_mc_reg(DENALI_CTL_141);
+	} while((retry--) && !(tmp & 0xffffU));
+
+	// out of retry or not CE
+	if (!retry || !(tmp & 0x3)) {
+		ret = -1;
+		goto err;
+	}
+
+	// ack ecc int
+	tmp = 0xffffU;
+	write_mc_reg(DENALI_CTL_149, tmp);
+
+	// check the error address
+	err_addr = (uint64_t)(read_mc_reg(DENALI_CTL_102) & 0x3);
+	err_addr = err_addr << 32;
+	err_addr |= (uint64_t)read_mc_reg(DENALI_CTL_101);
+	err_addr += DDR_BASE_ADDRESS;
+	if (((uint64_t)user_word) != err_addr){
+		ret = -1;
+		goto err;
+	}
+
+	// check error synd
+	synd = read_mc_reg(DENALI_CTL_102);
+	synd = (synd >> 8) & 0xff;
+	if (synd != (xor_check_code >> 8)){
+		ret = -1;
+		goto err;
+	}
+
+	if ((*user_word ^ USER_WORD_DATA) != BIT(TEST_BIT_NO)) {
+		ret = -1;
+		goto err;
+	}
+
+	write_mc_reg(DENALI_CTL_94, bak_DENALI_CTL_94);
+
+	return 0;
+
+err:
+	write_mc_reg(DENALI_CTL_94, bak_DENALI_CTL_94);
+
+	return ret;
+}
+#else
+static int force_ecc_ce_error(void) {return 0;}
+#endif
+
+static void ecc_prog_all0(uint64_t addr_start, uint64_t addr_end)
+{
+	int i;
+	uint32_t val;
+	uint64_t addr, prog_size;
+	uint32_t bak_lp_auto_entry_en, bak_in_order_accept;
+
+	// 1
+	addr = addr_start - DDR_BASE_ADDRESS;
+	prog_size = addr_end - addr_start + 1;
+
+	// 2
+	val = read_mc_reg(DENALI_CTL_60);
+	bak_lp_auto_entry_en = val & 0xf;
+	val &= ~0xf;
+	write_mc_reg(DENALI_CTL_60, val);
+
+	val = read_mc_reg(DENALI_CTL_133);
+	bak_in_order_accept = val & (1 << 16);
+	val |= (1 << 16);
+	write_mc_reg(DENALI_CTL_133, val);
+
+	// 3
+	val = read_mc_reg(DENALI_CTL_85);
+	val |= (1 << 16); // set BIST_DATA_CHECK
+	val &= ~(1 << 24);// unset BIST_ADDR_CHECK
+	write_mc_reg(DENALI_CTL_85, val);
+
+	val = read_mc_reg(DENALI_CTL_89);
+	val &= ~0x7;
+	val |= 0x4;
+	write_mc_reg(DENALI_CTL_89, val);
+
+	val = 0;
+	write_mc_reg(DENALI_CTL_90, val);
+	write_mc_reg(DENALI_CTL_91, val);
+
+	val = read_mc_reg(DENALI_CTL_161);
+	val &= ~(0xff << 16);
+	val |= (1 << 16);
+	write_mc_reg(DENALI_CTL_161, val);
+
+	// 4
+	for (i = 0 ; i < 34 ; i++) {
+		if (((prog_size >> i) & 1) == 1) {
+			val = addr & 0xffffffff;
+			write_mc_reg(DENALI_CTL_86, val);
+
+			val = (addr >> 32) & 0x3;
+			write_mc_reg(DENALI_CTL_87, val);
+
+			val = read_mc_reg(DENALI_CTL_85);
+			val &= ~(0x3f << 8);
+			val |= (i << 8);
+			write_mc_reg(DENALI_CTL_85, val);
+
+			mdelay(10);
+
+			// bit_go=1
+			val = read_mc_reg(DENALI_CTL_84);
+			val |= (1 << 24);
+			write_mc_reg(DENALI_CTL_84, val);
+
+			do {
+				val = read_mc_reg(DENALI_CTL_145);
+			}while(!(val & (1 << 16)));
+
+			// bit_go=0
+			val = read_mc_reg(DENALI_CTL_84);
+			val &= ~(1 << 24);
+			write_mc_reg(DENALI_CTL_84, val);
+
+			val = read_mc_reg(DENALI_CTL_153);
+			val |= (1 << 16);
+			write_mc_reg(DENALI_CTL_153, val);
+
+			do {
+				val = read_mc_reg(DENALI_CTL_145);
+			}while(val & (1 << 16));
+
+			addr += (1 << i);
+		}
+	}
+
+	// 5
+	// ack ecc int
+	val = 0xffffU;
+	write_mc_reg(DENALI_CTL_149, val);
+
+	// wait unitl the ecc int clear
+	do{
+		val = read_mc_reg(DENALI_CTL_141);
+	}while(val & 0xffffU);
+
+	// 6
+	val = read_mc_reg(DENALI_CTL_161);
+	val &= ~(0xff << 16);
+	write_mc_reg(DENALI_CTL_161, val);
+
+	val = read_mc_reg(DENALI_CTL_85);
+	val &= ~(1 << 16); // unset BIST_DATA_CHECK
+	write_mc_reg(DENALI_CTL_85, val);
+
+	// 7
+	val = read_mc_reg(DENALI_CTL_60);
+	val &= ~0xf;
+	val |= bak_lp_auto_entry_en;
+	write_mc_reg(DENALI_CTL_60, val);
+
+	val = read_mc_reg(DENALI_CTL_133);
+	val &= ~(1 << 16);
+	val |= bak_in_order_accept;
+	write_mc_reg(DENALI_CTL_133, val);
+}
+
+// follow DDRTOP_ApplicationNote_Rev01.14.excel
+// capter SubProc->Init0_ECC
+static void init_ecc(void)
+{
+	uint64_t addr_start, addr_end;
+	uint32_t cs_val_upper, val;
+
+	// 1. check DDR3/DDR3L/DDR4
+	val = read_mc_reg(DENALI_CTL_413);
+	val = (val >> 16) & 0xF;
+	if (val == 2)
+		addr_start = DDR_BASE_ADDRESS + 0x40;
+	else
+		addr_start = DDR_BASE_ADDRESS + 0x20;
+
+	// 2
+	cs_val_upper = read_mc_reg(DENALI_CTL_124);
+	cs_val_upper = (cs_val_upper >> 16) & 0xffffU;
+	val = read_mc_reg(DENALI_CTL_132);
+	val = (val >> 16) & 0x3;
+	if (val == 0x3) {
+		val = read_mc_reg(DENALI_CTL_126);
+		val = (val >> 16) & 0xffffU;
+		if (val > cs_val_upper) {
+			cs_val_upper = val;
+		}
+	}
+	addr_end = (uint64_t)(((cs_val_upper + 1) << 18) - 1) + DDR_BASE_ADDRESS;
+
+	// 3
+	// ECC_DISABLE_W_UC_ERR <= 1
+	val = read_mc_reg(DENALI_CTL_94);
+	val |= (1 << 16);
+	write_mc_reg(DENALI_CTL_94, val);
+
+	// mask ECC interrupt
+	val = read_mc_reg(DENALI_CTL_157);
+	val &= ~0xffffU;
+	val |= 0x1CF;
+	write_mc_reg(DENALI_CTL_157, val);
+
+	// 4. wait for 10 regACLK
+	mdelay(10);
+
+	// 5.prog_all0
+	ecc_prog_all0(addr_start, addr_end);
+
+	// 6.
+	// unmask ECC interrupt
+	val = read_mc_reg(DENALI_CTL_157);
+	val &= ~0xffffU;
+	write_mc_reg(DENALI_CTL_157, val);
+
+	// ack ECC interrupt
+	val = read_mc_reg(DENALI_CTL_149);
+	val |= 0x1CF;
+	write_mc_reg(DENALI_CTL_149, val);
+
+	// ECC_DISABLE_W_UC_ERR = 0
+	val = read_mc_reg(DENALI_CTL_94);
+	val &= ~(1 << 16);
+	write_mc_reg(DENALI_CTL_94, val);
+	mdelay(10);
+}
+
+static void program_mc1_ecc_en(void)
+{
+	uint32_t tmp;
+	uint16_t addr_diff[2], cs_size[2], cs_val_lower[2], row_start_val[2];
+	int i, maxrow_cs;
+
+	tmp = read_mc_reg(DENALI_CTL_93);
+	tmp &= ~(0x3 << 24);
+#ifdef CONFIG_RZF_DDR_ECC_DETECT_CORRECT
+	tmp |= (0x3 << 24);
+#elif CONFIG_RZF_DDR_ECC_DETECT
+	tmp |= (0x2 << 24);
+#else
+	tmp |= (1 << 24);
+#endif
+	write_mc_reg(DENALI_CTL_93, tmp);
+
+	tmp = read_mc_reg(DENALI_CTL_129);
+	tmp &= ~(0x1 << 8);
+	tmp |= (0x1 << 8);
+	write_mc_reg(DENALI_CTL_129, tmp);
+
+	tmp = read_mc_reg(DENALI_CTL_132);
+	tmp &= ~0x1;
+	write_mc_reg(DENALI_CTL_132, tmp);
+
+	tmp = read_mc_reg(DENALI_CTL_133);
+	tmp &= ~(0x1 << 16);
+	tmp |= (0x1 << 16);
+	write_mc_reg(DENALI_CTL_133, tmp);
+
+	tmp = read_mc_reg(DENALI_CTL_131);
+	tmp &= ~(0x1 << 24);
+	write_mc_reg(DENALI_CTL_131, tmp);
+
+	tmp = read_mc_reg(DENALI_CTL_122);
+	addr_diff[0] = (uint16_t)((tmp >> 8) & 0x3);
+	tmp = read_mc_reg(DENALI_CTL_123);
+	addr_diff[0] += (uint16_t)((tmp >> 8) & 0xf);
+	tmp = read_mc_reg(DENALI_CTL_122);
+	addr_diff[0] += (uint16_t)((tmp >> 24) & 0x7);
+
+	tmp = read_mc_reg(DENALI_CTL_122);
+	addr_diff[1] = (uint16_t)((tmp >> 16) & 0x3);
+	tmp = read_mc_reg(DENALI_CTL_123);
+	addr_diff[1] += (uint16_t)((tmp>> 16) & 0xf);
+	tmp = read_mc_reg(DENALI_CTL_123);
+	addr_diff[1] += (uint16_t)(tmp & 0x7);
+
+	for (i = 0; i < 2; i++) {
+		cs_size[i] = (0xDFFF >> 1) >> addr_diff[i];
+	}
+	if (cs_size[0] >= cs_size[1]) {
+		maxrow_cs = 0;
+	} else {
+		maxrow_cs = 1;
+	}
+
+	cs_val_lower[maxrow_cs] = 0x0000;
+	cs_val_lower[(maxrow_cs + 1) % 2] = cs_val_lower[maxrow_cs] + cs_size[maxrow_cs] + 1;
+
+	tmp = read_mc_reg(DENALI_CTL_124);
+	tmp &= ~0xffffU;
+	tmp |= (cs_val_lower[0] & 0xffffU);
+	write_mc_reg(DENALI_CTL_124, tmp);
+
+	tmp = read_mc_reg(DENALI_CTL_124);
+	tmp &= ~(0xffffU << 16);
+	tmp |= ((cs_val_lower[0] + cs_size[0]) << 16);
+	write_mc_reg(DENALI_CTL_124, tmp);
+
+	tmp = read_mc_reg(DENALI_CTL_132);
+	tmp = (tmp >> 16) & 0x3;
+	if (tmp == 0x3) {
+		tmp = read_mc_reg(DENALI_CTL_126);
+		tmp &= ~(0xffffU);
+		tmp |= (cs_val_lower[1] & 0xffffU);
+		write_mc_reg(DENALI_CTL_126, tmp);
+
+		tmp = read_mc_reg(DENALI_CTL_126);
+		tmp &= ~(0xffffU << 16);
+		tmp |= ((cs_val_lower[1] + cs_size[1]) << 16);
+		write_mc_reg(DENALI_CTL_126, tmp);
+	}
+	row_start_val[maxrow_cs] = 0x0;
+	i = (maxrow_cs + 1) % 2;
+	if (cs_size[i] == cs_size[maxrow_cs]) {
+		row_start_val[i] = 0x1;
+	} else if (cs_size[i] == (cs_size[maxrow_cs] >> 1)) {
+		row_start_val[i] = 0x2;
+	} else if (cs_size[i] == (cs_size[maxrow_cs] >> 2)) {
+		row_start_val[i] = 0x4;
+	} else {
+		row_start_val[i] = 0x0;
+	}
+
+	tmp = read_mc_reg(DENALI_CTL_125);
+	tmp &= ~0x7;
+	tmp |= (row_start_val[0] & 0x7);
+	write_mc_reg(DENALI_CTL_125, tmp);
+
+	tmp = read_mc_reg(DENALI_CTL_127);
+	tmp &= ~0x7;
+	tmp |= (row_start_val[1] & 0x7);
+	write_mc_reg(DENALI_CTL_127, tmp);
+}
+#endif
 
 static void program_mc1(uint8_t *lp_auto_entry_en)
 {
@@ -194,7 +627,10 @@ static void program_mc1(uint8_t *lp_auto_entry_en)
 		write_mc_reg(mc_phy_settings_tbl[i][0], mc_phy_settings_tbl[i][1]);
 	}
 
-	// Step8 is skipped because ECC is unused.
+#ifdef CONFIG_RZF_DDR_ECC
+	// Step8, Enable ECC if needed.
+	program_mc1_ecc_en();
+#endif
 }
 
 static void program_phy1(uint32_t sl_lanes, uint32_t byte_lanes)

@@ -37,4 +37,23 @@ config RZF_DDR_SIZE
 	hex "DDR RAM size"
 	default 0x40000000
 
+config RZF_DDR_ECC
+	bool "DDR ECC support for rzfive"
+	default n
+
+choice
+	prompt "Select DDR ECC support"
+	depends on RZF_DDR_ECC
+	default RZF_DDR_ECC_ENABLE
+
+config RZF_DDR_ECC_ENABLE
+	bool "Enable DDR ECC only"
+
+config RZF_DDR_ECC_DETECT
+	bool "Add error detection support"
+
+config RZF_DDR_ECC_DETECT_CORRECT
+	bool "Add error detection and auto correct support"
+endchoice
+
 endif
