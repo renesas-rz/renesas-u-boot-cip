@@ -15,6 +15,10 @@
 
 static u32 renesas_get_prr(void)
 {
+	#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G043U)
+		return 0;
+	#endif
+
 	if (IS_ENABLED(CONFIG_RCAR_64))
 		return readl(0xFFF00044);
 
