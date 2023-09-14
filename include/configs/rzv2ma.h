@@ -55,13 +55,13 @@
 	"loadaddr=0x000080000\0" \
 	"fdt_addr=0x000000000\0" \
 	"fdt_high=0x028000000\0" \
-	"fdt_file=r9a09g055ma3gbg-evaluation-board.dtb\0" \
-	"kernel=Image-rzv2ma.bin\0" \
+	"fdt_file=r9a09g055-v2maevk2.dtb\0" \
+	"kernel=Image\0" \
 	"core1addr=0x0\0" \
 	"core1_vector=0x0\0" \
 	"bootargs_sd=setenv bootargs root=/dev/mmcblk0p2 rootwait rootfstype=ext4 rw\0" \
 	"bootsd=run bootargs_sd;" \
-	"fatload mmc 0:1 ${loadaddr} ${kernel};fatload mmc 0:1 ${fdt_addr} ${fdt_file};booti ${loadaddr} - ${fdt_addr}\0" \
+	"ext4load mmc 0:2 ${loadaddr} boot/${kernel};ext4load mmc 0:2 ${fdt_addr} boot/${fdt_file};booti ${loadaddr} - ${fdt_addr}\0" \
 	"bootargs_nfs=setenv bootargs root=/dev/nfs rw nfsroot=${serverip}:/nfs/rzv2m,nfsvers=3 ip=${ipaddr}:${serverip}::${netmask}:rzv2m:eth0\0" \
 	"bootnfs=run bootargs_nfs;" \
 	"tftp ${loadaddr} ${kernel};tftp ${fdt_addr} ${fdt_file};booti ${loadaddr} - ${fdt_addr}\0" \
