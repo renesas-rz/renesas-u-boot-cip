@@ -97,11 +97,21 @@ void reset_cpu(void)
 
 int board_late_init(void)
 {
+	struct udevice *dev;
+	const u8 clock_gen_i2c_bus = 0;
+	const u8 clock_gen_addr = 0x68;
+	int ret;
+
 #ifdef CONFIG_WDT_RENESAS
 	reinitr_wdt();
 #endif
 
 	env_set("board_rev", &board_rev);
+
+	ret = i2c_get_chip_for_busnum(clock_gen_i2c_bus, clock_gen_addr, 1,
+				      &dev);
+	if (!ret)
+		dm_i2c_write(dev, 0x81, 0x4, 1);
 
 	return 0;
 }
