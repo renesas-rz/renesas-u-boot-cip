@@ -25,6 +25,11 @@
 /* WDT */
 #define WDT_INDEX		0
 
+__weak int wdt_expire_now(struct udevice *dev, ulong flags)
+{
+	return 0;
+}
+
 extern void cpg_setup(void);
 extern void pfc_setup(void);
 extern void ddr_setup(void);
