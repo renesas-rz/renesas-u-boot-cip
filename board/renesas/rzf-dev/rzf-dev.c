@@ -9,6 +9,7 @@
 #include <dm.h>
 #include <asm/sections.h>
 #include <asm/arch/sh_sdhi.h>
+#include <asm/sbi.h>
 #include <mmc.h>
 #include <i2c.h>
 #include <hang.h>
@@ -121,6 +122,7 @@ int board_early_init_f(void)
 int board_init(void)
 {
 #if CONFIG_TARGET_SMARC_RZF
+	struct sbiret sret;
 	struct udevice *dev;
 	struct udevice *bus;
 	const u8 pmic_bus = 0;
@@ -148,6 +150,7 @@ int board_init(void)
 		*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_3_3;
 	}
 	udelay(10);
+	sret = sbi_ecall(0x900031e, 2, 0, 0, 0, 0, 0, 0);
 #endif
 	return 0;
 }

@@ -44,6 +44,9 @@ static u32 status_bit_offset = 0x4;
 
 /* Control Register */
 #define L2_ENABLE	0x1
+/*PFTHRES*/
+#define PFTHRES_OFF	0x1
+#define PFTHRES_MSK	(3 << PFTHRES_OFF)
 /* prefetch */
 #define IPREPETCH_OFF	3
 #define DPREPETCH_OFF	5
@@ -156,6 +159,12 @@ static int v5l2_probe(struct udevice *dev)
 
 	ctl_val |= L2_ENABLE;
 
+	ctl_val &= ~L2_ENABLE;
+
+#if 0
+	ctl_val &= ~(PFTHRES_MSK);
+	ctl_val |= (0x3 << PFTHRES_OFF);
+#endif
 	if (plat->iprefetch != -EINVAL) {
 		ctl_val &= ~(IPREPETCH_MSK);
 		ctl_val |= (plat->iprefetch << IPREPETCH_OFF);
