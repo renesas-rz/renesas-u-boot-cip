@@ -8,6 +8,7 @@
 
 #include <common.h>
 #include <env.h>
+#include <i2c.h>
 #include <asm/global_data.h>
 #include <asm/arch/rmobile.h>
 #include <asm/io.h>
@@ -100,6 +101,7 @@ int board_late_init(void)
 	struct udevice *dev;
 	const u8 clock_gen_i2c_bus = 0;
 	const u8 clock_gen_addr = 0x68;
+	const u8 amp = 0x4;
 	int ret;
 
 #ifdef CONFIG_WDT_RENESAS
@@ -111,7 +113,7 @@ int board_late_init(void)
 	ret = i2c_get_chip_for_busnum(clock_gen_i2c_bus, clock_gen_addr, 1,
 				      &dev);
 	if (!ret)
-		dm_i2c_write(dev, 0x81, 0x4, 1);
+		dm_i2c_write(dev, 0x81, &amp, 1);
 
 	return 0;
 }
