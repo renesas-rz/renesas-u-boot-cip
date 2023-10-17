@@ -20,6 +20,7 @@
 #include <linux/delay.h>
 #include <linux/libfdt.h>
 #include <renesas_wdt.h>
+#include <i2c.h>
 
 #include "../../renesas/rzg-common/common.h"
 
@@ -201,11 +202,22 @@ int board_fit_config_name_match(const char *name)
 
 int board_late_init(void)
 {
+	struct udevice *dev;
+	const u8 clock_gen_i2c_bus = 4;
+	const u8 clock_gen_addr = 0x68;
+	const u8 amp = 0x7;
+	int ret;
+
 #ifdef CONFIG_WDT_RENESAS
 	reinitr_wdt();
 #endif
 
 	env_set_hex("board_rev", board_rev);
+
+	ret = i2c_get_chip_for_busnum(clock_gen_i2c_bus, clock_gen_addr, 1,
+			      &dev);
+	if (!ret)
+		dm_i2c_write(dev, 0x81, &amp, 1);
 
 	return 0;
 }
