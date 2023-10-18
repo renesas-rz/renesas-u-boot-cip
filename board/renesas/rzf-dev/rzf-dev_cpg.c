@@ -44,6 +44,10 @@ typedef struct {
 	CPG_REG_SETTING		stby_dat;
 } CPG_PLL_SETDATA_235;
 
+static CPG_PLL_SETDATA_146 cpg_pll1_setdata = {
+	{ CPG_PLL1_STBY, 0x00050001 },
+};
+
 static CPG_PLL_SETDATA_146 cpg_pll4_setdata = {
 #if (CONFIG_RZF_DDR_PLL4 ==1600)
 	{ CPG_PLL4_CLK1, 0xFAE13203 },
@@ -519,6 +523,9 @@ static void cpg_pll_setup(void)
 		val = mmio_read_32(CPG_PLL6_MON);
 	} while ((val & (PLL6_MON_PLL6_RESETB | PLL6_MON_PLL6_LOCK)) != 0);
 #endif
+
+	/* Set PLL1 to normal mode */
+	cpg_pll_start_146(&cpg_pll1_setdata);
 
 	/* Set PLL4 to normal mode */
 	cpg_pll_start_146(&cpg_pll4_setdata);
