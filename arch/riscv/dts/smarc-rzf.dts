@@ -118,6 +118,14 @@
 	};
 };
 
+&ehci0 {
+	status = "okay";
+};
+
+&ehci1 {
+	status = "okay";
+};
+
 &wdt0 {
 	status = "okay";
 	timeout-sec = <60>;

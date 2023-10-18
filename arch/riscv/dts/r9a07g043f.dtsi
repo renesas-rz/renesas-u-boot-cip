@@ -280,8 +280,6 @@
 			reg = <0 0x11c50000 0 0x100>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_USB0>;
 			resets = <&cpg R9A07G043F_CLK_USB0>;
-			phys = <&usb2_phy0>;
-			phy-names = "usb";
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
@@ -293,8 +291,6 @@
 			companion= <&ohci0>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_USB0>;
 			resets = <&cpg R9A07G043F_CLK_USB0>;
-			phys = <&usb2_phy0>;
-			phy-names = "usb";
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
@@ -305,8 +301,6 @@
 			reg = <0 0x11c70000 0 0x100>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_USB1>;
 			resets = <&cpg R9A07G043F_CLK_USB1>;
-			phys = <&usb2_phy1>;
-			phy-names = "usb";
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
@@ -317,8 +311,6 @@
 			reg = <0 0x11c70100 0 0x100>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_USB1>;
 			resets = <&cpg R9A07G043F_CLK_USB1>;
-			phys = <&usb2_phy1>;
-			phy-names = "usb";
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
