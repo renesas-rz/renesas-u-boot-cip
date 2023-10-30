@@ -16,9 +16,13 @@
 #include <renesas/rzf-dev/mmio.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_sys.h>
+#include <renesas/rzf-dev/rzf-dev_sys_regs.h>
 #include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
 #include <renesas/rzf-dev/rzf-dev_cpg_regs.h>
 #include "rzf-dev_spi_multi.h"
+#include "tzc400.h"
+#include "tzc_common.h"
+#include "plat_tzc_def.h"
 
 extern void cpg_setup(void);
 extern void pfc_setup(void);
@@ -205,6 +209,107 @@ u32 spl_boot_device(void)
 
 
 #ifdef CONFIG_SPL_BUILD
+
+typedef struct arm_tzc_regions_info {
+	unsigned long long base;
+	unsigned long long end;
+	unsigned int sec_attr;
+	unsigned int nsaid_permissions;
+} arm_tzc_regions_info_t;
+
+static const struct {
+	uint32_t reg;
+	uint32_t msk;
+	uint32_t val;
+} sys_acctl[] = {
+	/* Master Access Control Register */
+	{SYS_MSTACCCTL0,  0x000000BBU, 0x0000AA88U},
+	{SYS_MSTACCCTL1,  0xBBBBBBBBU, 0xAAAAAAAAU},
+	{SYS_MSTACCCTL2,  0x00BBBBBBU, 0x00AAAAAAU},
+	/* Slave Access Control Register */
+	{SYS_SLVACCCTL0,  0x0000000FU, 0x00000008U},
+	{SYS_SLVACCCTL1,  0x3CFFFCFFU, 0x0U},
+	{SYS_SLVACCCTL2,  0xC3C0FF, 0x0U},
+	{SYS_SLVACCCTL3,  0x3FFF0000U, 0x0U},
+	{SYS_SLVACCCTL4,  0xFFFF0FFFU, 0x00000000U},
+	{SYS_SLVACCCTL5,  0x00000033U, 0x00000000U},
+	{SYS_SLVACCCTL6,  0x0000000FU, 0x00000000U},
+	{SYS_SLVACCCTL7,  0x0000000CU, 0x0U},
+	{SYS_SLVACCCTL8,  0x00000030U, 0x00000000U},
+	{SYS_SLVACCCTL10, 0x00000003U, 0x00000000U},
+	{SYS_SLVACCCTL12, 0x00000003U, 0x00000000U},
+	{SYS_SLVACCCTL13, 0x00000003U, 0x00000000U},
+	{SYS_SLVACCCTL14, 0x00000003U, 0x00000000U},
+};
+
+static void plat_access_control_setup(void)
+{
+	uint32_t i;
+
+	for (i = 0; i < ARRAY_SIZE(sys_acctl); i++)
+	{
+		uint32_t val = mmio_read_32(sys_acctl[i].reg) & (~sys_acctl[i].msk);
+		val |= (sys_acctl[i].val & sys_acctl[i].msk);
+		mmio_write_32(sys_acctl[i].reg, val);
+	}
+}
+
+static uint8_t tzc400_get_num_filters(uintptr_t tzc_base)
+{
+	uint32_t tzc400_build;
+
+	tzc400_build = mmio_read_32(tzc_base + BUILD_CONFIG_OFF);
+
+	printf("%s CFG: %x\n", __func__, tzc400_build);
+	return (uint8_t)((tzc400_build >> BUILD_CONFIG_NF_SHIFT) & BUILD_CONFIG_NF_MASK) + 1U;
+}
+
+static void plat_tzc400_setup(uintptr_t tzc_base, const arm_tzc_regions_info_t *tzc_regions)
+{
+	uint8_t num_filters;
+	unsigned int region_index = 1U;
+	const arm_tzc_regions_info_t *p;
+	const arm_tzc_regions_info_t init_tzc_regions[] = {
+		{0}
+	};
+
+	tzc400_init(tzc_base);
+
+	tzc400_disable_filters();
+
+	tzc400_configure_region0(TZC_REGION_S_RDWR, PLAT_TZC_REGION_ACCESS_NS_UNPRIV);
+
+	if (tzc_regions == NULL)
+		p = init_tzc_regions;
+	else
+		p = tzc_regions;
+
+	num_filters = tzc400_get_num_filters(tzc_base);
+
+	for (; p->base != 0UL; p++) {
+		tzc400_configure_region((1 << num_filters) - 1, region_index,
+			p->base, p->end, p->sec_attr, p->nsaid_permissions);
+		region_index++;
+	}
+
+	tzc400_set_action(TZC_ACTION_ERR);
+
+	tzc400_enable_filters();
+}
+
+static void bl2_security_setup(void)
+{
+// 	const arm_tzc_regions_info_t ddr_tzc_regions[] = {
+// 		{}
+// 	};
+// 
+// 	/* initialize TZC-400 */
+// 	plat_tzc400_setup(RZF_TZC_DDR_BASE, &ddr_tzc_regions[0]);
+
+	/* setup Master/Slave Access Control */
+	plat_access_control_setup();
+}
+
 void spl_early_board_init_f(void)
 {
 	/* setup PFC */
@@ -241,6 +346,8 @@ void board_init_f(ulong dummy)
 	int ret;
 
 	cpu_cpg_setup();
+
+	bl2_security_setup();
 
 	/* Initialize SPL*/
 	ret = spl_early_init();

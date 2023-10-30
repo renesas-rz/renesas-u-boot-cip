@@ -106,17 +106,17 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x00030000,
 		CPG_T_CLK
 	},
+	{               /* SYSC */
+		(uintptr_t)CPG_CLKON_SYSC,
+		(uintptr_t)CPG_CLKMON_SYSC,
+		0x00020002,
+		CPG_T_CLK
+	},
 #else
 	{		/* DDR */
 		(uintptr_t)CPG_CLKON_DDR,
 		(uintptr_t)CPG_CLKMON_DDR,
 		0x00030003,
-		CPG_T_CLK
-	},
-	{		/* SYSC */
-		(uintptr_t)CPG_CLKON_SYSC,
-		(uintptr_t)CPG_CLKMON_SYSC,
-		0x00010001,
 		CPG_T_CLK
 	},
 #endif
@@ -247,7 +247,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 	{		/* DDR */
 		(uintptr_t)CPG_RST_DDR,
 		(uintptr_t)CPG_RSTMON_DDR,
-	    0x004F0000,
+		0x007F0000,
 		CPG_T_RST
 	},
 #else
@@ -268,7 +268,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 	{		/* SPI_MULTI */
 		(uintptr_t)CPG_RST_SPI,
 		(uintptr_t)CPG_RSTMON_SPI,
-		0x00030003,
+		0x00010001,
 		CPG_T_RST
 	},
 	{		/* SDHI */
