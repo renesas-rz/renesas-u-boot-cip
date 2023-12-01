@@ -21,6 +21,7 @@
 #include "common.h"
 #include "rcar3.h"
 #include <asm/io.h>
+#include "rza.h"
 
 /*
  *		image of renesas_usbhs
@@ -160,6 +161,13 @@ void usbhs_sys_function_ctrl(struct usbhs_priv *priv, int enable)
 	u16 mask = DCFM | DRPD | DPRPU | HSE | USBE;
 	u16 val  = HSE | USBE;
 
+	/* CNEN bit is required for function operation */
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+	if (usbhs_get_dparam(priv, has_cnen)) {
+		mask |= CNEN;
+		val  |= CNEN;
+	}
+#endif
 	/*
 	 * if enable
 	 *
@@ -458,7 +466,11 @@ static int usbhsc_drvcllbck_notify_hotplug(struct platform_device *pdev)
  */
 
 
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+#define USBHS_BASE      0x11c60000
+#else /* !defined(CONFIG_R9A07G044L) */
 #define USBHS_BASE	0xe6590000
+#endif
 int usbhs_probe(struct platform_device *pdev)
 {
 	struct usbhs_priv *priv;
@@ -480,11 +492,23 @@ int usbhs_probe(struct platform_device *pdev)
 	 * care platform info
 	 */
 	pr_dbg("priv->dparam.type = %ld\n", priv->dparam.type);
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+	priv->dparam.type = USBHS_TYPE_G2L;
+#else /* !defined(CONFIG_R9A07G044L) */
 	priv->dparam.type = USBHS_TYPE_RCAR_GEN3;
+#endif
 
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+	priv->pfunc = usbhs_g2l_ops;
+#else /* !defined(CONFIG_R9A07G044L) */
 	priv->pfunc = usbhs_rcar3_ops;
+#endif
 	if (!priv->dparam.pipe_configs) {
 		priv->dparam.pipe_configs = usbhsc_new_pipe;
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+		priv->dparam.has_cnen = 1;
+		priv->dparam.cfifo_byte_addr = 1;
+#endif
 		priv->dparam.pipe_size = ARRAY_SIZE(usbhsc_new_pipe);
 	}
 
@@ -499,6 +523,14 @@ int usbhs_probe(struct platform_device *pdev)
 	 */
 	priv->pdev	= pdev;
 	spin_lock_init(usbhs_priv_to_lock(priv));
+
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+	/* Fix fifo selection error */
+	if (priv->pfunc.power_ctrl) {
+		platform_set_drvdata(pdev, priv);
+		usbhsc_power_ctrl(priv, 1);
+	}
+#endif
 
 	/* call pipe and module init */
 	ret = usbhs_pipe_probe(priv);

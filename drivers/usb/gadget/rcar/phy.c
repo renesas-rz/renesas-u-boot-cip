@@ -157,6 +157,13 @@ static void rcar_gen3_device_recognition(struct rcar_gen3_chan *ch)
 	if (rcar_gen3_check_id(ch) && rcar_gen3_check_vbus(ch))
 		is_host = false;
 
+	/* FIXME: RZ/G2L does NOT have vbus control.
+	 * So the checking always return host mode.
+	 * We only use peripheral mode. So we just force
+	 * set is_host to false */
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+	is_host = false;
+#endif
 	if (is_host)
 		rcar_gen3_init_for_host(ch);
 	else
