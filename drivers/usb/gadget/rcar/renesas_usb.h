@@ -44,6 +44,33 @@ typedef unsigned long uintptr_t;
 #define pr_dbg(...)  do{}while(0)
 #endif
 
+/* avoid conflict with <dm/device.h> */
+#ifdef dev_dbg
+#undef dev_dbg
+#endif
+#ifdef dev_vdbg
+#undef dev_vdbg
+#endif
+#ifdef dev_info
+#undef dev_info
+#endif
+#ifdef dev_err
+#undef dev_err
+#endif
+#ifdef dev_warn
+#undef dev_warn
+#endif
+
+#define dev_dbg(dev, fmt, args...)		\
+	debug(fmt, ##args)
+#define dev_vdbg(dev, fmt, args...)		\
+	debug(fmt, ##args)
+#define dev_info(dev, fmt, args...)		\
+	printf(fmt, ##args)
+#define dev_err(dev, fmt, args...)		\
+	printf(fmt, ##args)
+#define dev_warn(dev, fmt, args...)		\
+	printf(fmt, ##args)
 
 #define iowrite32_rep __raw_writesl
 #define ioread32_rep __raw_readsl
@@ -232,11 +259,18 @@ struct renesas_usbhs_driver_param {
 	u32 has_otg:1; /* for controlling PWEN/EXTLP */
 	u32 has_sudmac:1; /* for SUDMAC */
 	u32 has_usb_dmac:1; /* for USB-DMAC */
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+	u32 has_cnen:1;
+	u32 cfifo_byte_addr:1;	/* CFIFO is byte addressable */
+#endif
 #define USBHS_USB_DMAC_XFER_SIZE	32	/* hardcode the xfer size */
 };
 
 #define USBHS_TYPE_RCAR_GEN2	1
 #define USBHS_TYPE_RCAR_GEN3	2
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+#define USBHS_TYPE_G2L		5
+#endif
 
 /*
  * option:
@@ -398,10 +432,17 @@ static inline void *phy_get_drvdata(struct phy *phy)
 	})
 
 
+#if defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A07G054L)
+#define PHY_BASE	0x11c50200
+#define RCAR3_PHY_DEVICE "RZG2L-PHY "
+#define USBHS_BASE	0x11c60000
+#define RCAR3_USBHS_DEVICE "RZG2L-USBHS "
+#else /* !defined(CONFIG_R9A07G044L) */
 #define PHY_BASE	0xee080200
 #define RCAR3_PHY_DEVICE "R-CAR3-PHY "
 #define USBHS_BASE	0xe6590000
 #define RCAR3_USBHS_DEVICE "R-CAR3-USBHS "
+#endif
 
 
 typedef irqreturn_t (*irq_handler_t)(int, void *);

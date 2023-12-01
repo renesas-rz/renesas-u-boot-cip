@@ -21,6 +21,8 @@
 #define RENESAS_USB_DRIVER_H
 
 #include "renesas_usb.h"
+#include <linux/delay.h>
+#include <linux/bug.h>
 
 struct usbhs_priv;
 
@@ -108,9 +110,13 @@ struct usbhs_priv;
 #define D2FIFOCTR	0x00F2	/* for R-Car Gen2 */
 #define D3FIFOSEL	0x00F4	/* for R-Car Gen2 */
 #define D3FIFOCTR	0x00F6	/* for R-Car Gen2 */
+#define SUSPMODE	0x0102  /* for RZ/A */
+/* SUSPMODE */
+#define SUSPM		(1 << 14)	/* SuspendM Control */
 
 /* SYSCFG */
 #define SCKE	(1 << 10)	/* USB Module Clock Enable */
+#define CNEN	(1 << 8)	/* Single-ended receiver operation Enable */
 #define HSE	(1 << 7)	/* High-Speed Operation Enable */
 #define DCFM	(1 << 6)	/* Controller Function Select */
 #define DRPD	(1 << 5)	/* D+ Line/D- Line Resistance Control */
