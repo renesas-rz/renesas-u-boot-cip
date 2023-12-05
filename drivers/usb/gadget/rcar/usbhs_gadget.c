@@ -86,7 +86,7 @@ int usb_gadget_register_driver(struct usb_gadget_driver *driver)
 	}
 
 	/*Register phy driver*/
-#if !defined(CONFIG_R9A07G044L) || !defined(CONFIG_R9A07G044C) || !defined(CONFIG_R9A07G043U) || !defined(CONFIG_R9A07G054L)
+#if !defined(CONFIG_R9A07G044L) || !defined(CONFIG_R9A07G044C) || !defined(CONFIG_R9A07G043U) || !defined(CONFIG_R9A07G054L) || !defined(CONFIG_ARCH_RZMPU)
 	ret = usbhs_lowlevel_init(USB_DEVICE_PORT, USB_INIT_DEVICE);
 	if (ret == -ENODEV) {	/* No such device. */
 		puts("Port not available.\n");
