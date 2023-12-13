@@ -14,6 +14,14 @@
 	model = "Renesas Development EVK based on r9a09g047e54";
 	compatible = "renesas,r9a09g047e54-dev", "renesas,r9a09g047e54", "renesas,r9a09g047";
 
+	aliases {
+		serial0 = &scif0;
+	};
+
+        chosen {
+                stdout-path = "serial0:115200n8";
+        };
+
 	memory@48000000 {
 		device_type = "memory";
 		/* first 128MB is reserved for secure area. */
@@ -36,4 +44,9 @@
 
 &extal_clk {
 	clock-frequency = <24000000>;
+};
+
+&scif0 {
+
+	status = "okay";
 };
