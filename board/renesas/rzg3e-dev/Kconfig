@@ -1,0 +1,31 @@
+if TARGET_RZG3E_DEV
+
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "rzg3e-dev"
+
+config SYS_VENDOR
+	default "renesas"
+
+config SYS_CONFIG_NAME
+	default "rzg3e-dev"
+
+endif
+
+if TARGET_SMARC_RZG3E
+
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "rzg3e-dev"
+
+config SYS_VENDOR
+	default "renesas"
+
+config SYS_CONFIG_NAME
+	default "smarc-rzg3e"
+
+endif
