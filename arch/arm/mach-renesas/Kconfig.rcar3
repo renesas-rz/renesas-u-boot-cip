@@ -85,6 +85,9 @@ config R9A07G054L
 config R9A07G043U
 	bool "Renesas SoC RZ/G2UL"
 
+config R9A09G047
+	bool "Renesas SoC RZ/G3E"
+
 config R9A09G057
 	bool "Renesas SoC RZ/V2H"
 
@@ -243,6 +246,11 @@ config TARGET_RZV2H_EVK_ALPHA
 	help
           Support for Renesas RZ/V2H Dev Platform
 
+config TARGET_RZG3E_DEV
+	bool "RZ/G3E Dev board"
+	help
+          Support for Renesas RZ/G3E Dev Platform
+
 endchoice
 
 source "board/renesas/condor/Kconfig"
@@ -261,6 +269,7 @@ source "board/renesas/rzv2l-dev/Kconfig"
 source "board/renesas/rzg2lc-dev/Kconfig"
 source "board/renesas/rzg2ul-dev/Kconfig"
 source "board/renesas/rzv2h-dev/Kconfig"
+source "board/renesas/rzg3e-dev/Kconfig"
 
 config MULTI_DTB_FIT_UNCOMPRESS_SZ
 	default 0x80000 if TARGET_BEACON_RZG2M
