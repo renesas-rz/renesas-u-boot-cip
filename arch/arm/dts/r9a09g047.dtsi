@@ -109,6 +109,16 @@
 			status = "disabled";
 		};
 
+		pinctrl: pinctrl@10410000 {
+			compatible = "renesas,r9a09g047-pinctrl";
+			reg = <0 0x10410000 0 0x10000>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			gpio-ranges = <&pinctrl 0 0 232>;
+			resets = <&cpg R9A09G047_IOTOP_RESETN>,
+				 <&cpg R9A09G047_IOTOP_ERROR_RESETN>;
+		};
+
 		gic: interrupt-controller@14900000 {
 			compatible = "arm,gic-v3";
 			#interrupt-cells = <3>;
