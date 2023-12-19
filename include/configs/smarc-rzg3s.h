@@ -62,13 +62,13 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootm_size=0x10000000 \0" \
-	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p1 \0" \
-	"prodemmcbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p1 \0" \
-	"bootimage=unzip 0x4A080000 0x48080000; booti 0x48080000 - 0x48000000 \0" \
-	"emmcload=ext4load mmc 0:1 0x4A080000 boot/Image.gz;" \
-	"ext4load mmc 0:1 0x48000000 boot/r9a08g045s-smarc.dts.dtb;run prodemmcbootargs \0" \
-	"sd1load=ext4load mmc 1:1 0x4A080000 boot/Image.gz;" \
-	"ext4load mmc 1:1 0x48000000 boot/r9a08g045s-smarc.dts.dtb;run prodsdbootargs \0" \
+	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
+	"prodemmcbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
+	"bootimage=booti 0x48080000 - 0x48000000 \0" \
+	"emmcload=ext4load mmc 0:2 0x48080000 boot/Image \0" \
+	"ext4load mmc 0:2 0x48000000 boot/r9a08g045s33-smarc.dtb;run prodemmcbootargs \0" \
+	"sd1load=ext4load mmc 1:2 0x48080000 boot/Image \0" \
+	"ext4load mmc 1:2 0x48000000 boot/r9a08g045s33-smarc.dtb;run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0"
 
 #define CONFIG_BOOTCOMMAND	"env default -a;run bootcmd_check;run bootimage"
