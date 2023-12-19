@@ -79,7 +79,7 @@ void s_init(void)
 	 * HSCLK will be considered to support later.
 	 */
 	*(volatile u32 *)(CPG_SDHI_DDIV) = 0x01110000;
-	*(volatile u32 *)(CPG_SDHI_DSEL) = 0x01110333;
+	*(volatile u32 *)(CPG_SDHI_DSEL) = 0x01110222;
 	while ((*(volatile u32 *)(CPG_CLKDIV_STATUS) != 0) ||
 	       (*(volatile u32 *)(CPG_CLKSEL_STATUS) != 0))
 		;
