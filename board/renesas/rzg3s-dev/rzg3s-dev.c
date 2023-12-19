@@ -52,6 +52,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_SDHI_DSEL			(CPG_BASE + 0x244)
 #define CPG_CLKDIV_STATUS		(CPG_BASE + 0x280)
 #define CPG_CLKSEL_STATUS		(CPG_BASE + 0x284)
+#define CPG_RST_USB			(CPG_BASE + 0x878)
+#define CPG_RSTMON_USB			(CPG_BASE + 0x9F8)
+#define CPG_CLKON_USB			(CPG_BASE + 0x578)
+#define CPG_CLKMON_USB			(CPG_BASE + 0x6F8)
 
 /* PFC */
 #define	PFC_P20				(PFC_BASE + 0x20)
@@ -70,6 +74,16 @@ DECLARE_GLOBAL_DATA_PTR;
 #define PFC_PWPR			(PFC_BASE + 0x3000)
 #define PWPR_B0WI			BIT(7)	 /* Bit Write Disable */
 #define PWPR_PFCWE			BIT(6)	/* PFC Register Write Enable */
+
+#define USBPHY_BASE			(0x11e00000)
+#define USB0_BASE			(0x11e10000)
+#define USB1_BASE			(0x11e30000)
+#define USBF_BASE			(0x11e20000)
+#define USBPHY_RESET			(USBPHY_BASE + 0x000u)
+#define COMMCTRL			0x800
+#define HcRhDescriptorA			0x048
+#define LPSTS				0x102
+#define	AHB_BUS_CTR			0x208
 
 void s_init(void)
 {
@@ -125,6 +139,31 @@ void s_init(void)
 	*(volatile u32 *)(CPG_RESET_I2C) = 0xF000F;
 }
 
+static void board_usb_init(void)
+{
+	/*Enable USB*/
+	(*(volatile u32 *)CPG_RST_USB) = 0x000f000f;
+	while ((*(volatile u32 *)CPG_RSTMON_USB & 0x0000000F) != 0x0000000F)
+		;
+	(*(volatile u32 *)CPG_CLKON_USB) = 0x000f000f;
+	while ((*(volatile u32 *)CPG_CLKMON_USB & 0x0000000F) != 0x0000000F)
+		;
+
+	(*(volatile u32 *)(USB0_BASE + AHB_BUS_CTR)) = 0x02;
+	(*(volatile u32 *)(USB1_BASE + AHB_BUS_CTR)) = 0x02;
+	/*Enable 2 USB ports*/
+	(*(volatile u32 *)USBPHY_RESET) = 0x00001000u;
+	/*USB0 is HOST*/
+	(*(volatile u32 *)(USB0_BASE + COMMCTRL)) = 0;
+	/*USB1 is HOST*/
+	(*(volatile u32 *)(USB1_BASE + COMMCTRL)) = 0;
+	/* Set USBPHY normal operation (Function only) */
+	(*(volatile u16 *)(USBF_BASE + LPSTS)) |= (0x1u << 14);	/* USBPHY.SUSPM = 1 (func only) */
+	/* Overcurrent is not supported */
+	(*(volatile u32 *)(USB0_BASE + HcRhDescriptorA)) |= (0x1u << 12); /* NOCP = 1 */
+	(*(volatile u32 *)(USB1_BASE + HcRhDescriptorA)) |= (0x1u << 12); /* NOCP = 1 */
+}
+
 int board_early_init_f(void)
 {
 	return 0;
@@ -134,6 +173,7 @@ int board_init(void)
 {
 	/* Address of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
+	board_usb_init();
 
 	return 0;
 }

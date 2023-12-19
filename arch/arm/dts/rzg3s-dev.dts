@@ -11,6 +11,12 @@
 #include "r9a08g045s-u-boot.dtsi"
 #include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
 
+/*
+ * select between USB phy0 and MTU3 pins which are multiplexed
+ * MTU3 pins are NOT required by clocksoure function
+ */
+#define MTU3_PINS_SEL			0
+
 / {
 	model = "rzg3s-dev";
 	compatible = "renesas,r9a08g045s", "renesas,rzg3s";
@@ -47,6 +53,17 @@
 				<RZG2L_PINMUX(4, 3, 1)>,
 				<RZG2L_PINMUX(4, 4, 1)>,
 				<RZG2L_PINMUX(4, 5, 1)>;
+	};
+
+#if !MTU3_PINS_SEL
+	usb0_pins: usb0 {
+		pinmux = <RZG2L_PINMUX(5, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(5, 2, 1)>;	/* OVC	*/
+	};
+#endif
+	usb1_pins: usb1 {
+		pinmux = <RZG2L_PINMUX(6, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(6, 1, 1)>;	/* OVC */
 	};
 };
 
@@ -89,3 +106,16 @@
 	status = "okay";
 };
 
+#if !MTU3_PINS_SEL
+&ehci0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb0_pins>;
+	status = "okay";
+};
+#endif
+
+&ehci1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb1_pins>;
+	status = "okay";
+};
