@@ -59,13 +59,17 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_CLKMON_USB			(CPG_BASE + 0x6F8)
 
 /* PFC */
-#define	PFC_P20				(PFC_BASE + 0x20)
-#define	PFC_PM20			(PFC_BASE + 0x0140)
-#define	PFC_PMC20			(PFC_BASE + 0x0220)
-
 #define	PFC_P25				(PFC_BASE + 0x25)
 #define	PFC_PM25			(PFC_BASE + 0x014A)
 #define	PFC_PMC25			(PFC_BASE + 0x0225)
+
+#define	PFC_P31				(PFC_BASE + 0x31)
+#define	PFC_PM31			(PFC_BASE + 0x0162)
+#define	PFC_PMC31			(PFC_BASE + 0x0231)
+
+#define	PFC_P35				(PFC_BASE + 0x35)
+#define	PFC_PM35			(PFC_BASE + 0x016A)
+#define	PFC_PMC35			(PFC_BASE + 0x0235)
 
 #define	PFC_IOLH_30_L			(PFC_BASE + 0x1180)
 #define	PFC_IOLH_34_L			(PFC_BASE + 0x11A0)
@@ -100,10 +104,14 @@ void s_init(void)
 	/* Set P13_4(bit4) and P13_0(bit0) to High output */
 	*(volatile u8 *)(PFC_P25) = (*(volatile u8 *)(PFC_P25) & 0xEE) | 0x11;
 #elif CONFIG_TARGET_SMARC_RZG3S
-	/* SD power enable: SD0_PWR_EN - P0_1 = 1, SDIO_PWR_EN - P0_3 = 1 */
-	*(volatile u8 *)(PFC_PMC20) &= 0xF5; /* Set P0_1(bit1) and P0_3(bit3) to GPIO Mode */
-	*(volatile u16 *)(PFC_PM20) |= 0x0088; /* Set P0_1(bit[3:2]) / P0_3(bit[7:6]) to Output */
-	*(volatile u8 *)(PFC_P20) |= 0x0A; /* Set P0_1(bit1) and P0_3(bit3) to High output */
+	/* SD power enable: SD0_PWR_EN - P2_1 = 1, SDIO_PWR_EN - P2_3 = 1, SD2_PWR_EN - P8_1 = 1 */
+	*(volatile u8 *)(PFC_PMC31) &= 0xF5; /* Set P2_1(bit1) and P2_3(bit3) to GPIO Mode */
+	*(volatile u8 *)(PFC_PMC35) &= 0xFD; /* Set P8_1(bit1) to GPIO Mode */
+	/* Set P2_1(bit[3:2]) and P2_3(bit[7:6]) to Output mode (Input Disable) */
+	*(volatile u16 *)(PFC_PM31) |= 0x0088;
+	*(volatile u16 *)(PFC_PM35) |= 0x0008; /* Set P8_1(bit[3:2]) to Output mode (Input Disable) */
+	*(volatile u8 *)(PFC_P31) |= 0x0A; /* Set P2_1(bit1) and P2_3(bit3) to High output */
+	*(volatile u8 *)(PFC_P35) |= 0x02; /* Set P8_1(bit1) to High output */
 #endif
 
 	/* Can go in board_eth_init() once enabled */
