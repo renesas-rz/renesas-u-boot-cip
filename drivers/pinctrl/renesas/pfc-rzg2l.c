@@ -96,6 +96,8 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 	int i, count;
 	const u32 *data;
 	u32 cells[port_max * RZG2L_MAX_PINS_PER_PORT];
+	u8 nmax_func = 5;
+	u8 nmin_func = 0;
 
 	data = dev_read_prop(config, "pinmux", &count);
 	if (count < 0) {
@@ -113,6 +115,8 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
 		writel(0, priv->regs + PWPR_G3S);
 		writel(PWPR_PFCWE, priv->regs + PWPR_G3S);
+		nmax_func = 8;
+		nmin_func = 1;
 	} else {
 		writel(0, priv->regs + PWPR);
 		writel(PWPR_PFCWE, priv->regs + PWPR);
@@ -123,7 +127,8 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 		func = (cells[i] >> 12) & 0xf;
 		port = (cells[i] / RZG2L_MAX_PINS_PER_PORT) & 0x1ff;
 		pin = cells[i] % RZG2L_MAX_PINS_PER_PORT;
-		if (func > 5 || port >= port_max || pin >= RZG2L_MAX_PINS_PER_PORT) {
+		if (func > nmax_func || func < nmin_func || port >= port_max ||
+				pin >= RZG2L_MAX_PINS_PER_PORT) {
 			printf("Invalid cell %i in node %s!\n",
 			       count, ofnode_get_name(dev_ofnode(config)));
 			continue;
