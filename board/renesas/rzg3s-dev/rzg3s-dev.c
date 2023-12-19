@@ -50,6 +50,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_RESET_I2C			(CPG_RESET_BASE + 0x80)
 #define CPG_SDHI_DDIV			(CPG_BASE + 0x218)
 #define CPG_SDHI_DSEL			(CPG_BASE + 0x244)
+#define CPG_SPI_DDIV			(CPG_BASE + 0x220)
 #define CPG_CLKDIV_STATUS		(CPG_BASE + 0x280)
 #define CPG_CLKSEL_STATUS		(CPG_BASE + 0x284)
 #define CPG_RST_USB			(CPG_BASE + 0x878)
@@ -137,6 +138,11 @@ void s_init(void)
 		;
 	/* I2C CLK */
 	*(volatile u32 *)(CPG_RESET_I2C) = 0xF000F;
+
+	/* Setting xSPI CLK 133 MHz */
+	*(volatile u32 *)(CPG_SPI_DDIV) = 0x00010001;
+	while (*(volatile u32 *)(CPG_CLKDIV_STATUS) != 0)
+		;
 }
 
 static void board_usb_init(void)
