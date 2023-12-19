@@ -80,3 +80,12 @@
 		reg = <7>;
 	};
 };
+
+&i2c0 {
+	status = "okay";
+};
+
+&i2c1 {
+	status = "okay";
+};
+

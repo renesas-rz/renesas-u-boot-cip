@@ -44,6 +44,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_CLKON_BASE			(CPG_BASE + 0x500)
 #define CPG_RESET_BASE			(CPG_BASE + 0x800)
 #define CPG_RESET_ETH			(CPG_RESET_BASE + 0x7C)
+#define CPG_RESET_I2C			(CPG_RESET_BASE + 0x80)
 #define CPG_SDHI_DDIV			(CPG_BASE + 0x218)
 #define CPG_SDHI_DSEL			(CPG_BASE + 0x244)
 #define CPG_CLKDIV_STATUS		(CPG_BASE + 0x280)
@@ -82,6 +83,8 @@ void s_init(void)
 	while ((*(volatile u32 *)(CPG_CLKDIV_STATUS) != 0) ||
 	       (*(volatile u32 *)(CPG_CLKSEL_STATUS) != 0))
 		;
+	/* I2C CLK */
+	*(volatile u32 *)(CPG_RESET_I2C) = 0xF000F;
 }
 
 int board_early_init_f(void)
