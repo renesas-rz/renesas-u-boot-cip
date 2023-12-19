@@ -75,6 +75,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define	PFC_IOLH_34_L			(PFC_BASE + 0x11A0)
 #define	PFC_IEN_30			(PFC_BASE + 0x1980)
 #define	PFC_IEN_34			(PFC_BASE + 0x19A0)
+#define	PFC_IEN_23			(PFC_BASE + 0x1918)
+#define	PFC_IEN_24			(PFC_BASE + 0x1920)
 
 #define PFC_PWPR			(PFC_BASE + 0x3000)
 #define PWPR_B0WI			BIT(7)	 /* Bit Write Disable */
@@ -103,6 +105,17 @@ void s_init(void)
 	*(volatile u16 *)(PFC_PM25) = (*(volatile u16 *)(PFC_PM25) & 0xFCFC) | 0x0202;
 	/* Set P13_4(bit4) and P13_0(bit0) to High output */
 	*(volatile u8 *)(PFC_P25) = (*(volatile u8 *)(PFC_P25) & 0xEE) | 0x11;
+
+	/* SD2 power control : P13_2 = 1 */
+	*(volatile u8 *)(PFC_PMC25) &= 0xFB;	/* Set P13_2(bit2) to Port Mode */
+	/* Set P13_2(bit[5:4]) to Output mode */
+	*(volatile u16 *)(PFC_PM25) = (*(volatile u16 *)(PFC_PM25) & 0xFFCF) | 0x20;
+	/* Set P13_2(bit2) to High output */
+	*(volatile u8 *)(PFC_P25) = (*(volatile u8 *)(PFC_P25) & 0xFB) | 0x4;
+
+	/* Input Enable Control */
+	*(volatile u32 *)(PFC_IEN_23) = 0x01010100;	/* SD2_DATA1, SD2_DATA0, SD2_CMD	*/
+	*(volatile u32 *)(PFC_IEN_24) = 0x0101;		/* SD2_DATA3, SD2_DATA2			*/
 #elif CONFIG_TARGET_SMARC_RZG3S
 	/* SD power enable: SD0_PWR_EN - P2_1 = 1, SDIO_PWR_EN - P2_3 = 1, SD2_PWR_EN - P8_1 = 1 */
 	*(volatile u8 *)(PFC_PMC31) &= 0xF5; /* Set P2_1(bit1) and P2_3(bit3) to GPIO Mode */
