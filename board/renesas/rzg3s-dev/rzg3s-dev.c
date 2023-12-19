@@ -67,6 +67,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define	PFC_PM31			(PFC_BASE + 0x0162)
 #define	PFC_PMC31			(PFC_BASE + 0x0231)
 
+#define	PFC_P33				(PFC_BASE + 0x33)
+#define	PFC_PM33			(PFC_BASE + 0x0166)
+#define	PFC_PMC33			(PFC_BASE + 0x0233)
+
 #define	PFC_P35				(PFC_BASE + 0x35)
 #define	PFC_PM35			(PFC_BASE + 0x016A)
 #define	PFC_PMC35			(PFC_BASE + 0x0235)
@@ -113,19 +117,27 @@ void s_init(void)
 	/* Set P13_2(bit2) to High output */
 	*(volatile u8 *)(PFC_P25) = (*(volatile u8 *)(PFC_P25) & 0xFB) | 0x4;
 
+#elif CONFIG_TARGET_SMARC_RZG3S
+	/* SD power enable: SD0_PWR_EN - P2_1 = 1, SDIO_PWR_EN - P2_3 = 1, SDIO_PWR_SEL - P4_2 = 1, SD2_PWR_EN - P8_1 = 1 */
+	/* Set P2_1(bit1), P2_2(bit2) and P2_3(bit3) to GPIO Mode */
+	*(volatile u8 *)(PFC_PMC31) &= 0xF1;
+	*(volatile u8 *)(PFC_PMC33) &= 0xFB; /* Set P4_2(bit2) to GPIO Mode */
+	*(volatile u8 *)(PFC_PMC35) &= 0xFD; /* Set P8_1(bit1) to GPIO Mode */
+	/* Set P2_1(bit[3:2]), P2_2(bit[5:4]) and P2_3(bit[7:6]) to Output mode */
+	*(volatile u16 *)(PFC_PM31) = (*(volatile u16 *)(PFC_PM31) & 0xFF03) | 0x00A8;
+	/* Set P4_2(bit[5:4]) to Output mode */
+	*(volatile u16 *)(PFC_PM33) = (*(volatile u16 *)(PFC_PM33) & 0xFFCF) | 0x0020;
+	/* Set P8_1(bit[3:2]) to Output mode */
+	*(volatile u16 *)(PFC_PM35) = (*(volatile u16 *)(PFC_PM35) & 0xFFF3) | 0x0008;
+	/* Set P2_1(bit1), P2_2(bit2) and P2_3(bit3) to High output */
+	*(volatile u8 *)(PFC_P31) |= 0x0E;
+	*(volatile u8 *)(PFC_P33) |= 0x04; /* Set P4_2(bit2) to High output */
+	*(volatile u8 *)(PFC_P35) |= 0x02; /* Set P8_1(bit1) to High output */
+#endif
+
 	/* Input Enable Control */
 	*(volatile u32 *)(PFC_IEN_23) = 0x01010100;	/* SD2_DATA1, SD2_DATA0, SD2_CMD	*/
 	*(volatile u32 *)(PFC_IEN_24) = 0x0101;		/* SD2_DATA3, SD2_DATA2			*/
-#elif CONFIG_TARGET_SMARC_RZG3S
-	/* SD power enable: SD0_PWR_EN - P2_1 = 1, SDIO_PWR_EN - P2_3 = 1, SD2_PWR_EN - P8_1 = 1 */
-	*(volatile u8 *)(PFC_PMC31) &= 0xF5; /* Set P2_1(bit1) and P2_3(bit3) to GPIO Mode */
-	*(volatile u8 *)(PFC_PMC35) &= 0xFD; /* Set P8_1(bit1) to GPIO Mode */
-	/* Set P2_1(bit[3:2]) and P2_3(bit[7:6]) to Output mode (Input Disable) */
-	*(volatile u16 *)(PFC_PM31) |= 0x0088;
-	*(volatile u16 *)(PFC_PM35) |= 0x0008; /* Set P8_1(bit[3:2]) to Output mode (Input Disable) */
-	*(volatile u8 *)(PFC_P31) |= 0x0A; /* Set P2_1(bit1) and P2_3(bit3) to High output */
-	*(volatile u8 *)(PFC_P35) |= 0x02; /* Set P8_1(bit1) to High output */
-#endif
 
 	/* Can go in board_eth_init() once enabled */
 	*(volatile u32 *)(ETH0_POC) = (*(volatile u32 *)(ETH0_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
