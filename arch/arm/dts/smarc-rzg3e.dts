@@ -87,19 +87,19 @@
 
 	sdhi2_pins: sd2 {
 		sd2_mux {
-			pinmux = <RZV2H_PINMUX(20, 0, 1)>; /* QSD2_CD */
+			pinmux = <RZV2H_PINMUX(K, 0, 1)>; /* QSD2_CD */
 		};
 
 		sd2_data {
-			pinmux = <RZV2H_PINMUX(17, 2, 1)>, /* QSD2_DAT0 */
-				 <RZV2H_PINMUX(17, 3, 1)>, /* QSD2_DAT1 */
-				 <RZV2H_PINMUX(17, 4, 1)>, /* QSD2_DAT2 */
-				 <RZV2H_PINMUX(17, 5, 1)>; /* QSD2_DAT3 */
+			pinmux = <RZV2H_PINMUX(H, 2, 1)>, /* QSD2_DAT0 */
+				 <RZV2H_PINMUX(H, 3, 1)>, /* QSD2_DAT1 */
+				 <RZV2H_PINMUX(H, 4, 1)>, /* QSD2_DAT2 */
+				 <RZV2H_PINMUX(H, 5, 1)>; /* QSD2_DAT3 */
 		};
 
 		sd2_ctrl {
-			pinmux = <RZV2H_PINMUX(17, 0, 1)>, /* QSD2_CLK */
-				 <RZV2H_PINMUX(17, 1, 1)>; /* QSD2_CMD */
+			pinmux = <RZV2H_PINMUX(H, 0, 1)>, /* QSD2_CLK */
+				 <RZV2H_PINMUX(H, 1, 1)>; /* QSD2_CMD */
 		};
 	};
 
