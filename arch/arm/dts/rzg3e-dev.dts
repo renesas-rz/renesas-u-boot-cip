@@ -72,8 +72,6 @@
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <3300000>;
 
-		//gpios = <&pinctrl RZV2H_GPIO(1, 5) GPIO_ACTIVE_HIGH>;
-
 		gpios-states = <0>;
 		states = <3300000 0 1800000 1>;
 	};
@@ -85,28 +83,12 @@
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <3300000>;
 
-		//gpios = <&pinctrl RZV2H_GPIO(K, 1) GPIO_ACTIVE_HIGH>;
-
 		gpios-states = <0>;
 		states = <3300000 0 1800000 1>;
 	};
 };
 
 &pinctrl {
-	sd1_pwr_en {
-		gpio-hog;
-		//gpios = <RZV2H_GPIO(1, 6) GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "sd1_pwr_en";
-	};
-
-	sd2_pwr_en {
-		gpio-hog;
-		//gpios = <RZV2H_GPIO(K, 2) GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "sd1_pwr_en";
-	};
-
 	sdhi0_pins: sd0 {
 		sd0_mux {
 			pinmux = <RZV2H_PINMUX(1, 0, 8)>; /* QSD0_CD */
@@ -119,33 +101,33 @@
 		};
 
 		sd1_data {
-			pinmux = <RZV2H_PINMUX(16, 2, 1)>, /* QSD1_DAT0 */
-				 <RZV2H_PINMUX(16, 3, 1)>, /* QSD1_DAT1 */
-				 <RZV2H_PINMUX(16, 4, 1)>, /* QSD1_DAT2 */
-				 <RZV2H_PINMUX(16, 5, 1)>; /* QSD1_DAT3 */
+			pinmux = <RZV2H_PINMUX(G, 2, 1)>, /* QSD1_DAT0 */
+				 <RZV2H_PINMUX(G, 3, 1)>, /* QSD1_DAT1 */
+				 <RZV2H_PINMUX(G, 4, 1)>, /* QSD1_DAT2 */
+				 <RZV2H_PINMUX(G, 5, 1)>; /* QSD1_DAT3 */
 		};
 
 		sd1_ctrl {
-			pinmux = <RZV2H_PINMUX(16, 0, 1)>, /* QSD2_CLK */
-				 <RZV2H_PINMUX(16, 1, 1)>; /* QSD2_CMD */
+			pinmux = <RZV2H_PINMUX(G, 0, 1)>, /* QSD2_CLK */
+				 <RZV2H_PINMUX(G, 1, 1)>; /* QSD2_CMD */
 		};
 	};
 
         sdhi2_pins: sd2 {
                 sd2_mux {
-                        pinmux = <RZV2H_PINMUX(20, 0, 1)>; /* QSD2_CD */
+                        pinmux = <RZV2H_PINMUX(K, 0, 1)>; /* QSD2_CD */
                 };
 
                 sd2_data {
-                        pinmux = <RZV2H_PINMUX(17, 2, 1)>, /* QSD2_DAT0 */
-                                 <RZV2H_PINMUX(17, 3, 1)>, /* QSD2_DAT1 */
-                                 <RZV2H_PINMUX(17, 4, 1)>, /* QSD2_DAT2 */
-                                 <RZV2H_PINMUX(17, 5, 1)>; /* QSD2_DAT3 */
+                        pinmux = <RZV2H_PINMUX(H, 2, 1)>, /* QSD2_DAT0 */
+                                 <RZV2H_PINMUX(H, 3, 1)>, /* QSD2_DAT1 */
+                                 <RZV2H_PINMUX(H, 4, 1)>, /* QSD2_DAT2 */
+                                 <RZV2H_PINMUX(H, 5, 1)>; /* QSD2_DAT3 */
                 };
 
                 sd2_ctrl {
-                        pinmux = <RZV2H_PINMUX(17, 0, 1)>, /* QSD2_CLK */
-                                 <RZV2H_PINMUX(17, 1, 1)>; /* QSD2_CMD */
+                        pinmux = <RZV2H_PINMUX(H, 0, 1)>, /* QSD2_CLK */
+                                 <RZV2H_PINMUX(H, 1, 1)>; /* QSD2_CMD */
                 };
         };
 };
