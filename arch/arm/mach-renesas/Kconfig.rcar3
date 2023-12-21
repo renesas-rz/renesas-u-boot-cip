@@ -251,6 +251,11 @@ config TARGET_RZG3E_DEV
 	help
           Support for Renesas RZ/G3E Dev Platform
 
+config TARGET_SMARC_RZG3E
+	bool "RZ/G3E SMARC board"
+	help
+          Support for Renesas RZ/G3E Dev Platform
+
 endchoice
 
 source "board/renesas/condor/Kconfig"
