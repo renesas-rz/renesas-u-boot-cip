@@ -17,6 +17,9 @@
 
 	aliases {
 		serial0 = &scif0;
+		mmc0 = &sdhi0;
+		mmc1 = &sdhi1;
+		mmc2 = &sdhi2;
 	};
 
 	chosen {
@@ -42,6 +45,64 @@
 			reg = <0x0 0x58000000 0x0 0x10000000>;
 		};
 	};
+
+	reg_1p8v: regulator0 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "fixed-1.8V";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
+	reg_3p3v: regulator1 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "fixed-3.3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
+	vccq_sdhi2: regulator-vccq-sdhi2 {
+		compatible = "regulator-gpio";
+
+		regulator-name = "SDHI2 VccQ";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+
+		gpios-states = <1>;
+		states = <3300000 1 1800000 0>;
+	};
+};
+
+&pinctrl {
+	sd2_pwr_en {
+		gpio-hog;
+		output-high;
+		line-name = "sd2_pwr_en";
+	};
+
+	sdhi2_pins: sd2 {
+		sd2_mux {
+			pinmux = <RZV2H_PINMUX(20, 0, 1)>; /* QSD2_CD */
+		};
+
+		sd2_data {
+			pinmux = <RZV2H_PINMUX(17, 2, 1)>, /* QSD2_DAT0 */
+				 <RZV2H_PINMUX(17, 3, 1)>, /* QSD2_DAT1 */
+				 <RZV2H_PINMUX(17, 4, 1)>, /* QSD2_DAT2 */
+				 <RZV2H_PINMUX(17, 5, 1)>; /* QSD2_DAT3 */
+		};
+
+		sd2_ctrl {
+			pinmux = <RZV2H_PINMUX(17, 0, 1)>, /* QSD2_CLK */
+				 <RZV2H_PINMUX(17, 1, 1)>; /* QSD2_CMD */
+		};
+	};
+
 };
 
 &extal_clk {
@@ -49,5 +110,27 @@
 };
 
 &scif0 {
+	status = "okay";
+};
+
+&sdhi0 {
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&reg_1p8v>;
+	bus-width = <8>;
+	mmc-hs200-1_8v;
+	non-removable;
+	fixed-emmc-driver-type = <1>;
+	status = "okay";
+};
+
+&sdhi2 {
+	pinctrl-0 = <&sdhi2_pins>;
+	pinctrl-names = "default";
+
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&vccq_sdhi2>;
+	bus-width = <4>;
+	sd-uhs-sdr50;
+	sd-uhs-sdr104;
 	status = "okay";
 };
