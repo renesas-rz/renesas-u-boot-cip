@@ -22,8 +22,20 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define PFC_BASE                       0x10410000
+#define        P_34                            (PFC_BASE + 0x0034)
+#define        PM_34                           (PFC_BASE + 0x0168)
+#define        PMC_34                          (PFC_BASE + 0x0234)
+
+
 void s_init(void)
 {
+#if CONFIG_TARGET_RZG3E_DEV
+       *(volatile u8 *)PMC_34   &= ~(0x06<<4); /* PK1,PK2 port */
+       *(volatile u8 *)P_34      = (*(volatile u32 *)P_34  & ~(0x03<<4)) | (0x01 <<5); /* PK1=1,PK2=0          */
+       *(volatile u16 *)PM_34    = (*(volatile u32 *)PM_34 & ~(0x0f<<8)) | (0x0c <<8); /* PK1,PK2 output       */
+#endif
+
 
 }
 
