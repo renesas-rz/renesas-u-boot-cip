@@ -1507,6 +1507,7 @@ static struct eqos_ops eqos_rzv2h_ops = {
 	.eqos_calibrate_pads = eqos_null_ops,
 	.eqos_disable_calibration = eqos_null_ops,
 	.eqos_set_tx_clk_speed = eqos_set_tx_clk_speed_rzv2h,
+	.eqos_get_enetaddr = eqos_null_ops,
 	.eqos_get_tick_clk_rate = eqos_get_tick_clk_rate_rzv2h
 };
 
