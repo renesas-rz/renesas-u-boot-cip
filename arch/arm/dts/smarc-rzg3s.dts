@@ -58,6 +58,16 @@
 			 <RZG2L_PINMUX(12, 1, 8)>,	/* SD2_DATA3	*/
 			 <RZG2L_PINMUX(14, 1, 7)>;	/* SD2_CD	*/
 	};
+
+	usb0_pins: usb0 {
+		pinmux = <RZG2L_PINMUX(5, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(5, 2, 1)>;	/* OVC	*/
+	};
+
+	usb1_pins: usb1 {
+		pinmux = <RZG2L_PINMUX(6, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(5, 4, 5)>;	/* OVC */
+	};
 };
 
 &xinclk {
@@ -106,3 +116,16 @@
 &i2c1 {
 	status = "okay";
 };
+
+&ehci0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb0_pins>;
+	status = "okay";
+};
+
+&ehci1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb1_pins>;
+	status = "okay";
+};
+
