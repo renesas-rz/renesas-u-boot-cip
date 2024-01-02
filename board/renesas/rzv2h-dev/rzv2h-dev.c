@@ -97,7 +97,7 @@ void s_init(void)
 	*(volatile u8 *)P_2A      = (*(volatile u32 *)P_2A  & ~(0x03<<4)) | (0x01 <<5); /* PA5=1,PA4=0		*/
 	*(volatile u16 *)PM_2A    = (*(volatile u32 *)PM_2A & ~(0x0f<<8)) | (0x0c <<8); /* PA5,PA4 output	*/
 #endif
-#if CONFIG_TARGET_RZV2H_EVK_ALPHA
+#if CONFIG_TARGET_RZV2H_EVK_ALPHA || CONFIG_TARGET_RZV2H_EVK_VER1
 	/* SD1  */
 	*(volatile u8 *)PMC_2A   &= ~(0x03 << 2);/* PA3,PA2 port */
 	*(volatile u8 *)P_2A      = (*(volatile u32 *)P_2A  & ~(0x03<<2)) | (0x01 <<3); /* PA3=1,PA2=0		*/
@@ -236,7 +236,7 @@ static void board_usb_init(void)
 	(*(volatile u32 *)PFC_PFC26) |= (0xF << 12);
 #endif /* CONFIG_TARGET_RZV2H_DEV */
 
-#if CONFIG_TARGET_RZV2H_EVK_ALPHA
+#if CONFIG_TARGET_RZV2H_EVK_ALPHA || CONFIG_TARGET_RZV2H_EVK_VER1
         /* Set P9_5 as Func.14 for VBUSEN */
         /* Control mode (multiplexed function) */
         (*(volatile u32 *)PFC_PMC29) |= (0x1u << 5);
@@ -264,7 +264,7 @@ static void board_usb_init(void)
         (*(volatile u32 *)PFC_PFC26) &= ~(0xF << 28);
         /* Function mode 15 */
         (*(volatile u32 *)PFC_PFC26) |= (0x0E << 28);
-#endif /* CONFIG_TARGET_RZV2H_EVK_ALPHA */
+#endif /* CONFIG_TARGET_RZV2H_EVK_ALPHA || CONFIG_TARGET_RZV2H_EVK_VER1 */
 
 	/* Enable Write protect */
 	(*(volatile u32 *)PFC_PWPR) &= ~(0x1u << 6);
