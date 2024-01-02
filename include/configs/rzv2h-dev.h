@@ -68,7 +68,7 @@
 	"emmcload=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/r9a09g057h4-dev.dtb;run prodemmcbootargs \0" \
 	"sd2load=ext4load mmc 2:2 0x48080000 boot/Image;ext4load mmc 2:2 0x48000000 boot/r9a09g057h4-dev.dtb;run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 2; then run sd2load; else run emmcload; fi \0"
-#else
+#elif defined(CONFIG_TARGET_RZV2H_EVK_ALPHA)
 #define CONFIG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0"	\
 	"bootm_size=0x10000000\0"	\
@@ -79,6 +79,16 @@
 	"emmcload=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/r9a09g057h4-evk-alpha.dtb;run prodemmcbootargs \0" \
 	"sd1load=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/r9a09g057h4-evk-alpha.dtb;run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0"
+#else
+#define CONFIG_EXTRA_ENV_SETTINGS       \
+	"usb_pgood_delay=2000\0"        \
+	"bootm_size=0x10000000\0"       \
+	"prodsd0bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
+	"prodsd1bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
+	"bootimage=booti 0x48080000 - 0x48000000 \0" \
+	"sd0load=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/r9a09g057h4-evk-ver1.dtb;run prodsd0bootargs \0" \
+	"sd1load=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/r9a09g057h4-evk-ver1.dtb;run prodsd1bootargs \0" \
+	"bootcmd_check=if mmc dev 1; then run sd1load; else run sd0load; fi \0"
 #endif
 
 #define CONFIG_BOOTCOMMAND	"env default -a;run bootcmd_check;run bootimage"
