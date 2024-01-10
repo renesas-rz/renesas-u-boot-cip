@@ -58,7 +58,7 @@ static void sh_serial_init_generic(struct uart_port *port)
 	sci_out(port, SCSPTR, 0x0003);
 #endif
 
-#if !(defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U))
+#if !(defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_RZF_DEV))
 	if (port->type == PORT_HSCIF)
 		sci_out(port, HSSRR, HSSRR_SRE | HSSRR_SRCYC8);
 #endif
