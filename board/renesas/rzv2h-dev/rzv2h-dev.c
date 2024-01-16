@@ -42,6 +42,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define PFC_23				(PFC_BASE + 0x048C)
 #define	PMC_24				(PFC_BASE + 0x0224)
 #define	PFC_24				(PFC_BASE + 0x0490)
+#define	PFC_OSCBYPS			(PFC_BASE + 0x3C00)
 
 #define PWPR_REGWE_A			BIT(6)
 #define	PWPR_REGWE_B			BIT(5)
@@ -139,6 +140,9 @@ void s_init(void)
 		;
 	
 	*(volatile u32 *)PWPR &= ~(PWPR_REGWE_A | PWPR_REGWE_B);
+
+	/* Set Bypass and Powerdown mode for Audio OSC */
+	*(volatile u32 *)(PFC_OSCBYPS) = 0x001C0406;
 
 	/* Enable aclk_csr, aclk, tx, rx, tx_180, rx_180 for ETH0 */
 	*(volatile u32 *)(CPG_CLKON_ETH0) = 0x3F003F00;
