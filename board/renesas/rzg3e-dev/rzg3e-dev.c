@@ -28,6 +28,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define P(x)			(PFC_BASE + 0x20 + PORT_##x)
 #define PM(x)			(PFC_BASE + 0x140 + 2 * PORT_##x)
 #define PMC(x)			(PFC_BASE + 0x220 + PORT_##x)
+#define PFC(x)			(PFC_BASE + 0x0400 + 0x80 + 4 * PORT_##x)
 
 #define PFC_PWPR		(PFC_BASE + 0x3C04)
 #define PFC_PWPR_REGWE_A	BIT(6)
@@ -43,10 +44,16 @@ void s_init(void)
 	*(volatile u8 *)P(1) = (*(volatile u8 *)P(1) & ~BIT(5)) | BIT(6); /* P1_5 = 0, P1_6 = 1 */
 	*(volatile u16 *)PM(1) = (*(volatile u16 *)PM(1) & ~GENMASK(13, 10)) | BIT(13) | BIT(11); /* P1_5, P1_6 output */
 
+	*(volatile u32 *)PFC(G) = 0x00111111;
+	*(volatile u8 *)PMC(G)  = 0x3f;
+
 	/* QSD2 */
 	*(volatile u8 *)PMC(K) &= ~(BIT(1) | BIT(2)); /* PK_1, PK_2 */
 	*(volatile u8 *)P(K) = (*(volatile u8 *)P(K) & ~BIT(1)) | BIT(2); /* PK_1 = 0, PK_2 = 1 */
 	*(volatile u16 *)PM(K) = (*(volatile u16 *)PM(K) & ~GENMASK(5, 2)) | BIT(5) | BIT(3); /* PK_1, PK_2 output */
+
+	*(volatile u32 *)PFC(H) = 0x00111111;
+	*(volatile u8 *)PMC(H)  = 0x3f;
 #endif
 
 #if CONFIG_TARGET_SMARC_RZG3E
