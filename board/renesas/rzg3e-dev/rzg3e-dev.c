@@ -32,11 +32,19 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define PFC_PWPR		(PFC_BASE + 0x3C04)
 #define PFC_PWPR_REGWE_A	BIT(6)
+#define PFC_PWPR_REGWE_B	BIT(5)
+
+#define PFC_OEN			(PFC_BASE + 0x3C40)
+#define PFC_OEN_OEN0		BIT(0)
+#define PFC_OEN_OEN1		BIT(1)
+
+#define ICU_IPTSR_REG		0x10400060
 
 void s_init(void)
 {
+
 	/* Enable writing to PFC and PMC registers */
-       *(volatile u32 *)PFC_PWPR = *(volatile u32 *)PFC_PWPR | PFC_PWPR_REGWE_A;
+       *(volatile u32 *)PFC_PWPR = *(volatile u32 *)PFC_PWPR | PFC_PWPR_REGWE_A | PFC_PWPR_REGWE_B ;
 
 #if CONFIG_TARGET_RZG3E_DEV
 	/* QSD1 */
@@ -54,6 +62,26 @@ void s_init(void)
 
 	*(volatile u32 *)PFC(H) = 0x00111111;
 	*(volatile u8 *)PMC(H)  = 0x3f;
+
+	/* ETH0 */
+	*(volatile u8 *)PMC(A)  = 0x0f;
+	*(volatile u32 *)PFC(A) = 0x00001111;
+	*(volatile u8 *)PMC(B)  = 0xff;
+	*(volatile u32 *)PFC(B) = 0x11111111;
+	*(volatile u8 *)PMC(C)  = 0x07;
+	*(volatile u32 *)PFC(C) = 0x00000111;
+
+	/* ETH1 */
+	*(volatile u8 *)PMC(D)  = 0x0f;
+	*(volatile u32 *)PFC(D) = 0x00001111;
+	*(volatile u8 *)PMC(E)  = 0xff;
+	*(volatile u32 *)PFC(E) = 0x11111111;
+	*(volatile u8 *)PMC(F)  = 0x07;
+	*(volatile u32 *)PFC(F) = 0x00000111;
+
+	*(volatile u32 *)(PFC_OEN) &= ~(PFC_OEN_OEN1 | PFC_OEN_OEN0);
+	while((*(volatile u32 *)(PFC_OEN) & (PFC_OEN_OEN1 | PFC_OEN_OEN0)) != 0x0)
+
 #endif
 
 #if CONFIG_TARGET_SMARC_RZG3E
@@ -64,7 +92,9 @@ void s_init(void)
 #endif
 
 	/* Disable writing to PFC and PMC registers */
-       *(volatile u32 *)PFC_PWPR = *(volatile u32 *)PFC_PWPR & ~PFC_PWPR_REGWE_A;
+       *(volatile u32 *)PFC_PWPR = *(volatile u32 *)PFC_PWPR & ~(PFC_PWPR_REGWE_A | PFC_PWPR_REGWE_B);
+
+       *(volatile u32 *)(ICU_IPTSR_REG) = 0;
 }
 
 int board_early_init_f(void)
