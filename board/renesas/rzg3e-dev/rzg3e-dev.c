@@ -29,6 +29,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define PM(x)			(PFC_BASE + 0x140 + 2 * PORT_##x)
 #define PMC(x)			(PFC_BASE + 0x220 + PORT_##x)
 #define PFC(x)			(PFC_BASE + 0x0400 + 0x80 + 4 * PORT_##x)
+#define	PFC_OSCBYPS		(PFC_BASE + 0x3C00)
 
 #define PFC_PWPR		(PFC_BASE + 0x3C04)
 #define PFC_PWPR_REGWE_A	BIT(6)
@@ -95,6 +96,9 @@ void s_init(void)
        *(volatile u32 *)PFC_PWPR = *(volatile u32 *)PFC_PWPR & ~(PFC_PWPR_REGWE_A | PFC_PWPR_REGWE_B);
 
        *(volatile u32 *)(ICU_IPTSR_REG) = 0;
+
+       /* Set Bypass and Powerdown mode for Audio OSC */
+       *(volatile u32 *)(PFC_OSCBYPS) = 0x001C0406;
 }
 
 int board_early_init_f(void)
