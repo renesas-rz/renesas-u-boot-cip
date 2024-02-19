@@ -80,6 +80,9 @@ void s_init(void)
 	*(volatile u8 *)PMC(F)  = 0x07;
 	*(volatile u32 *)PFC(F) = 0x00000111;
 
+	/* Enale OE of IO block for xSPI */
+	*(volatile u32 *)(PFC_OEN) &= ~GENMASK(5,2);
+
 	*(volatile u32 *)(PFC_OEN) &= ~(PFC_OEN_OEN1 | PFC_OEN_OEN0);
 	while((*(volatile u32 *)(PFC_OEN) & (PFC_OEN_OEN1 | PFC_OEN_OEN0)) != 0x0)
 
