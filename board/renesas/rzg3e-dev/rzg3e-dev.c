@@ -41,11 +41,16 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define ICU_IPTSR_REG		0x10400060
 
+#define SYS_ADC_CFG		0x10431600
+
 void s_init(void)
 {
 
 	/* Enable writing to PFC and PMC registers */
        *(volatile u32 *)PFC_PWPR = *(volatile u32 *)PFC_PWPR | PFC_PWPR_REGWE_A | PFC_PWPR_REGWE_B ;
+
+	/* Enable ADC */
+	*(volatile u32 *)(SYS_ADC_CFG) = 0;
 
 #if CONFIG_TARGET_RZG3E_DEV
 	/* QSD1 */
