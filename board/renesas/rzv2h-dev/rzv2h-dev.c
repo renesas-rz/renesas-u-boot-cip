@@ -88,10 +88,14 @@ DECLARE_GLOBAL_DATA_PTR;
 #define USB2_PHY_RESET			0x000
 #define USB2_PHY_OTGR			0x600
 
+#define SYS_ADC_CFG			0x10431600
 
 void s_init(void)
 {
 	*(volatile u32 *)PWPR |= (PWPR_REGWE_A | PWPR_REGWE_B);
+
+	/* Enable ADC */
+	*(volatile u32 *)(SYS_ADC_CFG) = 0;
 
 #if CONFIG_TARGET_RZV2H_DEV
 	*(volatile u8 *)PMC_2A   &= ~(0x03<<4);	/* PA5,PA4 port	*/
