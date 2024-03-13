@@ -218,7 +218,7 @@ static efi_status_t efi_get_dfu_info(
  *   - package information
  */
 const efi_guid_t efi_firmware_image_type_uboot_fit =
-	EFI_FIRMWARE_IMAGE_TYPE_UBOOT_FIT_GUID;
+	EFI_RENESAS_FIRMWARE_IMAGE_UBOOT_FIT_GUID;
 
 /**
  * efi_firmware_fit_get_image_info - return information about the current

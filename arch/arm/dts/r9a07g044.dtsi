@@ -13,6 +13,10 @@
 	#address-cells = <2>;
 	#size-cells = <2>;
 
+    signature {
+        capsule-key = /incbin/("CRT.esl");
+    };
+
 	audio_clk1: audio1-clk {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;

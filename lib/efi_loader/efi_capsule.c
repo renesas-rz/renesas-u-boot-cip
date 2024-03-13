@@ -651,14 +651,13 @@ static efi_status_t efi_capsule_update_firmware(
 		image_binary = (void *)image + sizeof(*image);
 		image_binary_size = image->update_image_size;
 		vendor_code = image_binary + image_binary_size;
-		if (!IS_ENABLED(CONFIG_EFI_CAPSULE_AUTHENTICATE) &&
-		    (image->image_capsule_support &
-				CAPSULE_SUPPORT_AUTHENTICATION)) {
-			ret = efi_remove_auth_hdr(&image_binary,
+
+		/* The set_image requires the image address without signature 
+		hence remove authentication header if present */
+		ret = efi_remove_auth_hdr(&image_binary,
 						  &image_binary_size);
-			if (ret != EFI_SUCCESS)
-				goto out;
-		}
+		if (ret != EFI_SUCCESS)
+			goto out;
 
 		abort_reason = NULL;
 		ret = EFI_CALL(fmp->set_image(fmp, image->update_image_index,
