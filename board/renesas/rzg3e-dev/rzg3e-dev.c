@@ -43,6 +43,11 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define SYS_ADC_CFG		0x10431600
 
+#define CPG_BASE		0x10420000
+#define CPG_SSEL(x)		(CPG_BASE + 0x300 + (x) * 4)
+#define CPG_SSEL_WEN_L(x)	(BIT(16) << ((x) * 4))
+#define CPG_SSEL_L(x)		(BIT(0) << ((x) * 4))
+
 void s_init(void)
 {
 
@@ -107,6 +112,9 @@ void s_init(void)
 
        /* Set Bypass and Powerdown mode for Audio OSC */
        *(volatile u32 *)(PFC_OSCBYPS) = 0x001C0406;
+
+	/* Use CSDIV_2to16_PLLDSI for DSI0/1_VCLK */
+       *(volatile u32 *)CPG_SSEL(3) = (CPG_SSEL_WEN_L(1) | CPG_SSEL_WEN_L(0) | CPG_SSEL_L(1) | CPG_SSEL_L(0));
 }
 
 int board_early_init_f(void)
