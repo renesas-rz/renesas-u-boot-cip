@@ -94,6 +94,9 @@ int sysreset_get_last_walk(void)
 
 void sysreset_walk_halt(enum sysreset_t type)
 {
+#ifdef CONFIG_RENESAS_RZG2LWDT
+	reset_cpu();
+#else
 	int ret;
 
 	ret = sysreset_walk(type);
@@ -108,6 +111,7 @@ void sysreset_walk_halt(enum sysreset_t type)
 	else
 		log_err("System reset not supported on this platform\n");
 	hang();
+#endif
 }
 
 /*NOTE: The function reset_cpu() moved to rz platform specific code */
