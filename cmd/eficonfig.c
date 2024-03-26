@@ -623,7 +623,7 @@ static efi_status_t eficonfig_select_volume(struct eficonfig_select_file_info *f
 	efi_handle_t *volume_handles = NULL;
 	struct efi_simple_file_system_protocol *v;
 
-	ret = efi_locate_handle_buffer_int(BY_PROTOCOL, &efi_simple_file_system_protocol_guid,
+	ret = efi_locate_handle_buffer(BY_PROTOCOL, &efi_simple_file_system_protocol_guid,
 					   NULL, &count, (efi_handle_t **)&volume_handles);
 	if (ret != EFI_SUCCESS) {
 		eficonfig_print_msg("No block device found!");

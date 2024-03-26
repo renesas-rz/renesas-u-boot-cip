@@ -1137,10 +1137,6 @@ efi_status_t efi_load_capsule_drivers(void);
 
 efi_status_t platform_get_eventlog(struct udevice *dev, u64 *addr, u32 *sz);
 
-efi_status_t efi_locate_handle_buffer_int(enum efi_locate_search_type search_type,
-					  const efi_guid_t *protocol, void *search_key,
-					  efi_uintn_t *no_handles, efi_handle_t **buffer);
-
 efi_status_t efi_open_volume_int(struct efi_simple_file_system_protocol *this,
 				 struct efi_file_handle **root);
 efi_status_t efi_file_open_int(struct efi_file_handle *this,

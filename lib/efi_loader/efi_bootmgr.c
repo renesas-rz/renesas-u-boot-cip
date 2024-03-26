@@ -661,7 +661,7 @@ efi_status_t efi_bootmgr_update_media_device_boot_option(void)
 	efi_handle_t *volume_handles = NULL;
 	struct eficonfig_media_boot_option *opt = NULL;
 
-	ret = efi_locate_handle_buffer_int(BY_PROTOCOL,
+	ret = efi_locate_handle_buffer(BY_PROTOCOL,
 					   &efi_simple_file_system_protocol_guid,
 					   NULL, &count,
 					   (efi_handle_t **)&volume_handles);
