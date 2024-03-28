@@ -71,6 +71,9 @@ const efi_guid_t efi_guid_driver_binding_protocol =
 /* event group ExitBootServices() invoked */
 const efi_guid_t efi_guid_event_group_exit_boot_services =
 			EFI_EVENT_GROUP_EXIT_BOOT_SERVICES;
+/* event group before ExitBootServices() invoked */
+const efi_guid_t efi_guid_event_group_before_exit_boot_services =
+			EFI_EVENT_GROUP_BEFORE_EXIT_BOOT_SERVICES;
 /* event group SetVirtualAddressMap() invoked */
 const efi_guid_t efi_guid_event_group_virtual_address_change =
 			EFI_EVENT_GROUP_VIRTUAL_ADDRESS_CHANGE;
@@ -192,6 +195,36 @@ const char *__efi_nesting_dec(void)
 static bool efi_event_is_queued(struct efi_event *event)
 {
 	return !!event->queue_link.next;
+}
+
+/**
+ * efi_purge_handle() - Clean the deleted handle from the various lists
+ * @handle: handle to remove
+ *
+ * Return: status code
+ */
+static efi_status_t efi_purge_handle(efi_handle_t handle)
+{
+	struct efi_register_notify_event *item;
+
+	if (!list_empty(&handle->protocols))
+		return EFI_ACCESS_DENIED;
+	/* The handle is about to be freed. Remove it from events */
+	list_for_each_entry(item, &efi_register_notify_events, link) {
+		struct efi_protocol_notification *hitem, *hnext;
+
+		list_for_each_entry_safe(hitem, hnext, &item->handles, link) {
+			if (handle == hitem->handle) {
+				list_del(&hitem->link);
+				free(hitem);
+			}
+		}
+	}
+	/* The last protocol has been removed, delete the handle. */
+	list_del(&handle->link);
+	free(handle);
+
+	return EFI_SUCCESS;
 }
 
 /**
@@ -613,14 +646,20 @@ efi_status_t efi_remove_all_protocols(const efi_handle_t handle)
  * efi_delete_handle() - delete handle
  *
  * @handle: handle to delete
+ *
+ * Return: status code
  */
-efi_status_t  efi_delete_handle(efi_handle_t handle)
+efi_status_t efi_delete_handle(efi_handle_t handle)
 {
-	if (!handle)
-		return;
-	efi_remove_all_protocols(handle);
-	list_del(&handle->link);
-	free(handle);
+	efi_status_t ret;
+
+		ret = efi_remove_all_protocols(handle);
+	if (ret != EFI_SUCCESS) {
+		log_err("Handle %p has protocols installed. Unable to delete\n", handle);
+	return ret;
+	}
+
+	return efi_purge_handle(handle);
 }
 
 /**
@@ -2121,6 +2160,16 @@ static efi_status_t EFIAPI efi_exit_boot_services(efi_handle_t image_handle,
 	/* Check if ExitBootServices has already been called */
 	if (!systab.boottime)
 		goto out;
+
+/* Notify EFI_EVENT_GROUP_BEFORE_EXIT_BOOT_SERVICES event group. */
+	list_for_each_entry(evt, &efi_events, link) {
+		if (evt->group &&
+		    !guidcmp(evt->group,
+			     &efi_guid_event_group_before_exit_boot_services)) {
+			efi_signal_event(evt);
+			break;
+		}
+	}
 
 	/* Stop all timer related activities */
 	timers_enabled = false;
