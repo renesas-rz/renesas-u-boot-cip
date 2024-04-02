@@ -22,6 +22,7 @@
 		mmc2 = &sdhi2;
 		ethernet0 = &eth0;
 		ethernet1 = &eth1;
+		i2c8 = &i2c8;
 	};
 
         chosen {
@@ -168,6 +169,11 @@
 			 <RZV2H_PINMUX(E, 1, 1)>, /* TXC_TX_CLK */
 			 <RZV2H_PINMUX(D, 3, 1)>; /* TX_CTL_TX_EN */
 	};
+
+	i2c8_pins: i2c8 {
+	        pinmux = <RZV2H_PINMUX(3, 6, 4)>, /* SCL8 */
+			 <RZV2H_PINMUX(3, 7, 4)>; /* SDA8 */
+	};
 };
 
 &extal_clk {
@@ -267,4 +273,11 @@
 			txd3-skew-psec = <0>;
 		};
 	};
+};
+
+&i2c8 {
+	pinctrl-0 = <&i2c8_pins>;
+	pinctrl-names = "default";
+
+	status = "okay";
 };
