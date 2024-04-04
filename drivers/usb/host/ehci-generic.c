@@ -67,6 +67,7 @@ static int ehci_usb_probe(struct udevice *dev)
 	struct ehci_hcor *hcor;
 	int err, ret;
 
+#if !(defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G043U) || defined(CONFIG_RZF_DEV) || defined(CONFIG_R9A09G057))
 	err = 0;
 	ret = clk_get_bulk(dev, &priv->clocks);
 	if (ret && ret != -ENOENT) {
@@ -99,6 +100,7 @@ static int ehci_usb_probe(struct udevice *dev)
 	err = generic_setup_phy(dev, &priv->phy, 0);
 	if (err)
 		goto regulator_err;
+#endif
 
 	hccr = map_physmem(dev_read_addr(dev), 0x100, MAP_NOCACHE);
 	hcor = (struct ehci_hcor *)((uintptr_t)hccr +
