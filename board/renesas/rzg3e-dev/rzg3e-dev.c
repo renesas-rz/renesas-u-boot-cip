@@ -47,6 +47,28 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_SSEL(x)		(CPG_BASE + 0x300 + (x) * 4)
 #define CPG_SSEL_WEN_L(x)	(BIT(16) << ((x) * 4))
 #define CPG_SSEL_L(x)		(BIT(0) << ((x) * 4))
+#define CPG_BUS_MSTOP(x)	(CPG_BASE + 0xD00 + (x) * 4 - 0x4)
+
+void rzg3e_cpg_init_setting(void)
+{
+	/* Use CSDIV_2to16_PLLDSI for DSI0/1_VCLK */
+	*(volatile u32 *)CPG_SSEL(3) = (CPG_SSEL_WEN_L(1) | CPG_SSEL_WEN_L(0) | CPG_SSEL_L(1) | CPG_SSEL_L(0));
+
+	/* Release Module stop state for all needed IPs */
+	*(volatile u32 *)CPG_BUS_MSTOP(1) = 0xCFFF0000;
+	*(volatile u32 *)CPG_BUS_MSTOP(2) = 0xFCFF0000;
+	*(volatile u32 *)CPG_BUS_MSTOP(3) = 0xFE7D0000;
+	*(volatile u32 *)CPG_BUS_MSTOP(4) = 0x78AF0000;
+	*(volatile u32 *)CPG_BUS_MSTOP(5) = 0xFFEA0000;
+	*(volatile u32 *)CPG_BUS_MSTOP(6) = 0xFFFF0000;
+	*(volatile u32 *)CPG_BUS_MSTOP(7) = 0x5F830000;
+	*(volatile u32 *)CPG_BUS_MSTOP(8) = 0x18FC0000;
+	*(volatile u32 *)CPG_BUS_MSTOP(9) = 0xFC100000;
+	*(volatile u32 *)CPG_BUS_MSTOP(10) = 0xD8BE0000;
+	*(volatile u32 *)CPG_BUS_MSTOP(11) = 0xFFFF0000;
+	*(volatile u32 *)CPG_BUS_MSTOP(12) = 0x06030000;
+	*(volatile u32 *)CPG_BUS_MSTOP(13) = 0x063F0000;
+}
 
 void s_init(void)
 {
@@ -113,8 +135,7 @@ void s_init(void)
        /* Set Bypass and Powerdown mode for Audio OSC */
        *(volatile u32 *)(PFC_OSCBYPS) = 0x000C0002;
 
-	/* Use CSDIV_2to16_PLLDSI for DSI0/1_VCLK */
-       *(volatile u32 *)CPG_SSEL(3) = (CPG_SSEL_WEN_L(1) | CPG_SSEL_WEN_L(0) | CPG_SSEL_L(1) | CPG_SSEL_L(0));
+	rzg3e_cpg_init_setting();
 }
 
 int board_early_init_f(void)
