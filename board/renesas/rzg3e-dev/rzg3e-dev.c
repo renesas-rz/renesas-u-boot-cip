@@ -48,6 +48,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_SSEL_WEN_L(x)	(BIT(16) << ((x) * 4))
 #define CPG_SSEL_L(x)		(BIT(0) << ((x) * 4))
 #define CPG_BUS_MSTOP(x)	(CPG_BASE + 0xD00 + (x) * 4 - 0x4)
+#define CPG_LP_VSPI_CTL1	(CPG_BASE + 0xC9C)
+#define CPG_LP_VSPI_CTL2	(CPG_BASE + 0xCA0)
 
 void rzg3e_cpg_init_setting(void)
 {
@@ -68,6 +70,10 @@ void rzg3e_cpg_init_setting(void)
 	*(volatile u32 *)CPG_BUS_MSTOP(11) = 0xFFFF0000;
 	*(volatile u32 *)CPG_BUS_MSTOP(12) = 0x06030000;
 	*(volatile u32 *)CPG_BUS_MSTOP(13) = 0x063F0000;
+
+	/* For VSPI LPI initial setting */
+	*(volatile u32 *)CPG_LP_VSPI_CTL1 = 0x01111111;
+	*(volatile u32 *)CPG_LP_VSPI_CTL2 = 0x1;
 }
 
 void s_init(void)
