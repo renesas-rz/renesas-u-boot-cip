@@ -624,11 +624,15 @@ static int riic_probe_chip(struct udevice *dev, uint addr, uint flags)
 static int riic_probe(struct udevice *dev)
 {
 	struct riic_priv *priv = dev_get_priv(dev);
+#if !(defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G047))
 	int ret;
 
-#if !(defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G047))
 	writel(0x000F000F, 0x11010880);
 	writel(0x01010101, 0x11031870);
+#else
+	writel(0x0FF80FF8, 0x10420624);
+	writel(0xFF00FF00, 0x10420924);
+	writel(0x00010001, 0x10420928);
 #endif
 	priv->base = dev_read_addr_ptr(dev);
 
@@ -636,12 +640,11 @@ static int riic_probe(struct udevice *dev)
 	ret = clk_get_by_index(dev, 0, &priv->clk);
 	if (ret)
 		return ret;
-#endif
 
 	ret = clk_enable(&priv->clk);
 	if (ret)
 		return ret;
-
+#endif
 	riic_init_setting(dev, I2C_SPEED_STANDARD_RATE);
 
 	return 0;
