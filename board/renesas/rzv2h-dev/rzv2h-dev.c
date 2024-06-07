@@ -55,10 +55,12 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_BASE			0x10420000
 #define CPG_SSEL0			(CPG_BASE + 0x0300)
 #define CPG_SSEL1			(CPG_BASE + 0x0304)
-#define CPG_CLKON_ETH0			(CPG_BASE + 0x062C)
-#define CPG_CLKMON_ETH0			(CPG_BASE + 0x0814)
-#define CPG_RESET_ETH			(CPG_BASE + 0x092C)
-#define CPG_RESETMON_ETH		(CPG_BASE + 0x0A14)
+#define CPG_CLKON_11			(CPG_BASE + 0x062C)
+#define CPG_CLKON_12			(CPG_BASE + 0x0630)
+#define CPG_CLKMON_5			(CPG_BASE + 0x0814)
+#define CPG_CLKMON_6			(CPG_BASE + 0x0818)
+#define CPG_RST_11			(CPG_BASE + 0x092C)
+#define CPG_RSTMON_5			(CPG_BASE + 0x0A14)
 
 #define CPG_RST_USB			(CPG_BASE + 0x0928)
 #define CPG_RSTMON4_USB			(CPG_BASE + 0x0A10)
@@ -155,14 +157,14 @@ void s_init(void)
 
 	*(volatile u32 *)(ICU_IPTSR_REG) = 0;
 	
-	/* Reset ETH 0 */
-	*(volatile u32 *)(CPG_RESET_ETH) = 0x00010000;
-	while((*(volatile u32 *)(CPG_RESETMON_ETH) & 0x00000002) == 0x0)
+	/* Reset ETH 0,1 */
+	*(volatile u32 *)(CPG_RST_11) = 0x00030000;
+	while((*(volatile u32 *)(CPG_RSTMON_5) & 0x00000006) == 0x0)
 		;
 
-	/* Release reset ETH0 */
-	*(volatile u32 *)(CPG_RESET_ETH) = 0x00010001;
-	while((*(volatile u32 *)(CPG_RESETMON_ETH) & 0x00000002) != 0x0)
+	/* Release reset ETH0,1 */
+	*(volatile u32 *)(CPG_RST_11) = 0x00030003;
+	while((*(volatile u32 *)(CPG_RSTMON_5) & 0x00000006) != 0x0)
 		;
 
 	/* Disable SMUX2_GBE0_RXCLK and SMUX2_GBE1_RXCLK */
@@ -174,9 +176,16 @@ void s_init(void)
 	*(volatile u32 *) (CPG_SSEL1) = 0x00100010;
 
 	/* Enable aclk_csr, aclk, tx, rx, tx_180, rx_180 for ETH0 */
-	*(volatile u32 *)(CPG_CLKON_ETH0) = 0x3F003F00;
-	while((*(volatile u32 *)(CPG_CLKMON_ETH0) & 0x3F000000) != 0x3F000000)
+	/* Enable tx, rx for ETH1 */
+	*(volatile u32 *)(CPG_CLKON_11) = 0xFF00FF00;
+	while((*(volatile u32 *)(CPG_CLKMON_5) & 0xFF000000) != 0xFF000000)
 		;
+
+	/* Enable aclk_csr, aclk, tx_180, rx_180 for ETH1 */
+	*(volatile u32 *)(CPG_CLKON_12) = 0x000F000F;
+	while((*(volatile u32 *)(CPG_CLKMON_6) & 0x0000000F) != 0x0000000F)
+		;
+
 }
 
 static void _usbphy_init(void)
