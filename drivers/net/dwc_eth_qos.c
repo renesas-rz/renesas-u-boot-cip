@@ -462,13 +462,13 @@ static int eqos_set_tx_clk_speed_rzv2h(struct udevice *dev)
 
 	switch (eqos->phy->speed) {
 	case SPEED_1000:
-		writel(0x00010000, CPG_CSDIV0);
+		writel(0x00110000, CPG_CSDIV0);
 		break;
 	case SPEED_100:
-		writel(0x00010001, CPG_CSDIV0);
+		writel(0x00110011, CPG_CSDIV0);
 		break;
 	case SPEED_10:
-		writel(0x00010002, CPG_CSDIV0);
+		writel(0x00110022, CPG_CSDIV0);
 		break;
 	default:
 		pr_err("invalid speed %d", eqos->phy->speed);
