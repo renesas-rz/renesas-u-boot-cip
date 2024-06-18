@@ -183,7 +183,7 @@
 	mdio {
 		#address-cells = <1>;
 		#size-cells = <0>;
-		phy0: ethernet-phy@0 {
+		phy0: ethernet-phy@7 {
 			compatible = "ethernet-phy-id0022.1640",
 					"ethernet-phy-ieee802.3-c22";
 			reg = <0>;
@@ -214,10 +214,10 @@
 	mdio {
 		#address-cells = <1>;
 		#size-cells = <0>;
-		phy1: ethernet-phy@0 {
+		phy1: ethernet-phy@7 {
 			compatible = "ethernet-phy-id0022.1640",
 					"ethernet-phy-ieee802.3-c22";
-			reg = <0>;
+			reg = <7>;
 			rxc-skew-psec = <1400>;
 			txc-skew-psec = <1400>;
 			rxdv-skew-psec = <0>;
