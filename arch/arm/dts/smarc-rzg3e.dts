@@ -226,8 +226,6 @@
 	phy-handle = <&phy0>;
 	phy-mode = "rgmii-id";
 
-	pinctrl-0 = <&eth0_pins>;
-	pinctrl-names = "default";
 	status = "okay";
 
 	mdio {
@@ -236,7 +234,7 @@
 		phy0: ethernet-phy@7 {
 			compatible = "ethernet-phy-id0022.1640",
 					"ethernet-phy-ieee802.3-c22";
-			reg = <0>;
+			reg = <7>;
 			rxc-skew-psec = <1400>;
 			txc-skew-psec = <1400>;
 			rxdv-skew-psec = <0>;
@@ -257,8 +255,6 @@
 	phy-handle = <&phy1>;
 	phy-mode = "rgmii-id";
 
-	pinctrl-0 = <&eth1_pins>;
-	pinctrl-names = "default";
 	status = "okay";
 
 	mdio {
