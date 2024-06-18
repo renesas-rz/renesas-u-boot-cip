@@ -85,7 +85,6 @@ void s_init(void)
 	/* Enable ADC */
 	*(volatile u32 *)(SYS_ADC_CFG) = 0;
 
-#if CONFIG_TARGET_RZG3E_DEV
 	/* QSD1 */
 	*(volatile u8 *)PMC(1) &= ~(BIT(5) | BIT(6)); /* P1_5, P1_6 */
 	*(volatile u8 *)P(1) = (*(volatile u8 *)P(1) & ~BIT(5)) | BIT(6); /* P1_5 = 0, P1_6 = 1 */
@@ -123,15 +122,6 @@ void s_init(void)
 
 	*(volatile u32 *)(PFC_OEN) &= ~(PFC_OEN_OEN1 | PFC_OEN_OEN0);
 	while((*(volatile u32 *)(PFC_OEN) & (PFC_OEN_OEN1 | PFC_OEN_OEN0)) != 0x0)
-
-#endif
-
-#if CONFIG_TARGET_SMARC_RZG3E
-	/* QSD2 */
-	*(volatile u8 *)PMC(K) &= ~(BIT(1) | BIT(2)); /* PK_1, PK_2 */
-	*(volatile u8 *)P(K) = *(volatile u8 *)P(K) | BIT(1) | BIT(2); /* PK_1 = 1, PK_2 = 1 */
-	*(volatile u16 *)PM(K) = (*(volatile u16 *)PM(K) & ~GENMASK(5, 2)) | BIT(5) | BIT(3); /* PK_1, PK_2 output */
-#endif
 
 	/* Disable writing to PFC and PMC registers */
        *(volatile u32 *)PFC_PWPR = *(volatile u32 *)PFC_PWPR & ~(PFC_PWPR_REGWE_A | PFC_PWPR_REGWE_B);
