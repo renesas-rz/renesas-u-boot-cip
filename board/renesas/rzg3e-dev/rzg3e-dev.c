@@ -129,7 +129,11 @@ void s_init(void)
        *(volatile u32 *)(ICU_IPTSR_REG) = 0;
 
        /* Set Bypass and Powerdown mode for Audio OSC */
-       *(volatile u32 *)(PFC_OSCBYPS) = 0x000C0002;
+#if CONFIG_TARGET_SMARC_RZG3E
+	*(volatile u32 *)(PFC_OSCBYPS) = (*(volatile u32 *)(PFC_OSCBYPS) & 0xFFF3FC00) | 0x000C0003;
+#else
+	*(volatile u32 *)(PFC_OSCBYPS) = 0x000C0002;
+#endif
 
 	rzg3e_cpg_init_setting();
 }
