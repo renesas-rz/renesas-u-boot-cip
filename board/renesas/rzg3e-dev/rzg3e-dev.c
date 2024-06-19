@@ -44,6 +44,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define SYS_ADC_CFG		0x10431600
 
 #define CPG_BASE		0x10420000
+#define CPG_SSEL0		(CPG_BASE + 0x0300)
+#define CPG_SSEL1		(CPG_BASE + 0x0304)
 #define CPG_SSEL(x)		(CPG_BASE + 0x300 + (x) * 4)
 #define CPG_SSEL_WEN_L(x)	(BIT(16) << ((x) * 4))
 #define CPG_SSEL_L(x)		(BIT(0) << ((x) * 4))
@@ -127,6 +129,14 @@ void s_init(void)
        *(volatile u32 *)PFC_PWPR = *(volatile u32 *)PFC_PWPR & ~(PFC_PWPR_REGWE_A | PFC_PWPR_REGWE_B);
 
        *(volatile u32 *)(ICU_IPTSR_REG) = 0;
+
+	/* Disable SMUX2_GBE0_RXCLK and SMUX2_GBE1_RXCLK */
+	*(volatile u32 *) (CPG_SSEL0) = 0x10000000;
+	*(volatile u32 *) (CPG_SSEL1) = 0x00100000;
+
+	/* Enable SMUX2_GBE0_RXCLK and SMUX2_GBE1_RXCLK */
+	*(volatile u32 *) (CPG_SSEL0) = 0x10001000;
+	*(volatile u32 *) (CPG_SSEL1) = 0x00100010;
 
        /* Set Bypass and Powerdown mode for Audio OSC */
 #if CONFIG_TARGET_SMARC_RZG3E
