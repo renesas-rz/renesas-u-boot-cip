@@ -493,6 +493,7 @@ static const struct dm_spi_ops xspi_ops = {
 	.xfer		= xspi_xfer,
 	.set_speed	= xspi_set_speed,
 	.set_mode	= xspi_set_mode,
+	.release_bus	= xspi_release_bus,
 };
 
 static const struct udevice_id xspi_ids[] = {
