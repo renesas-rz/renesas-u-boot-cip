@@ -250,19 +250,13 @@ config DWC_ETH_QOS_TEGRA186
 	  The Synopsys Designware Ethernet QOS IP block with specific
 	  configuration used in NVIDIA's Tegra186 chip.
 
-config DWC_ETH_QOS_QCOM
-	bool "Synopsys DWC Ethernet QOS device support for Qcom SoCs"
+config DWC_ETH_QOS_RZT2H
+	bool "Synopsys DWC Ethernet QOS device support for RZT2H"
 	depends on DWC_ETH_QOS
+	default y if TARGET_RZT2H_DEV
 	help
 	  The Synopsys Designware Ethernet QOS IP block with specific
-	  configuration used in Qcom QCS404 SoC.
-
-config DWC_ETH_QOS_STARFIVE
-	bool "Synopsys DWC Ethernet QOS device support for STARFIVE"
-	depends on DWC_ETH_QOS
-	help
-	  The Synopsys Designware Ethernet QOS IP block with specific
-	  configuration used in STARFIVE  JH7110 soc.
+	  configuration used in RZT2H.
 
 config DWC_ETH_QOS_RZV2H
 	bool "Synopsys DWC Ethernet QOS device support for RZV2H"
