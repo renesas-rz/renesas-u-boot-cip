@@ -100,6 +100,8 @@ config R9A08G045S
 
 config R9A08G046
 	bool "Renesas SoC RZ/G3L"
+config R9A09G077
+	bool "Renesas SoC RZ/T2H"
 
 endmenu
 
@@ -299,6 +301,10 @@ config TARGET_SMARC_RZG3L
 	bool "RZ/G3L Dev board"
 	help
           Support for Renesas RZ/G3L Dev Platform
+config TARGET_RZT2H_DEV
+	bool "RZ/T2H Dev board"
+	help
+          Support for Renesas RZ/T2H Dev Platform
 
 endchoice
 
