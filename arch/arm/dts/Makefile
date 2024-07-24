@@ -951,6 +951,7 @@ dtb-$(CONFIG_ARCH_IMX9) += \
 	imx93-phyboard-segin.dtb
 
 dtb-$(CONFIG_ARCH_IMXRT) += imxrt1050-evk.dtb \
+
 	imxrt1020-evk.dtb \
 	imxrt1170-evk.dtb \
 
@@ -990,6 +991,53 @@ dtb-$(CONFIG_TARGET_RZG2L) += \
 	r9a07g044l2-smarc.dts
 
 ifdef CONFIG_RCAR_64
+
+	imxrt1020-evk.dtb
+
+dtb-$(CONFIG_RCAR_GEN2) += \
+	r8a7790-lager-u-boot.dtb \
+	r8a7790-stout-u-boot.dtb \
+	r8a7791-koelsch-u-boot.dtb \
+	r8a7791-porter-u-boot.dtb \
+	r8a7792-blanche-u-boot.dtb \
+	r8a7793-gose-u-boot.dtb \
+	r8a7794-alt-u-boot.dtb \
+	r8a7794-silk-u-boot.dtb
+
+dtb-$(CONFIG_RCAR_GEN3) += \
+	r8a774a1-beacon-rzg2m-kit.dtb \
+	r8a774b1-beacon-rzg2n-kit.dtb \
+	r8a774e1-beacon-rzg2h-kit.dtb \
+	r8a774a1-hihope-rzg2m-u-boot.dtb \
+	r8a774b1-hihope-rzg2n-u-boot.dtb \
+	r8a774c0-ek874-revc-u-boot.dtb \
+	r8a774c0-ek874-u-boot.dtb \
+	r8a774e1-hihope-rzg2h-u-boot.dtb \
+	r8a77950-ulcb-u-boot.dtb \
+	r8a77950-salvator-x-u-boot.dtb \
+	r8a77960-ulcb-u-boot.dtb \
+	r8a77960-salvator-x-u-boot.dtb \
+	r8a77965-ulcb-u-boot.dtb \
+	r8a77965-salvator-x-u-boot.dtb \
+	r8a77970-eagle-u-boot.dtb \
+	r8a77980-condor-u-boot.dtb \
+	r8a77990-ebisu-u-boot.dtb \
+	r8a77995-draak-u-boot.dtb \
+	r8a779a0-falcon-u-boot.dtb \
+	rzg2l-dev.dtb \
+	smarc-rzg2l.dtb \
+	rzv2l-dev.dtb \
+	smarc-rzv2l.dtb \
+	rzg2lc-dev.dtb \
+	smarc-rzg2lc.dtb \
+	rzg2ul-type1-dev.dtb \
+	rzg2ul-type1-ddr3l-dev.dtb \
+	rzg2ul-type2-dev.dtb \
+	smarc-rzg2ul.dtb \
+	rzt2h-dev.dtb
+
+ifdef CONFIG_RCAR_GEN3
+
 DTC_FLAGS += -R 4 -p 0x1000
 endif
 
