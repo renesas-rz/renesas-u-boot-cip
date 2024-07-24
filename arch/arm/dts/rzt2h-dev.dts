@@ -1,0 +1,93 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+/*
+ * Device Tree Source for the RZ/T2H Development EVK board
+ *
+ * Copyright (C) 2023 Renesas Electronics Corp.
+ */
+
+/dts-v1/;
+#include "r9a09g077.dtsi"
+#include <dt-bindings/pinctrl/rzt2h-pinctrl.h>
+#include <dt-bindings/gpio/gpio.h>
+#include "r9a09g077-u-boot.dtsi"
+
+/ {
+	model = "Renesas Development EVK based on r9a09g077m44";
+	compatible = "renesas,r9a09g077m44-dev", "renesas,r9a09g077m44", "renesas,r9a09g077";
+
+
+	aliases {
+		serial0 = &sci0;
+		mmc0 = &sdhi0;
+		mmc1 = &sdhi1;
+	};
+
+	chosen {
+		bootargs = "ignore_loglevel";
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory@C4000000 {
+		device_type = "memory";
+		reg = <0x0 0xC4000000 0x0 0x3C000000>;
+	};
+
+	memory@204000000 {
+		device_type = "memory";
+		reg = <0x2 0x40000000 0x1 0xC0000000>;
+	};
+
+	reg_1p8v: regulator0 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "fixed-1.8V";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
+	reg_3p3v: regulator1 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "fixed-3.3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
+};
+
+&sci0 {
+	status = "okay";
+};
+
+&sdhi0 {
+	bus-width = <8>;
+	status = "okay";
+
+	/* This is used for interface that support both eMMC and SD in board */
+	mutual-channel;
+};
+
+&sdhi1 {
+	bus-width = <4>;
+	status = "okay";
+};
+
+&gmac1 {
+	phy-handle = <&phy3>;
+	phy-mode = "rgmii-id";
+	status = "okay";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		phy3: ethernet-phy@3 {
+			compatible = "ethernet-phy-id0007.0772";
+			phy-mode = "rgmii-id";
+			reg = <3>;
+		};
+	};
+};
