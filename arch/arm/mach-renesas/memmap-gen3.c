@@ -12,6 +12,44 @@
 
 #define GEN3_NR_REGIONS 16
 
+#if (defined CONFIG_R9A09G077)
+static struct mm_region r9a09g077_mem_map[GEN3_NR_REGIONS] = {
+	{
+		.virt = 0x0UL,
+		.phys = 0x0UL,
+		.size = 0xC0000000UL,
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
+			PTE_BLOCK_NON_SHARE |
+			PTE_BLOCK_PXN | PTE_BLOCK_UXN
+	}, {
+		/* DDR mirror */
+		.virt = 0xC4000000UL,
+		.phys = 0xC4000000UL,
+		.size = 0x3C000000UL,
+		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
+			PTE_BLOCK_INNER_SHARE
+	}, {
+		.virt = 0x100000000UL,
+		.phys = 0x100000000UL,
+		.size = 0x100000000UL,
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
+			PTE_BLOCK_NON_SHARE |
+			PTE_BLOCK_PXN | PTE_BLOCK_UXN
+	}, {
+		/* DDR */
+		.virt = 0x240000000UL,
+		.phys = 0x240000000UL,
+		.size = 0x1C0000000UL,
+		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
+			PTE_BLOCK_INNER_SHARE
+	}, {
+		/* List terminator */
+		0,
+	}
+};
+
+struct mm_region *mem_map = r9a09g077_mem_map;
+#else
 static struct mm_region gen3_mem_map[GEN3_NR_REGIONS] = {
 	{
 		.virt = 0x0UL,
@@ -147,3 +185,4 @@ void enable_caches(void)
 
 	dcache_enable();
 }
+#endif
