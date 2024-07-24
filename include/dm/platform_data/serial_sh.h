@@ -15,6 +15,7 @@ enum sh_clk_mode {
 enum sh_serial_type {
 	PORT_SCI,
 	PORT_SCIF,
+	PORT_RSCI,
 	PORT_SCIFA,
 	PORT_SCIFB,
 	PORT_HSCIF,
