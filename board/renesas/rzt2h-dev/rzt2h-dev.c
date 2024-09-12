@@ -79,10 +79,9 @@ void s_init(void)
 	/* Setting xSPI1 CS0 End Address */
 	*(volatile u32 *)CS0ENDAD_xSPI(1) = 0x57FFFFFF;
 
-	/* P2_5_SD0_PWEN_A Output HIGH */
-	*(volatile u8 *)PMC(2) &= ~BIT(5);
-	*(volatile u8 *)P(2) |= BIT(5);
-	*(volatile u16 *)PM(2) |= (0x3 << 10);
+	/* P2_5_SD0_PWEN_A */
+	*(volatile u8 *)PMC(2) |= BIT(5);
+	*(volatile u64 *)PFC(2) = (*(volatile u64 *)PFC(2) & 0xffff00ffffffffff) | ((u64)0x29 << 40);
 
 	/* P2_6_SD0_IOVS_A Output LOW */
 	*(volatile u8 *)PMC(2) &= ~BIT(6);
@@ -90,9 +89,8 @@ void s_init(void)
 	*(volatile u16 *)PM(2) |= (0x3 << 12);
 
 	/* P8_5_SD1_PWEN_A Output HIGH */
-	*(volatile u8 *)PMC(8) &= ~BIT(5);
-	*(volatile u8 *)P(8) |= BIT(5);
-	*(volatile u16 *)PM(8) |= (0x3 << 10);
+	*(volatile u8 *)PMC(8) |= BIT(5);
+	*(volatile u64 *)PFC(8) = (*(volatile u64 *)PFC(8) & 0xffff00ffffffffff) | ((u64)0x29 << 40);
 
 	/* P8_6_SD1_IOVS_A Output LOW */
 	*(volatile u8 *)PMC(8) &= ~BIT(6);
