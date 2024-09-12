@@ -56,6 +56,16 @@ static inline u64 sh_sdhi_readq(struct sh_sdhi_host *host, int reg)
 	return readq(host->addr + (reg << host->bus_shift));
 }
 
+static inline void sh_sdhi_writel(struct sh_sdhi_host *host, int reg, u32 val)
+{
+	writel(val, host->addr + (reg << host->bus_shift));
+}
+
+static inline u32 sh_sdhi_readl(struct sh_sdhi_host *host, int reg)
+{
+	return readl(host->addr + (reg << host->bus_shift));
+}
+
 static inline void sh_sdhi_writew(struct sh_sdhi_host *host, int reg, u16 val)
 {
 	writew(val, host->addr + (reg << host->bus_shift));
@@ -909,6 +919,11 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 		}
 	}
 
+#if (defined CONFIG_R9A09G077)
+	sh_sdhi_writel(host, SDHI_SD_STATUS, ~SD_STATUS_SD_PWEN & sh_sdhi_readl(host, SDHI_SD_STATUS));
+	mdelay(5);
+	sh_sdhi_writel(host, SDHI_SD_STATUS, SD_STATUS_SD_PWEN);
+#endif
 	sh_sdhi_initialize_common(host);
 
 	plat->cfg.voltages = MMC_VDD_165_195 | MMC_VDD_32_33 | MMC_VDD_33_34;
