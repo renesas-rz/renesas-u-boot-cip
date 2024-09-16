@@ -20,6 +20,7 @@
 #include <asm/arch/sh_sdhi.h>
 #include <i2c.h>
 #include <mmc.h>
+#include <linux/delay.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -64,6 +65,73 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define DDRMIR_MASK		GENMASK(27,  0)
 #define addr_shift		0x2
+
+/* USB2.0 Host registers */
+#define USB2_BASE		(0x92040000)
+#define USBF_BASE		(0x92041000)
+#define USB2_INT_ENABLE		0x200
+#define USB2_COMMCTRL		0x800
+#define USB2_VBCTRL		0x80c
+#define USB2_LINECTRL1		0x810
+#define USB2_PHYCTRL		0x830
+#define USB2_USBCTR		0x20c
+#define USB2_UTMI_CTRL		0x318
+#define USB2_OCSLPTIMSET	0x310
+#define USB2_OBINTSTA		0x804
+#define USB2_OBINTEN		0x808
+#define USB2_HcRhDescriptorA	0x048
+#define USBf_LPSTS		0x102
+#define USB2_SPD_RSM_TIMSET	0x30c
+
+/* INT_ENABLE */
+#define USB2_INT_ENABLE_UCOM_INTEN	BIT(3)
+#define USB2_INT_ENABLE_USBH_INTB_EN	BIT(2) /* For EHCI */
+#define USB2_INT_ENABLE_USBH_INTA_EN	BIT(1) /* For OHCI */
+
+/* USBCTR */
+#define USB2_USBCTR_DIRPD	BIT(2)
+#define USB2_USBCTR_PLL_RST	BIT(1)
+
+/* SPD_RSM_TIMSET */
+#define USB2_SPD_RSM_TIMSET_INIT	0x014e029b
+
+/* OC_TIMSET */
+#define USB2_OCSLPTIMSET_INIT	0x000209ab
+
+/* COMMCTRL */
+#define USB2_COMMCTRL_OTG_PERI	BIT(31) /* 1 = Peripheral mode */
+
+/* OBINTSTA and OBINTEN */
+#define USB2_OBINT_SESSVLDCHG	BIT(12)
+#define USB2_OBINT_IDDIGCHG	BIT(11)
+#define USB2_OBINT_VBSTAINT	BIT(3)
+#define USB2_OBINT_IDCHG	BIT(0)
+#define USB2_OBINT_BITS		(USB2_OBINT_SESSVLDCHG | \
+				USB2_OBINT_IDDIGCHG)
+#define USB2_OBINT_BITS_T2H	(USB2_OBINT_IDCHG | \
+				USB2_OBINT_VBSTAINT)
+
+/* VBCTRL */
+#define USB2_VBCTRL_VBSTA	BIT(29)
+#define USB2_VBCTRL_VBLVL	BIT(21)
+#define USB2_VBCTRL_OCCLREN	BIT(16)
+#define USB2_VBCTRL_DRVVBUSSEL	BIT(8)
+#define USB2_VBCTRL_SIDDQREL	BIT(2)
+#define USB2_VBCTRL_VBOUT	BIT(0)
+
+/* LINECTRL1 */
+#define USB2_LINECTRL1_DPRPD_EN	BIT(19)
+#define USB2_LINECTRL1_DP_RPD	BIT(18)
+#define USB2_LINECTRL1_DMRPD_EN	BIT(17)
+#define USB2_LINECTRL1_DM_RPD	BIT(16)
+#define USB2_LINECTRL1_OPMODE_NODRV	BIT(6)
+
+/* PHYCTRL */
+#define USB2_PHYCTRL_OTGSESSVLD	BIT(20)
+#define USB2_PHYCTRL_IDDIG	BIT(19)
+#define USB2_PHYCTRL_VBUSVALID	BIT(18)
+#define USB2_PHYCTRL_IDPULLUP	BIT(5)  /* 1 = ID sampling is enabled */
+#define USB2_PHYCTRL_DRVVBUS	BIT(4)
 
 #define MODCTRL			0x8
 
@@ -154,9 +222,50 @@ void s_init(void)
 	*(volatile u32 *)PRCRS = PRCRS_PRKEY;
 }
 
+static void board_usb_init(void)
+{
+	/* Disable Write protect to enable writing */
+	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
+	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
+
+	/* set P00_0 operation as USB_VBUSEN*/
+	*(volatile u8 *)PMC(0)		|= BIT(0);
+	*(volatile u64 *)PFC(0)	= (*(volatile u64 *)PFC(0) & 0x3f) | 0x13;
+
+	/* Enable Write protect to disable writing*/
+	(*(volatile u32 *)PRCRN) = PRCRN_PRKEY;
+	(*(volatile u32 *)PRCRS) = PRCRS_PRKEY;
+
+	/* Disable interrupt */
+	*(volatile u32 *)(USB2_BASE + USB2_INT_ENABLE) = 0;
+
+	/* enable pull down resisor */
+	*(volatile u32 *)(USB2_BASE + USB2_LINECTRL1) |= USB2_LINECTRL1_DP_RPD | USB2_LINECTRL1_DPRPD_EN | USB2_LINECTRL1_DMRPD_EN | USB2_LINECTRL1_DM_RPD;
+
+	/* enable VBUS valid comparator */
+	*(volatile u32 *)(USB2_BASE + USB2_PHYCTRL) |= USB2_PHYCTRL_DRVVBUS;
+
+	/* usb is HOST */
+	*(volatile u32 *)(USB2_BASE + USB2_COMMCTRL) &= ~USB2_COMMCTRL_OTG_PERI;
+
+	/* UTMI normal mode */
+	(*(volatile u16 *)(USBF_BASE + USBf_LPSTS)) |= 0x4000;
+
+	/* SIDDQ mode release and enable VBUS output */
+	*(volatile u32 *)(USB2_BASE + USB2_VBCTRL) |= USB2_VBCTRL_SIDDQREL | USB2_VBCTRL_VBOUT;
+
+	/* Overcurrent is not supported */
+	(*(volatile u32 *)(USB2_BASE + USB2_HcRhDescriptorA)) |= (0x1u << 12);
+
+	/* Release PLL reset */
+	(*(volatile u32 *)(USB2_BASE + USB2_USBCTR)) |= USB2_USBCTR_PLL_RST;
+	(*(volatile u32 *)(USB2_BASE + USB2_USBCTR)) &= ~USB2_USBCTR_PLL_RST;
+
+	udelay(10);
+}
+
 int board_early_init_f(void)
 {
-
 	return 0;
 }
 
@@ -191,6 +300,8 @@ int board_init(void)
 		return ret;
 	/* Set up speed for Converters for GMAC1 */
 	ethss_link_up(3, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
+
+	board_usb_init();
 
 	return 0;
 }
