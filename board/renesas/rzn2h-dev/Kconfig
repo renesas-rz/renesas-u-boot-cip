@@ -1,0 +1,15 @@
+if TARGET_RZN2H_DEV
+
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "rzn2h-dev"
+
+config SYS_VENDOR
+	default "renesas"
+
+config SYS_CONFIG_NAME
+	default "rzn2h-dev"
+
+endif
