@@ -88,6 +88,9 @@ config R9A07G043U
 config R9A09G077
 	bool "Renesas SoC RZ/T2H"
 
+config R9A09G087
+        bool "Renesas SoC RZ/N2H"
+
 endmenu
 
 choice
@@ -238,6 +241,11 @@ config TARGET_RZT2H_DEV
 	help
           Support for Renesas RZ/T2H Dev Platform
 
+config TARGET_RZN2H_DEV
+        bool "RZ/N2H Dev board"
+        help
+          Support for Renesas RZ/N2H Dev Platform
+
 endchoice
 
 source "board/renesas/condor/Kconfig"
@@ -257,7 +265,6 @@ source "board/renesas/rzv2l-dev/Kconfig"
 source "board/renesas/rzg2lc-dev/Kconfig"
 source "board/renesas/rzg2ul-dev/Kconfig"
 source "board/renesas/rzt2h-dev/Kconfig"
->>>>>>> arm: mach-rmobile: Kconfig.64: add RZ/T2H board config:arch/arm/mach-rmobile/Kconfig.64
 
 config MULTI_DTB_FIT_UNCOMPRESS_SZ
 	default 0x80000 if TARGET_BEACON_RZG2M
