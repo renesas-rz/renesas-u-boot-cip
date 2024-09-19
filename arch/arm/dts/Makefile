@@ -1034,7 +1034,8 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	rzg2ul-type1-ddr3l-dev.dtb \
 	rzg2ul-type2-dev.dtb \
 	smarc-rzg2ul.dtb \
-	rzt2h-dev.dtb
+	rzt2h-dev.dtb \
+	rzn2h-dev.dtb
 
 ifdef CONFIG_RCAR_GEN3
 
