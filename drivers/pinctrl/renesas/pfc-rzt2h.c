@@ -188,6 +188,7 @@ static int rzt2h_pinctrl_probe(struct udevice *dev)
 
 static const struct udevice_id rzt2h_pinctrl_match[] = {
 	{ .compatible = "renesas,r9a09g077-pinctrl", .data = 36 },
+	{ .compatible = "renesas,r9a09g087-pinctrl", .data = 36 },
 	{}
 };
 
