@@ -12,7 +12,7 @@
 
 #define GEN3_NR_REGIONS 16
 
-#if (defined CONFIG_R9A09G077)
+#if ((defined CONFIG_R9A09G077) || (defined CONFIG_R9A09G087))
 static struct mm_region r9a09g077_mem_map[GEN3_NR_REGIONS] = {
 	{
 		.virt = 0x0UL,
