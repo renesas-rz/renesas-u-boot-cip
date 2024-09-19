@@ -92,7 +92,7 @@ struct uart_port {
 # define SCIF_ORER 0x0001  /* overrun error bit */
 #elif defined(CONFIG_RCAR_GEN2) || defined(CONFIG_RCAR_64) || \
       defined(CONFIG_R7S72100) || defined(CONFIG_RZG2L) || defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || \
-      defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A09G077) || defined(CONFIG_R9A09G047) || defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_RZF_DEV) || defined(CONFIG_R9A08G045S) || defined(CONFIG_R9A08G046)
+      defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A09G077) || defined(CONFIG_R9A09G087) || defined(CONFIG_R9A09G047) || defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_RZF_DEV) || defined(CONFIG_R9A08G045S) || defined(CONFIG_R9A08G046)
 # if defined(CFG_SCIF_A)
 #  define SCIF_ORER	0x0200
 # else
@@ -316,7 +316,7 @@ static inline void sci_##name##_out(struct uart_port *port,\
 					sh4_scif_offset, sh4_scif_size)
 		#define SCIF_FNS(name, sh4_scif_offset, sh4_scif_size) \
 			CPU_SCIF_FNS(name, sh4_scif_offset, sh4_scif_size)
-#elif defined(CONFIG_RZG2L) || defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A09G077) || defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_R9A09G047) || defined(CONFIG_RZF_DEV) || defined(CONFIG_R9A08G045S) || defined(CONFIG_R9A08G046)
+#elif defined(CONFIG_RZG2L) || defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A09G077) || defined(CONFIG_R9A09G087) || defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_R9A09G047) || defined(CONFIG_RZF_DEV) || defined(CONFIG_R9A08G045S) || defined(CONFIG_R9A08G046)
 #define SCIF_FNS(reg_name, reg_offset, reg_size) \
 	CPU_SCIF_FNS(reg_name, reg_offset, reg_size)
 #else
@@ -394,7 +394,7 @@ SCIF_FNS(SCLSR,  0,  0, 0x14, 16)
 #else
 SCIF_FNS(SCLSR,  0,  0, 0x24, 16)
 #endif
-#elif defined(CONFIG_RZG2L) || defined(CONFIG_R9A07G044C) ||  defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A09G077) || defined(CONFIG_R9A09G047) || defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_RZF_DEV) || defined(CONFIG_R9A08G045S) || defined(CONFIG_R9A08G046)
+#elif defined(CONFIG_RZG2L) || defined(CONFIG_R9A07G044C) ||  defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A07G043U) || defined(CONFIG_R9A09G077) || defined(CONFIG_R9A09G087) || defined(CONFIG_R9A09G047) || defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_RZF_DEV) || defined(CONFIG_R9A08G045S) || defined(CONFIG_R9A08G046)
 SCIF_FNS(SCSMR,  0x00, 16)
 SCIF_FNS(SCBRR,  0x02,  8)
 SCIF_FNS(SCSCR,  0x04, 16)
@@ -408,7 +408,7 @@ SCIF_FNS(SCLSR,  0x12, 16)
 SCIF_FNS(SCSEMR, 0x14,  8)
 SCIF_FNS(SCxTCR, 0x16, 16)
 
-#if defined(CONFIG_R9A09G077)
+#if (defined(CONFIG_R9A09G077) || defined(CONFIG_R9A09G087))
 /* RSCI registers */
 SCIF_FNS(RSCxRDR, 0x00, 32)
 SCIF_FNS(RSCxTDR, 0x04, 32)
