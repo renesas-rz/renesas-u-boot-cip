@@ -105,6 +105,8 @@ int arch_misc_init(void)
 
 #ifdef CONFIG_R9A09G077
 	env_set("platform", "r9a09g077");
+#elif CONFIG_R9A09G087
+	env_set("platform", "r9a09g087");
 #else
 	int i, idx = rmobile_cpuinfo_idx();
 	const u8 *cpu_name = get_cpu_name(idx);
@@ -130,6 +132,8 @@ int print_cpuinfo(void)
 
 #ifdef CONFIG_R9A09G077
 	printf("CPU: Renesas Electronics RZ/T2H\n");
+#elif CONFIG_R9A09G087
+	printf("CPU: Renesas Electronics RZ/N2H\n");
 #else
 	int i = rmobile_cpuinfo_idx();
 
