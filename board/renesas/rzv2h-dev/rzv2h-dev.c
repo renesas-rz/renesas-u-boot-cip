@@ -321,7 +321,7 @@ static void board_pmic_i2c_init(void)
 {
 	struct udevice *bus, *dev;
 	int ret;
-	u8 reg_addr, reg_val;
+	u8 reg_addr, reg_val, read_val;
 
 	/* Get the I2C bus */
 	ret = uclass_get_device_by_seq(UCLASS_I2C, 8, &bus);
@@ -339,6 +339,20 @@ static void board_pmic_i2c_init(void)
 	ret = dm_i2c_write(dev, reg_addr, &reg_val, 1);
 	if (ret)
 		goto pmic_failed;
+
+	/* Read the value of register 0x24 of device address 0x6a */
+	ret = dm_i2c_read(dev, reg_addr, &read_val, 1);
+	if (ret) {
+		printf("Failed to get value of register 0x%x\n", reg_addr);
+		goto pmic_failed;
+	}
+
+	/* Check if DCDC installation was successful */
+	if (read_val != reg_val) {
+		printf("Written value was not correctly at register 0x%x\n",
+		       reg_addr);
+		goto pmic_failed;
+	}
 
 	return;
 
