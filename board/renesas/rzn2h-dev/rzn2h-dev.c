@@ -154,13 +154,13 @@ void s_init(void)
 	*(volatile u64 *)PFC(2) = (*(volatile u64 *)PFC(2) & 0xffff00ffffffffff) | ((u64)0x29 << 40);
 
 	/* P2_6_SD0_IOVS_A Output LOW */
-	*(volatile u8 *)PMC(2) |= BIT(6);
-	*(volatile u64 *)PFC(8) = (*(volatile u64 *)PFC(8) & 0xffff00ffffffffff) | ((u64)0x29 << 40);
+	*(volatile u8 *)PMC(2) &= ~BIT(6);
+	*(volatile u8 *)P(2) &= ~BIT(6);
+	*(volatile u16 *)PM(2) |= (0x3 << 12);
 
-	/* P08_5_SD1_PWEN_A Output HIGH */
-	*(volatile u8 *)PMC(8) &= ~BIT(5);
-	*(volatile u8 *)P(8) |= BIT(5);
-	*(volatile u16 *)PM(8) |= (0x3 << 10);
+	/* P8_5_SD1_PWEN_A Output HIGH */
+	*(volatile u8 *)PMC(8) |= BIT(5);
+	*(volatile u64 *)PFC(8) = (*(volatile u64 *)PFC(8) & 0xffff00ffffffffff) | ((u64)0x29 << 40);
 
 	/* P08_6_SD1_IOVS_A Output LOW */
 	*(volatile u8 *)PMC(8) &= ~BIT(6);
@@ -183,11 +183,11 @@ void s_init(void)
 					| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16);
 
 	*(volatile u8 *)PMC(34)		|= BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
-	*(volatile u64 *)PFC(34)	= (*(volatile u64 *)PFC(34) & 0x00ff000000000000)
+	*(volatile u64 *)PFC(34)	= (*(volatile u64 *)PFC(34) & 0xffff000000000000)
 					| ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
 
 	*(volatile u8 *)PMC(0)		|= BIT(3)|BIT(2)|BIT(1)|BIT(0);
-	*(volatile u64 *)PFC(0)		= (*(volatile u64 *)PFC(0) & 0xffffffffff000000)
+	*(volatile u64 *)PFC(0)		= (*(volatile u64 *)PFC(0) & 0xffffffff00000000)
 					|(0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
 
 	/* GMAC1_MDC, GMAC1_MDIO */
