@@ -45,11 +45,14 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define MSTPCRE			0x80280310
 #define MSTPCRE_GMAC1		BIT(16)
+#define MSTPCRE_GMAC2		BIT(17)
 #define MSTPCRE_ETHSS		BIT(3)
 
 #define MRCTLE			0x80280250
-#define MRCTLE_GMAC1_PCLKH	BIT(17)
-#define MRCTLE_GMAC1_PCLKM	BIT(16)
+#define MRCTLE_GMAC1_PCLKH	BIT(16)
+#define MRCTLE_GMAC1_PCLKM	BIT(17)
+#define MRCTLE_GMAC2_PCLKH	BIT(18)
+#define MRCTLE_GMAC2_PCLKM	BIT(19)
 #define MRCTLE_ETHSS		BIT(5)
 #define MRCTLE_MII_CONV		BIT(6)
 
@@ -206,6 +209,42 @@ void s_init(void)
 	/* Release module reset for GMAC1 */
 	*(volatile u32 *)MRCTLE &= ~(MRCTLE_GMAC1_PCLKH | MRCTLE_GMAC1_PCLKM);
 
+	/* Release PHY2 Reset state  P03_1 */
+	*(volatile u8 *)PMC(3) &= ~BIT(1);
+	*(volatile u8 *)P(3) |= BIT(1);
+	*(volatile u16 *)PM(3) |= (0x3 << 2);
+
+	/* ETH2 PIN */
+	/* ETH2_TXCLK, ETH2_TXD[0], ETH2_TXD[1], ETH2_TXD[2], ETH2_TXD[3], ETH2_TXEN, ETH2_RXCLK, ETH2_RXD[0],
+	ETH2_RXD[1], ETH2_RXD[2], ETH2_RXD[3], ETH2_RXDV, ETH2_RXER, ETH2_TXER, ETH2_CRS, ETH2_COL */
+	*(volatile u8 *)PMC(29)		|= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1);
+	*(volatile u64 *)PFC(29)	= (*(volatile u64 *)PFC(29) & 0x00000000000000ff)
+					| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8);
+
+	*(volatile u8 *)PMC(30)		|= BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+	*(volatile u64 *)PFC(30)	= (*(volatile u64 *)PFC(30) & 0xffffff0000000000)
+					| ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+
+	*(volatile u8 *)PMC(31)		|= BIT(5)|BIT(4)|BIT(2)|BIT(1);
+	*(volatile u64 *)PFC(31)	= (*(volatile u64 *)PFC(31) & 0xffff0000ff0000ff)
+					| ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 16) | (0xf << 8);
+
+	/* GMAC2_MDC, GMAC2_MDIO */
+	*(volatile u8 *)PMC(30)		|= BIT(6)|BIT(5);
+	*(volatile u64 *)PFC(30)	= (*(volatile u64 *)PFC(30) & ~((u64)0x3f << 48) & ~((u64)0x3f << 40))
+					| ((u64)0x10 << 48) | ((u64)0x10 << 40);
+
+	/* ETH2_REFCLK */
+	*(volatile u8 *)PMC(31)		|= BIT(0);
+	*(volatile u64 *)PFC(31)	= (*(volatile u64 *)PFC(31) & ~(0x3f << 0)) | (0x02 << 0);
+
+	/* GMAC2 CLK */
+	/* Release module stop for GMAC2 */
+	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_GMAC2);
+
+	/* Release module reset for GMAC2 */
+	*(volatile u32 *)MRCTLE &= ~(MRCTLE_GMAC2_PCLKH | MRCTLE_GMAC2_PCLKM);
+
 	/* ETH SS CLK */
 	/* Release module stop for ETH_SS */
 	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_ETHSS);
@@ -292,14 +331,22 @@ int board_init(void)
 	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
 	adxctl_init();
 
-	/* ETHSS: Mode Control 0x0, GMAC1 on port ETH3 */
-	ethss_init_hw(0x0);
+	/* ETHSS: Mode Control 0x6, GMAC1 on port ETH3, GMAC2 on port ETH2 */
+	ethss_init_hw(0x6);
+
 	/* ETHSS: GMAC1 RGMII_ID mode on port ETH3 */
 	ret = ethss_config(3, PHY_INTERFACE_MODE_RGMII_ID);
 	if (ret < 0)
 		return ret;
 	/* Set up speed for Converters for GMAC1 */
 	ethss_link_up(3, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
+
+	/* ETHSS: GMAC2 RGMII_ID mode on port ETH2 */
+	ret = ethss_config(2, PHY_INTERFACE_MODE_RGMII_ID);
+	if (ret < 0)
+		return ret;
+	/* Set up speed for Converters for GMAC2 */
+	ethss_link_up(2, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
 
 	board_usb_init();
 
