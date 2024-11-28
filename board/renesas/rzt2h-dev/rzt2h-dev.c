@@ -268,8 +268,8 @@ static void board_usb_init(void)
 	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
 
 	/* set P00_0 operation as USB_VBUSEN*/
-	*(volatile u8 *)PMC(0)		|= BIT(0);
 	*(volatile u64 *)PFC(0)	= (*(volatile u64 *)PFC(0) & 0x3f) | 0x13;
+	*(volatile u8 *)PMC(0)		|= BIT(0);
 
 	/* Enable Write protect to disable writing*/
 	(*(volatile u32 *)PRCRN) = PRCRN_PRKEY;
