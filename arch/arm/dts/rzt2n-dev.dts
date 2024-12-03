@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+/*
+ * Device Tree Source for the RZ/T2N Development EVK board
+ *
+ * Copyright (C) 2024 Renesas Electronics Corp.
+ */
+
+/dts-v1/;
+
+
+/ {
+	model = "Renesas Development EVK based on r9a07g076";
+	compatible = "renesas,r9a07g076";
+};
+
+
+

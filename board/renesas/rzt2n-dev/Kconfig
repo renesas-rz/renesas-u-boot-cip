@@ -1,0 +1,15 @@
+if TARGET_RZT2N_DEV
+
+config SYS_SOC
+	default "renesas"
+
+config SYS_BOARD
+	default "rzt2n-dev"
+
+config SYS_VENDOR
+	default "renesas"
+
+config SYS_CONFIG_NAME
+	default "rzt2n-dev"
+
+endif
