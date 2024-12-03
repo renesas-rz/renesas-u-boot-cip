@@ -684,4 +684,12 @@ config RZG2L_GPIO
 	  Support the gpio functionality of the pin function controller (PFC)
 	  on the Renesas RZ/G2L SoC family.
 
+config RZT2N_GPIO
+	bool "Renesas RZ/T2N GPIO driver"
+	depends on DM_GPIO && PINCTRL_PFC_RZT2N
+	help
+	  This driver supports the GPIO banks on Renesas RZ/T2N SoCs.
+	  
 endif
+
+
