@@ -98,6 +98,13 @@ static const u8 *get_cpu_name(int idx)
 #ifdef CONFIG_ARCH_MISC_INIT
 int arch_misc_init(void)
 {
+
+#ifdef CONFIG_R9A09G077
+	env_set("platform", "r9a09g077");
+#else
+#ifdef CONFIG_R9A07G076
+	env_set("platform", "r9a07g076");
+#else
 	int i, idx = renesas_cpuinfo_idx();
 	const u8 *cpu_name = get_cpu_name(idx);
 	char cpu[10] = { 0 };
@@ -106,13 +113,21 @@ int arch_misc_init(void)
 		cpu[i] = tolower(cpu_name[i]);
 
 	env_set("platform", cpu);
-
+#endif
+#endif
 	return 0;
 }
 #endif
 
 int print_cpuinfo(void)
 {
+
+#ifdef CONFIG_R9A09G077
+	printf("CPU: Renesas Electronics RZ/T2H\n");
+#else
+#ifdef CONFIG_R9A07G076
+	printf("CPU: Renesas Electronics RZ/T2N\n");
+#else
 	int i = renesas_cpuinfo_idx();
 
 	if (renesas_cpuinfo[i].cpu_type == RENESAS_CPU_TYPE_R8A7796 &&
@@ -126,6 +141,8 @@ int print_cpuinfo(void)
 		get_cpu_name(i), renesas_get_cpu_rev_integer(),
 		renesas_get_cpu_rev_fraction());
 
+#endif
+#endif
 	return 0;
 }
 #elif defined(CONFIG_RZA1)

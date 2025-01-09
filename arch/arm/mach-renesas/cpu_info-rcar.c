@@ -15,10 +15,14 @@
 
 static u32 renesas_get_prr(void)
 {
+#if defined(CONFIG_R9A07G076)
+	return 0;
+#else
 	if (IS_ENABLED(CONFIG_RCAR_64))
 		return readl(0xFFF00044);
 
 	return readl(0xFF000044);
+#endif
 }
 
 u32 renesas_get_cpu_type(void)
