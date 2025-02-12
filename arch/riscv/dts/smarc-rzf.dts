@@ -26,7 +26,7 @@
 	};
 
 	memory@48000000 {
-		u-boot,dm-spl;
+		bootph-pre-ram;
 		device_type = "memory";
 		/* first 128MB is reserved for secure area. */
 		reg = <0 0x48000000 0 0x38000000>;
@@ -95,7 +95,7 @@
         #address-cells = <1>;
         #size-cells = <0>;
         flash0: spi-flash@0 {
-		u-boot,dm-spl;
+		bootph-pre-ram;
                 #address-cells = <1>;
                 #size-cells = <1>;
                 compatible = "spi-flash", "jedec,spi-nor";

@@ -18,13 +18,13 @@
 	};
 
 	cpus {
-		u-boot,dm-spl;
+		bootph-pre-ram;
 		#address-cells = <1>;
 		#size-cells = <0>;
 
 		timebase-frequency = <12000000>;
 		CPU0: cpu@0 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			device_type = "cpu";
 			reg = <0>;
 			status = "okay";
@@ -40,7 +40,7 @@
 			d-cache-line-size = <32>;
 			next-level-cache = <&L2>;
 			CPU0_intc: interrupt-controller {
-				u-boot,dm-spl;
+				bootph-pre-ram;
 				#interrupt-cells = <1>;
 				interrupt-controller;
 				compatible = "riscv,cpu-intc";
@@ -54,14 +54,14 @@
 	 * Boards that provide audio clocks should override them.
 	 */
 	xinclk: xinclk {
-		u-boot,dm-spl;
+		bootph-pre-ram;
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <0>;
 	};
 
 	soc: soc {
-		u-boot,dm-spl;
+		bootph-pre-ram;
 		#address-cells = <2>;
 		#size-cells = <2>;
 		compatible = "simple-bus";
@@ -85,7 +85,7 @@
 		};
 
 		plic0: interrupt-controller@12c00000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "andestech,nceplic100";
 			reg = <0x0 0x12c00000 0x0 0x2000000>;
 			interrupt-controller;
@@ -94,7 +94,7 @@
 		};
 
 		plic1: interrupt-controller@13000000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "andestech,plicsw";
 			interrupt-controller;
 			reg = <0x0 0x13000000 0x0 0x400000>;
@@ -102,14 +102,14 @@
 		};
 
 		plmt0@110c0000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "andestech,plmt0", "riscv,plmt0";
 			reg = <0x0 0x110c0000 0x0 0x100000>;
 			interrupts-extended = <&CPU0_intc 7>;
 		};
 
 		cpg: clock-controller@11010000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,r9a07g043f-cpg";
 			reg = <0 0x11010000 0 0x10000>;
 			clocks = <&xinclk>;
@@ -120,7 +120,7 @@
 		};
 
 		pinctrl: pin-controller@11030000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,r9a07g043f-pinctrl";
 			reg = <0 0x11030000 0 0x10000>;
 			gpio-controller;
@@ -130,7 +130,7 @@
 		};
 
 		scif0: serial@1004b800 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,scif-r9a07g043", "renesas,scif-r9a07g044", "renesas,scif";
 			reg = <0 0x1004b800 0 0x400>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SCIF0>;
@@ -140,7 +140,7 @@
 		};
 
 		scif1: serial@1004bc00 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,scif-r9a07g043", "renesas,scif-r9a07g044", "renesas,scif";
 			reg = <0 0x1004bc00 0 0x400>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SCIF1>;
@@ -150,7 +150,7 @@
 		};
 
 		scif2: serial@1004c000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,scif-r9a07g043", "renesas,scif-r9a07g044", "renesas,scif";
 			reg = <0 0x1004c000 0 0x400>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SCIF2>;
@@ -160,7 +160,7 @@
 		};
 
 		sdhi0: sd@11c00000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,sdhi-r9a07g043f";
 			reg = <0 0x11c00000 0 0x10000>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SDHI0>;
@@ -170,7 +170,7 @@
 		};
 
 		sdhi1: sd@11c10000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,sdhi-r9a07g043f";
 			reg = <0x0 0x11c10000 0 0x10000>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SDHI1>;
@@ -180,7 +180,7 @@
 		};
 
 		eth0: ethernet@11c20000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,etheravb-r9a07g043f";
 			reg = <0 0x11c20000 0 0x10000>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_ETH0>;
@@ -193,7 +193,7 @@
 		};
 
 		eth1: ethernet@11c30000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,etheravb-r9a07g043f";
 			reg = <0 0x11c30000 0 0x10000>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_ETH1>;
@@ -206,7 +206,7 @@
 		};
 
 		i2c0: i2c@10058000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			#address-cells = <1>;
 			#size-cells = <0>;
 			compatible = "renesas,riic-r9a07g043f",
@@ -219,7 +219,7 @@
 		};
 
 		i2c1: i2c@10058400 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			#address-cells = <1>;
 			#size-cells = <0>;
 			compatible = "renesas,riic-r9a07g043f",
@@ -256,7 +256,7 @@
 		};
 
 		ohci0: usb@11c50000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "generic-ohci";
 			reg = <0 0x11c50000 0 0x100>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_USB0>;
@@ -266,7 +266,7 @@
 		};
 
 		ehci0: usb@11c50100 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "generic-ehci";
 			reg = <0 0x11c50100 0 0x100>;
 			companion= <&ohci0>;
@@ -277,7 +277,7 @@
 		};
 
 		ohci1: usb@11c70000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "generic-ohci";
 			reg = <0 0x11c70000 0 0x100>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_USB1>;
@@ -287,7 +287,7 @@
 		};
 
 		ehci1: usb@11c70100 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "generic-ehci";
 			reg = <0 0x11c70100 0 0x100>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_USB1>;
@@ -297,7 +297,7 @@
 		};
 
 		usb2_phy0: usb-phy@11c50200 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,usb2-phy-r9a07g043f", "renesas,rcar-gen3-usb2-phy";
 			reg = <0 0x11c50200 0 0x700>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_USB0>;
@@ -308,7 +308,7 @@
 		};
 
 		usb2_phy1: usb-phy@11c70200 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,usb2-phy-r9a07g043f", "renesas,rcar-gen3-usb2-phy";
 			reg = <0 0x11c70200 0 0x700>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_USB1>;
@@ -319,7 +319,7 @@
 		};
 
 		hsusb: usb@11c60000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,usbhs-r9a07g043f",
 				     "renesas,g2l-usbhs";
 			reg = <0 0x11c60000 0 0x724>;
@@ -331,7 +331,7 @@
 		};
 
 		spibsc: spi@10060000 {
-			u-boot,dm-spl;
+			bootph-pre-ram;
 			compatible = "renesas,r9a07g043g-spibsc";
 			reg = <0 0x10060000 0 0x78>, <0 0x20000000 0 0x10000000>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SPI>;
