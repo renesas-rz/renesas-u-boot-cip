@@ -933,6 +933,14 @@ config SH_SCIF_CLK_FREQ
 	depends on SCIF_CONSOLE && (!DM_SERIAL || (SPL && !SPL_DM_SERIAL))
 	default 65000000
 
+config RSCI_CONSOLE
+	bool "Renesas RSCI UART support"
+	depends on R9A07G076 || ARCH_RENESAS
+	help
+	  Select this to enable Renesas RSCI UART. To operate serial ports
+	  on systems with RZ/T2HN RZ/N2H series SoCs, say Y to this option. If unsure,
+	  say N.
+
 config SEMIHOSTING_SERIAL
 	bool "Semihosting UART support"
 	depends on SEMIHOSTING && !SERIAL_RX_BUFFER
