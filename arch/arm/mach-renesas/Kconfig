@@ -90,6 +90,7 @@ config RZG2L
 
 config RZT2N
 	prompt "Renesas RZ/T2N Family ARM SoCs"
+	select GICV3
 	select RCAR_64
 	select RCAR_GEN3
 	select RENESAS_SOC_FAMILY_RZT2

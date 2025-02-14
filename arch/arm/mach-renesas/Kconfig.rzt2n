@@ -23,7 +23,6 @@ endchoice
 source "board/renesas/rzt2n-dev/Kconfig"
 
 config MULTI_DTB_FIT_UNCOMPRESS_SZ
-	default 0x80000 if TARGET_SMARC_RZT2N
 	default 0x80000 if TARGET_RZT2N_DEV
 
 endif
