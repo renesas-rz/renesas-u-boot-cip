@@ -22,7 +22,6 @@
 
 /* Generic Interrupt Controller Definitions */
 /* RZ/T2H use GIC-v3 */
-#define CONFIG_GICV3
 #define GICD_BASE	0x83000000
 #define GICR_BASE	0x83040000
 
@@ -62,7 +61,7 @@
 #define CONFIG_BOARD_SIZE_LIMIT		1048576
 
 /* ENV setting */
-#define CONFIG_EXTRA_ENV_SETTINGS	\
+#define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0" \
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
