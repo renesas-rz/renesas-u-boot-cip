@@ -76,7 +76,7 @@ static struct mm_region rzt2n_mem_map[GEN3_NR_REGIONS] = {
 		/* DDR */
 		.virt = 0x240000000UL,
 		.phys = 0x240000000UL,
-		.size = 0x0C0000000UL,
+		.size = 0x080000000UL,
 		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
 			PTE_BLOCK_INNER_SHARE
 	}, {

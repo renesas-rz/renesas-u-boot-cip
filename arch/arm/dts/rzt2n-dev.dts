@@ -31,9 +31,9 @@
 		reg = <0x0 0xC4000000 0x0 0x3C000000>;
 	};
 
-	memory@204000000 {
+	memory@240000000 {
 		device_type = "memory";
-		reg = <0x2 0x40000000 0x0 0xC0000000>;
+		reg = <0x2 0x40000000 0x0 0x80000000>;
 	};
 
 	reg_1p8v: regulator0 {
