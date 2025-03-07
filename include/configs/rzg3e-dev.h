@@ -6,7 +6,7 @@
 #ifndef __RZG3E_DEV_H
 #define __RZG3E_DEV_H
 
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 
 #define CONFIG_REMAKE_ELF
 
