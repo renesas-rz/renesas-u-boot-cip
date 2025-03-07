@@ -23,7 +23,7 @@
 #include <linux/io.h>
 #include <linux/sizes.h>
 #ifdef CONFIG_ARCH_RENESAS
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 #endif
 #ifdef CONFIG_RZF_DEV
 #include <asm/arch-rzmpu/sh_sdhi.h>
