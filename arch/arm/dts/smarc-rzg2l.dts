@@ -56,6 +56,24 @@
 				<RZG2L_PINMUX(28, 1, 1)>;
 	};
 
+	eth1_pins: eth1 {
+		pinmux = <RZG2L_PINMUX(37, 2, 1)>, /* ET1_LINKSTA */
+			 <RZG2L_PINMUX(37, 0, 1)>, /* ET1_MDC */
+			 <RZG2L_PINMUX(37, 1, 1)>, /* ET1_MDIO */
+			 <RZG2L_PINMUX(29, 0, 1)>, /* ET1_TXC */
+			 <RZG2L_PINMUX(29, 1, 1)>, /* ET1_TX_CTL */
+			 <RZG2L_PINMUX(30, 0, 1)>, /* ET1_TXD0 */
+			 <RZG2L_PINMUX(30, 1, 1)>, /* ET1_TXD1 */
+			 <RZG2L_PINMUX(31, 0, 1)>, /* ET1_TXD2 */
+			 <RZG2L_PINMUX(31, 1, 1)>, /* ET1_TXD3 */
+			 <RZG2L_PINMUX(33, 1, 1)>, /* ET1_RXC */
+			 <RZG2L_PINMUX(34, 0, 1)>, /* ET1_RX_CTL */
+			 <RZG2L_PINMUX(34, 1, 1)>, /* ET1_RXD0 */
+			 <RZG2L_PINMUX(35, 0, 1)>, /* ET1_RXD1 */
+			 <RZG2L_PINMUX(35, 1, 1)>, /* ET1_RXD2 */
+			 <RZG2L_PINMUX(36, 0, 1)>; /* ET1_RXD3 */
+	};
+
 	i2c1_pins: i2c1 {
 		pinmux = <RZG2L_PINMUX(14, 2, 1)>,
 				<RZG2L_PINMUX(14, 3, 1)>;
@@ -104,6 +122,18 @@
 	phy-handle = <&phy0>;
 	phy-mode = "rgmii";
 	phy0: ethernet-phy@7 {
+		reg = <7>;
+	};
+};
+
+&eth1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&eth1_pins>;
+	status = "okay";
+
+	phy-handle = <&phy1>;
+	phy-mode = "rgmii";
+	phy1: ethernet-phy@7 {
 		reg = <7>;
 	};
 };
