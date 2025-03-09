@@ -164,19 +164,6 @@ enum sbi_ext_renesas_fid {
 #define SBI_EN 1
 #define SBI_DI 0
 
-enum sbi_ext_id_v01 {
-	SBI_EXT_0_1_SET_TIMER = 0x0,
-	SBI_EXT_0_1_CONSOLE_PUTCHAR = 0x1,
-	SBI_EXT_0_1_CONSOLE_GETCHAR = 0x2,
-	SBI_EXT_0_1_CLEAR_IPI = 0x3,
-	SBI_EXT_0_1_SEND_IPI = 0x4,
-	SBI_EXT_0_1_REMOTE_FENCE_I = 0x5,
-	SBI_EXT_0_1_REMOTE_SFENCE_VMA = 0x6,
-	SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID = 0x7,
-	SBI_EXT_0_1_SHUTDOWN = 0x8,
-};
-
-
 int do_sbi_get_mcache_ctl_status(struct cmd_tbl *cmdtp, int flag, int argc,
 			 char *const argv[])
 {
