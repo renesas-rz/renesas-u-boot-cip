@@ -80,10 +80,19 @@ int riscv_fdt_copy_resv_mem_node(const void *src, void *dst)
 			log_err("failed to add reserved memory: %d\n", err);
 			return err;
 		}
-		if (fdt_getprop(src, node, "no-map", NULL)) {
-			rmem_offset = fdt_node_offset_by_phandle(dst, phandle);
+		rmem_offset = fdt_node_offset_by_phandle(dst, phandle);
+		if (fdt_getprop(src, node, "no-map", NULL))
 			fdt_setprop_empty(dst, rmem_offset, "no-map");
-		}
+
+		if (!strstr(name, "pma_resv"))
+			continue;
+
+		if (fdt_getprop(src, node, "linux,dma-default", NULL))
+			fdt_setprop_empty(dst, rmem_offset, "linux,dma-default");
+
+		err = fdt_setprop_string(dst, rmem_offset, "compatible", "shared-dma-pool");
+		if (err < 0)
+			return err;
 	}
 
 	return 0;
