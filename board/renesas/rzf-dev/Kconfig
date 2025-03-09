@@ -87,6 +87,14 @@ config DEBUG_RZF_FPGA
 	help
 		DEBUG Flag on FPGA Board
 
+config SH_SDHI_FREQ
+	int "RZ/Five SDHI Clock Frequency (Hz)"
+	default 133333333
+	help
+	Set the clock frequency for SDHI controller.
+	Default value corresponds to 133.33MHz clock.
+	Should match CPG settings in board initialization.
+
 config DEBUG_OPENSBI
 	bool "debug OpenSBI"
 	default n
