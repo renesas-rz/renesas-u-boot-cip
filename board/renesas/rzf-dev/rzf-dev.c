@@ -12,6 +12,7 @@
 #include <mmc.h>
 #include <i2c.h>
 #include <hang.h>
+#include <renesas/rzf-dev/mmio.h>
 #include <renesas/rzf-dev/rzf-dev_def.h>
 #include <renesas/rzf-dev/rzf-dev_sys.h>
 #include <renesas/rzf-dev/rzf-dev_pfc_regs.h>
@@ -39,12 +40,12 @@ static void v5l2_init(void)
 	uclass_get_device(UCLASS_CACHE, 0, &dev);
 }
 
-#ifdef CONFIG_BOARD_EARLY_INIT_F
-int board_early_init_f(void)
+static int sd_power_setup(void)
 {
-#ifdef CONFIG_V5L2_CACHE
-	v5l2_init();
-#endif
+	int ret = 0;
+
+	mmio_write_32(PFC_PWPR, 0x0);
+	mmio_write_32(PFC_PWPR, PWPR_PFCWE);
 #if CONFIG_TARGET_SMARC_RZF
 	/* SD1 power control : P0_3 = 1 P6_1 = 1        */
 	*(volatile u8 *)(PFC_PMC10) &= 0xF7;    /* Port func mode 0b00  */
@@ -53,14 +54,6 @@ int board_early_init_f(void)
 	*(volatile u16 *)(PFC_PM16) = (*(volatile u16 *)(PFC_PM16) & 0xFFF3) | 0x0008; /* Port output mode 0b10 */
 	*(volatile u8 *)(PFC_P10) = (*(volatile u8 *)(PFC_P10) & 0xF7) | 0x08; /* P0_3  output 1        */
 	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFD) | 0x02; /* P6_1  output 1        */
-
-	/* can go in board_eht_init() once enabled */
-	*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_3_3;
-	*(volatile u32 *)(PFC_ETH_ch1) = (*(volatile u32 *)(PFC_ETH_ch1) & 0xFFFFFFFC) | ETH_ch1_1_8;
-	/* Enable RGMII for both ETH{0,1} */
-	*(volatile u32 *)(PFC_ETH_MII) = (*(volatile u32 *)(PFC_ETH_MII) & 0xFFFFFFFC);
-	/* ETH CLK */
-	*(volatile u32 *)(CPG_RST_ETH) = 0x30002;
 #else
 	/* SD0 power control: P5_4=1,P18_4 = 1; */
 	*(volatile u8 *)(PFC_PMC15) &= 0xEF;
@@ -77,7 +70,28 @@ int board_early_init_f(void)
 	*(volatile u16 *)(PFC_PM22) = (*(volatile u16 *)(PFC_PM22) & 0xF3FF) | 0x800; /* Port output mode 0b10 */
 	*(volatile u8 *)(PFC_P16) = (*(volatile u8 *)(PFC_P16) & 0xFB) | 0x04;  /* Port 6[2:1] output value 0b1*/
 	*(volatile u8 *)(PFC_P22) = (*(volatile u8 *)(PFC_P22) & 0xDF) | 0x20;  /* Port 18[2:1] output value 0b1*/
+#endif
+	mmio_write_32(PFC_PWPR, 0x0);
+	mmio_write_32(PFC_PWPR, PWPR_B0Wl);
 
+	return 0;
+}
+
+#ifdef CONFIG_BOARD_EARLY_INIT_F
+int board_early_init_f(void)
+{
+#ifdef CONFIG_V5L2_CACHE
+	v5l2_init();
+#endif
+#if CONFIG_TARGET_SMARC_RZF
+	/* can go in board_eht_init() once enabled */
+	*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_3_3;
+	*(volatile u32 *)(PFC_ETH_ch1) = (*(volatile u32 *)(PFC_ETH_ch1) & 0xFFFFFFFC) | ETH_ch1_1_8;
+	/* Enable RGMII for both ETH{0,1} */
+	*(volatile u32 *)(PFC_ETH_MII) = (*(volatile u32 *)(PFC_ETH_MII) & 0xFFFFFFFC);
+	/* ETH CLK */
+	*(volatile u32 *)(CPG_RST_ETH) = 0x30002;
+#else
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(PFC_ETH_ch0) = (*(volatile u32 *)(PFC_ETH_ch0) & 0xFFFFFFFC) | ETH_ch0_3_3;
 	*(volatile u32 *)(PFC_ETH_ch1) = (*(volatile u32 *)(PFC_ETH_ch1) & 0xFFFFFFFC) | ETH_ch1_3_3;
@@ -90,6 +104,8 @@ int board_early_init_f(void)
 	*(volatile u32 *)(CPG_PL2SDHI_DSEL) = 0x00110011;
 	while (*(volatile u32 *)(CPG_CLKSTATUS) != 0)
 		;
+
+	sd_power_setup();
 
 	return 0;
 }
