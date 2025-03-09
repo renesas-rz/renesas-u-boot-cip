@@ -79,7 +79,7 @@ config BOARD_SPECIFIC_OPTIONS # dummy
 	def_bool y
 	select RISCV_NDS
 	select SUPPORT_SPL
-
+	select BINMAN if SPL
 
 config DEBUG_RZF_FPGA
 	bool "FPGA DEBUG option"
