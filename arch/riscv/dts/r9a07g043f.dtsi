@@ -2,11 +2,11 @@
 /*
  * Device Tree Source for the RZ/Five series (r9a07g043fx) SoC
  *
- * Copyright (C) 2022 Renesas Electronics Corp.
+ * Copyright (C) 2023 Renesas Electronics Corporation
  */
 #include <dt-bindings/clock/r9a07g043f-cpg.h>
 / {
-	compatible = "renesas,rzf";
+	compatible = "renesas,r9a07g043";
 	#address-cells = <2>;
 	#size-cells = <2>;
 
@@ -17,8 +17,6 @@
 		i2c3 = &i2c3;
 	};
 
-	/* Bootloader run on 1 core, just delare 1 core in dts but
-	the dtb can support multicore device */
 	cpus {
 		u-boot,dm-spl;
 		#address-cells = <1>;
@@ -50,19 +48,6 @@
 		};
 	};
 
-	L2: l2-cache@13400000 {
-		u-boot,dm-spl;
-		compatible = "v5l2cache";
-		cache-level = <2>;
-		cache-size = <0x40000>;
-		reg = <0x0 0x13400000 0x0 0x40000>;
-		andes,inst-prefetch = <0>;
-		andes,data-prefetch = <0>;
-		/* The value format is <XRAMOCTL XRAMICTL> */
-		andes,tag-ram-ctl = <1 0>;
-		andes,data-ram-ctl = <1 0>;
-	};
-
 	/*
 	 * The external audio clocks are configured as 0 Hz fixed frequency
 	 * clocks by default.
@@ -85,19 +70,16 @@
 
 		plic0: interrupt-controller@12c00000 {
 			u-boot,dm-spl;
-			compatible = "riscv,plic0";
-			#address-cells = <2>;
-			#interrupt-cells = <2>;
-			interrupt-controller;
+			compatible = "andestech,nceplic100";
 			reg = <0x0 0x12c00000 0x0 0x2000000>;
+			interrupt-controller;
+			riscv,ndev = <511>;
 			interrupts-extended = <&CPU0_intc 11 &CPU0_intc 9>;
 		};
 
 		plic1: interrupt-controller@13000000 {
 			u-boot,dm-spl;
-			compatible = "riscv,plic1";
-			#address-cells = <2>;
-			#interrupt-cells = <2>;
+			compatible = "andestech,plicsw";
 			interrupt-controller;
 			reg = <0x0 0x13000000 0x0 0x400000>;
 			interrupts-extended = <&CPU0_intc 3>;
@@ -105,7 +87,7 @@
 
 		plmt0@110c0000 {
 			u-boot,dm-spl;
-			compatible = "riscv,plmt0";
+			compatible = "andestech,plmt0", "riscv,plmt0";
 			reg = <0x0 0x110c0000 0x0 0x100000>;
 			interrupts-extended = <&CPU0_intc 7>;
 		};
@@ -127,13 +109,13 @@
 			reg = <0 0x11030000 0 0x10000>;
 			gpio-controller;
 			#gpio-cells = <2>;
-			gpio-ranges = <&pinctrl 0 0 176>;
+			gpio-ranges = <&pinctrl 0 0 152>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_GPIO>;
 		};
 
 		scif0: serial@1004b800 {
 			u-boot,dm-spl;
-			compatible = "renesas,scif-r9a07g043f", "renesas,scif";
+			compatible = "renesas,scif-r9a07g043", "renesas,scif-r9a07g044", "renesas,scif";
 			reg = <0 0x1004b800 0 0x400>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SCIF0>;
 			resets = <&cpg R9A07G043F_CLK_SCIF0>;
@@ -143,7 +125,7 @@
 
 		scif1: serial@1004bc00 {
 			u-boot,dm-spl;
-			compatible = "renesas,scif-r9a07g043f", "renesas,scif";
+			compatible = "renesas,scif-r9a07g043", "renesas,scif-r9a07g044", "renesas,scif";
 			reg = <0 0x1004bc00 0 0x400>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SCIF1>;
 			resets = <&cpg R9A07G043F_CLK_SCIF1>;
@@ -153,7 +135,7 @@
 
 		scif2: serial@1004c000 {
 			u-boot,dm-spl;
-			compatible = "renesas,scif-r9a07g043f", "renesas,scif";
+			compatible = "renesas,scif-r9a07g043", "renesas,scif-r9a07g044", "renesas,scif";
 			reg = <0 0x1004c000 0 0x400>;
 			clocks = <&cpg CPG_MOD R9A07G043F_CLK_SCIF2>;
 			resets = <&cpg R9A07G043F_CLK_SCIF2>;
@@ -189,7 +171,6 @@
 			phy-mode = "rgmii";
 			#address-cells = <1>;
 			#size-cells = <0>;
-			eth-pin-mode-switch = <&pinctrl 0>;
 			status = "disabled";
 		};
 
@@ -337,6 +318,19 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			status = "disabled";
+		};
+
+		L2: l2-cache@13400000 {
+			compatible = "v5l2cache";
+			cache-level = <2>;
+			cache-size = <0x40000>;
+			cache-line-size = <64>;
+			cache-sets = <1024>;
+			reg = <0x0 0x13400000 0x0 0x100000>;
+			andes,inst-prefetch = <0x3>;
+			andes,data-prefetch = <0x3>;
+			andes,tag-ram-ctl = <1 0>;
+			andes,data-ram-ctl = <1 0>;
 		};
 	};
 };
