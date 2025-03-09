@@ -221,9 +221,6 @@ void board_init_f(ulong dummy)
 	if (ret)
 		panic("spl_early_init() failed: %d\n", ret);
 
-	/* Initialize CPU Architecure */
-	arch_cpu_init_dm();
-
 	/* Initialixe Bord part */
 	spl_early_board_init_f();
 
