@@ -40,6 +40,13 @@ static void v5l2_init(void)
 	uclass_get_device(UCLASS_CACHE, 0, &dev);
 }
 
+#if defined(CONFIG_OF_BOARD_SETUP)
+int ft_board_setup(void *blob, struct bd_info *bd)
+{
+	return 0;
+}
+#endif
+
 static int sd_power_setup(void)
 {
 	int ret = 0;
