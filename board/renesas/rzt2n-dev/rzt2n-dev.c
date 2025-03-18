@@ -53,14 +53,14 @@ DECLARE_GLOBAL_DATA_PTR;
 #define MSTPCRE_ETHSS		BIT(3)
 
 #define ADXCTL0_BASE		0x81290100
-#define DDRMIR0_MASK		GENMASK(20, 16)
+#define DDRMIR0_MASK		GENMASK(19, 16)
 #define DDRMIR0(x)		(x << 16)
 #define ADXC0_MASTERS		6
 
 #define ADXCTL1_BASE		0x81291100
-#define DDRMIR1_MASK		GENMASK(28, 24)
+#define DDRMIR1_MASK		GENMASK(27, 24)
 #define DDRMIR1(x)		(x << 24)
-#define ADXC1_MASTERS		7
+#define ADXC1_MASTERS		6
 
 #define DDRMIR_MASK		GENMASK(27,  0)
 #define addr_shift		0x2
@@ -113,7 +113,7 @@ int board_early_init_f(void)
 int adxctl_init(void)
 {
 	int i;
-
+	/*DDR Mirror0 addr_shift=0 Mirror1 addr_shift=2*/
 	for (i = 2; i < ADXC0_MASTERS; i++)
 		writel(((readl((uintptr_t)(ADXCTL0_BASE + i * 0x4)) & ~DDRMIR_MASK) |
 				DDRMIR1(addr_shift)), (uintptr_t)(ADXCTL0_BASE + i * 0x4));
