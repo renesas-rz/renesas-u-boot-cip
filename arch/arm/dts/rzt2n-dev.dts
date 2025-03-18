@@ -33,7 +33,7 @@
 
 	memory@240000000 {
 		device_type = "memory";
-		reg = <0x2 0x40000000 0x0 0x80000000>;
+		reg = <0x2 0x40000000 0x0 0x40000000>;
 	};
 
 	reg_1p8v: regulator0 {
