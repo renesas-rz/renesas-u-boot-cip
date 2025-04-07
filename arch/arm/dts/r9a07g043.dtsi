@@ -209,7 +209,7 @@
 
 		scif0: serial@1004b800 {
 			compatible = "renesas,scif-r9a07g043",
-				     "renesas,scif-r9a07g044","renesas,scif";
+				     "renesas,scif-r9a07g044";
 			reg = <0 0x1004b800 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(380) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(382) IRQ_TYPE_LEVEL_HIGH>,
@@ -228,7 +228,7 @@
 
 		scif1: serial@1004bc00 {
 			compatible = "renesas,scif-r9a07g043",
-				     "renesas,scif-r9a07g044","renesas,scif";
+				     "renesas,scif-r9a07g044";
 			reg = <0 0x1004bc00 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(385) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(387) IRQ_TYPE_LEVEL_HIGH>,
@@ -247,7 +247,7 @@
 
 		scif2: serial@1004c000 {
 			compatible = "renesas,scif-r9a07g043",
-				     "renesas,scif-r9a07g044","renesas,scif";
+				     "renesas,scif-r9a07g044";
 			reg = <0 0x1004c000 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(390) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(392) IRQ_TYPE_LEVEL_HIGH>,
@@ -266,7 +266,7 @@
 
 		scif3: serial@1004c400 {
 			compatible = "renesas,scif-r9a07g043",
-				     "renesas,scif-r9a07g044","renesas,scif";
+				     "renesas,scif-r9a07g044";
 			reg = <0 0x1004c400 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(395) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(397) IRQ_TYPE_LEVEL_HIGH>,
@@ -285,7 +285,7 @@
 
 		scif4: serial@1004c800 {
 			compatible = "renesas,scif-r9a07g043",
-				     "renesas,scif-r9a07g044","renesas,scif";
+				     "renesas,scif-r9a07g044";
 			reg = <0 0x1004c800 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(400) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(402) IRQ_TYPE_LEVEL_HIGH>,
@@ -303,7 +303,7 @@
 		};
 
 		sci0: serial@1004d000 {
-			compatible = "renesas,r9a07g043-sci", "renesas,sci", "renesas,rz-sci";
+			compatible = "renesas,r9a07g043-sci", "renesas,sci";
 			reg = <0 0x1004d000 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(405) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(406) IRQ_TYPE_EDGE_RISING>,
@@ -318,7 +318,7 @@
 		};
 
 		sci1: serial@1004d400 {
-			compatible = "renesas,r9a07g043-sci", "renesas,sci", "renesas,rz-sci";
+			compatible = "renesas,r9a07g043-sci", "renesas,sci";
 			reg = <0 0x1004d400 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(409) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(410) IRQ_TYPE_EDGE_RISING>,
@@ -369,7 +369,7 @@
 		i2c0: i2c@10058000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			compatible = "renesas,riic-r9a07g043", "renesas,riic-rz","renesas,riic-r9a07g043u";
+			compatible = "renesas,riic-r9a07g043", "renesas,riic-rz";
 			reg = <0 0x10058000 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(350) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(348) IRQ_TYPE_EDGE_RISING>,
@@ -391,7 +391,7 @@
 		i2c1: i2c@10058400 {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			compatible = "renesas,riic-r9a07g043", "renesas,riic-rz","renesas,riic-r9a07g043u";
+			compatible = "renesas,riic-r9a07g043", "renesas,riic-rz";
 			reg = <0 0x10058400 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(358) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(356) IRQ_TYPE_EDGE_RISING>,
@@ -413,7 +413,7 @@
 		i2c2: i2c@10058800 {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			compatible = "renesas,riic-r9a07g043", "renesas,riic-rz","renesas,riic-r9a07g043u";
+			compatible = "renesas,riic-r9a07g043", "renesas,riic-rz";
 			reg = <0 0x10058800 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(366) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(364) IRQ_TYPE_EDGE_RISING>,
@@ -435,7 +435,7 @@
 		i2c3: i2c@10058c00 {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			compatible = "renesas,riic-r9a07g043", "renesas,riic-rz","renesas,riic-r9a07g043u";
+			compatible = "renesas,riic-r9a07g043", "renesas,riic-rz";
 			reg = <0 0x10058c00 0 0x400>;
 			interrupts = <SOC_PERIPHERAL_IRQ(374) IRQ_TYPE_LEVEL_HIGH>,
 				     <SOC_PERIPHERAL_IRQ(372) IRQ_TYPE_EDGE_RISING>,
@@ -490,7 +490,7 @@
 
 		sbc: spi@10060000 {
 			compatible = "renesas,r9a07g043-rpc-if",
-				     "renesas,rzg2l-rpc-if","renesas,r9a07g043u-spibsc";
+				     "renesas,rzg2l-rpc-if";
 			reg = <0 0x10060000 0 0x10000>,
 			      <0 0x20000000 0 0x10000000>,
 			      <0 0x10070000 0 0x10000>;
@@ -505,7 +505,7 @@
 		};
 
 		cpg: clock-controller@11010000 {
-			compatible = "renesas,r9a07g043-cpg","renesas,r9a07g043u-cpg";
+			compatible = "renesas,r9a07g043-cpg";
 			reg = <0 0x11010000 0 0x10000>;
 			clocks = <&extal_clk>;
 			clock-names = "extal";
@@ -521,7 +521,7 @@
 		};
 
 		pinctrl: pinctrl@11030000 {
-			compatible = "renesas,r9a07g043-pinctrl","renesas,r9a07g043u-pinctrl";
+			compatible = "renesas,r9a07g043-pinctrl";
 			reg = <0 0x11030000 0 0x10000>;
 			gpio-controller;
 			#gpio-cells = <2>;
@@ -574,7 +574,7 @@
 		};
 
 		sdhi0: mmc@11c00000 {
-			compatible = "renesas,sdhi-r9a07g043","renesas,sdhi-r9a07g043u",
+			compatible = "renesas,sdhi-r9a07g043",
 				     "renesas,rcar-gen3-sdhi";
 			reg = <0x0 0x11c00000 0 0x10000>;
 			interrupts = <SOC_PERIPHERAL_IRQ(104) IRQ_TYPE_LEVEL_HIGH>,
@@ -590,7 +590,7 @@
 		};
 
 		sdhi1: mmc@11c10000 {
-			compatible = "renesas,sdhi-r9a07g043","renesas,sdhi-r9a07g043u",
+			compatible = "renesas,sdhi-r9a07g043",
 				     "renesas,rcar-gen3-sdhi";
 			reg = <0x0 0x11c10000 0 0x10000>;
 			interrupts = <SOC_PERIPHERAL_IRQ(106) IRQ_TYPE_LEVEL_HIGH>,
@@ -606,7 +606,7 @@
 		};
 
 		eth0: ethernet@11c20000 {
-			compatible = "renesas,r9a07g043-gbeth","renesas,etheravb-r9a07g043u",
+			compatible = "renesas,r9a07g043-gbeth",
 				     "renesas,rzg2l-gbeth";
 			reg = <0 0x11c20000 0 0x10000>;
 			interrupts = <SOC_PERIPHERAL_IRQ(84) IRQ_TYPE_LEVEL_HIGH>,
@@ -626,7 +626,7 @@
 		};
 
 		eth1: ethernet@11c30000 {
-			compatible = "renesas,r9a07g043-gbeth","renesas,etheravb-r9a07g043u",
+			compatible = "renesas,r9a07g043-gbeth",
 				     "renesas,rzg2l-gbeth";
 			reg = <0 0x11c30000 0 0x10000>;
 			interrupts = <SOC_PERIPHERAL_IRQ(87) IRQ_TYPE_LEVEL_HIGH>,
@@ -715,7 +715,7 @@
 		};
 
 		usb2_phy0: usb-phy@11c50200 {
-			compatible = "renesas,usb2-phy-r9a07g043","renesas,rcar-gen3-usb2-phy",
+			compatible = "renesas,usb2-phy-r9a07g043",
 				     "renesas,rzg2l-usb2-phy";
 			reg = <0 0x11c50200 0 0x700>;
 			interrupts = <SOC_PERIPHERAL_IRQ(94) IRQ_TYPE_LEVEL_HIGH>;
@@ -728,7 +728,7 @@
 		};
 
 		usb2_phy1: usb-phy@11c70200 {
-			compatible = "renesas,usb2-phy-r9a07g043","renesas,rcar-gen3-usb2-phy",
+			compatible = "renesas,usb2-phy-r9a07g043",
 				     "renesas,rzg2l-usb2-phy";
 			reg = <0 0x11c70200 0 0x700>;
 			interrupts = <SOC_PERIPHERAL_IRQ(99) IRQ_TYPE_LEVEL_HIGH>;
@@ -742,7 +742,7 @@
 
 		hsusb: usb@11c60000 {
 			compatible = "renesas,usbhs-r9a07g043",
-				     "renesas,rza2-usbhs";
+				    	"renesas,rza2-usbhs";
 			reg = <0 0x11c60000 0 0x10000>;
 			interrupts = <SOC_PERIPHERAL_IRQ(100) IRQ_TYPE_EDGE_RISING>,
 				     <SOC_PERIPHERAL_IRQ(101) IRQ_TYPE_LEVEL_HIGH>,
@@ -760,10 +760,16 @@
 		};
 
 		wdt0: watchdog@12800800 {
-			compatible = "renesas,r9a07g054-wdt",
-				     "renesas,rzg2l-wdt","renesas,r9a07g043u-wdt";
+			compatible = "renesas,r9a07g043-wdt",
+				     "renesas,rzg2l-wdt";
 			reg = <0 0x12800800 0 0x400>;
-			clocks = <&extal_clk>;
+			clocks = <&cpg CPG_MOD R9A07G043_WDT0_PCLK>,
+ 				 	<&cpg CPG_MOD R9A07G043_WDT0_CLK>;
+			clock-names = "pclk", "oscclk";
+			interrupts = <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
+				         <GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "wdt", "perrout";
+			resets = <&cpg R9A07G043_WDT0_PRESETN>;
 			power-domains = <&cpg>;
 			status = "disabled";
 		};

@@ -87,12 +87,6 @@ enum clk_ids {
 };
 
 /*Divider tables*/
-static struct clk_div_table divdsilpcl[] = {
-	{0, 16},
-	{1, 32},
-	{2, 64},
-	{3, 128},
-};
 
 static struct clk_div_table dtable_2b[] = {
 	{0, 1},
@@ -422,20 +416,6 @@ static struct mssr_mod_clk r9a07g043u_mod_clks[] = {
 
 };
 
-static const unsigned int r9a07g043u_crit_mod_clks[] = {
-	CLK_MODE_BASE + R9A07G043_GIC600_GICCLK,
-};
-
-/* clock type, register offset1, register offset2, register offset3*/
-static const struct cpg_pll_info cpg_pll_configs[] = {
-	{ CLK_TYPE_PLL1, PLL146_CLK1_R(0), PLL146_CLK2_R(0), 0},
-	{ CLK_TYPE_PLL2, PLL235_CLK1_R(0), PLL235_CLK3_R(0), PLL235_CLK4_R(0)},
-	{ CLK_TYPE_PLL3, PLL235_CLK1_R(1), PLL235_CLK3_R(1), PLL235_CLK4_R(1)},
-	{ CLK_TYPE_PLL4, PLL146_CLK1_R(1), PLL146_CLK2_R(1), 0},
-	{ CLK_TYPE_PLL5, PLL235_CLK1_R(2), PLL235_CLK3_R(2), PLL235_CLK4_R(2)},
-	{ CLK_TYPE_PLL6, PLL146_CLK1_R(2), PLL146_CLK2_R(2), 0},
-};
-
 /* Some struct value not defined: mstp_table, reset_node,get_pll_config */
  const struct cpg_mssr_info r9a07g043u_cpg_info = {
 	.core_clk		= r9a07g043u_core_clks,
@@ -449,6 +429,7 @@ static const struct cpg_pll_info cpg_pll_configs[] = {
 static const struct udevice_id r9a07g043u_clk_ids[] = {
 	{
 		.compatible	= "renesas,r9a07g043u-cpg",
+		.compatible	= "renesas,r9a07g043-cpg",
 		.data		= (ulong)&r9a07g043u_cpg_info,
 	},
 	{ }

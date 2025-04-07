@@ -653,6 +653,7 @@ static const struct udevice_id riic_ids[] = {
 	{ .compatible = "renesas,riic-r9a07g044l", },
 	{ .compatible = "renesas,riic-r9a07g044c", },
 	{ .compatible = "renesas,riic-r9a07g054l", },
+	{ .compatible = "renesas,riic-r9a07g043", },
 	{ .compatible = "renesas,riic-r9a07g043u", },
 	{ .compatible = "renesas,riic-r9a07g043f", },
 	{ .compatible = "renesas,riic-r9a08g045s", },
