@@ -63,6 +63,7 @@ static const struct udevice_id rzg2l_wdt_match[] = {
 	{ .compatible = "renesas,r9a07g044l-wdt", },
 	{ .compatible = "renesas,r9a07g054l-wdt", },
 	{ .compatible = "renesas,r9a07g043u-wdt", },
+	{ .compatible = "renesas,r9a07g043-wdt", },
 	{ .compatible = "renesas,r9a07g043f-wdt", },
 	{ .compatible = "renesas,r9a07g044-wdt", },
 	{ .compatible = "renesas,r9a08g045-wdt", },
