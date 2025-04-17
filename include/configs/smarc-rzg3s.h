@@ -6,7 +6,7 @@
 #ifndef __SMARC_RZG3S_H
 #define __SMARC_RZG3S_H
 
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 
 #define CONFIG_REMAKE_ELF
 
@@ -51,9 +51,12 @@
 #define CONFIG_MAX_MEM_MAPPED		(0x40000000u - DRAM_RSV_SIZE)
 
 #define CONFIG_SYS_MONITOR_BASE		0x00000000
+//MM Defined in u-boot/kconfig & u-boot/boot/kconfig, overriden/configured in rzg3s_defconfig and variants
+/*
 #define CONFIG_SYS_MONITOR_LEN		(1 * 1024 * 1024)
 #define CONFIG_SYS_MALLOC_LEN		(64 * 1024 * 1024)
 #define CONFIG_SYS_BOOTM_LEN		(64 << 20)
+*/
 
 /* The HF/QSPI layout permits up to 1 MiB large bootloader blob */
 #define CONFIG_BOARD_SIZE_LIMIT		1048576
