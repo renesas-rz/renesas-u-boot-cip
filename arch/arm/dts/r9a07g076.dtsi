@@ -215,6 +215,7 @@
 			snps,read-requests = <15>;
 			snps,burst-map = <0x7>;
 		};
+
 		gmac2: ethernet@92010000 {
 			compatible = "renesas,rzt2n-eqos",
 				     "snps,dwc-qos-ethernet-4.10";
@@ -235,6 +236,7 @@
 			snps,read-requests = <15>;
 			snps,burst-map = <0x7>;
 		};
+
 	};
 };
 

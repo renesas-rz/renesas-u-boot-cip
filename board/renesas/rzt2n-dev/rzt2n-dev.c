@@ -41,10 +41,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define PRCRS                   0x81296000
 #define PRCRS_PRKEY             (0xa5 << 8)
 #define PRCRS_WR_EN             0xF
-#define PMC(x)			((x < 13) ? (0x812C0400 + (x)):(0x802C0400 + (x)))
-#define PM(x)			((x < 13) ? (0x812C0200 + (x) * 2):(0x802C0200 + (x) * 2))
-#define P(x)			((x < 13) ? (0x812C0000 + (x)):(0x802C0000 + (x)))
-#define PFC(x)			((x < 13) ? (0x812C0600 + (x) * 8):(0x802C0600 + (x) * 8))
+#define PMC(x)			((x < 7) ? (0x812C0400 + (x)):(0x802C0400 + (x)))
+#define PM(x)			((x < 7) ? (0x812C0200 + (x) * 2):(0x802C0200 + (x) * 2))
+#define P(x)			((x < 7) ? (0x812C0000 + (x)):(0x802C0000 + (x)))
+#define PFC(x)			((x < 7) ? (0x812C0600 + (x) * 8):(0x802C0600 + (x) * 8))
 
 #define SCKCR			0x80280000
 #define PHYSEL			BIT(21)
@@ -92,14 +92,14 @@ DECLARE_GLOBAL_DATA_PTR;
 #define MRCTLE_HPSW BIT(21)
 
 #define ADXCTL0_BASE		0x81290100
-#define DDRMIR0_MASK		GENMASK(20, 16)
+#define DDRMIR0_MASK		GENMASK(19, 16)
 #define DDRMIR0(x)		(x << 16)
 #define ADXC0_MASTERS		6
 
 #define ADXCTL1_BASE		0x81291100
-#define DDRMIR1_MASK		GENMASK(28, 24)
+#define DDRMIR1_MASK		GENMASK(27, 24)
 #define DDRMIR1(x)		(x << 24)
-#define ADXC1_MASTERS		7
+#define ADXC1_MASTERS		6
 
 #define DDRMIR_MASK		GENMASK(27,  0)
 #define addr_shift		0x2
@@ -151,23 +151,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define CS0ENDAD_xSPI(x)	(0x80293004 + (0x100 * (x)))
 
-/*SW_MODE=0 ETH0 = ETHSW Port 0 */
-#define ETHSW_PORT0_IN_USE   	0
-/*SW_MODE=0 ETH1 = ETHSW Port 1 */
-#define ETHSW_PORT1_IN_USE   	0
-/*SW_MODE=0 ETH2 = ETHSW Port 2 */
-#define ETHSW_PORT2_IN_USE   	0
-
-/*SW_MODE=0 ETH3 = GMAC1 */
-#define GMAC1_ETH_BLOCK_IN_USE	1
-/*SW_MODE=0 ETH4 = GMAC2 */
-#define GMAC2_ETH_BLOCK_IN_USE	1
-
-
-#if ETHSW_PORT1_IN_USE == 1
-static void eth1_io_multiplex_config(void);
-#endif
-
+void debug_ethernet_settings(void);
 
 /* Needed by lowlevel_init.S*/
 void s_init(void)
@@ -179,13 +163,13 @@ void s_init(void)
 	/* Setting xSPI1 CS0 End Address */
 	*(volatile u32 *)CS0ENDAD_xSPI(1) = 0x57FFFFFF;
 
-	/* P03_3 enable both SD0_PWEN_A & SD1_PWEN_A Output HIGH */
+/* P03_3 enable both SD0_PWEN_A & SD1_PWEN_A Output HIGH */
 
 	*(volatile u8 *)PMC(3) &= ~BIT(3);
 	*(volatile u8 *)P(3) |= BIT(3);
 	*(volatile u16 *)PM(3) |= (0x3 << 6);
 
-	/* P3_2_SD1_IOVS Output LOW */
+/* P3_2_SD1_IOVS Output LOW */
 	*(volatile u8 *)PMC(3) &= ~BIT(2);
 	*(volatile u8 *)P(3) &= ~BIT(2);
 	*(volatile u16 *)PM(3) |= (0x3 << 4);
@@ -193,43 +177,136 @@ void s_init(void)
 	/* Release module stop for SDHI0/1 */
 	*(volatile u32 *)MSTPCRM &= ~(MSTPCRM_SDHI0 | MSTPCRM_SDHI1);
 
-	/*ETH1 settings*/
-	/* IO Multiplexing Configuration */
-   /* PMC and PFC for ETH1_TXCLK,ETH1_TXD0,ETH1_TXD1,ETH1_TXD2,ETH1_TXD3,ETH1_TXEN,ETH1_RXCLK*/
+	/* ==================================================ETH0 =======================================*/
+    /* PMC and PFC for ETH0_TXCLK,ETH0_TXD0,ETH0_TXD1,ETH0_TXD2,ETH0_TXD3,ETH0_TXEN,ETH0_RXCLK,ETH0_RXD0*/
+	*(volatile u8 *)PMC(19) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+    *(volatile u64 *)PFC(19) = (*(volatile u64 *)PFC(19) & 0x0000000000000000)
+     | ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+
+	/* PMC and PFC for ETH0_RXD1,ETH0_RXD2,ETH0_RXD3,ETH0_RXDV,ETH012_GMAC0_MDC,ETH012_GMAC0_MDIO,ETHSW_PHYLINK0,ETH0_REFCLK*/
+	*(volatile u8 *)PMC(20) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+    *(volatile u64 *)PFC(20) = (*(volatile u64 *)PFC(20) & 0x0000000000000000) \
+     | ((u64)0x02 << 56) | ((u64)0x14<< 48) | ((u64)0x11<< 40) | ((u64)0x11 << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+
+	/* ==================================================ETH1 =======================================*/
+
+    /* PMC and PFC for ETH1_TXCLK,ETH1_TXD0,ETH1_TXD1,ETH1_TXD2,ETH1_TXD3,ETH1_TXEN,ETH1_RXCLK*/
 	*(volatile u8 *)PMC(21) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1);
 	*(volatile u64 *)PFC(21) = (*(volatile u64 *)PFC(21) & 0x00000000000000FF) \
 	| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8);
 
-	/* PMC and PFC for ETH1_RXD0,ETH1_RXD1,ETH1_RXD2,ETH1_RXD3,ETH1_RXDV,ETH012_GMAC0_MDC,ETH012_GMAC0_MDIO,ETH1_REFCLK,ETHSW_PHYLINK1*/
-	*(volatile u8 *)PMC(22) |= BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+	/* PMC and PFC for ETH1_RXD0,ETH1_RXD1,ETH1_RXD2,ETH1_RXD3,ETH1_RXDV,ETHSW_PHYLINK1,ETH1_REFCLK*/
+	*(volatile u8 *)PMC(22) |= BIT(7)| BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 	*(volatile u64 *)PFC(22) = (*(volatile u64 *)PFC(22) & 0xFF00000000000000) \
-	| ( ((u64)0x02<< 48) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0));
+	| ( ((u64)0x02<< 48) | ((u64)0x14<< 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0));
 
-	/* GMAC0 Shared between ETH012*/
-	*(volatile u8 *)PMC(20) |= (BIT(5)|BIT(4));
-	*(volatile u64 *)PFC(20) = (*(volatile u64 *)PFC(20) & 0xFFFF0000FFFFFFFF) \
-	|(((u64)0x11<< 40) | ((u64)0x11<< 32));
-#if 0
+	/* ==================================================ETH2 =======================================*/
+
+    /* PMC and PFC for ETH2_TXCLK,ETH2_TXD0,ETH2_TXD1,ETH2_TXD2,ETH2_TXD3,ETH2_TXEN,ETH2_RXCLK,ETH2_RXD0*/
+	*(volatile u8 *)PMC(23) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+	*(volatile u64 *)PFC(23) = (*(volatile u64 *)PFC(23) & 0x0000000000000000) \
+	| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+
+	/* PMC and PFC for ETH2_RXD1,ETH2_RXD2,ETH2_RXD3,ETH2_RXDV,ETH2_REFCLK*/
+	*(volatile u8 *)PMC(24) |= BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+	*(volatile u64 *)PFC(24) = (*(volatile u64 *)PFC(24) & 0xFFFFFF0000000000) \
+	| ((u64)0x2<< 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+
+	/* P25_0_ETHSW_PHYLINK2*/
+	*(volatile u8 *)PMC(25) |= BIT(0);
+	*(volatile u64 *)PFC(25) = (*(volatile u64 *)PFC(25) & 0xFFFFFFFFFFFFFF00) \
+	|  (0x14<< 0);
+
+	/* ==================================================ETH3 =======================================*/
+
+    /* PMC and PFC for ETH3_TXCLK,ETH3_TXD0,ETH3_TXD1,ETH3_TXD2,ETH3_TXD3,ETH3_TXEN,ETH3_RXCLK,ETH3_RXD0*/
+	*(volatile u8 *)PMC(0) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+
+	*(volatile u64 *)PFC(0) = (*(volatile u64 *)PFC(0) & 0x0000000000000000) \
+	| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+
+	/* PMC and PFC for ETH3_RXD1,ETH3_RXD2,ETH3_RXD3,ETH3_RXDV,ETH2_REFCLK*/
+	*(volatile u8 *)PMC(1) |= BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+	*(volatile u64 *)PFC(1) = (*(volatile u64 *)PFC(1) & 0xFFFFFFFF00000000) \
+	|((u64)0x2 << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+
+	/* P03_5_ETH3_RXER */
+	*(volatile u8 *)PMC(3) |= BIT(5);
+	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFF00FFFFFFFFFF) \
+	| ((u64)0xf<< 40);
+
+	/* ==================================================ETH4 =======================================*/
+
+    /* PMC and PFC for P01_6_ETH4_TXCLK_RMII_CLKIN & P01_7_ETH4_TXD0*/
+	*(volatile u8 *)PMC(1) |=BIT(7)|BIT(6);
+	*(volatile u64 *)PFC(1) = (*(volatile u64 *)PFC(1) & 0x0000FFFFFFFFFFFF) \
+	|((u64)0xf << 56) | ((u64)0xf << 48);
+
+	/*P02_0_ETH4_TXD1, P02_1_ETH4_TXD2, P02_2_ETH4_TXD3, P02_3_ETH4_TXEN
+	P02_4_ETH4_RXCLK, P02_5_ETH4_RXD0, P02_6_ETH4_RXD1, P02_7_ETH4_RXD2 */
+	*(volatile u8 *)PMC(2) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+	*(volatile u64 *)PFC(2) = (*(volatile u64 *)PFC(2) & 0x0000000000000000) \
+	| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+
+	/*P03_0_ETH4_RXD3, P03_1_ETH4_RXDV_CRS_DV */
+	*(volatile u8 *)PMC(3) |=BIT(1)|BIT(0);
+	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFFFFFFFF0000) \
+	|(0xf << 8) | (0xf << 0);
+
+	/*P16_3_ETH4_RXER*/
+	*(volatile u8 *)PMC(16) |=BIT(3);
+	*(volatile u64 *)PFC(16) = (*(volatile u64 *)PFC(16) & 0xFFFFFFFF00FFFFFF) \
+	|(0x10 <<24);
+
+	/*P03_4_ETH4_REFCLK */
+	*(volatile u8 *)PMC(3) |=BIT(4);
+	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFF00FFFFFFFF) \
+	| ((u64)0x2 << 32);
+
+	/* ===================================== ETH1 GMAC1 =======================================*/
+
     /* Release PHY Reset state P4_7 */
     *(volatile u8 *)PMC(4) &= ~BIT(7);
     *(volatile u8 *)P(4) |= BIT(7);
 
     /* P4_7 set as output */
     *(volatile u16 *)PM(4) |= (0x3 << 14);
-#endif
+
+
+	/* ETH1 connect to GMAC1*/
+	*(volatile u8 *)PMC(20) |= (BIT(5)|BIT(4));
+	*(volatile u64 *)PFC(20) = (*(volatile u64 *)PFC(20) & 0xFFFF0000FFFFFFFF) \
+	|(((u64)0x12<< 40) | ((u64)0x12<< 32));
+
+	/*P24_6_ETH3_GMAC1_MDC & P24_7_ETH3_GMAC1_MDIO*/
+	*(volatile u8 *)PMC(24) |= (BIT(7)|BIT(6));
+	*(volatile u64 *)PFC(24) = (*(volatile u64 *)PFC(24) & 0x0000FFFFFFFFFFFF) \
+	| ( ((u64)0x12<<56) | ((u64)0x12<< 48));
+
+
+	/* Release module stop for GMAC1 */
+	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_GMAC1);
+
+	/* Release module reset for GMAC1 */
+	*(volatile u32 *)MRCTLE &= ~(MRCTLE_GMAC1_PCLKH | MRCTLE_GMAC1_PCLKM);
+
+	/* ==========================================GMAC2 =======================================*/
+
 	/* Release PHY Reset state P16_1 */
 	*(volatile u8 *)PMC(16) &= ~BIT(1);
 	*(volatile u8 *)P(16) |= BIT(1);
 
 	/* P16_1 set as output */
 	*(volatile u16 *)PM(16) |= (0x3 << 2);
-#if 0
-	/* Release module stop for GMAC0 */
-	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_GMAC0);
 
-	/* Release module reset for GMAC0 */
-	*(volatile u32 *)MRCTLE &= ~(MRCTLE_GMAC0_PCLKH | MRCTLE_GMAC0_PCLKM);
-#endif
+	/* Release module stop for GMAC2 */
+	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_GMAC2);
+
+	/* Release module reset for GMAC2 */
+	*(volatile u32 *)MRCTLE &= ~(MRCTLE_GMAC2_PCLKH | MRCTLE_GMAC2_PCLKM);
+
+	/* ==========================================END=======================================*/
+
 	/* Release module stop for ETH_SS */
 	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_ETHSS);
 
@@ -246,6 +323,47 @@ void s_init(void)
 	*(volatile u32 *)PRCRS = PRCRS_PRKEY;
 }
 
+static void board_usb_init(void)
+{
+	/* Disable Write protect to enable writing */
+	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
+	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
+
+	/* set P11_0 operation as USB_VBUSEN*/
+	*(volatile u64 *)PFC(11) = (*(volatile u64 *)PFC(11) & 0xFFFFFFFFFFFFFF00) | (0x17<< 0);
+	*(volatile u8 *)PMC(11) |= BIT(0);
+
+	/* Enable Write protect to disable writing*/
+	(*(volatile u32 *)PRCRN) = PRCRN_PRKEY;
+	(*(volatile u32 *)PRCRS) = PRCRS_PRKEY;
+
+	/* Release USB module from the stopped state MSTPCRE[8]=0 is performed in TF-A */
+
+	/* Disable interrupt */
+	*(volatile u32 *)(USB2_BASE + USB2_INT_ENABLE) = 0;
+
+	/* enable pull down resisor */
+	*(volatile u32 *)(USB2_BASE + USB2_LINECTRL1) |= USB2_LINECTRL1_DP_RPD | USB2_LINECTRL1_DPRPD_EN | USB2_LINECTRL1_DMRPD_EN | USB2_LINECTRL1_DM_RPD;
+
+	/* usb is HOST */
+	*(volatile u32 *)(USB2_BASE + USB2_COMMCTRL) &= ~USB2_COMMCTRL_OTG_PERI;
+
+	/*  LPSTS.SUSPM =1 UTMI normal mode */
+	(*(volatile u16 *)(USBF_BASE + USBf_LPSTS)) |= 0x4000;
+
+	/* Enable VBUS output */
+	*(volatile u32 *)(USB2_BASE + USB2_VBCTRL) |= USB2_VBCTRL_VBOUT;
+
+	/* Overcurrent is not supported */
+	(*(volatile u32 *)(USB2_BASE + USB2_HcRhDescriptorA)) |= (0x1u << 12);
+
+	/* Release PLL reset */
+	(*(volatile u32 *)(USB2_BASE + USB2_USBCTR)) |= USB2_USBCTR_PLL_RST;
+	(*(volatile u32 *)(USB2_BASE + USB2_USBCTR)) &= ~USB2_USBCTR_PLL_RST;
+
+	udelay(100);
+}
+
 /* Needed by common/board_f */
 
 int board_early_init_f(void)
@@ -258,7 +376,7 @@ int board_early_init_f(void)
 int adxctl_init(void)
 {
 	int i;
-
+	/*DDR Mirror0 addr_shift=0 Mirror1 addr_shift=2*/
 	for (i = 2; i < ADXC0_MASTERS; i++)
 		writel(((readl((uintptr_t)(ADXCTL0_BASE + i * 0x4)) & ~DDRMIR_MASK) |
 				DDRMIR1(addr_shift)), (uintptr_t)(ADXCTL0_BASE + i * 0x4));
@@ -278,38 +396,108 @@ int board_init(void)
 	gd->bd->bi_boot_params = CONFIG_TEXT_BASE + 0x50000;
 
 	adxctl_init();
-	/* ETHSS: Mode Control 0x0, GMAC1 on port ETH3, GMAC2 on ETH4 */
-	ethss_init_hw(0x0);
-#if 0
-#if GMAC1_ETH_BLOCK_IN_USE == 1
-	/* ETHSS: GMAC1 RGMII_ID mode on port ETH3 */
-	ret = ethss_config(3, PHY_INTERFACE_MODE_RGMII_ID);
+
+	ethss_init_hw(0x7);
+
+	ret = ethss_config(1, PHY_INTERFACE_MODE_RGMII_ID);
 	if (ret < 0)
 	{
-		printf("ETH3 port Init FAILED \n");
+		printf("ETH1 port Init FAILED \n");
 		return ret;
 	}
+	ethss_link_up(1, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
 
-	/* Set up speed for Converters for GMAC1 */
-	ethss_link_up(3, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
-
-#endif
-
-#if GMAC2_ETH_BLOCK_IN_USE == 1
-
-	/* ETHSS: GMAC2 RGMII_ID mode on port ETH4 */
-	ret = ethss_config(4, PHY_INTERFACE_MODE_RGMII_ID);
+	ret = ethss_config(2, PHY_INTERFACE_MODE_RGMII_ID);
 	if (ret < 0)
 	{
-		printf("ETH4 port Init FAILED \n");
+		printf("ETH2 port Init FAILED \n");
 		return ret;
 	}
-	/* Set up speed for Converters for GMAC2 */
-	ethss_link_up(4, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
-#endif
+	ethss_link_up(2, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
+
 	board_usb_init();
-#endif
+	debug_ethernet_settings();
 	return 0;
+}
+
+void debug_ethernet_settings(void)
+{
+
+	printf("======================================ETH0 ==============================\n");
+	printf("ETH0 PMC19 = 0x%02x\n", *(volatile u8 *)PMC(19));
+	printf("ETH0 PFC19 = 0x%016llx\n",  *(volatile u64 *)PFC(19));
+
+	printf("ETH0 PMC20 = 0x%02x\n", *(volatile u8 *)PMC(20));
+	printf("ETH0 PFC20 = 0x%016llx\n",  *(volatile u64 *)PFC(20));
+
+	printf("======================================ETH1 ==============================\n");
+	printf("ETH1 PMC21 = 0x%02x\n", *(volatile u8 *)PMC(21));
+	printf("ETH1 PFC21 = 0x%016llx\n",  *(volatile u64 *)PFC(21));
+
+	printf("ETH1 PMC22 = 0x%02x\n", *(volatile u8 *)PMC(22));
+	printf("ETH1 PFC22 = 0x%016llx\n",  *(volatile u64 *)PFC(22));
+
+	printf("======================================ETH2 ==============================\n");
+	printf("ETH2 PMC23 = 0x%02x\n", *(volatile u8 *)PMC(23));
+	printf("ETH2 PFC23 = 0x%016llx\n",  *(volatile u64 *)PFC(23));
+
+	printf("ETH2 PMC24 = 0x%02x\n", *(volatile u8 *)PMC(24));
+	printf("ETH2 PFC24 = 0x%016llx\n",  *(volatile u64 *)PFC(24));
+
+	printf("ETH2 PMC25 = 0x%02x\n", *(volatile u8 *)PMC(25));
+	printf("ETH2 PFC25 = 0x%016llx\n",  *(volatile u64 *)PFC(25));
+
+	printf("======================================ETH3 ==============================\n");
+	printf("ETH3 PMC0 = 0x%02x\n", *(volatile u8 *)PMC(0));
+	printf("ETH3 PFC0 = 0x%016llx\n",  *(volatile u64 *)PFC(0));
+	printf("ETH3 PMC1 = 0x%02x\n", *(volatile u8 *)PMC(1));
+	printf("ETH3 PFC1 = 0x%016llx\n",  *(volatile u64 *)PFC(1));
+	printf("ETH3 PMC3 = 0x%02x\n", *(volatile u8 *)PMC(3));
+	printf("ETH3 PFC3 = 0x%016llx\n",  *(volatile u64 *)PFC(3));
+
+	printf("======================================ETH4 ==============================\n");
+	printf("ETH4 PMC1 = 0x%02x\n", *(volatile u8 *)PMC(1));
+	printf("ETH4 PFC1 = 0x%016llx\n",  *(volatile u64 *)PFC(1));
+	printf("ETH4 PMC2 = 0x%02x\n", *(volatile u8 *)PMC(2));
+	printf("ETH4 PFC3 = 0x%016llx\n",  *(volatile u64 *)PFC(2));
+	printf("ETH4 PMC3 = 0x%02x\n", *(volatile u8 *)PMC(3));
+	printf("ETH4 PFC3 = 0x%016llx\n",  *(volatile u64 *)PFC(3));
+
+
+	printf(" ============================== ETH1 GMAC1 =============================\n");
+	printf("GMAC1 PMC4 = 0x%02x\n", *(volatile u8 *)PMC(4));
+	printf("GMAC1 P4   = 0x%02x\n", *(volatile u8 *)P(4));
+	printf("GMAC1 PM4  = 0x%04x\n", *(volatile u16 *)PM(4));
+
+	printf("ETH1 PMC20 = 0x%02x\n", *(volatile u8 *)PMC(20));
+	printf("ETH1 PFC20 = 0x%016llx\n",  *(volatile u64 *)PFC(20));
+
+	printf("ETH1 PMC24 = 0x%02x\n", *(volatile u8 *)PMC(24));
+	printf("ETH1 PFC24 = 0x%016llx\n",  *(volatile u64 *)PFC(24));
+
+	printf("MSTPCRE = 0x%08x\n", *(volatile u32 *)MSTPCRE);
+	printf("MRCTLE  = 0x%08x\n", *(volatile u32 *)MRCTLE);
+	printf("SCKCR2  = 0x%08x\n", *(volatile u32 *)SCKCR2);
+
+	printf("MODCTRL  = 0x%08x\n", *(volatile u32 *)0x80110008);
+	printf("CONVCTRL0  = 0x%08x\n", *(volatile u32 *)0x80110100);
+	printf("CONVCTRL1  = 0x%08x\n", *(volatile u32 *)0x80110104);
+	printf("CONVCTRL2  = 0x%08x\n", *(volatile u32 *)0x80110108);
+	printf("CONVCTRL3  = 0x%08x\n", *(volatile u32 *)0x8011010C);
+	printf("CONVCTRL4  = 0x%08x\n", *(volatile u32 *)0x80110110);
+	printf("CONVRST    = 0x%08x\n", *(volatile u32 *)0x80110114);
+
+	printf(" ============================== CLOCK=============================\n");
+	printf("SCKCR     		= 0x%08x\n", *(volatile u32 *)0x81280000);
+	printf("SCKCR2    		= 0x%08x\n", *(volatile u32 *)0x81280004);
+	printf("SCKCR3    		= 0x%08x\n", *(volatile u32 *)0x81280008);
+	printf("SCKCR4    		= 0x%08x\n", *(volatile u32 *)0x8128000C);
+	printf("PMSEL     		= 0x%08x\n", *(volatile u32 *)0x81280010);
+	printf("PLL0MON   		= 0x%08x\n", *(volatile u32 *)0x81280020);
+	printf("PLL0EN    		= 0x%08x\n", *(volatile u32 *)0x81280030);
+	printf("PLL1MON  		= 0x%08x\n", *(volatile u32 *)0x81280040);
+	printf("PLL2MON  		= 0x%08x\n", *(volatile u32 *)0x81280090);
+	printf("PLL2EN  		= 0x%08x\n", *(volatile u32 *)0x812800A0);			
 }
 
 void reset_cpu(void)

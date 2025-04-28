@@ -10,6 +10,12 @@
 #include <dt-bindings/pinctrl/rzt2n-pinctrl.h>
 #include <dt-bindings/gpio/gpio.h>
 #include "r9a07g076-u-boot.dtsi"
+/*
+ * ETH2 Settings
+ * - 0: ETH2 using GMAC2 disabled
+ * - 1: ETH2 using GMAC2 ENABLED
+ */
+#define GMAC2_ETH2_ENABLE		0
 
 / {
 	model = "Renesas Development EVK based on r9a07g076";
@@ -78,21 +84,21 @@
 };
 
 &gmac1 {
-	phy-handle = <&phy3>;
+	phy-handle = <&phy1>;
 	phy-mode = "rgmii-id";
 	status = "okay";
 
 	mdio {
 		#address-cells = <1>;
 		#size-cells = <0>;
-		phy3: ethernet-phy@3 {
+		phy1: ethernet-phy@1 {
 			compatible = "ethernet-phy-id0007.0772";
 			phy-mode = "rgmii-id";
-			reg = <3>;
+			reg = <1>;
 		};
 	};
 };
-
+#if (GMAC2_ETH2_ENABLE)
 &gmac2 {
 	phy-handle = <&phy2>;
 	phy-mode = "rgmii-id";
@@ -108,3 +114,4 @@
 		};
 	};
 };
+#endif

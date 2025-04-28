@@ -51,6 +51,7 @@ __weak u32 renesas_get_cpu_rev_fraction(void)
 	return 0;
 }
 
+#if !(defined(CONFIG_R9A07G076))
 /* CPU information table */
 static const struct {
 	u16 cpu_type;
@@ -94,6 +95,7 @@ static const u8 *get_cpu_name(int idx)
 
 	return cpu_name ? cpu_name : renesas_cpuinfo[idx].cpu_name;
 }
+#endif
 
 #ifdef CONFIG_ARCH_MISC_INIT
 int arch_misc_init(void)
