@@ -151,7 +151,10 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define CS0ENDAD_xSPI(x)	(0x80293004 + (0x100 * (x)))
 
+#define DEBUG_PRINT_ETHERNET_SETTINGS       (0)
+#if DEBUG_PRINT_ETHERNET_SETTINGS == 1
 void debug_ethernet_settings(void);
+#endif
 
 /* Needed by lowlevel_init.S*/
 void s_init(void)
@@ -338,7 +341,7 @@ static void board_usb_init(void)
 	(*(volatile u32 *)PRCRS) = PRCRS_PRKEY;
 
 	/* Release USB module from the stopped state MSTPCRE[8]=0 is performed in TF-A */
-
+	
 	/* Disable interrupt */
 	*(volatile u32 *)(USB2_BASE + USB2_INT_ENABLE) = 0;
 
@@ -416,10 +419,12 @@ int board_init(void)
 	ethss_link_up(2, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
 
 	board_usb_init();
+#if DEBUG_PRINT_ETHERNET_SETTINGS == 1
 	debug_ethernet_settings();
+#endif
 	return 0;
 }
-
+#if DEBUG_PRINT_ETHERNET_SETTINGS == 1
 void debug_ethernet_settings(void)
 {
 
@@ -497,8 +502,9 @@ void debug_ethernet_settings(void)
 	printf("PLL0EN    		= 0x%08x\n", *(volatile u32 *)0x81280030);
 	printf("PLL1MON  		= 0x%08x\n", *(volatile u32 *)0x81280040);
 	printf("PLL2MON  		= 0x%08x\n", *(volatile u32 *)0x81280090);
-	printf("PLL2EN  		= 0x%08x\n", *(volatile u32 *)0x812800A0);			
+	printf("PLL2EN  		= 0x%08x\n", *(volatile u32 *)0x812800A0);				
 }
+#endif
 
 void reset_cpu(void)
 {
