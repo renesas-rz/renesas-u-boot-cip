@@ -21,11 +21,10 @@
 #define CONFIG_INITRD_TAG
 
 /* Generic Interrupt Controller Definitions */
-/* RZ/T2H use GIC-v3 */
+/* use GIC-v3 */
+//#define CONFIG_GICV3
 #define GICD_BASE	0x83000000
 #define GICR_BASE	0x83040000
-
-#define RSCI1_BASE	0x80005400
 
 /* console */
 #define CONFIG_SYS_CBSIZE		2048
@@ -45,17 +44,11 @@
 #define DRAM_RSV_SIZE			0x4000000
 #define CONFIG_SYS_SDRAM_BASE		(0xC0000000 + DRAM_RSV_SIZE)
 #define CONFIG_SYS_SDRAM_SIZE		(0x40000000 - DRAM_RSV_SIZE)
-//#define CONFIG_SYS_LOAD_ADDR		(0xC4200000)
+
 #define CONFIG_LOADADDR			CONFIG_SYS_LOAD_ADDR // Default load address for tfpt,bootp...
 #define CONFIG_VERY_BIG_RAM
 #define CONFIG_MAX_MEM_MAPPED		(0x40000000 - DRAM_RSV_SIZE)
 
-/*
-#define CONFIG_SYS_MONITOR_BASE		0x00000000
-#define CONFIG_SYS_MONITOR_LEN		(1 * 1024 * 1024)
-#define CONFIG_SYS_MALLOC_LEN		(64 * 1024 * 1024)
-#define CONFIG_SYS_BOOTM_LEN		(64 << 20)
-*/
 
 /* The HF/QSPI layout permits up to 1 MiB large bootloader blob */
 #define CONFIG_BOARD_SIZE_LIMIT		1048576

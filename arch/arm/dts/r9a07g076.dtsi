@@ -21,6 +21,53 @@
 		clock-frequency = <0>;
 	};
 
+	/* eth0_tx_clk clock input */
+	eth0_tx_clk: eth0_tx_clk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		/* This value must be overridden by the board */
+		clock-frequency = <0>;
+	};
+
+	/* eth0_rx_clk clock input */
+	eth0_rx_clk: eth0_rx_clk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		/* This value must be overridden by the board */
+		clock-frequency = <0>;
+	};
+
+	/* eth2_tx_clk clock input */
+	eth1_tx_clk: eth1_tx_clk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		/* This value must be overridden by the board */
+		clock-frequency = <0>;
+	};
+
+	/* eth1_rx_clk clock input */
+	eth1_rx_clk: eth1_rx_clk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		/* This value must be overridden by the board */
+		clock-frequency = <0>;
+	};
+
+	/* eth2_tx_clk clock input */
+	eth2_tx_clk: eth2_tx_clk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		/* This value must be overridden by the board */
+		clock-frequency = <0>;
+	};
+
+	/* eth2_rx_clk clock input */
+	eth2_rx_clk: eth2_rx_clk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		/* This value must be overridden by the board */
+		clock-frequency = <0>;
+	};
 
 	cpus {
 		#address-cells = <1>;
@@ -74,10 +121,16 @@
 
 		cpg: clock-controller@80280000 {
 			compatible = "renesas,r9a07g076-cpg";
-			reg = <0 0x80280000 0 0x10000>,
-				<0 0x81280000 0 0x10000>;
-			clocks = <&extal_clk>;
-			clock-names = "extal";
+			reg = <0 0x80280000 0 0x400>,
+				<0 0x81280000 0 0x400>;
+			clocks = <&extal_clk>,
+				 <&eth0_tx_clk>, <&eth0_rx_clk>,
+				 <&eth1_tx_clk>, <&eth1_rx_clk>,
+				 <&eth2_tx_clk>, <&eth2_rx_clk>;
+			clock-names = "extal",
+				      "eth0_tx_clk", "eth0_rx_clk",
+					  "eth1_tx_clk", "eth1_rx_clk",
+				      "eth2_tx_clk", "eth2_rx_clk";
 			#clock-cells = <2>;
 			#reset-cells = <1>;
 			#power-domain-cells = <0>;
@@ -142,6 +195,46 @@
 			status = "disabled";
 		};
 
+		gmac1: ethernet@92000000 {
+			compatible = "renesas,rzt2n-eqos",
+				     "snps,dwc-qos-ethernet-4.10";
+			reg = <0 0x92000000 0 0x10000>;
+			interrupts = <GIC_SPI 387 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 389 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 388 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "macirq", "eth_wake_irq", "eth_lpi";
+			clocks =  <&cpg CPG_MOD R9A07G076_GMAC1_CLK>;
+			clock-names = "clk";
+			resets = <&cpg R9A07G076_GMAC1_PCLKAH_RST>,
+				 <&cpg R9A07G076_GMAC1_PCLKAM_RST>;
+			reset-names = "reset_h", "reset_m";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+			snps,write-requests = <15>;
+			snps,read-requests = <15>;
+			snps,burst-map = <0x7>;
+		};
+		gmac2: ethernet@92010000 {
+			compatible = "renesas,rzt2n-eqos",
+				     "snps,dwc-qos-ethernet-4.10";
+			reg = <0 0x92010000 0 0x10000>;
+			interrupts = <GIC_SPI 406 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 408 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 407 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "macirq", "eth_wake_irq", "eth_lpi";
+			clocks =  <&cpg CPG_MOD R9A07G076_GMAC2_CLK>;
+			clock-names = "clk";
+			resets = <&cpg R9A07G076_GMAC2_PCLKAH_RST>,
+				 <&cpg R9A07G076_GMAC2_PCLKAM_RST>;
+			reset-names = "reset_h", "reset_m";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+			snps,write-requests = <15>;
+			snps,read-requests = <15>;
+			snps,burst-map = <0x7>;
+		};
 	};
 };
 

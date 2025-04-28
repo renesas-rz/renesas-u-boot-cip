@@ -37,6 +37,10 @@ int dc21x4x_initialize(struct bd_info *bis);
 int designware_initialize(ulong base_addr, u32 interface);
 int dm9000_initialize(struct bd_info *bis);
 int dnet_eth_initialize(int id, void *regs, unsigned int phy_addr);
+void ethss_init_hw(u32 cfg_mode);
+int ethss_config(int port, phy_interface_t interface);
+void ethss_link_up(int port, phy_interface_t interface,
+		   int speed, int duplex);
 int e1000_initialize(struct bd_info *bis);
 int eepro100_initialize(struct bd_info *bis);
 int ep93xx_eth_initialize(u8 dev_num, int base_addr);
