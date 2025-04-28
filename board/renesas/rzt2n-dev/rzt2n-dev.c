@@ -180,6 +180,26 @@ void s_init(void)
 	/* Release module stop for SDHI0/1 */
 	*(volatile u32 *)MSTPCRM &= ~(MSTPCRM_SDHI0 | MSTPCRM_SDHI1);
 
+	/* ==========================================SDHI0 & SDHI1=======================================*/
+
+	*(volatile u8 *)PMC(4) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+    *(volatile u64 *)PFC(4) = (*(volatile u64 *)PFC(4) & 0x0000000000000000)
+     | ((u64)0x2C << 56) | ((u64)0x2C << 48) | ((u64)0x2C << 40) | ((u64)0x2C << 32) | (0x2C << 24) | (0x2C << 16) | (0x2C << 8) | (0x2C << 0);
+
+	*(volatile u8 *)PMC(5) |= BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
+    *(volatile u64 *)PFC(5) = (*(volatile u64 *)PFC(5) & 0xFFFF000000000000)
+     | ((u64)0x2C << 40) | ((u64)0x2C << 32) | (0x2C << 24) | (0x2C << 16) | (0x2C << 8) | (0x2C << 0);
+
+	*(volatile u8 *)PMC(3) |= BIT(7) | BIT(6);
+	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0x0000FFFFFFFFFFFF) \
+	| ((u64)0x2C << 56) | ((u64)0x2C << 48);
+
+	*(volatile u8 *)PMC(15) |= BIT(0);
+	*(volatile u64 *)PFC(15) = (*(volatile u64 *)PFC(15) & 0xFFFFFFFFFFFFFF00) \
+	|  (0x2C<< 0);
+
+	/* ==================================================ETH1 =======================================*/
+
 	/* ==================================================ETH0 =======================================*/
     /* PMC and PFC for ETH0_TXCLK,ETH0_TXD0,ETH0_TXD1,ETH0_TXD2,ETH0_TXD3,ETH0_TXEN,ETH0_RXCLK,ETH0_RXD0*/
 	*(volatile u8 *)PMC(19) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
