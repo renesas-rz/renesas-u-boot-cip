@@ -33,8 +33,8 @@ obj-$(CONFIG_ROCKCHIP_SERIAL) += serial_rockchip.o
 obj-$(CONFIG_XILINX_UARTLITE) += serial_xuartlite.o
 obj-$(CONFIG_SANDBOX_SERIAL) += sandbox.o
 
-ifdef CONFIG_R9A08G045S
-obj-$(CONFIG_SCIF_CONSOLE) += serial_sh_g3s.o
+ifneq ($(or $(CONFIG_R9A08G045S),$(CONFIG_R9A08G046)),)
+  obj-$(CONFIG_SCIF_CONSOLE) += serial_sh_g3s.o
 else
 obj-$(CONFIG_SCIF_CONSOLE) += serial_sh.o
 endif

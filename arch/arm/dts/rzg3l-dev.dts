@@ -11,8 +11,14 @@
 #include "r9a08g045s-u-boot.dtsi"
 #include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
 
+/*
+ * select between USB phy0 and MTU3 pins which are multiplexed
+ * MTU3 pins are NOT required by clocksoure function
+ */
+#define MTU3_PINS_SEL			0
+
 / {
-	model = "smarc-rzg3s";
+	model = "rzg3l-dev";
 	compatible = "renesas,r9a08g045s", "renesas,rzg3s";
 
 	aliases {
@@ -26,11 +32,10 @@
 	memory@48000000 {
 		device_type = "memory";
 		/* first 128MB is reserved for secure area. */
-		reg = <0 0x48000000 0 0x78000000>;
+		reg = <0 0x48000000 0 0x38000000>;
 	};
 };
 
-#if 0
 &pinctrl {
 	eth0_pins: eth0 {
 		pinmux = <RZG2L_PINMUX(1, 0, 1)>,
@@ -50,6 +55,17 @@
 				<RZG2L_PINMUX(4, 5, 1)>;
 	};
 
+#if !MTU3_PINS_SEL
+	usb0_pins: usb0 {
+		pinmux = <RZG2L_PINMUX(5, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(5, 2, 1)>;	/* OVC	*/
+	};
+#endif
+	usb1_pins: usb1 {
+		pinmux = <RZG2L_PINMUX(6, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(6, 1, 1)>;	/* OVC */
+	};
+
 	sdhi2_pins: sd2 {
 		pinmux = <RZG2L_PINMUX(11, 0, 8)>,	/* SD2_CLK	*/
 			 <RZG2L_PINMUX(11, 1, 8)>,	/* SD2_CMD	*/
@@ -57,20 +73,10 @@
 			 <RZG2L_PINMUX(11, 3, 8)>,	/* SD2_DATA1	*/
 			 <RZG2L_PINMUX(12, 0, 8)>,	/* SD2_DATA2	*/
 			 <RZG2L_PINMUX(12, 1, 8)>,	/* SD2_DATA3	*/
-			 <RZG2L_PINMUX(14, 1, 7)>;	/* SD2_CD	*/
-	};
-
-	usb0_pins: usb0 {
-		pinmux = <RZG2L_PINMUX(5, 0, 1)>,	/* VBUS	*/
-			 <RZG2L_PINMUX(5, 2, 1)>;	/* OVC	*/
-	};
-
-	usb1_pins: usb1 {
-		pinmux = <RZG2L_PINMUX(6, 0, 1)>,	/* VBUS	*/
-			 <RZG2L_PINMUX(5, 4, 5)>;	/* OVC */
+			 <RZG2L_PINMUX(14, 1, 7)>,	/* SD2_CD	*/
+			 <RZG2L_PINMUX(14, 2, 7)>;	/* SD2_WP	*/
 	};
 };
-#endif	/* 0 */
 
 &xinclk {
 	clock-frequency = <24000000>;
@@ -91,7 +97,6 @@
 	status = "okay";
 };
 
-#if 0
 &sdhi2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&sdhi2_pins>;
@@ -101,8 +106,8 @@
 };
 
 &eth0 {
-	pinctrl-0 = <&eth0_pins>;
 	pinctrl-names = "default";
+	pinctrl-0 = <&eth0_pins>;
 	phy-handle = <&phy0>;
 	phy-mode = "rgmii";
 	status = "okay";
@@ -111,7 +116,6 @@
 		reg = <7>;
 	};
 };
-#endif	/* 0 */
 
 &i2c0 {
 	status = "okay";
@@ -121,16 +125,16 @@
 	status = "okay";
 };
 
-#if 0
+#if !MTU3_PINS_SEL
 &ehci0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb0_pins>;
 	status = "okay";
 };
+#endif
 
 &ehci1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb1_pins>;
 	status = "okay";
 };
-#endif	/* 0 */

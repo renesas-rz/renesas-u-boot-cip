@@ -3,8 +3,8 @@
  * Copyright (C) 2022 Renesas Electronics Corporation
  */
 
-#ifndef __SMARC_RZG3S_H
-#define __SMARC_RZG3S_H
+#ifndef __RZG3L_DEV_H
+#define __RZG3L_DEV_H
 
 #include <asm/arch/renesas.h>
 
@@ -73,4 +73,4 @@
 /* Ethernet RAVB */
 #define CONFIG_BITBANGMII_MULTI
 
-#endif /* __RZG3S_DEV_H */
+#endif /* __RZG3L_DEV_H */

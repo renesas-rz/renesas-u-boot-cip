@@ -1,31 +1,31 @@
-if TARGET_RZG3S_DEV
+if TARGET_RZG3L_DEV
 
 config SYS_SOC
 	default "renesas"
 
 config SYS_BOARD
-	default "rzg3s-dev"
+	default "rzg3l-dev"
 
 config SYS_VENDOR
 	default "renesas"
 
 config SYS_CONFIG_NAME
-	default "rzg3s-dev"
+	default "rzg3l-dev"
 
 endif
 
-if TARGET_SMARC_RZG3S
+if TARGET_SMARC_RZG3L
 
 config SYS_SOC
 	default "renesas"
 
 config SYS_BOARD
-	default "rzg3s-dev"
+	default "rzg3l-dev"
 
 config SYS_VENDOR
 	default "renesas"
 
 config SYS_CONFIG_NAME
-	default "smarc-rzg3s"
+	default "smarc-rzg3l"
 
 endif
