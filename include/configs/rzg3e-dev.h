@@ -47,7 +47,7 @@
 #define CONFIG_BOARD_SIZE_LIMIT		1048576
 
 /* ENV setting */
-#define CONFIG_EXTRA_ENV_SETTINGS	\
+#define CFG_EXTRA_ENV_SETTINGS	\
 	"bootm_size=0x10000000\0"
 
 #define CONFIG_BOOTCOMMAND	\

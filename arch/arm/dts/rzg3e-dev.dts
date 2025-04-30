@@ -12,7 +12,7 @@
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-	model = "Renesas Development EVK based on r9a09g047e54";
+	model = "Renesas Development EVK based on r9a09g047e57";
 	compatible = "renesas,r9a09g047e54-dev", "renesas,r9a09g047e54", "renesas,r9a09g047";
 
 	aliases {
