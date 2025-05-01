@@ -7,18 +7,12 @@
 
 /dts-v1/;
 #include <dt-bindings/gpio/gpio.h>
-#include "r9a08g045s.dtsi"
-#include "r9a08g045s-u-boot.dtsi"
+#include "r9a08g046.dtsi"
+#include "r9a08g046-u-boot.dtsi"
 #include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
 
-/*
- * select between USB phy0 and MTU3 pins which are multiplexed
- * MTU3 pins are NOT required by clocksoure function
- */
-#define MTU3_PINS_SEL			0
-
 / {
-	model = "rzg3l-dev";
+	model = "smarc-rzg3l";
 	compatible = "renesas,r9a08g045s", "renesas,rzg3s";
 
 	aliases {
@@ -32,10 +26,11 @@
 	memory@48000000 {
 		device_type = "memory";
 		/* first 128MB is reserved for secure area. */
-		reg = <0 0x48000000 0 0x38000000>;
+		reg = <0 0x48000000 0 0x78000000>;
 	};
 };
 
+#if 0
 &pinctrl {
 	eth0_pins: eth0 {
 		pinmux = <RZG2L_PINMUX(1, 0, 1)>,
@@ -55,17 +50,6 @@
 				<RZG2L_PINMUX(4, 5, 1)>;
 	};
 
-#if !MTU3_PINS_SEL
-	usb0_pins: usb0 {
-		pinmux = <RZG2L_PINMUX(5, 0, 1)>,	/* VBUS	*/
-			 <RZG2L_PINMUX(5, 2, 1)>;	/* OVC	*/
-	};
-#endif
-	usb1_pins: usb1 {
-		pinmux = <RZG2L_PINMUX(6, 0, 1)>,	/* VBUS	*/
-			 <RZG2L_PINMUX(6, 1, 1)>;	/* OVC */
-	};
-
 	sdhi2_pins: sd2 {
 		pinmux = <RZG2L_PINMUX(11, 0, 8)>,	/* SD2_CLK	*/
 			 <RZG2L_PINMUX(11, 1, 8)>,	/* SD2_CMD	*/
@@ -73,10 +57,20 @@
 			 <RZG2L_PINMUX(11, 3, 8)>,	/* SD2_DATA1	*/
 			 <RZG2L_PINMUX(12, 0, 8)>,	/* SD2_DATA2	*/
 			 <RZG2L_PINMUX(12, 1, 8)>,	/* SD2_DATA3	*/
-			 <RZG2L_PINMUX(14, 1, 7)>,	/* SD2_CD	*/
-			 <RZG2L_PINMUX(14, 2, 7)>;	/* SD2_WP	*/
+			 <RZG2L_PINMUX(14, 1, 7)>;	/* SD2_CD	*/
+	};
+
+	usb0_pins: usb0 {
+		pinmux = <RZG2L_PINMUX(5, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(5, 2, 1)>;	/* OVC	*/
+	};
+
+	usb1_pins: usb1 {
+		pinmux = <RZG2L_PINMUX(6, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(5, 4, 5)>;	/* OVC */
 	};
 };
+#endif	/* 0 */
 
 &xinclk {
 	clock-frequency = <24000000>;
@@ -97,6 +91,7 @@
 	status = "okay";
 };
 
+#if 0
 &sdhi2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&sdhi2_pins>;
@@ -106,14 +101,37 @@
 };
 
 &eth0 {
-	pinctrl-names = "default";
 	pinctrl-0 = <&eth0_pins>;
+	pinctrl-names = "default";
 	phy-handle = <&phy0>;
 	phy-mode = "rgmii";
 	status = "okay";
 
 	phy0: ethernet-phy@7 {
 		reg = <7>;
+	};
+};
+#endif	/* 0 */
+
+&eth0 {
+	status = "okay";
+	phy-handle = <&phy0>;
+	phy-mode = "rgmii-id";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		phy0: ethernet-phy@0 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <0>;
+			txc-skew-ps = <1700>;
+			txen-skew-ps = <(-700)>;
+			txd0-skew-ps = <0>;
+			txd1-skew-ps = <0>;
+			txd2-skew-ps = <0>;
+			txd3-skew-ps = <0>;
+		};
 	};
 };
 
@@ -125,16 +143,16 @@
 	status = "okay";
 };
 
-#if !MTU3_PINS_SEL
+#if 0
 &ehci0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb0_pins>;
 	status = "okay";
 };
-#endif
 
 &ehci1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb1_pins>;
 	status = "okay";
 };
+#endif	/* 0 */

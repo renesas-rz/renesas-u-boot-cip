@@ -196,8 +196,13 @@ struct eqos_tegra186_regs {
 
 #if IS_ENABLED(CONFIG_DWC_ETH_QOS_RZV2H)
 /* These registers are rzv2h-specific */
+#if IS_ENABLED(CONFIG_R9A08G046)
+#define CPG_BASE					0x11010000
+#define CPG_CSDIV0					(CPG_BASE + 0x0434)
+#else
 #define CPG_BASE					0x10420000
 #define CPG_CSDIV0					(CPG_BASE + 0x0500)
+#endif
 #endif
 
 /* Descriptors */

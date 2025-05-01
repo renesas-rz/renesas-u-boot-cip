@@ -55,6 +55,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPG_CLKON_USB			(CPG_BASE + 0x578)
 #define CPG_CLKMON_USB			(CPG_BASE + 0x6F8)
 
+//g3l
+#define CPG_ETH_SSEL			(CPG_BASE + 0x410)
+#define CPG_ETH_SDIV			(CPG_BASE + 0x434)
+
 /* PFC */
 #define	PFC_P25				(PFC_BASE + 0x25)
 #define	PFC_PM25			(PFC_BASE + 0x014A)
@@ -84,6 +88,14 @@ DECLARE_GLOBAL_DATA_PTR;
 #define	PFC_IEN_34			(PFC_BASE + 0x19A0)
 #define	PFC_IEN_23			(PFC_BASE + 0x1918)
 #define	PFC_IEN_24			(PFC_BASE + 0x1920)
+
+//g3l
+#define PFC_PMC2A			(PFC_BASE + 0x22A)
+#define PFC_PMC2B			(PFC_BASE + 0x22B)
+#define PFC_PMC2C			(PFC_BASE + 0x22C)
+#define PFC_PFC2A			(PFC_BASE + 0x4A8)
+#define PFC_PFC2B			(PFC_BASE + 0x4AC)
+#define PFC_PFC2C			(PFC_BASE + 0x4B0)
 
 #define PFC_PWPR			(PFC_BASE + 0x3000)
 #define PWPR_B0WI			BIT(7)	 /* Bit Write Disable */
@@ -118,6 +130,15 @@ void s_init(void)
 	*(volatile u32 *)(PFC_IEN_30_L) = 0x01010101;
 	*(volatile u32 *)(PFC_IEN_30_H) = 0x00000101;
 
+	//g3l
+	/* Pinmux for ETH0 */
+	*(volatile u32 *)(PFC_PFC2A) = 0x00001111;
+	*(volatile u32 *)(PFC_PFC2B) = 0x11111111;
+	*(volatile u32 *)(PFC_PFC2C) = 0x00000111;
+	*(volatile u8 *)(PFC_PMC2A) = 0xF;
+	*(volatile u8 *)(PFC_PMC2B) = 0xFF;
+	*(volatile u8 *)(PFC_PMC2C) = 0x7;
+
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(ETH0_POC) = (*(volatile u32 *)(ETH0_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
 	*(volatile u32 *)(ETH1_POC) = (*(volatile u32 *)(ETH1_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
@@ -126,11 +147,16 @@ void s_init(void)
 
 	*(volatile u32 *)(PFC_PWPR) = 0;
 	*(volatile u32 *)(PFC_PWPR) = PWPR_B0WI;
+
+	//g3l
 	/* ETH CLK */
 	*(volatile u32 *)(CPG_CLKON_ETH) = 0x3FFF1555;
-	while(*(volatile u32 *)(CPG_CLKMON_ETH) != 0x00001555)
-		;
+	while(*(volatile u32 *)(CPG_CLKMON_ETH) != 0x00001555);
+	*(volatile u32 *)(CPG_ETH_SSEL) = 0xFFFF0202;
 	*(volatile u32 *)(CPG_RESET_ETH) = 0x00010001;
+
+
+
 	/*
 	 * Setting SD CLKs.
 	 * Currently, we use IMCLKs with output CLK rate 133 MHz, HSCLK will be considered to support later.
