@@ -12,7 +12,7 @@
 #include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
 
 / {
-	model = "smarc-rzg3l";
+	model = "rzg3l-dev";
 	compatible = "renesas,r9a08g045s", "renesas,rzg3s";
 
 	aliases {
