@@ -2058,11 +2058,27 @@ struct efi_signature_list {
 
 /* This GUID is meant to identify Renesas "family" uniquely. 
 This is useful for example to download a firmware update with fwupd
-This may be better moved to board specific!
+This is now moved to board specific!
 */
+#if defined(CONFIG_R9A07G044L) /*RZ/G2L*/
 #define EFI_RENESAS_FIRMWARE_IMAGE_UBOOT_FIT_GUID \
 	EFI_GUID(0x3adc889e, 0xe14f, 0x11ee, 0xb4, 0x3d, \
 		 0xf7, 0x66, 0x21, 0x3e, 0xed, 0xfe)
+#elif defined(CONFIG_R9A07G043U) /*RZ/G2UL*/
+#define EFI_RENESAS_FIRMWARE_IMAGE_UBOOT_FIT_GUID \
+	EFI_GUID(0x1da874c0, 0x2cc3, 0x11f0, 0xa0, 0xec, \
+	0x83, 0x56, 0xd8, 0x84, 0x09, 0x8e)
+#elif defined(CONFIG_R9A07G044C) /*RZ/G2LC*/
+#define EFI_RENESAS_FIRMWARE_IMAGE_UBOOT_FIT_GUID \
+    EFI_GUID(0x9c9f8174, 0x2cc3, 0x11f0, 0x90, 0xfd, \
+             0x7b, 0xec, 0xf8, 0x47, 0xd0, 0x3e)
+#elif defined(CONFIG_R9A07G054L)  /*RZ/V2L*/
+#define EFI_RENESAS_FIRMWARE_IMAGE_UBOOT_FIT_GUID \
+    EFI_GUID(0xa51ca278, 0x2cc3, 0x11f0, 0xb1, 0x9e, \
+             0x8b, 0x7f, 0x9b, 0x16, 0x92, 0x8a)
+#else
+# error ERROR Define Capsule GUID
+#endif
 
 #define EFI_FIRMWARE_IMAGE_TYPE_UBOOT_RAW_GUID \
 	EFI_GUID(0xe2bb9c06, 0x70e9, 0x4b14, 0x97, 0xa3, \
