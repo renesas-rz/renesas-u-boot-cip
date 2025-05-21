@@ -49,6 +49,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define SCKCR			0x80280000
 #define PHYSEL			BIT(21)
 
+/* xSPI clock enable*/
+#define MRCTLA 0x80280240
+#define MRCTLA_XSPI1 (5)
+
 /* ETH Release Module Stop */
 
 #define MSTPCRE 0x80280310
@@ -156,6 +160,8 @@ DECLARE_GLOBAL_DATA_PTR;
 void debug_ethernet_settings(void);
 #endif
 
+#define XSPI1_FLASH_RW_ENABLE               (0)
+
 /* Needed by lowlevel_init.S*/
 void s_init(void)
 {
@@ -179,6 +185,21 @@ void s_init(void)
 
 	/* Release module stop for SDHI0/1 */
 	*(volatile u32 *)MSTPCRM &= ~(MSTPCRM_SDHI0 | MSTPCRM_SDHI1);
+
+	/* ==========================================xSPI1 Flash =======================================*/
+
+	/* xSPI1 : XSPI1_CKP/P15_6  & xSPI : XSPI1_CS0#/P15_7 */
+	*(volatile u8 *)PMC(15) |= BIT(7) | BIT(6);
+	*(volatile u64 *)PFC(15) = (*(volatile u64 *)PFC(15) & 0x0000FFFFFFFFFFFF) \
+	| ((u64)0x20 << 56) | ((u64)0x20 << 48);
+
+	/* xSPI1 : XSPI1_IO0/P16_2 xSPI : XSPI1_IO1/P16_3 xSPI : XSPI1_IO2/P16_4 xSPI : XSPI1_IO3/P16_5*/
+	*(volatile u8 *)PMC(16) |= BIT(5)|BIT(4)|BIT(3)|BIT(2);
+    *(volatile u64 *)PFC(16) = (*(volatile u64 *)PFC(16) & 0xFFFF00000000FFFF)
+     | ((u64)0x20 << 40) | ((u64)0x20 << 32) | (0x20 << 24) | (0x20 << 16);
+
+	/* Release module reset for GMAC1 */
+	*(volatile u32 *)MRCTLA &= ~(MRCTLA_XSPI1);
 
 	/* ==========================================SDHI0 & SDHI1=======================================*/
 
@@ -274,11 +295,12 @@ void s_init(void)
 	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFFFFFFFF0000) \
 	|(0xf << 8) | (0xf << 0);
 
+#if XSPI1_FLASH_RW_ENABLE == 0
 	/*P16_3_ETH4_RXER*/
 	*(volatile u8 *)PMC(16) |=BIT(3);
 	*(volatile u64 *)PFC(16) = (*(volatile u64 *)PFC(16) & 0xFFFFFFFF00FFFFFF) \
 	|(0x10 <<24);
-
+#endif
 	/*P03_4_ETH4_REFCLK */
 	*(volatile u8 *)PMC(3) |=BIT(4);
 	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFF00FFFFFFFF) \

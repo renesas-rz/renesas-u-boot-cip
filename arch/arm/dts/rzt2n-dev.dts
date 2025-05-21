@@ -83,6 +83,31 @@
 	status = "okay";
 };
 
+&xspi0 {
+	pinctrl-names = "default";
+	status = "okay";
+
+	flash@0 {
+		compatible = "macronix,mx25lw51245g", "jedec,spi-nor";
+		reg = <0>;
+		m25p,fast-read;
+		spi-max-frequency = <50000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@000000 {
+				label = "test-area-1";
+				reg = <0x00000000 0x01000000>;
+			};
+		};
+	};
+};
+
 &gmac1 {
 	phy-handle = <&phy3>;
 	phy-mode = "rgmii-id";
