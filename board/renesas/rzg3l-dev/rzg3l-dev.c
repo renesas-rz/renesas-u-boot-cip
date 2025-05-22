@@ -96,6 +96,9 @@ DECLARE_GLOBAL_DATA_PTR;
 #define PFC_PFC2A			(PFC_BASE + 0x4A8)
 #define PFC_PFC2B			(PFC_BASE + 0x4AC)
 #define PFC_PFC2C			(PFC_BASE + 0x4B0)
+//i2c
+#define	PFC_PMC23			(PFC_BASE + 0x223)
+#define	PFC_PFC23			(PFC_BASE + 0x48C)
 
 #define PFC_PWPR			(PFC_BASE + 0x3000)
 #define PWPR_B0WI			BIT(7)	 /* Bit Write Disable */
@@ -138,6 +141,12 @@ void s_init(void)
 	*(volatile u8 *)(PFC_PMC2A) = 0xF;
 	*(volatile u8 *)(PFC_PMC2B) = 0xFF;
 	*(volatile u8 *)(PFC_PMC2C) = 0x7;
+
+	#if CONFIG_TARGET_RZG3L_DEV
+	/* Pinmux for I2C0	*/
+	*(volatile u32 *)(PFC_PFC23) |= 0x4400;
+	*(volatile u8 *)(PFC_PMC23)  |= 0x0C;
+	#endif
 
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(ETH0_POC) = (*(volatile u32 *)(ETH0_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
