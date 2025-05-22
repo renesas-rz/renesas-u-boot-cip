@@ -5,11 +5,11 @@ config RCAR_64
 	bool
 	select ARM64
 	select CMD_CACHE
-	select OF_BOARD_SETUP
 	select PHY
 	select PINCONF
 	select PINCTRL
 	select POSITION_INDEPENDENT
+	imply OF_BOARD_SETUP
 	imply CMD_FS_UUID
 	imply CMD_GPT
 	imply CMD_MMC_SWRITE if MMC

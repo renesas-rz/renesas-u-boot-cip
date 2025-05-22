@@ -212,7 +212,6 @@ static void update_rpc_status(void *blob)
 	void *atf_fdt_blob = (void *)(rcar_atf_boot_args[1]);
 	int offset, enabled;
 
-#if 0
 	/*
 	 * Check if the DT fragment received from TF-A had its RPC-IF device node
 	 * enabled.
@@ -239,9 +238,6 @@ static void update_rpc_status(void *blob)
 		return;
 
 	fdt_status_okay(blob, offset);
-#else
-	printf("update_rpc_status() Disabled on G3L.\n");
-#endif
 }
 
 int ft_board_setup(void *blob, struct bd_info *bd)
