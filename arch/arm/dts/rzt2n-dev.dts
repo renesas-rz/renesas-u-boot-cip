@@ -22,7 +22,7 @@
 	compatible = "renesas,r9a07g076";
 
 	aliases {
-		serial0 = &sci0;
+		serial0 = &sci1;
 		mmc0 = &sdhi0;
 		mmc1 = &sdhi1;
 		ethernet0 = &gmac1;
@@ -66,7 +66,7 @@
 
 };
 
-&sci0 {
+&sci1 {
 	status = "okay";
 };
 

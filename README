@@ -23,12 +23,7 @@ Please refer to document "r01us0780ej0020-rzt2n(Linux_Start-up_Guide_RZT2N).pdf"
 
    `XSPIW 0 0x060000 0xff000` 
 
-2. The TF-A and u-boot connected to SCI0. Please note the Flash writer is using SCI1. Follow the procedure below:
-
-   2a. Use SCI1 channel for Flash writer
-
-   2b. Use SCI0 channel for TF-A, u-boot and Linux kernel
-
+2. The TF-A and u-boot debug serial connected to SCI1
 
 ## Features / Limitations
 1. The ethernet port enabled on this version of u-boot is ETH1. Connect the Ethernet cable on ETH1 J42
