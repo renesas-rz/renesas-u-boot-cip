@@ -162,6 +162,27 @@ int board_init(void)
 	return 0;
 }
 
+#if CONFIG_TARGET_SMARC_RZG3E
+int board_late_init(void)
+{
+	struct udevice *dev;
+	const u8 greenpak_i2c_bus = 8;
+	const u8 greenpak_i2c_addr = 0x38;
+	const u8 od_rst = 0x38;
+	const u8 zero = 0;
+	int ret;
+
+	ret = i2c_get_chip_for_busnum(greenpak_i2c_bus, greenpak_i2c_addr, 1,
+				      &dev);
+	if (!ret) {
+		dm_i2c_write(dev, 0x5c, &zero, 1);
+		dm_i2c_write(dev, 0x5c, &od_rst, 1);
+	}
+
+	return 0;
+}
+#endif
+
 void reset_cpu(void)
 {
 
