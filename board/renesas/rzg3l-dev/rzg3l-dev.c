@@ -89,13 +89,22 @@ DECLARE_GLOBAL_DATA_PTR;
 #define	PFC_IEN_23			(PFC_BASE + 0x1918)
 #define	PFC_IEN_24			(PFC_BASE + 0x1920)
 
-//g3l
+//g3l Eth0
 #define PFC_PMC2A			(PFC_BASE + 0x22A)
 #define PFC_PMC2B			(PFC_BASE + 0x22B)
 #define PFC_PMC2C			(PFC_BASE + 0x22C)
 #define PFC_PFC2A			(PFC_BASE + 0x4A8)
 #define PFC_PFC2B			(PFC_BASE + 0x4AC)
 #define PFC_PFC2C			(PFC_BASE + 0x4B0)
+
+//g3l Eth1
+#define PFC_PMC2D			(PFC_BASE + 0x22D)
+#define PFC_PMC2E			(PFC_BASE + 0x22E)
+#define PFC_PMC2F			(PFC_BASE + 0x22F)
+#define PFC_PFC2D			(PFC_BASE + 0x4B4)
+#define PFC_PFC2E			(PFC_BASE + 0x4B8)
+#define PFC_PFC2F			(PFC_BASE + 0x4BC)
+
 //i2c
 #define	PFC_PMC23			(PFC_BASE + 0x223)
 #define	PFC_PFC23			(PFC_BASE + 0x48C)
@@ -155,6 +164,16 @@ void s_init(void)
 	*(volatile u8 *)(PFC_PMC2B) = 0xFF;
 	*(volatile u8 *)(PFC_PMC2C) = 0x7;
 
+
+	/* Pinmux for ETH1 */
+	*(volatile u32 *)(PFC_PFC2D) = 0x00001111;
+	*(volatile u32 *)(PFC_PFC2E) = 0x11111111;
+	*(volatile u32 *)(PFC_PFC2F) = 0x00000111;
+	*(volatile u8 *)(PFC_PMC2D) = 0xF;
+	*(volatile u8 *)(PFC_PMC2E) = 0xFF;
+	*(volatile u8 *)(PFC_PMC2F) = 0x7;
+
+
 	/* Pinmux for I2C0	*/
 	*(volatile u32 *)(PFC_PFC23) |= 0x4400;
 	*(volatile u8 *)(PFC_PMC23)  |= 0x0C;
@@ -168,14 +187,13 @@ void s_init(void)
 	*(volatile u32 *)(PFC_PWPR) = 0;
 	*(volatile u32 *)(PFC_PWPR) = PWPR_B0WI;
 
+
 	//g3l
-	/* ETH CLK */
-	*(volatile u32 *)(CPG_CLKON_ETH) = 0x3FFF1555;
-	while(*(volatile u32 *)(CPG_CLKMON_ETH) != 0x00001555);
-	*(volatile u32 *)(CPG_ETH_SSEL) = 0xFFFF0202;
-	*(volatile u32 *)(CPG_RESET_ETH) = 0x00010001;
-
-
+	/* ETH CLK Setup for Eth0 and Eth1 */
+	*(volatile u32 *)(CPG_CLKON_ETH) = 0x3FFF3FFF;
+	while(*(volatile u32 *)(CPG_CLKMON_ETH) != 0x00003FFF);
+	*(volatile u32 *)(CPG_ETH_SSEL) = 0xFFFF0202;  //source clock selection for ETH0 and ETH1
+	*(volatile u32 *)(CPG_RESET_ETH) = 0x00030003;
 
 	/*
 	 * Setting SD CLKs.
