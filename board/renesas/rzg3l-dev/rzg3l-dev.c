@@ -124,10 +124,23 @@ void s_init(void)
 	*(volatile u32 *)(PFC_PFC30) = (*(volatile u32 *)(PFC_PFC30) & 0xFF000000) | 0x111111;
 	*(volatile u8 *)(PFC_PMC30) |= 0x3F;	/* PG0-PG5 function	*/
 
+#if CONFIG_TARGET_SMARC_RZG3L
+	/* PJ1 = 0 QSD1_IOVS=0	*/
+	
+	*(volatile u8 *)(PFC_PMC33) &= ~(0x02);
+	*(volatile u16 *)(PFC_PM33) = (*(volatile u16 *)(PFC_PM33) & 0xFF) | 0x08; /*bit[5:4]='B10	*/
+	*(volatile u8 *)(PFC_P33) &= ~(0x02);
+	/* PJ2 = 1 QSD1_PWEN=1	*/
+	*(volatile u8 *)(PFC_PMC33) &= ~(0x04);
+	*(volatile u16 *)(PFC_PM33) = (*(volatile u16 *)(PFC_PM33) & 0xFF) | 0x20; /*bit[5:4]='B10	*/
+	*(volatile u8 *)(PFC_P33) |= 0x04;
+
+#else
 	/* P56 = 1 QSD1_PWEN=1	*/
 	*(volatile u8 *)(PFC_PMC25) &= ~(0x40);
 	*(volatile u16 *)(PFC_PM25) = (*(volatile u16 *)(PFC_PM25) & 0xFFF) | 0x2000; /*bit[13:12]='B10	*/
 	*(volatile u8 *)(PFC_P25) |= 0x40;
+#endif
 
 	/* Input Enable Control PG0-PG5 Enable	*/
 	*(volatile u32 *)(PFC_IEN_30_L) = 0x01010101;
@@ -142,11 +155,9 @@ void s_init(void)
 	*(volatile u8 *)(PFC_PMC2B) = 0xFF;
 	*(volatile u8 *)(PFC_PMC2C) = 0x7;
 
-	#if CONFIG_TARGET_RZG3L_DEV
 	/* Pinmux for I2C0	*/
 	*(volatile u32 *)(PFC_PFC23) |= 0x4400;
 	*(volatile u8 *)(PFC_PMC23)  |= 0x0C;
-	#endif
 
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(ETH0_POC) = (*(volatile u32 *)(ETH0_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
