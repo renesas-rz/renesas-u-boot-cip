@@ -26,9 +26,10 @@ Please refer to document "r01us0780ej0020-rzt2n(Linux_Start-up_Guide_RZT2N).pdf"
 2. The TF-A and u-boot debug serial connected to SCI1
 
 ## Features / Limitations
-1. The ethernet port enabled on this version of u-boot is ETH1. Connect the Ethernet cable on ETH1 J42
-2. For ETH1 to work the SW7 requires the settings SW7-7: ON, SW7-8: OFF
-3. For eMMC to work the SW7 requires the settings SW7-7: ON, SW7-8: ON
+1. The ethernet mode used is 0 (MODCTRL : Mode Control Register), use ETH3 (gmac1) for network booting
+2. ETH4 also enabled by default ( macro GMAC2_ETH4_ENABLE=1), use u-boot command 'setenv ethact eth1'
+to explicitly select ETH4 port
+3. For eMMC boot to work the SW7 requires the settings SW7-7: ON, SW7-8: ON
 
 ## TFTP / NFS
 1. This requires the TFTP and NFS server to be setup correctly.
