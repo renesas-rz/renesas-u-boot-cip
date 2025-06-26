@@ -15,12 +15,13 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
 #include <asm/arch/gpio.h>
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 #include <asm/arch/rcar-mstp.h>
 #include <asm/arch/sh_sdhi.h>
 #include <i2c.h>
 #include <mmc.h>
 #include <linux/delay.h>
+#include <efi_loader.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -47,6 +48,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define MSTPCRE_GMAC1		BIT(16)
 #define MSTPCRE_GMAC2		BIT(17)
 #define MSTPCRE_ETHSS		BIT(3)
+#define MSTPCRE_USB			BIT(8)
 
 #define MRCTLE			0x80280250
 #define MRCTLE_GMAC1_PCLKH	BIT(16)
@@ -140,6 +142,26 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define CS0ENDAD_xSPI(x)	(0x80293004 + (0x100 * (x)))
 
+#if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+
+#define RENESAS_FIP_IMAGE_GUID \
+	EFI_GUID(0x880866e9, 0x84ba, 0x4793, 0xa9, 0x08, \
+		 0x33, 0xe0, 0xb9, 0x16, 0xf3, 0x98)
+
+struct efi_fw_image fw_images[] = {
+	{
+		.image_type_id = RENESAS_FIP_IMAGE_GUID,
+		.fw_name = u"RENESAS-FIP",
+		.image_index = 1,
+	},
+};
+
+struct efi_capsule_update_info update_info = {
+	.dfu_string = "sf 0:0=fip.bin raw 0x20000 0x1F0000\0",
+	.num_images = ARRAY_SIZE(fw_images),
+	.images = fw_images,
+};
+#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
 void s_init(void)
 {
@@ -267,6 +289,9 @@ static void board_usb_init(void)
 	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
 	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
 
+	/* USB module stop release */
+	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_USB);
+
 	/* set P00_0 operation as USB_VBUSEN*/
 	*(volatile u64 *)PFC(0)	= (*(volatile u64 *)PFC(0) & 0x3f) | 0x13;
 	*(volatile u8 *)PMC(0)		|= BIT(0);
@@ -314,12 +339,12 @@ int adxctl_init(void)
 	int i;
 
 	for (i = 2; i < ADXC0_MASTERS; i++)
-		writel(((readl(ADXCTL0_BASE + i * 0x4) & ~DDRMIR_MASK) |
-				DDRMIR1(addr_shift)), ADXCTL0_BASE + i * 0x4);
+		writel(((readl((uintptr_t)(ADXCTL0_BASE + i * 0x4)) & ~DDRMIR_MASK) |
+				DDRMIR1(addr_shift)), (uintptr_t)(ADXCTL0_BASE + i * 0x4));
 
 	for (i = 0; i < ADXC1_MASTERS; i++)
-		writel(((readl(ADXCTL1_BASE + i * 0x4) & ~DDRMIR_MASK) |
-			DDRMIR1(addr_shift)), ADXCTL1_BASE + i * 0x4);
+		writel(((readl((uintptr_t)(ADXCTL1_BASE + i * 0x4)) & ~DDRMIR_MASK) |
+			DDRMIR1(addr_shift)), (uintptr_t)(ADXCTL1_BASE + i * 0x4));
 	return 0;
 }
 
@@ -328,7 +353,7 @@ int board_init(void)
 	int ret;
 
 	/* adress of boot parameters */
-	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
+	gd->bd->bi_boot_params = CONFIG_TEXT_BASE + 0x50000;
 	adxctl_init();
 
 	/* ETHSS: Mode Control 0x6, GMAC1 on port ETH3, GMAC2 on port ETH2 */
@@ -355,7 +380,24 @@ int board_init(void)
 
 void reset_cpu(void)
 {
+#ifdef CONFIG_RENESAS_RZG2LWDT
+	struct udevice *wdt_dev;
+	if (uclass_get_device(UCLASS_WDT, WDT_INDEX, &wdt_dev) < 0) {
+		printf("failed to get wdt device. cannot reset\n");
+		return;
+	}
+	if (wdt_expire_now(wdt_dev, 0) < 0) {
+		printf("failed to expire_now wdt\n");
+	}
+#endif // CONFIG_RENESAS_RZG2LWDT
+}
 
+int board_late_init(void)
+{
+#ifdef CONFIG_RENESAS_RZG2LWDT
+	rzg2l_reinitr_wdt();
+#endif // CONFIG_RENESAS_RZG2LWDT
+	return 0;
 }
 
 /*

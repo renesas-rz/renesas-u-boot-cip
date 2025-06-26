@@ -44,6 +44,7 @@
 #define SDHI_VERSION			(0x01C4 >> 1)
 #define SDHI_HOST_MODE			(0x01C8 >> 1)
 #define SDHI_SDIF_MODE			(0x01CC >> 1)
+#define SDHI_SD_STATUS			(0x01E4 >> 1)	/* Only support RZ/T2H */
 #define SDHI_EXT_SWAP			(0x01E0 >> 1)
 #define SDHI_SD_DMACR			(0x0324 >> 1)
 
@@ -155,6 +156,11 @@
 /* SDHI_SOFT_RST */
 #define SOFT_RST_ON			(0 << 0)
 #define SOFT_RST_OFF			(1 << 0)
+
+/* SDHI_SD_STATUS */
+#define SD_STATUS_SD_PWEN		(1 << 0)
+#define SD_STATUS_SD_RST		(1 << 1)
+#define SD_STATUS_SD_IOVS		(1 << 16)
 
 #define	CLKDEV_SD_DATA			25000000	/* 25 MHz */
 #define CLKDEV_HS_DATA			50000000	/* 50 MHz */
