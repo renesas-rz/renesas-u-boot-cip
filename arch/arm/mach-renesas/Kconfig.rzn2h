@@ -1,0 +1,29 @@
+# Copyright (C) 2023 Renesas Electronics Corporation
+# SPDX-License-Identifier: GPL-2.0+
+
+if RZN2H
+
+config R9A09G087
+	bool "Renesas R9A09G087 SoC"
+	help
+	  Enable support for the Renesas R9A09G087 (RZ/N2H) SoC.
+
+choice
+	prompt "Renesas RZ/N2H Family Board selection"
+	optional
+
+config TARGET_RZN2H_DEV
+	bool "Renesas RZ/N2H DEV"
+	imply R9A09G087
+	help
+	  Enable support for the RZ/N2H evaluation board.
+
+endchoice
+
+source "board/renesas/rzn2h-dev/Kconfig"
+
+config MULTI_DTB_FIT_UNCOMPRESS_SZ
+	default 0x80000 if TARGET_SMARC_RZT2H
+	default 0x80000 if TARGET_RZN2H_DEV
+
+endif

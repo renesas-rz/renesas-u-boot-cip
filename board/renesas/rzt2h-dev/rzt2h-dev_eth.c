@@ -46,12 +46,12 @@
 
 static void ethss_reg_writel(int offset, u32 value)
 {
-	writel(value, ETH_SUBSYSTEM_REG_BASE + offset);
+	writel(value, (uintptr_t)(ETH_SUBSYSTEM_REG_BASE + offset));
 }
 
 static u32 ethss_reg_readl(int offset)
 {
-	return readl(ETH_SUBSYSTEM_REG_BASE + offset);
+	return readl((uintptr_t)(ETH_SUBSYSTEM_REG_BASE + offset));
 }
 
 static void ethss_reg_rmw(int offset, u32 mask, u32 val)

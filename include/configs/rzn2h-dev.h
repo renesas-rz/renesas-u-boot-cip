@@ -6,7 +6,7 @@
 #ifndef __RZN2H_DEV_H
 #define __RZN2H_DEV_H
 
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 
 #define CONFIG_REMAKE_ELF
 
@@ -44,18 +44,13 @@
 #define DRAM_RSV_SIZE			0x4000000
 #define CONFIG_SYS_SDRAM_BASE		(0xC0000000 + DRAM_RSV_SIZE)
 #define CONFIG_SYS_SDRAM_SIZE		(0x40000000 - DRAM_RSV_SIZE)
-#define CONFIG_SYS_LOAD_ADDR		(0xC4200000)
+
 #define CONFIG_LOADADDR			CONFIG_SYS_LOAD_ADDR // Default load address for tfpt,bootp...
 #define CONFIG_VERY_BIG_RAM
 #define CONFIG_MAX_MEM_MAPPED		(0x40000000 - DRAM_RSV_SIZE)
 
 #define CONFIG_SYS_MONITOR_BASE		0x00000000
-#define CONFIG_SYS_MONITOR_LEN		(1 * 1024 * 1024)
-#define CONFIG_SYS_MALLOC_LEN		(64 * 1024 * 1024)
-#define CONFIG_SYS_BOOTM_LEN		(64 << 20)
 
-/* The HF/QSPI layout permits up to 1 MiB large bootloader blob */
-#define CONFIG_BOARD_SIZE_LIMIT		1048576
 
 /* ENV setting */
 #define CONFIG_EXTRA_ENV_SETTINGS	\

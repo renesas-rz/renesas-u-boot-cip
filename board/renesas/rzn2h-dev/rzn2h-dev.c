@@ -15,7 +15,7 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
 #include <asm/arch/gpio.h>
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 #include <asm/arch/rcar-mstp.h>
 #include <asm/arch/sh_sdhi.h>
 #include <i2c.h>
@@ -314,12 +314,12 @@ int adxctl_init(void)
 	int i;
 
 	for (i = 2; i < ADXC0_MASTERS; i++)
-		writel(((readl(ADXCTL0_BASE + i * 0x4) & ~DDRMIR_MASK) |
-				DDRMIR1(addr_shift)), ADXCTL0_BASE + i * 0x4);
+		writel(((readl((uintptr_t)(ADXCTL0_BASE + i * 0x4)) & ~DDRMIR_MASK) |
+				DDRMIR1(addr_shift)), (uintptr_t)(ADXCTL0_BASE + i * 0x4));
 
 	for (i = 0; i < ADXC1_MASTERS; i++)
-		writel(((readl(ADXCTL1_BASE + i * 0x4) & ~DDRMIR_MASK) |
-			DDRMIR1(addr_shift)), ADXCTL1_BASE + i * 0x4);
+		writel(((readl((uintptr_t)(ADXCTL1_BASE + i * 0x4)) & ~DDRMIR_MASK) |
+			DDRMIR1(addr_shift)), (uintptr_t)(ADXCTL1_BASE + i * 0x4));
 	return 0;
 }
 
@@ -328,7 +328,7 @@ int board_init(void)
 	int ret;
 
 	/* adress of boot parameters */
-	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
+	gd->bd->bi_boot_params = CONFIG_TEXT_BASE + 0x50000;
 	adxctl_init();
 
 	/* ETHSS: Mode Control 0x6, GMAC1 on port ETH3, GMAC2 on port ETH2 */
