@@ -32,7 +32,9 @@ obj-$(CONFIG_INTEL_MID_SERIAL) += serial_intel_mid.o
 obj-$(CONFIG_ROCKCHIP_SERIAL) += serial_rockchip.o
 obj-$(CONFIG_XILINX_UARTLITE) += serial_xuartlite.o
 obj-$(CONFIG_SANDBOX_SERIAL) += sandbox.o
-obj-$(CONFIG_SCIF_CONSOLE) += serial_sh.o
+ifdef CONFIG_SERIAL_SH_RSCI
+obj-$(CONFIG_SCIF_CONSOLE) += serial_sh_rsci.o
+endif
 obj-$(CONFIG_SEMIHOSTING_SERIAL) += serial_semihosting.o
 obj-$(CONFIG_ZYNQ_SERIAL) += serial_zynq.o
 obj-$(CONFIG_FSL_LPUART) += serial_lpuart.o
