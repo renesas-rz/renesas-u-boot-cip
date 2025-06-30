@@ -503,6 +503,8 @@ static const struct udevice_id xspi_ids[] = {
 	{ .compatible = "renesas,r9a09g057-xspi" },
 	{ .compatible = "renesas,xspi-r9a08g045" },
 	{ .compatible = "renesas,xspi-r9a08g046" },
+	{ .compatible = "renesas,xspi-r9a09g047" },
+	{ .compatible = "renesas,t2-xspi-if" },
 	{ }
 };
 
