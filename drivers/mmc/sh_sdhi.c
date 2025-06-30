@@ -22,8 +22,8 @@
 #include <linux/compat.h>
 #include <linux/io.h>
 #include <linux/sizes.h>
-#ifdef CONFIG_ARCH_RMOBILE
-#include <asm/arch/rmobile.h>
+#ifdef CONFIG_ARCH_RENESAS
+#include <asm/arch/renesas.h>
 #endif
 #ifdef CONFIG_RZF_DEV
 #include <asm/arch-rzmpu/sh_sdhi.h>
@@ -863,11 +863,12 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 	struct sh_sdhi_plat *plat = dev_get_plat(dev);
 	struct sh_sdhi_host *host = dev_get_priv(dev);
 	struct mmc_uclass_priv *upriv = dev_get_uclass_priv(dev);
-	struct clk sh_sdhi_clk;
 	const u32 quirks = dev_get_driver_data(dev);
 	fdt_addr_t base;
+#if !((defined CONFIG_R9A09G077) || (defined CONFIG_R9A09G087))
+	struct clk sh_sdhi_clk;
 	int ret;
-
+#endif
 	base = dev_read_addr(dev);
 	if (base == FDT_ADDR_T_NONE)
 		return -EINVAL;
@@ -921,7 +922,7 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 
 #if ((defined CONFIG_R9A09G077) || (defined CONFIG_R9A09G087))
 	sh_sdhi_writel(host, SDHI_SD_STATUS, ~SD_STATUS_SD_PWEN & sh_sdhi_readl(host, SDHI_SD_STATUS));
-	mdelay(6);
+	mdelay(5);
 	sh_sdhi_writel(host, SDHI_SD_STATUS, SD_STATUS_SD_PWEN);
 #endif
 	sh_sdhi_initialize_common(host);
