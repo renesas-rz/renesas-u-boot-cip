@@ -1371,6 +1371,9 @@ static int vsc8541_config(struct phy_device *phydev)
 	case PHY_INTERFACE_MODE_GMII:
 	case PHY_INTERFACE_MODE_RMII:
 	case PHY_INTERFACE_MODE_RGMII:
+#if (defined(CONFIG_TARGET_RZT2H_DEV) || defined(CONFIG_TARGET_RZN2H_DEV))
+	case PHY_INTERFACE_MODE_RGMII_ID:
+#endif
 		retval = vsc8531_vsc8541_mac_config(phydev);
 		if (retval != 0)
 			return retval;

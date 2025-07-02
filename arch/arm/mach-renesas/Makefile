@@ -3,9 +3,14 @@
 # (C) Copyright 2000-2006
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 
-obj-y = cpu_info.o
+
 obj-y += emac.o
 
+ifneq ($(CONFIG_R9A09G077)$(CONFIG_R9A09G087),)
+obj-y = rzt2h/cpu_info.o
+obj-$(CONFIG_RCAR_GEN3) += rzt2h/lowlevel_init_gen3.o rzt2h/cpu_info-rcar.o rzt2h/memmap-gen3.o
+else
+obj-y = cpu_info.o
 obj-$(CONFIG_DISPLAY_BOARDINFO) += board.o
 obj-$(CONFIG_TMU_TIMER) += ../../sh/lib/time.o
 obj-$(CONFIG_RCAR_GEN2) += lowlevel_init_ca15.o cpu_info-rcar.o
@@ -14,6 +19,7 @@ obj-$(CONFIG_RCAR_GEN3) += cpu_info-rcar.o memmap-gen3.o
 obj-$(CONFIG_RCAR_GEN4) += cpu_info-rcar.o memmap-gen3.o
 obj-$(CONFIG_RZ_G2) += cpu_info-rzg.o
 obj-$(CONFIG_RZG2L) += cpu_info-rzg2l.o memmap-rzg2l.o
+endif
 
 ifneq ($(CONFIG_R8A779A0),)
 obj-$(CONFIG_ARMV8_PSCI) += psci-r8a779a0.o

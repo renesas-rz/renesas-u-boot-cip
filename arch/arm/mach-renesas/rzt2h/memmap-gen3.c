@@ -5,15 +5,15 @@
  * Copyright (C) 2017 Marek Vasut <marek.vasut@gmail.com>
  */
 
+#include <common.h>
+#include <cpu_func.h>
 #include <asm/armv8/mmu.h>
 #include <asm/global_data.h>
-#include <asm/u-boot.h>
-#include <cpu_func.h>
 
 #define GEN3_NR_REGIONS 16
 
-#if ((defined CONFIG_R9A09G077) || (defined CONFIG_R9A09G087))
-static struct mm_region r9a09g077_mem_map[GEN3_NR_REGIONS] = {
+#if ((defined CONFIG_R9A09G077) || (defined CONFIG_R9A09G087)) 
+static struct mm_region rzt2_mem_map[GEN3_NR_REGIONS] = {
 	{
 		.virt = 0x0UL,
 		.phys = 0x0UL,
@@ -48,7 +48,7 @@ static struct mm_region r9a09g077_mem_map[GEN3_NR_REGIONS] = {
 	}
 };
 
-struct mm_region *mem_map = r9a09g077_mem_map;
+struct mm_region *mem_map = rzt2_mem_map;
 #else
 static struct mm_region gen3_mem_map[GEN3_NR_REGIONS] = {
 	{
