@@ -361,6 +361,11 @@ void reset_cpu(void)
 
 }
 
+int board_late_init(void)
+{
+	return 0;
+}
+
 /*
  * Reallocate gd to inside DDR area to avoid using it from
  * inaccessible outside DDR mem.
