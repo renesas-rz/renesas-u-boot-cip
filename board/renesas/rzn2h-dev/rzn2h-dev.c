@@ -47,6 +47,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define MSTPCRE_GMAC1		BIT(16)
 #define MSTPCRE_GMAC2		BIT(17)
 #define MSTPCRE_ETHSS		BIT(3)
+#define MSTPCRE_USB			BIT(8)
 
 #define MRCTLE			0x80280250
 #define MRCTLE_GMAC1_PCLKH	BIT(16)
@@ -266,6 +267,8 @@ static void board_usb_init(void)
 	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
 	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
 
+	/* USB module stop release */
+	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_USB);
 	/* set P02_2 operation as USB_VBUSEN*/
 	*(volatile u64 *)PFC(2)		= (*(volatile u64 *)PFC(2) & 0xFFFFFFFFFF00FFFF) | (0x13 << 16);
 	*(volatile u8 *)PMC(2)		|= BIT(2);
