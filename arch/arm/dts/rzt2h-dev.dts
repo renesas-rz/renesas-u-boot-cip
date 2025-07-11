@@ -791,11 +791,31 @@
 	timeout-sec = <60>;
 };
 
+&gmac0 {
+	status = "disabled";
+	phy-mode = "gmii";
+	ethss-handle = <&ethss>;
+
+	fixed-link {
+		speed = <1000>;
+		full-duplex;
+	};
+};
+
 #if (SEL_ETHSS_PCIE)
 &gmac1 {
 	phy-handle = <&phy3>;
 	phy-mode = "rgmii-id";
+	pcs-handle = <&mii_conv3>;
 	status = "okay";
+	phy-reset-gpios = <&pinctrl RZT2H_GPIO(32, 3) GPIO_ACTIVE_HIGH>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mdio1_pins>;
+	enable-time-based-scheduling;
+	snps,force_thresh_dma_mode;
+	snps,tx_threshold = <128>;
+	snps,mtl-tx-config = <&mtl_tx_setup>;
+	snps,mtl-rx-config = <&mtl_rx_setup>;
 
 	mdio {
 		#address-cells = <1>;
@@ -803,7 +823,9 @@
 		phy3: ethernet-phy@3 {
 			compatible = "ethernet-phy-id0007.0772";
 			phy-mode = "rgmii-id";
-
+			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-combine-disable;
 			reg = <3>;
 		};
 	};
@@ -814,8 +836,16 @@
 &gmac2 {
 	phy-handle = <&phy2>;
 	phy-mode = "rgmii-id";
+	pcs-handle = <&mii_conv2>;
 	status = "okay";
-
+	phy-reset-gpios = <&pinctrl RZT2H_GPIO(17, 5) GPIO_ACTIVE_HIGH>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mdio2_pins>;
+	enable-time-based-scheduling;
+	snps,force_thresh_dma_mode;
+	snps,tx_threshold = <128>;
+	snps,mtl-tx-config = <&mtl_tx_setup>;
+	snps,mtl-rx-config = <&mtl_rx_setup>;
 
 	mdio {
 		#address-cells = <1>;
@@ -823,7 +853,9 @@
 		phy2: ethernet-phy@2 {
 			compatible = "ethernet-phy-id0007.0772";
 			phy-mode = "rgmii-id";
-
+			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-combine-disable;
 			reg = <2>;
 		};
 	};
