@@ -1170,7 +1170,7 @@
 };
 
 &xspi0 {
-	pinctrl-names = "default";
+
 	status = "okay";
 
 	flash@0 {
