@@ -140,7 +140,9 @@
 		pinctrl: pinctrl@812C0000 {
 			compatible = "renesas,r9a09g087-pinctrl";
 			reg = <0 0x802C0000 0 0x2000>,
-			      <0 0x812C0000 0 0x2000>;
+			     <0 0x812C0000 0 0x2000>,
+			     <0 0x802B000 0 0x2000>;
+			reg-names = "port13_35","safety","non-safety";
 			gpio-controller;
 			#gpio-cells = <2>;
 			gpio-ranges = <&pinctrl 0 0 287>;
@@ -405,10 +407,6 @@
 			compatible = "generic-ohci";
 			reg = <0 0x92040000 0 0x100>;
 			interrupts = <GIC_SPI 586 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&cpg CPG_MOD R9A09G077_USB_CLK>;
-			phys = <&usb2_phy 1>;
-			phy-names = "usb";
-			power-domains = <&cpg>;
 			status = "disabled";
 		};
 
@@ -416,9 +414,6 @@
 			compatible = "generic-ehci";
 			reg = <0 0x92040100 0 0x100>;
 			interrupts = <GIC_SPI 586 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&cpg CPG_MOD R9A09G077_USB_CLK>;
-			phys = <&usb2_phy 2>;
-			phy-names = "usb";
 			companion = <&ohci>;
 			power-domains = <&cpg>;
 			status = "disabled";
@@ -783,7 +778,7 @@
 		};
 
 		gmac0: ethernet@80100000 {
-			compatible = "renesas,rzn2h-eqos",
+			compatible = "renesas,rzt2h-eqos",
 				     "snps,dwc-qos-ethernet-4.10";
 			reg = <0 0x80100000 0 0x10000>;
 			interrupts = <GIC_SPI 498 IRQ_TYPE_LEVEL_HIGH>,
@@ -805,7 +800,7 @@
 		};
 
 		gmac1: ethernet@92000000 {
-			compatible = "renesas,rzn2h-eqos",
+			compatible = "renesas,rzt2h-eqos",
 				     "snps,dwc-qos-ethernet-4.10";
 			reg = <0 0x92000000 0 0x10000>;
 			interrupts = <GIC_SPI 517 IRQ_TYPE_LEVEL_HIGH>,
@@ -827,7 +822,7 @@
 		};
 
 		gmac2: ethernet@92010000 {
-			compatible = "renesas,rzn2h-eqos",
+			compatible = "renesas,rzt2h-eqos",
 				     "snps,dwc-qos-ethernet-4.10";
 			reg = <0 0x92010000 0 0x10000>;
 			interrupts = <GIC_SPI 536 IRQ_TYPE_LEVEL_HIGH>,
