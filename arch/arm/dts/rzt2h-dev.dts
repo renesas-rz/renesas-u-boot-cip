@@ -38,7 +38,7 @@
  * - 0: ETHSW, ESC (default)
  * - 1: LCDC
  */
-#define SEL_ETHSW_ESC_LCDC		0
+#define SEL_ETHSW_ESC_LCDC		1
 
 /*
  * Set SEL_ETHSS_PCIE to below values to select using of:

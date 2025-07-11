@@ -137,7 +137,7 @@
 			#power-domain-cells = <0>;
 		};
 
-		pinctrl: pinctrl@802C0000 {
+		pinctrl: pinctrl@812C0000 {
 			compatible = "renesas,r9a09g077-pinctrl";
 			reg = <0 0x802C0000 0 0x2000>,
 			     <0 0x812C0000 0 0x2000>,
@@ -145,7 +145,7 @@
 			reg-names = "port13_35","safety","non-safety";
 			gpio-controller;
 			#gpio-cells = <2>;
-			gpio-ranges = <&pinctrl 0 0 729>;
+			gpio-ranges = <&pinctrl 0 0 287>;
 		};
 
 		intc_ex: intc_ex@802A0000 {
@@ -451,29 +451,6 @@
 			reg = <0x0 0x83000000 0 0x40000>,
 				<0x0 0x83040000 0 0x160000>;
 			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_LOW>;
-		};
-		xspi0: spi@801c0000 {
-			compatible = "renesas,t2-xspi-if";
-			reg = <0 0x801c0000 0 0x1000>,
-			      <0 0x40000000 0 0x10000000>;
-			reg-names = "regs", "dirmap";
-			resets = <&cpg R9A09G077_xSPI0_RST>;
-			power-domains = <&cpg>;
-			#address-cells = <1>;
-			#size-cells = <0>;
-			status = "disabled";
-		};
-
-		xspi1: spi@801c1000 {
-			compatible = "renesas,t2-xspi-if";
-			reg = <0 0x801c1000 0 0x1000>,
-			      <0 0x50000000 0 0x10000000>;
-			reg-names = "regs", "dirmap";
-			resets = <&cpg R9A09G077_xSPI1_RST>;
-			power-domains = <&cpg>;
-			#address-cells = <1>;
-			#size-cells = <0>;
-			status = "disabled";
 		};
 
 		sdhi0: mmc@92080000  {
@@ -981,6 +958,30 @@
 			interrupt-names = "alarm", "carry", "periodic";
 			clocks = <&cpg CPG_MOD R9A09G077_RTC_CLK>;
 			clock-names = "rtc0";
+			status = "disabled";
+		};
+
+		xspi0: spi@801c0000 {
+			compatible = "renesas,t2h-xspi-if";
+			reg = <0 0x801c0000 0 0x1000>,
+				<0 0x40000000 0 0x10000000>;
+			reg-names = "regs", "dirmap";
+			resets = <&cpg R9A09G077_xSPI0_RST>;
+			power-domains = <&cpg>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+		};
+
+		xspi1: spi@801c1000 {
+			compatible = "renesas,t2h-xspi-if";
+			reg = <0 0x801c1000 0 0x1000>,
+				<0 0x50000000 0 0x10000000>;
+			reg-names = "regs", "dirmap";
+			resets = <&cpg R9A09G077_xSPI1_RST>;
+			power-domains = <&cpg>;
+			#address-cells = <1>;
+			#size-cells = <0>;
 			status = "disabled";
 		};
 

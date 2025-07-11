@@ -15,7 +15,7 @@
  * Create the pin index from its bank and position numbers and store in
  * the upper 16 bits the alternate function identifier
  */
-#define RZT2H_PORT_PINMUX(b, p, f)	((b) * RZT2H_PINS_PER_PORT + (p) | ((f) << 12))
+#define RZT2H_PORT_PINMUX(b, p, f)	((b) * RZT2H_PINS_PER_PORT + (p) | ((f) << 16))
 
 /* Convert a port and pin label to its global pin index */
  #define RZT2H_GPIO(port, pin)	((port) * RZT2H_PINS_PER_PORT + (pin))
