@@ -170,7 +170,7 @@ static int rzt2h_node_pinctrl_set_state(struct udevice *dev, struct udevice *con
 
 	for (i = 0 ; i < count; i++) {
 		cells[i] = fdt32_to_cpu(data[i]);
-		func = (cells[i] >> 12) & 0x3f;
+		func = (cells[i] >> 16) & 0x3f;
 		port = (cells[i] / RZT2H_MAX_PINS_PER_PORT) & 0x1ff;
 		pin = cells[i] % RZT2H_MAX_PINS_PER_PORT;
 		if (func > 64 || port >= port_max || pin >= RZT2H_MAX_PINS_PER_PORT) {
@@ -216,7 +216,7 @@ static int rzt2h_subnode_pinctrl_set_state(struct udevice *dev, struct udevice *
 			return rv;
 		}
 		for (i = 0 ; i < count; i++) {
-			func = (cells[i] >> 12) & 0x3f;
+			func = (cells[i] >> 16) & 0x3f;
 			port = (cells[i] / RZT2H_MAX_PINS_PER_PORT) & 0x1ff;
 			pin = cells[i] % RZT2H_MAX_PINS_PER_PORT;
 			debug("subnode func %x port %d pin %d \n",func,port,pin);

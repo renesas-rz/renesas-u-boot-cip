@@ -46,7 +46,7 @@
  * - 0: ETHSW, ESC (default)
  * - 1: LCDC
  */
-#define SEL_ETHSW_ESC_LCDC		0
+#define SEL_ETHSW_ESC_LCDC		1
 
 /*
  * Set SEL_GPT_SD0 to below values to select using of:
@@ -691,7 +691,8 @@
 };
 
 &sci0 {
-
+	pinctrl-0 = <&sci0_pins>;
+	pinctrl-names = "default";
 	status = "okay";
 };
 
