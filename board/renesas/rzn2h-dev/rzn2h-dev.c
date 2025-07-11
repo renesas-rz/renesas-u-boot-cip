@@ -21,6 +21,7 @@
 #include <i2c.h>
 #include <mmc.h>
 #include <linux/delay.h>
+#include <efi_loader.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -139,7 +140,28 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define MODCTRL			0x8
 
-#define CS0ENDAD_xSPI(x)       (0x80293004 + (0x100 * (x)))
+#define CS0ENDAD_xSPI(x)	(0x80293004 + (0x100 * (x)))
+
+#if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+
+#define RENESAS_FIP_IMAGE_GUID \
+	EFI_GUID(0x880866e9, 0x84ba, 0x4793, 0xa9, 0x08, \
+		 0x33, 0xe0, 0xb9, 0x16, 0xf3, 0x98)
+
+struct efi_fw_image fw_images[] = {
+	{
+		.image_type_id = RENESAS_FIP_IMAGE_GUID,
+		.fw_name = u"RENESAS-FIP",
+		.image_index = 1,
+	},
+};
+
+struct efi_capsule_update_info update_info = {
+	.dfu_string = "sf 0:0=fip.bin raw 0x20000 0x1F0000\0",
+	.num_images = ARRAY_SIZE(fw_images),
+	.images = fw_images,
+};
+#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
 void s_init(void)
 {
