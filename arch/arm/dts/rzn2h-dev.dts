@@ -1125,10 +1125,14 @@
 #endif
 
 &ohci {
+	memory-region = <&global_cma>;
+	dr_mode = "otg";	
 	status = "okay";
 };
 
 &ehci {
+	memory-region = <&global_cma>;
+	dr_mode = "otg";
 	status = "okay";
 };
 
