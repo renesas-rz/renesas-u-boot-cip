@@ -7,3 +7,11 @@ config PHY_R8A779F0_ETHERNET_SERDES
 	depends on RCAR_64 && PHY
 	help
 	  Support for Ethernet SERDES found on Renesas R-Car S4-8 SoCs.
+	
+config PHY_RZT2H_USB2
+    bool "Support for Renesas RZ/T2H USB2 PHY"
+    depends on RZT2H
+
+config PHY_RZN2H_USB2
+    bool "Support for Renesas RZ/N2H USB2 PHY"
+    depends on RZN2H
