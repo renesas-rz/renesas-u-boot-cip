@@ -285,17 +285,24 @@ void s_init(void)
 
 static void board_usb_init(void)
 {
+	u32 dummy;
+	int i;
+
 	/* Disable Write protect to enable writing */
 	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
 	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
-
-	/* USB module stop release */
-	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_USB);
 
 	/* set P00_0 operation as USB_VBUSEN*/
 	*(volatile u64 *)PFC(0)	= (*(volatile u64 *)PFC(0) & 0x3f) | 0x13;
 	*(volatile u8 *)PMC(0)		|= BIT(0);
 
+	/* USB module stop release */
+	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_USB);
+	udelay(1);
+	for(i=0;i<7;i++)
+	{
+		dummy = *(volatile u32 *)(USB2_BASE + USB2_PHYCTRL);
+	}
 	/* Enable Write protect to disable writing*/
 	(*(volatile u32 *)PRCRN) = PRCRN_PRKEY;
 	(*(volatile u32 *)PRCRS) = PRCRS_PRKEY;
