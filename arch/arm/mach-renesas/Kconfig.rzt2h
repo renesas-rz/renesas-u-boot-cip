@@ -5,6 +5,7 @@ if RZT2H
 
 config R9A09G077
 	bool "Renesas R9A09G077 SoC"
+	imply CLK_R9A09G077
 	help
 	  Enable support for the Renesas R9A09G077 (RZ/T2H) SoC.
 
