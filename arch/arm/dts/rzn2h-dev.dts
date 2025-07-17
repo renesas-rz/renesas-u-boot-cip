@@ -1126,19 +1126,19 @@
 
 &ohci {
 	memory-region = <&global_cma>;
-	dr_mode = "otg";	
+	dr_mode = "host";	
 	status = "okay";
 };
 
 &ehci {
 	memory-region = <&global_cma>;
-	dr_mode = "otg";
+	dr_mode = "host";
 	status = "okay";
 };
 
 &hsusb {
 	dr_mode = "otg";
-	status = "okay";
+	status = "host";
 };
 
 &rtc {
