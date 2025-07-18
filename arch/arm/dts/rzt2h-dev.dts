@@ -9,7 +9,105 @@
 #include "r9a09g077.dtsi"
 #include <dt-bindings/pinctrl/rzt2h-pinctrl.h>
 #include <dt-bindings/gpio/gpio.h>
-#include "r9a09g077-u-boot.dtsi"
+#include <dt-bindings/net/rzt2h-ethss.h>
+#include <dt-bindings/net/mscc-phy-vsc8531.h>
+
+/*
+ * Select SDHI0 or eMMC support
+ * SEL_SD0 = 0: SDHI
+ * SEL_SDO = 1: eMMC (default)
+ */
+#define SEL_SD0		1
+
+/*
+ * Set marco to 1 to use OTG with CN33
+ * SEL_OTG = 1 use OTG with CN33
+ * SEL_OTG = 0 use USB host with CN80 and USB function with CN79 (default)
+ */
+#define SEL_OTG		0
+
+/*
+ * Set SEL_RSPI_ETHSS to below values to select using of:
+ * - 0: RSPI0
+ * - 1: ETHSS (default)
+ */
+#define SEL_RSPI_ETHSS		1
+
+/*
+ * Set SEL_ETHSW_ESC_LCDC to below values to select using of:
+ * - 0: ETHSW, ESC (default)
+ * - 1: LCDC
+ */
+#define SEL_ETHSW_ESC_LCDC		1
+
+/*
+ * Set SEL_ETHSS_PCIE to below values to select using of:
+ * - 0: PCIE
+ * - 1: ETHSS (default)
+ */
+#define SEL_ETHSS_PCIE		1
+
+/*
+ * Set SEL_PCIE_RC_EP to below values to select using of:
+ * - 0: Endpoint
+ * - 1: Root complex (default)
+ */
+#define SEL_PCIE_RC_EP		1
+
+/*
+ *  Select SCI or LCDC support
+ *  SEL_SCI1_LCDC=0: SCI1
+ *  SEL_SCI1_LCDC=1: LCDC (default)
+ */
+#define SEL_SCI1_LCDC		1
+
+/*
+ * Set SEL_GPT_SD0 to below values to select using of:
+ * - 0 : GPT
+ * - 1 : SD0 (default)
+ */
+#define SEL_GPT_SD0		1
+
+/* Select function support POEG (1: enabled, 0 : disabled) */
+
+#define POEG_SUPPORT		1
+
+/*
+ * MTU3 macros are created to support setting pinctrl and properties in order
+ * to use MTU3 functions.
+ * MTU3_PWM_SUPPORT: Enable to support PWM of MTU3. By default, PWM mode 1 of
+ * MTU3 channel2 and channel3 will be selected.
+ * MTU3_PWM_COMPLEMENTARY_SELECT: Enable this macro to select complementary PWM
+ * mode of MTU3 channel3 instead of PWM mode 1.
+ * MTU3_PHASE_COUNTING_SUPPORT: Enable to support phase counting functions.
+ * MTU3_32BIT_PHASE_COUNTING_SELECT: Select 32-bit phase counting mode; this
+ * macro is used along with MTU3_PHASE_COUNTING_SUPPORT.
+ */
+#define MTU3_PWM_SUPPORT			1
+#define MTU3_PWM_COMPLEMENTARY_SELECT		1
+#define MTU3_PHASE_COUNTING_SUPPORT		0
+#define MTU3_32BIT_PHASE_COUNTING_SELECT	0
+
+/*
+ * POE3_SUPPORT is used to enable POE3 to control Hi-Z state of complementary
+ * PWM signals. Note: This macro must be enabled along with macros MTU3_PWM_SUPPORT
+ * and MTU3_PWM_COMPLEMENTARY_SELECT to fully take effect.
+ */
+#define POE3_SUPPORT		1
+
+/*
+ * Set SEL_SCI3_PTPOUT2 to below values to select using of:
+ * - 0: SCI3 (default)
+ * - 1: ETHSW_PTPOUT2
+ */
+#define SEL_SCI3_PTPOUT2       0
+
+/*
+ * Set SEL_ESC_ETHSW_GMAC2 to below values to select using of:
+ * - 0: ETHSW, I2C0, GMAC2 (default)
+ * - 1: ESC
+ */
+#define SEL_ESC_ETHSW_GMAC2          0
 
 / {
 	model = "Renesas Development EVK based on r9a09g077m44";
@@ -18,10 +116,20 @@
 
 	aliases {
 		serial0 = &sci0;
+		serial1 = &sci1;
+#if (!SEL_SCI3_PTPOUT2)
+		serial3 = &sci3;
+#endif
 		mmc0 = &sdhi0;
 		mmc1 = &sdhi1;
-		ethernet0 = &gmac1;
-		ethernet1 = &gmac2;
+#if (!SEL_ESC_ETHSW_GMAC2)
+		i2c0 = &i2c0;
+#endif
+		i2c1 = &i2c1;
+		i2c2 = &i2c2;
+		eth0 = &gmac1;
+		eth1 = &gmac2;
+		eth2 = &gmac0;
 	};
 
 	chosen {
@@ -34,9 +142,22 @@
 		reg = <0x0 0xC4000000 0x0 0x3C000000>;
 	};
 
-	memory@204000000 {
+	memory@240000000 {
 		device_type = "memory";
 		reg = <0x2 0x40000000 0x1 0xC0000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		global_cma: linux,cma@D0000000 {
+			compatible = "shared-dma-pool";
+			linux,cma-default;
+			reusable;
+			reg = <0x0 0xD0000000 0x0 0x10000000>;
+		};
 	};
 
 	reg_1p8v: regulator0 {
@@ -59,29 +180,642 @@
 		regulator-always-on;
 	};
 
+#if (SEL_GPT_SD0)
+	vccq_sdhi0: regulator-vccq-sdhi0 {
+		compatible = "regulator-gpio";
+
+		regulator-name = "SDHI0 VccQ";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+
+		gpios = <&pinctrl RZT2H_GPIO(2, 6) GPIO_ACTIVE_HIGH>;
+
+		gpios-states = <1>;
+		states = <3300000 0 1800000 1>;
+	};
+#endif
+
+	vccq_sdhi1: regulator-vccq-sdhi1 {
+		compatible = "regulator-gpio";
+
+		regulator-name = "SDHI1 VccQ";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+
+		gpios = <&pinctrl RZT2H_GPIO(8, 6) GPIO_ACTIVE_HIGH>;
+
+		gpios-states = <1>;
+		states = <3300000 0 1800000 1>;
+	};
+
+#if (SEL_ETHSW_ESC_LCDC)
+	hdmi-out {
+		compatible = "hdmi-connector";
+		type = "d";
+
+		port {
+			hdmi_con_out: endpoint {
+				remote-endpoint = <&adv7513_out>;
+			};
+		};
+	};
+#endif
+
+	mtl_rx_setup: rx-queues-config {
+		snps,rx-queues-to-use = <1>;
+		queue0 {
+		};
+	};
+
+	mtl_tx_setup: tx-queues-config {
+		snps,tx-queues-to-use = <3>;
+		snps,tx-sched-wrr;
+		queue0 {
+			snps,weight = <0x10>;
+			snps,dcb-algorithm;
+		};
+
+		queue1 {
+			snps,weight = <0x10>;
+			snps,dcb-algorithm;
+		};
+
+		queue2 {
+			snps,weight = <0x10>;
+			snps,dcb-algorithm;
+		};
+	};
+};
+
+&pinctrl {
+#if (SEL_ETHSW_ESC_LCDC && SEL_SCI1_LCDC)
+	du_pins: du {
+		du_data {
+			pinmux = <RZT2H_PORT_PINMUX(10, 0, 0x28)>, /* LCDC_DATR0 */
+				 <RZT2H_PORT_PINMUX(10, 1, 0x28)>, /* LCDC_DATR1 */
+				 <RZT2H_PORT_PINMUX(10, 2, 0x28)>, /* LCDC_DATR2 */
+				 <RZT2H_PORT_PINMUX(10, 3, 0x28)>, /* LCDC_DATR3 */
+				 <RZT2H_PORT_PINMUX(10, 4, 0x28)>, /* LCDC_DATR4 */
+				 <RZT2H_PORT_PINMUX(10, 5, 0x28)>, /* LCDC_DATR5 */
+				 <RZT2H_PORT_PINMUX(10, 6, 0x28)>, /* LCDC_DATR6 */
+				 <RZT2H_PORT_PINMUX(10, 7, 0x28)>, /* LCDC_DATR7 */
+				 <RZT2H_PORT_PINMUX(11, 0, 0x28)>, /* LCDC_DATG0 */
+				 <RZT2H_PORT_PINMUX(14, 1, 0x28)>, /* LCDC_DATG1 */
+				 <RZT2H_PORT_PINMUX(14, 2, 0x28)>, /* LCDC_DATG2 */
+				 <RZT2H_PORT_PINMUX(14, 3, 0x28)>, /* LCDC_DATG3 */
+				 <RZT2H_PORT_PINMUX(14, 4, 0x28)>, /* LCDC_DATG4 */
+				 <RZT2H_PORT_PINMUX(14, 5, 0x28)>, /* LCDC_DATG5 */
+				 <RZT2H_PORT_PINMUX(14, 6, 0x28)>, /* LCDC_DATG6 */
+				 <RZT2H_PORT_PINMUX(17, 6, 0x28)>, /* LCDC_DATG7 */
+				 <RZT2H_PORT_PINMUX(17, 7, 0x28)>, /* LCDC_DATB0 */
+				 <RZT2H_PORT_PINMUX(18, 0, 0x28)>, /* LCDC_DATB1 */
+				 <RZT2H_PORT_PINMUX(18, 1, 0x28)>, /* LCDC_DATB2 */
+				 <RZT2H_PORT_PINMUX(18, 2, 0x28)>, /* LCDC_DATB3 */
+				 <RZT2H_PORT_PINMUX(18, 3, 0x28)>, /* LCDC_DATB4 */
+				 <RZT2H_PORT_PINMUX(18, 4, 0x28)>, /* LCDC_DATB5 */
+				 <RZT2H_PORT_PINMUX(18, 5, 0x28)>, /* LCDC_DATB6 */
+				 <RZT2H_PORT_PINMUX(18, 6, 0x28)>; /* LCDC_DATB7 */
+			drive-strength = <3>;
+		};
+
+		du_clk {
+			pinmux = <RZT2H_PORT_PINMUX( 9, 4, 0x28)>; /* LCDC_CLK */
+			drive-strength = <3>;
+		};
+
+		du_sync {
+			pinmux = <RZT2H_PORT_PINMUX( 9, 5, 0x28)>, /* LCDC_HSYNC */
+				 <RZT2H_PORT_PINMUX( 9, 6, 0x28)>; /* LCDC_VSYNC */
+			drive-strength = <3>;
+		};
+
+		du_de {
+			pinmux = <RZT2H_PORT_PINMUX( 9, 7, 0x28)>; /* LCDC_DE */
+			drive-strength = <3>;
+		};
+	};
+#endif
+	sci0_pins: sci0 {
+		pinmux = <RZT2H_PORT_PINMUX(27, 5, 0x14)>, /* SCI0_TXD */
+			 <RZT2H_PORT_PINMUX(27, 4, 0x14)>; /* SCI0_RXD */
+	};
+
+#if (!SEL_SCI3_PTPOUT2)
+	sci3_pins: sci3 {
+		pinmux = <RZT2H_PORT_PINMUX(13, 5, 0x14)>, /* SCI3_TXD */
+			 <RZT2H_PORT_PINMUX(13, 4, 0x14)>, /* SCI3_RXD */
+			 <RZT2H_PORT_PINMUX(14, 0, 0x14)>; /* SCI3_DE */
+	};
+#endif
+
+#if (SEL_GPT_SD0)
+	sd0_pwr_en {
+		gpio-hog;
+		gpios = <RZT2H_GPIO(2, 5) GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "sd0_pwr_en";
+	};
+#endif
+
+#if (!SEL_ESC_ETHSW_GMAC2)
+	sd1_pwr_en {
+		gpio-hog;
+		gpios = <RZT2H_GPIO(8, 5) GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "sd1_pwr_en";
+	};
+#endif
+
+	sdhi0_pins: sd0 {
+		sd0_data {
+			pinmux = <RZT2H_PORT_PINMUX(12, 2, 0x29)>, /* SD0_DATA0 */
+				 <RZT2H_PORT_PINMUX(12, 3, 0x29)>, /* SD0_DATA1 */
+				 <RZT2H_PORT_PINMUX(12, 4, 0x29)>, /* SD0_DATA2 */
+				 <RZT2H_PORT_PINMUX(12, 5, 0x29)>, /* SD0_DATA3 */
+				 <RZT2H_PORT_PINMUX(12, 6, 0x29)>, /* SD0_DATA4 */
+				 <RZT2H_PORT_PINMUX(12, 7, 0x29)>, /* SD0_DATA5 */
+				 <RZT2H_PORT_PINMUX(13, 0, 0x29)>, /* SD0_DATA6 */
+				 <RZT2H_PORT_PINMUX(13, 1, 0x29)>; /* SD0_DATA7 */
+		};
+
+		sd0_ctrl {
+			pinmux = <RZT2H_PORT_PINMUX(12, 0, 0x29)>, /* SD0_CLK */
+				 <RZT2H_PORT_PINMUX(12, 1, 0x29)>, /* SD0_CMD */
+				 <RZT2H_PORT_PINMUX(22, 5, 0x29)>; /* SD0_CD  */
+		};
+	};
+
+	sdhi1_pins: sd1 {
+		sd1_data {
+			pinmux = <RZT2H_PORT_PINMUX(16, 7, 0x29)>, /* SD1_DATA0 */
+				 <RZT2H_PORT_PINMUX(17, 0, 0x29)>, /* SD1_DATA1 */
+				 <RZT2H_PORT_PINMUX(17, 1, 0x29)>, /* SD1_DATA2 */
+				 <RZT2H_PORT_PINMUX(17, 2, 0x29)>; /* SD1_DATA3 */
+		};
+
+		sd1_ctrl {
+			pinmux = <RZT2H_PORT_PINMUX(16, 5, 0x29)>, /* SD1_CLK */
+				 <RZT2H_PORT_PINMUX(16, 6, 0x29)>, /* SD1_CMD */
+				 <RZT2H_PORT_PINMUX(17, 4, 0x29)>; /* SD1_CD  */
+		};
+	};
+
+#if !(SEL_GPT_SD0)
+	gpt02_0_pins: gpt02_0 {
+		pinmux = <RZT2H_PORT_PINMUX(2, 5, 0x09)>, /* Channel A GTIOC02_0A */
+			 <RZT2H_PORT_PINMUX(2, 6, 0x09)>; /* Channel B GTIOC02_0B */
+	};
+#endif
+
+#if (!SEL_ESC_ETHSW_GMAC2)
+	i2c0_pins: i2c0 {
+		pinmux = <RZT2H_PORT_PINMUX(23, 3, 0x17)>, /* SDA */
+			<RZT2H_PORT_PINMUX(23, 4, 0x17)>; /* SCL */
+	};
+#endif
+
+	i2c1_pins: i2c1 {
+		pinmux = <RZT2H_PORT_PINMUX(5, 0, 0x17)>, /* SDA */
+			<RZT2H_PORT_PINMUX(4, 7, 0x17)>; /* SCL */
+	};
+
+#if (!SEL_RSPI_ETHSS)
+	spi0_pins: spi0 {
+		pinmux = <RZT2H_PORT_PINMUX(31, 4, 0x1A)>, /* SSL */
+			<RZT2H_PORT_PINMUX(31, 5, 0x1A)>, /* SCK */
+			<RZT2H_PORT_PINMUX(31, 6, 0x1A)>, /* MOSI */
+			<RZT2H_PORT_PINMUX(31, 7, 0x1A)>; /* MISO */
+	};
+#endif
+
+	mdio1_pins: gmac_mdio1 {
+		pinmux = <RZT2H_PORT_PINMUX(26, 1, 0x10)>,      /* MDIO1_MDC */
+			 <RZT2H_PORT_PINMUX(26, 2, 0x10)>;      /* MDIO1_MDIO */
+	};
+
+#if (!SEL_ESC_ETHSW_GMAC2)
+	mdio2_pins: gmac_mdio2 {
+		pinmux = <RZT2H_PORT_PINMUX(30, 5, 0x10)>,      /* MDIO2_MDC */
+			 <RZT2H_PORT_PINMUX(30, 6, 0x10)>;      /* MDIO2_MDIO */
+	};
+
+	ethsw_pins: ethsw_pins {
+		pinmux = <RZT2H_PORT_PINMUX(21, 4, 0x11)>,      /* ETHSW_MDC */
+			 <RZT2H_PORT_PINMUX(21, 5, 0x11)>,      /* ETHSW_MDIO */
+			 <RZT2H_PORT_PINMUX(21, 6, 0x11)>,      /* ETHSW_PHYLINK0 */
+			 <RZT2H_PORT_PINMUX(26, 3, 0x11)>,      /* ETHSW_PHYLINK1 */
+			 <RZT2H_PORT_PINMUX(30, 7, 0x11)>,      /* ETHSW_PHYLINK2 */
+			 <RZT2H_PORT_PINMUX(17, 6, 0x11)>,      /* ETHSW_PTPOUT0 */
+			 <RZT2H_PORT_PINMUX(17, 7, 0x11)>,      /* ETHSW_PTPOUT1 */
+#if (SEL_SCI3_PTPOUT2)
+			 <RZT2H_PORT_PINMUX(14, 0, 0x11)>,      /* ETHSW_PTPOUT2 */
+#endif
+			 <RZT2H_PORT_PINMUX(18, 7, 0x11)>;      /* ETHSW_PTPOUT3 */
+	};
+#else
+	esc_pins: esc_pins {
+		pinmux = <RZT2H_PORT_PINMUX(21, 4, 0x12)>,      /* ESC_MDC */
+			 <RZT2H_PORT_PINMUX(21, 5, 0x12)>,      /* ESC_MDIO */
+			 <RZT2H_PORT_PINMUX(21, 6, 0x12)>,      /* ESC_PHYLINK0 */
+			 <RZT2H_PORT_PINMUX(26, 3, 0x12)>,      /* ESC_PHYLINK1 */
+			 <RZT2H_PORT_PINMUX(30, 7, 0x12)>,      /* ESC_PHYLINK2 */
+			 <RZT2H_PORT_PINMUX(23, 3, 0x12)>,	/* ESC_I2CCLK */
+			 <RZT2H_PORT_PINMUX(23, 4, 0x12)>,	/* ESC_I2CDATA */
+			 <RZT2H_PORT_PINMUX(11, 0, 0x12)>;	/* ESC_RESETOUT */
+	};
+#endif
+
+	pins_refclk: pins_refclk {
+		pinmux = <RZT2H_PORT_PINMUX(21, 7, 0x02)>,	/* ETH0_REFCLK */
+			 <RZT2H_PORT_PINMUX(26, 4, 0x02)>,	/* ETH1_REFCLK */
+			 <RZT2H_PORT_PINMUX(31, 0, 0x02)>,	/* ETH2_REFCLK */
+			 <RZT2H_PORT_PINMUX(34, 6, 0x02)>;	/* ETH3_REFCLK */
+	};
+
+	eth0_pins: ethss_0 {
+		pinmux = <RZT2H_PORT_PINMUX(20, 0, 0x0F)>,      /* ETH0_TXCLK */
+			 <RZT2H_PORT_PINMUX(20, 1, 0x0F)>,      /* ETH0_TXD[0] */
+			 <RZT2H_PORT_PINMUX(20, 2, 0x0F)>,      /* ETH0_TXD[1] */
+			 <RZT2H_PORT_PINMUX(20, 3, 0x0F)>,      /* ETH0_TXD[2] */
+			 <RZT2H_PORT_PINMUX(20, 4, 0x0F)>,      /* ETH0_TXD[3] */
+			 <RZT2H_PORT_PINMUX(20, 5, 0x0F)>,      /* ETH0_TXEN */
+			 <RZT2H_PORT_PINMUX(20, 6, 0x0F)>,      /* ETH0_RXCLK */
+			 <RZT2H_PORT_PINMUX(20, 7, 0x0F)>,      /* ETH0_RXD[0] */
+			 <RZT2H_PORT_PINMUX(21, 0, 0x0F)>,      /* ETH0_RXD[1] */
+			 <RZT2H_PORT_PINMUX(21, 1, 0x0F)>,      /* ETH0_RXD[2] */
+			 <RZT2H_PORT_PINMUX(21, 2, 0x0F)>,      /* ETH0_RXD[3] */
+			 <RZT2H_PORT_PINMUX(21, 3, 0x0F)>,      /* ETH0_RXDV */
+			 <RZT2H_PORT_PINMUX(22, 1, 0x0F)>,      /* ETH0_TXER */
+			 <RZT2H_PORT_PINMUX(22, 2, 0x0F)>,      /* ETH0_RXER */
+			 <RZT2H_PORT_PINMUX(22, 3, 0x0F)>,      /* ETH0_CRS */
+			 <RZT2H_PORT_PINMUX(22, 4, 0x0F)>;      /* ETH0_COL */
+			input-schmitt-disable;
+			slew-rate       = <1>;
+			drive-strength  = <3>;
+	};
+
+	eth1_pins: ethss_1 {
+		pinmux = <RZT2H_PORT_PINMUX(24, 5, 0x0F)>,      /* ETH1_TXCLK */
+			 <RZT2H_PORT_PINMUX(24, 6, 0x0F)>,      /* ETH1_TXD[0] */
+			 <RZT2H_PORT_PINMUX(24, 7, 0x0F)>,      /* ETH1_TXD[1] */
+			 <RZT2H_PORT_PINMUX(25, 0, 0x0F)>,      /* ETH1_TXD[2] */
+			 <RZT2H_PORT_PINMUX(25, 1, 0x0F)>,      /* ETH1_TXD[3] */
+			 <RZT2H_PORT_PINMUX(25, 2, 0x0F)>,      /* ETH1_TXEN */
+			 <RZT2H_PORT_PINMUX(25, 3, 0x0F)>,      /* ETH1_RXCLK */
+			 <RZT2H_PORT_PINMUX(25, 4, 0x0F)>,      /* ETH1_RXD[0] */
+			 <RZT2H_PORT_PINMUX(25, 5, 0x0F)>,      /* ETH1_RXD[1] */
+			 <RZT2H_PORT_PINMUX(25, 6, 0x0F)>,      /* ETH1_RXD[2] */
+			 <RZT2H_PORT_PINMUX(25, 7, 0x0F)>,      /* ETH1_RXD[3] */
+			 <RZT2H_PORT_PINMUX(26, 0, 0x0F)>,      /* ETH1_RXDV */
+			 <RZT2H_PORT_PINMUX(26, 6, 0x0F)>,      /* ETH1_TXER */
+			 <RZT2H_PORT_PINMUX(26, 7, 0x0F)>,      /* ETH1_RXER */
+			 <RZT2H_PORT_PINMUX(27, 0, 0x0F)>,      /* ETH1_CRS */
+			 <RZT2H_PORT_PINMUX(27, 1, 0x0F)>;      /* ETH1_COL */
+			input-schmitt-disable;
+			slew-rate       = <1>;
+			drive-strength  = <3>;
+	};
+
+#if (SEL_RSPI_ETHSS)
+	eth2_pins: ethss_2 {
+		pinmux = <RZT2H_PORT_PINMUX(29, 1, 0x0F)>,      /* ETH2_TXCLK */
+			 <RZT2H_PORT_PINMUX(29, 2, 0x0F)>,      /* ETH2_TXD[0] */
+			 <RZT2H_PORT_PINMUX(29, 3, 0x0F)>,      /* ETH2_TXD[1] */
+			 <RZT2H_PORT_PINMUX(29, 4, 0x0F)>,      /* ETH2_TXD[2] */
+			 <RZT2H_PORT_PINMUX(29, 5, 0x0F)>,      /* ETH2_TXD[3] */
+			 <RZT2H_PORT_PINMUX(29, 6, 0x0F)>,      /* ETH2_TXEN */
+			 <RZT2H_PORT_PINMUX(29, 7, 0x0F)>,      /* ETH2_RXCLK */
+			 <RZT2H_PORT_PINMUX(30, 0, 0x0F)>,      /* ETH2_RXD[0] */
+			 <RZT2H_PORT_PINMUX(30, 1, 0x0F)>,      /* ETH2_RXD[1] */
+			 <RZT2H_PORT_PINMUX(30, 2, 0x0F)>,      /* ETH2_RXD[2] */
+			 <RZT2H_PORT_PINMUX(30, 3, 0x0F)>,      /* ETH2_RXD[3] */
+			 <RZT2H_PORT_PINMUX(30, 4, 0x0F)>,      /* ETH2_RXDV */
+			 <RZT2H_PORT_PINMUX(31, 2, 0x0F)>,      /* ETH2_TXER */
+			 <RZT2H_PORT_PINMUX(31, 3, 0x0F)>,      /* ETH2_RXER */
+			 <RZT2H_PORT_PINMUX(31, 4, 0x0F)>,      /* ETH2_CRS */
+			 <RZT2H_PORT_PINMUX(31, 5, 0x0F)>;      /* ETH2_COL */
+			input-schmitt-disable;
+			slew-rate       = <1>;
+			drive-strength  = <3>;
+	};
+#endif
+
+#if (SEL_ETHSS_PCIE)
+	eth3_pins: ethss_3 {
+		pinmux = <RZT2H_PORT_PINMUX(33, 2, 0x0F)>,	/* ETH3_TXCLK */
+			 <RZT2H_PORT_PINMUX(33, 3, 0x0F)>,	/* ETH3_TXD[0] */
+			 <RZT2H_PORT_PINMUX(33, 4, 0x0F)>,	/* ETH3_TXD[1] */
+			 <RZT2H_PORT_PINMUX(33, 5, 0x0F)>,	/* ETH3_TXD[2] */
+			 <RZT2H_PORT_PINMUX(33, 6, 0x0F)>,	/* ETH3_TXD[3] */
+			 <RZT2H_PORT_PINMUX(33, 7, 0x0F)>,	/* ETH3_TXEN */
+			 <RZT2H_PORT_PINMUX(34, 0, 0x0F)>,	/* ETH3_RXCLK */
+			 <RZT2H_PORT_PINMUX(34, 1, 0x0F)>,	/* ETH3_RXD[0] */
+			 <RZT2H_PORT_PINMUX(34, 2, 0x0F)>,	/* ETH3_RXD[1] */
+			 <RZT2H_PORT_PINMUX(34, 3, 0x0F)>,	/* ETH3_RXD[2] */
+			 <RZT2H_PORT_PINMUX(34, 4, 0x0F)>,	/* ETH3_RXD[3] */
+			 <RZT2H_PORT_PINMUX(34, 5, 0x0F)>,	/* ETH3_RXDV */
+			 <RZT2H_PORT_PINMUX(34, 7, 0x0F)>,	/* ETH3_TXER */
+			 <RZT2H_PORT_PINMUX(35, 0, 0x0F)>,	/* ETH3_RXER */
+			 <RZT2H_PORT_PINMUX(35, 1, 0x0F)>,	/* ETH3_CRS */
+			 <RZT2H_PORT_PINMUX(35, 2, 0x0F)>;	/* ETH3_COL */
+			input-schmitt-disable;
+			slew-rate       = <1>;
+			drive-strength  = <3>;
+	};
+#else
+#if (SEL_PCIE_RC_EP)
+	pcie_rstout0 {
+		gpio-hog;
+		gpios = <RZT2H_GPIO(33, 3) GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "pcie_rstout0";
+	};
+
+	pcie_rstout1 {
+		gpio-hog;
+		gpios = <RZT2H_GPIO(33, 4) GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "pcie_rstout1";
+	};
+#endif
+#endif
+
+#if (SEL_OTG)
+	usb_exicen_a {
+		gpio-hog;
+		gpios = <RZT2H_GPIO(0, 2) GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "usb_exicen_a";
+	};
+#endif
+
+	usb_pins: usb_pins {
+		pinmux = <RZT2H_PORT_PINMUX(0, 0, 0x13)>; /* VBUS */
+	};
+
+	xspi1_pins: xspi1 {
+		xspi1_clk {
+			pinmux = <RZT2H_PORT_PINMUX(1, 0, 0x1C)>; /* XSPI1_CKP */
+		};
+
+		xspi1_data {
+			pinmux = <RZT2H_PORT_PINMUX(1, 4, 0x1C)>, /* XSPI1_IO0 */
+				 <RZT2H_PORT_PINMUX(1, 5, 0x1C)>, /* XSPI1_IO1 */
+				 <RZT2H_PORT_PINMUX(1, 6, 0x1C)>, /* XSPI1_IO2 */
+				 <RZT2H_PORT_PINMUX(1, 7, 0x1C)>; /* XSPI1_IO3 */
+		};
+
+		xspi1_cs {
+			pinmux = <RZT2H_PORT_PINMUX(1, 1, 0x1C)>; /* XSPI1_CS0 */
+		};
+	};
+
+	icu_pins: icu_pins {
+		pinmux = <RZT2H_PORT_PINMUX(8, 7, 0x0)>, /* IRQ0 */
+			<RZT2H_PORT_PINMUX(0, 3, 0x0)>; /* IRQ2 */
+	};
+
+	can0_pins: can0 {
+		pinmux = <RZT2H_PORT_PINMUX(24, 3, 0x19)>, /* RX */
+			 <RZT2H_PORT_PINMUX(24, 4, 0x19)>; /* TX */
+	};
+
+	adc0_pins: adc0 {
+		pinmux = <RZT2H_PORT_PINMUX(4, 4, 0x1f)>; /* ADCTRG0# */
+	};
+
+	adc1_pins: adc1 {
+		pinmux = <RZT2H_PORT_PINMUX(4, 5, 0x1f)>; /* ADCTRG1# */
+	};
+
+	adc2_pins: adc2 {
+		pinmux = <RZT2H_PORT_PINMUX(4, 6, 0x1f)>; /* ADCTRG2# */
+	};
+
+#if (MTU3_PWM_SUPPORT || MTU3_PHASE_COUNTING_SUPPORT)
+	mtu3_pins: mtu3 {
+		pinmux =
+#if MTU3_PHASE_COUNTING_SUPPORT
+#if MTU3_32BIT_PHASE_COUNTING_SELECT
+			<RZT2H_PORT_PINMUX(3, 2, 0x07)>, /* MTIOC1A */
+#endif
+			<RZT2H_PORT_PINMUX(0, 6, 0x06)>, /* MTCLKA */
+#if !MTU3_PWM_SUPPORT
+			<RZT2H_PORT_PINMUX(0, 7, 0x06)>; /* MTCLKB */
+#else
+			<RZT2H_PORT_PINMUX(0, 7, 0x06)>, /* MTCLKB */
+#endif
+#endif
+#if MTU3_PWM_SUPPORT
+			<RZT2H_PORT_PINMUX(3, 5, 0x06)>, /* MTIOC3A */
+			<RZT2H_PORT_PINMUX(3, 7, 0x06)>, /* MTIOC6B */
+			<RZT2H_PORT_PINMUX(3, 6, 0x06)>, /* MTIOC3C */
+#if !MTU3_PWM_COMPLEMENTARY_SELECT
+			<RZT2H_PORT_PINMUX(27, 3, 0x06)>; /* MTIOC2A */
+#else
+			<RZT2H_PORT_PINMUX(4, 0, 0x06)>; /* MTIOC6D */
+#endif
+#endif
+	};
+#endif
+
+#if POE3_SUPPORT
+	poe3_pins: poe3 {
+		pinmux = <RZT2H_PORT_PINMUX(2, 4, 0x08)>; /* POE0# */
+	};
+#endif
+
+#if !(SEL_SCI1_LCDC)
+	sci1_pins: sci1 {
+		pinmux = <RZT2H_PORT_PINMUX(18, 4, 0x14)>, /* SCI1_TXD */
+			 <RZT2H_PORT_PINMUX(18, 3, 0x14)>; /* SCI1_RXD */
+		bias-pull-up;
+	};
+#endif
+};
+
+&extal {
+	clock-frequency = <25000000>;
+};
+
+&dmac0 {
+	memory-region = <&global_cma>;
+};
+
+&loco {
+	clock-frequency = <1000000>;
 };
 
 &sci0 {
+	pinctrl-0 = <&sci0_pins>;
+	pinctrl-names = "default";
 	status = "okay";
 };
 
+#if (!SEL_SCI3_PTPOUT2)
+&sci3 {
+	pinctrl-0 = <&sci3_pins>;
+	pinctrl-names = "default";
+	linux,rs485-enabled-at-boot-time;
+	rs485-rx-during-tx;
+	rs485-enabled;
+
+	status = "okay";
+};
+#endif
+
+#if (SEL_GPT_SD0)
+#if (SEL_SD0)
 &sdhi0 {
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&reg_1p8v>;
 	bus-width = <8>;
+	non-removable;
+	mmc-hs200-1_8v;
+	fixed-emmc-driver-type = <1>;
 	status = "okay";
-
-	/* This is used for interface that support both eMMC and SD in board */
-	mutual-channel;
 };
+#else
+&sdhi0 {
+	pinctrl-0 = <&sdhi0_pins>;
+	pinctrl-names = "default";
+
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&vccq_sdhi0>;
+	bus-width = <4>;
+	sd-uhs-sdr50;
+	sd-uhs-sdr104;
+	status = "okay";
+};
+#endif
+#endif
 
 &sdhi1 {
+	pinctrl-0 = <&sdhi1_pins>;
+	pinctrl-names = "default";
+
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&vccq_sdhi1>;
 	bus-width = <4>;
+	sd-uhs-sdr50;
+	sd-uhs-sdr104;
 	status = "okay";
 };
 
+#if (!SEL_RSPI_ETHSS)
+&spi0 {
+	pinctrl-0 = <&spi0_pins>;
+	pinctrl-names = "default";
+
+	status = "okay";
+};
+#endif
+
+#if (!SEL_ESC_ETHSW_GMAC2)
+&i2c0 {
+	pinctrl-0 = <&i2c0_pins>;
+	pinctrl-names = "default";
+
+	status = "okay";
+
+	eeprom: eeprom@50 {
+		compatible = "renesas,r1ex24016", "atmel,24c16";
+		reg = <0x50>;
+		pagesize = <16>;
+	};
+};
+#endif
+
+&i2c1 {
+	pinctrl-0 = <&i2c1_pins>;
+	pinctrl-names = "default";
+
+	status = "okay";
+
+#if (SEL_ETHSW_ESC_LCDC)
+	adv7513: adv7513@39 {
+		compatible = "adi,adv7513";
+		reg = <0x39>;
+
+		adi,input-depth = <8>;
+		adi,input-colorspace = "rgb";
+		adi,input-clock = "1x";
+
+		avdd-supply = <&reg_1p8v>;
+		dvdd-supply = <&reg_1p8v>;
+		pvdd-supply = <&reg_1p8v>;
+		dvdd-3v-supply = <&reg_3p3v>;
+		bgvdd-supply = <&reg_1p8v>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				adv7513_in: endpoint {
+					remote-endpoint = <&du_out_rgb>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				adv7513_out: endpoint {
+					remote-endpoint = <&hdmi_con_out>;
+				};
+			};
+		};
+	};
+#endif
+};
+
+&wdt2 {
+	status = "okay";
+	timeout-sec = <60>;
+};
+
+&wdt3 {
+	status = "okay";
+	timeout-sec = <60>;
+};
+
+&wdt4 {
+	status = "okay";
+	timeout-sec = <60>;
+};
+
+&wdt5 {
+	status = "okay";
+	timeout-sec = <60>;
+};
+
+&gmac0 {
+	status = "disabled";
+	phy-mode = "gmii";
+	ethss-handle = <&ethss>;
+
+	fixed-link {
+		speed = <1000>;
+		full-duplex;
+	};
+};
+
+#if (SEL_ETHSS_PCIE)
 &gmac1 {
 	phy-handle = <&phy3>;
 	phy-mode = "rgmii-id";
+	pcs-handle = <&mii_conv3>;
 	status = "okay";
+	phy-reset-gpios = <&pinctrl RZT2H_GPIO(32, 3) GPIO_ACTIVE_HIGH>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mdio1_pins>;
+	enable-time-based-scheduling;
+	snps,force_thresh_dma_mode;
+	snps,tx_threshold = <128>;
+	snps,mtl-tx-config = <&mtl_tx_setup>;
+	snps,mtl-rx-config = <&mtl_rx_setup>;
 
 	mdio {
 		#address-cells = <1>;
@@ -89,15 +823,29 @@
 		phy3: ethernet-phy@3 {
 			compatible = "ethernet-phy-id0007.0772";
 			phy-mode = "rgmii-id";
+			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-combine-disable;
 			reg = <3>;
 		};
 	};
 };
+#endif
 
+#if ((SEL_RSPI_ETHSS) && (!SEL_ESC_ETHSW_GMAC2))
 &gmac2 {
 	phy-handle = <&phy2>;
 	phy-mode = "rgmii-id";
+	pcs-handle = <&mii_conv2>;
 	status = "okay";
+	phy-reset-gpios = <&pinctrl RZT2H_GPIO(17, 5) GPIO_ACTIVE_HIGH>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mdio2_pins>;
+	enable-time-based-scheduling;
+	snps,force_thresh_dma_mode;
+	snps,tx_threshold = <128>;
+	snps,mtl-tx-config = <&mtl_tx_setup>;
+	snps,mtl-rx-config = <&mtl_rx_setup>;
 
 	mdio {
 		#address-cells = <1>;
@@ -105,13 +853,324 @@
 		phy2: ethernet-phy@2 {
 			compatible = "ethernet-phy-id0007.0772";
 			phy-mode = "rgmii-id";
+			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-combine-disable;
 			reg = <2>;
 		};
 	};
 };
+#endif
+
+&ethss {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pins_refclk>,
+		    <&eth1_pins>,
+#if (SEL_RSPI_ETHSS)
+		    <&eth2_pins>,
+#endif
+#if (SEL_ETHSS_PCIE)
+		    <&eth3_pins>,
+#endif
+		    <&eth0_pins>;
+#if (!SEL_ESC_ETHSW_GMAC2)
+	renesas,ethss-switch-portmanagement = <ETHSS_GMAC0_PORT>;
+	ethsw_pulse_gen_timer = <0>; /* Pulse generator use ETHSW timer 0 */
+#endif
+};
+
+#if (!SEL_ETHSS_PCIE)
+#if (SEL_PCIE_RC_EP)
+&pcie0 {
+	pcie-lane = <1>;
+	status = "okay";
+};
+#else
+&pcie0_ep {
+	status = "okay";
+};
+#endif
+#endif
+
+#if ((!SEL_ETHSW_ESC_LCDC) && (!SEL_ESC_ETHSW_GMAC2))
+&ethsw {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	phy-reset-gpios = <&pinctrl RZT2H_GPIO(11, 0) GPIO_ACTIVE_HIGH>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&ethsw_pins>;
+
+	dsa,member = <0 0>;
+
+	mdio {
+		clock-frequency = <2500000>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		phy0: ethernet-phy@0 {
+			compatible = "ethernet-phy-id0007.0772";
+			phy-mode = "mii";
+			max-speed = <100>;
+			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-combine-disable;
+			reg = <0>;
+		};
+
+		phy1: ethernet-phy@1 {
+			compatible = "ethernet-phy-id0007.0772";
+			phy-mode = "mii";
+			max-speed = <100>;
+			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-combine-disable;
+			reg = <1>;
+		};
+	};
+};
+
+
+&switch_port0 {
+	label = "lan0";
+	phy-mode = "mii";
+	phy-handle = <&phy0>;
+	status = "okay";
+};
+
+&switch_port1 {
+	label = "lan1";
+	phy-mode = "mii";
+	phy-handle = <&phy1>;
+	status = "okay";
+};
+
+&switch_port3 {
+	status = "okay";
+};
+#endif
+
+#if ((!SEL_ETHSW_ESC_LCDC) && (SEL_ESC_ETHSW_GMAC2))
+&esc {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&esc_pins>;
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		phy0: ethernet-phy@0 {
+			compatible = "ethernet-phy-id0007.0772";
+			phy-mode = "mii";
+			max-speed = <100>;
+			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-combine-disable;
+			reg = <0>;
+		};
+
+		phy1: ethernet-phy@1 {
+			compatible = "ethernet-phy-id0007.0772";
+			phy-mode = "mii";
+			max-speed = <100>;
+			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-combine-disable;
+			reg = <1>;
+		};
+
+		phy2: ethernet-phy@2 {
+			compatible = "ethernet-phy-id0007.0772";
+			phy-mode = "rgmii-id";
+			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
+			vsc8531,led-1-combine-disable;
+			reg = <2>;
+		};
+	};
+
+	led_dipsw_device {
+		led0-gpios = <&pinctrl RZT2H_GPIO(23, 1) GPIO_ACTIVE_HIGH>;
+		led1-gpios = <&pinctrl RZT2H_GPIO(32, 2) GPIO_ACTIVE_HIGH>;
+		led2-gpios = <&pinctrl RZT2H_GPIO(6, 7) GPIO_ACTIVE_HIGH>;
+		led3-gpios = <&pinctrl RZT2H_GPIO(8, 5) GPIO_ACTIVE_HIGH>;
+		dipsw0-gpios = <&pinctrl RZT2H_GPIO(35, 3) GPIO_ACTIVE_HIGH>;
+		dipsw1-gpios = <&pinctrl RZT2H_GPIO(35, 4) GPIO_ACTIVE_HIGH>;
+		dipsw2-gpios = <&pinctrl RZT2H_GPIO(35, 5) GPIO_ACTIVE_HIGH>;
+		dipsw3-gpios = <&pinctrl RZT2H_GPIO(35, 6) GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&esc_port0 {
+	label = "esc0";
+	phy-mode = "mii";
+	phy-handle = <&phy0>;
+	status = "okay";
+};
+
+&esc_port1 {
+	label = "esc1";
+	phy-mode = "mii";
+	phy-handle = <&phy1>;
+	status = "okay";
+};
+
+&esc_port2 {
+	label = "esc2";
+	phy-mode = "rgmii-id";
+	phy-handle = <&phy2>;
+	status = "okay";
+};
+#endif
+
+#if (!SEL_ESC_ETHSW_GMAC2)
+&mii_conv0 {
+	renesas,ethss-port = <ETHSS_SWITCH_PORT0>;
+	renesas,ethsw-phylink = <0>;
+	status = "okay";
+};
+
+&mii_conv1 {
+	renesas,ethss-port = <ETHSS_SWITCH_PORT1>;
+	renesas,ethsw-phylink = <0>;
+	status = "okay";
+};
+
+&mii_conv2 {
+	renesas,ethss-port = <ETHSS_GMAC2_PORT>;
+	status = "okay";
+};
+#else
+&mii_conv0 {
+	renesas,ethss-port = <ETHSS_ETHERCAT_PORT0>;
+	renesas,esc-phylink = <0>;
+	status = "okay";
+};
+
+&mii_conv1 {
+	renesas,ethss-port = <ETHSS_ETHERCAT_PORT1>;
+	renesas,esc-phylink = <0>;
+	status = "okay";
+};
+
+&mii_conv2 {
+	renesas,ethss-port = <ETHSS_ETHERCAT_PORT2>;
+	renesas,esc-phylink = <0>;
+	status = "okay";
+};
+#endif
+&mii_conv3 {
+	renesas,ethss-port = <ETHSS_GMAC1_PORT>;
+	status = "okay";
+};
+
+&ohci {
+	memory-region = <&global_cma>;
+	dr_mode = "otg";
+	status = "okay";
+};
+
+&ehci {
+	memory-region = <&global_cma>;
+	dr_mode = "otg";
+	status = "okay";
+};
+
+&hsusb {
+	dr_mode = "otg";
+	status = "okay";
+};
+
+&usb2_phy {
+	pinctrl-0 = <&usb_pins>;
+	pinctrl-names = "default";
+
+	status = "okay";
+};
+
+#if (SEL_ETHSW_ESC_LCDC && SEL_SCI1_LCDC)
+&du {
+	pinctrl-0 = <&du_pins>;
+	pinctrl-names = "default";
+
+	status = "okay";
+
+	ports {
+		port@0 {
+			du_out_rgb: endpoint {
+				remote-endpoint = <&adv7513_in>;
+			};
+		};
+	};
+};
+#endif
+
+&rtc {
+	status = "okay";
+};
+
+&intc_ex {
+	pinctrl-0 = <&icu_pins>;
+	pinctrl-names = "default";
+
+	status = "okay";
+};
+
+&cmt0 {
+	status = "okay";
+};
+
+&cmt1 {
+	status = "okay";
+};
+
+&cmt2 {
+	status = "okay";
+};
+
+&cmtw0 {
+	status = "okay";
+};
+
+&cmtw1 {
+	status = "okay";
+};
+
+&canfd {
+	pinctrl-0 = <&can0_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	channel0 {
+		status = "okay";
+	};
+};
+
+&adc0 {
+	pinctrl-0 = <&adc0_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&adc1 {
+	pinctrl-0 = <&adc1_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&adc2 {
+	pinctrl-0 = <&adc2_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
 
 &xspi0 {
-	pinctrl-names = "default";
+
 	status = "okay";
 
 	flash@0 {
@@ -135,6 +1194,85 @@
 	};
 };
 
-&ehci {
+#if !(SEL_SCI1_LCDC)
+&sci1 {
+	pinctrl-0 = <&sci1_pins>;
+	pinctrl-names = "default";
 	status = "okay";
 };
+#endif
+
+#if !(SEL_GPT_SD0)
+&gpt02_0 {
+	pinctrl-0 = <&gpt02_0_pins>;
+	pinctrl-names = "default";
+	channel = "both_AB";
+#if (POEG_SUPPORT)
+	poeg = <&poeg0_a &poeg0_b &poeg0_c &poeg0_d>;
+#endif
+	status = "okay";
+};
+#endif
+
+#if (POEG_SUPPORT)
+&poeg0_a {
+	status = "okay";
+};
+
+&poeg0_b {
+	status = "okay";
+};
+
+&poeg0_c {
+	status = "okay";
+};
+
+&poeg0_d {
+	status = "okay";
+};
+#endif
+
+&mtu3 {
+#if (MTU3_PWM_SUPPORT || MTU3_PHASE_COUNTING_SUPPORT)
+	pinctrl-0 = <&mtu3_pins>;
+	pinctrl-names = "default";
+#endif
+
+#if MTU3_PWM_SUPPORT
+#if MTU3_PWM_COMPLEMENTARY_SELECT
+	/* Enable PWM complementary at MTIOC6B and MTIOC6D pins. */
+	pwm_complementary = <6 1>;
+#else
+	/* Enable PWM output at MTIOC2A and MTIOC3C pins. */
+	pwm_mode1 = <2 0>, <3 1>;
+#endif
+#endif
+
+#if MTU3_PHASE_COUNTING_SUPPORT
+#if MTU3_32BIT_PHASE_COUNTING_SELECT
+	/* Enable 1 32-bit phase counter by using both MTU1 and MTU2. */
+	32-bit_phase_counting;
+#else
+	/* Enable 2 16-bit phase counters for MTU1 and MTU2. */
+	16-bit_phase_counting = <1 2>;
+#endif
+#endif
+	status = "okay";
+};
+
+#if (MTU3_PWM_SUPPORT && MTU3_PWM_COMPLEMENTARY_SELECT && POE3_SUPPORT)
+&poe3 {
+	pinctrl-0 = <&poe3_pins>;
+	pinctrl-names = "default";
+	poe3_pins_mode = <0 0>, <4 0>, <8 0>, <10 0>;
+	oscillation_detection = <1>;
+	status = "okay";
+	mtu3_ch67 {
+		mtu3_outputs = <0>;
+		addition_poe3_inputs = <0>;
+		mtioc6b_pin_select = <1>;
+		mtioc6d_pin_select = <1>;
+		dsmif_error_detection = <0 0>, <0 5>, <1 0>, <1 9>;
+	};
+};
+#endif

@@ -294,6 +294,7 @@ static const struct udevice_id sh_serial_id[] ={
 	{.compatible = "renesas,scif", .data = PORT_SCIF},
 	{.compatible = "renesas,scifa", .data = PORT_SCIFA},
 	{.compatible = "renesas,rsci", .data = PORT_RSCI},
+	{.compatible = "renesas,rz-rscif", .data = PORT_RSCI},
 	{}
 };
 
