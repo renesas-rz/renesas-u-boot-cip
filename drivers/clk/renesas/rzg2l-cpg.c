@@ -208,12 +208,13 @@ static ulong rzg2l_div_clk_get_rate(struct udevice *dev, const struct cpg_core_c
 
 static ulong rzg2l_core_clk_get_rate(struct udevice *dev, const struct cpg_core_clk *cc)
 {
+	ulong parent_rate;
+	struct clk clk_in;
 	switch (cc->type) {
 	case CLK_TYPE_FF:
-		const ulong parent_rate = rzg2l_cpg_clk_get_rate_by_id(dev, cc->parent);
+		parent_rate = rzg2l_cpg_clk_get_rate_by_id(dev, cc->parent);
 		return parent_rate * cc->mult / cc->div;
 	case CLK_TYPE_IN:
-		struct clk clk_in;
 		clk_get_by_name(dev, cc->name, &clk_in);
 		return clk_get_rate(&clk_in);
 	case CLK_TYPE_SD_MUX:
