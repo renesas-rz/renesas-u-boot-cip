@@ -140,7 +140,7 @@ static void rzt2h_pinctrl_set_function(struct rzt2h_pinctrl_priv *priv,
 	rzt2h_pinctrl_writeb(priv, port, reg8, PMC(port));
 
 	reg64 = rzt2h_pinctrl_readq(priv, port, PFC(port));
-	reg64 = (reg64 & ~(0x3F << (pin * 8))) | (func << (pin * 8));
+	reg64 = (reg64 & ~(0x3FULL  << ((u64)pin * 8))) | (((u64)(func & 0x3F))<< ((u64)pin * 8));
 	rzt2h_pinctrl_writeq(priv, port, reg64, PFC(port));
 
 }
