@@ -81,7 +81,7 @@
 &pinctrl {
 	/* Support pinctrl for SD function of SDHI0 */
 	sdhi0_pins: sd0 {
-		pinmux = <RZV2H_PINMUX(10, 5, 15)>; /* SD0_CD */
+		pinmux = <RZV2H_PINMUX(A, 5, 15)>; /* SD0_CD */
 	};
 
 	sdhi1_pins: sd1 {

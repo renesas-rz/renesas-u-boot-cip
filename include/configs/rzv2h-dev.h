@@ -6,7 +6,7 @@
 #ifndef __RZV2H_DEV_H
 #define __RZV2H_DEV_H
 
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 
 #define CONFIG_REMAKE_ELF
 
@@ -48,7 +48,7 @@
 
 /* ENV setting */
 #if defined(CONFIG_TARGET_RZV2H_DEV)
-#define CONFIG_EXTRA_ENV_SETTINGS	\
+#define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0"	\
 	"bootm_size=0x10000000\0"	\
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk2p2 \0" \
@@ -58,7 +58,7 @@
 	"sd2load=ext4load mmc 2:2 0x48080000 boot/Image;ext4load mmc 2:2 0x48000000 boot/r9a09g057h4-dev.dtb;run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 2; then run sd2load; else run emmcload; fi \0"
 #elif defined(CONFIG_TARGET_RZV2H_EVK_ALPHA)
-#define CONFIG_EXTRA_ENV_SETTINGS	\
+#define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0"	\
 	"bootm_size=0x10000000\0"	\
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
@@ -69,7 +69,7 @@
 	"sd1load=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/r9a09g057h4-evk-alpha.dtb;run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0"
 #else
-#define CONFIG_EXTRA_ENV_SETTINGS       \
+#define CFG_EXTRA_ENV_SETTINGS       \
 	"usb_pgood_delay=2000\0"        \
 	"bootm_size=0x10000000\0"       \
 	"prodsd0bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \

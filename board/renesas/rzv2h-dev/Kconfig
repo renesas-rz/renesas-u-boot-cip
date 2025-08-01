@@ -1,7 +1,7 @@
 if TARGET_RZV2H_DEV
 
 config SYS_SOC
-	default "rmobile"
+	default "renesas"
 
 config SYS_BOARD
 	default "rzv2h-dev"
@@ -17,7 +17,7 @@ endif
 if TARGET_RZV2H_EVK_ALPHA
 
 config SYS_SOC
-	default "rmobile"
+	default "renesas"
 
 config SYS_BOARD
 	default "rzv2h-dev"
@@ -33,7 +33,7 @@ endif
 if TARGET_SMARC_RZV2H
 
 config SYS_SOC
-	default "rmobile"
+	default "renesas"
 
 config SYS_BOARD
 	default "rzv2h-dev"
@@ -49,7 +49,7 @@ endif
 if TARGET_RZV2H_EVK_VER1
 
 config SYS_SOC
-	default "rmobile"
+	default "renesas"
 
 config SYS_BOARD
 	default "rzv2h-dev"
