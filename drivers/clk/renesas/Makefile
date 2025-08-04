@@ -39,3 +39,5 @@ endif
 obj-$(CONFIG_CLK_R9A07G043U) += clk-rzg2l.o r9a07g043u-cpg-mssr.o
 obj-$(CONFIG_CLK_R9A07G043F) += clk-rzg2l.o r9a07g043f-cpg-mssr.o
 obj-$(CONFIG_CLK_R9A08G045S) += clk-rzg2l.o r9a08g045s-cpg-mssr.o
+obj-$(CONFIG_CLK_R9A09G057) += r9a09g057-cpg.o
+obj-$(CONFIG_CLK_R9A09G056) += r9a09g056-cpg.o

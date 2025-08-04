@@ -469,7 +469,6 @@
 			reg = <0 0x15800000 0 0x100>;
 			interrupts = <GIC_SPI 742 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H0_HCLK>;
-			resets = <&cpg R9A09G057_USB2_U2H0_HRESETN>;
 			power-domains = <&cpg>;
 			status = "disabled";
                 };
@@ -479,7 +478,6 @@
 			reg = <0 0x15800100 0 0x100>;
 			interrupts = <GIC_SPI 743 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H0_HCLK>;
-			resets = <&cpg R9A09G057_USB2_U2H0_HRESETN>;
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
@@ -489,7 +487,6 @@
 			reg = <0 0x15810000 0 0x100>;
 			interrupts = <GIC_SPI 747 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H1_HCLK>;
-			resets = <&cpg R9A09G057_USB2_U2H1_HRESETN>;
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
@@ -499,7 +496,6 @@
 			reg = <0 0x15810100 0 0x100>;
 			interrupts = <GIC_SPI 748 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H1_HCLK>;
-			resets = <&cpg R9A09G057_USB2_U2H1_HRESETN>;
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
@@ -510,7 +506,6 @@
 			reg = <0 0x15820000 0 0x724>;
 			interrupts = <GIC_SPI 751 IRQ_TYPE_EDGE_RISING>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2P_EXR_CPUCLK>;
-			resets = <&cpg R9A09G057_USB2_U2P_EXL_SYSRST>;
 			renesas,buswait = <7>;
 			power-domains = <&cpg>;
 			status = "disabled";
