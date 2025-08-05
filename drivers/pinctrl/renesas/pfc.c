@@ -68,6 +68,86 @@ struct sh_pfc_pinctrl_priv {
 	struct sh_pfc_pinctrl		pmx;
 };
 
+struct pinmux_info_entry {
+	enum sh_pfc_model model;
+	const struct sh_pfc_soc_info *info;
+};
+
+static const struct pinmux_info_entry pinmux_info_table[] = {
+#ifdef CONFIG_PINCTRL_PFC_R8A7790
+	{ SH_PFC_R8A7790, &r8a7790_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A7791
+	{ SH_PFC_R8A7791, &r8a7791_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A7792
+	{ SH_PFC_R8A7792, &r8a7792_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A7793
+	{ SH_PFC_R8A7793, &r8a7793_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A7794
+	{ SH_PFC_R8A7794, &r8a7794_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A77951
+	{ SH_PFC_R8A7795, &r8a77951_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A77960
+	{ SH_PFC_R8A77960, &r8a77960_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A77961
+	{ SH_PFC_R8A77961, &r8a77961_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A774A1
+	{ SH_PFC_R8A774A1, &r8a774a1_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A774B1
+	{ SH_PFC_R8A774B1, &r8a774b1_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A774C0
+	{ SH_PFC_R8A774C0, &r8a774c0_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A774E1
+	{ SH_PFC_R8A774E1, &r8a774e1_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A77965
+	{ SH_PFC_R8A77965, &r8a77965_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A77970
+	{ SH_PFC_R8A77970, &r8a77970_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A77980
+	{ SH_PFC_R8A77980, &r8a77980_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A77990
+	{ SH_PFC_R8A77990, &r8a77990_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A77995
+	{ SH_PFC_R8A77995, &r8a77995_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A779A0
+	{ SH_PFC_R8A779A0, &r8a779a0_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A779F0
+	{ SH_PFC_R8A779F0, &r8a779f0_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A779G0
+	{ SH_PFC_R8A779G0, &r8a779g0_pinmux_info },
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A779H0
+	{ SH_PFC_R8A779H0, &r8a779h0_pinmux_info },
+#endif
+};
+
+static const struct sh_pfc_soc_info *get_pinmux_info(enum sh_pfc_model model)
+{
+	for (int i = 0; i < ARRAY_SIZE(pinmux_info_table); i++) {
+		if (pinmux_info_table[i].model == model)
+			return pinmux_info_table[i].info;
+	}
+	return NULL;
+}
+
 int sh_pfc_get_pin_index(struct sh_pfc *pfc, unsigned int pin)
 {
 	unsigned int offset;
@@ -947,7 +1027,6 @@ static int sh_pfc_map_pins(struct sh_pfc *pfc, struct sh_pfc_pinctrl *pmx)
 	return 0;
 }
 
-
 static int sh_pfc_pinctrl_probe(struct udevice *dev)
 {
 	struct sh_pfc_pinctrl_priv *priv = dev_get_priv(dev);
@@ -962,90 +1041,9 @@ static int sh_pfc_pinctrl_probe(struct udevice *dev)
 	if (!priv->pfc.regs)
 		return -ENOMEM;
 
-#ifdef CONFIG_PINCTRL_PFC_R8A7790
-	if (model == SH_PFC_R8A7790)
-		priv->pfc.info = &r8a7790_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A7791
-	if (model == SH_PFC_R8A7791)
-		priv->pfc.info = &r8a7791_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A7792
-	if (model == SH_PFC_R8A7792)
-		priv->pfc.info = &r8a7792_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A7793
-	if (model == SH_PFC_R8A7793)
-		priv->pfc.info = &r8a7793_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A7794
-	if (model == SH_PFC_R8A7794)
-		priv->pfc.info = &r8a7794_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A77951
-	if (model == SH_PFC_R8A7795)
-		priv->pfc.info = &r8a77951_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A77960
-	if (model == SH_PFC_R8A77960)
-		priv->pfc.info = &r8a77960_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A77961
-	if (model == SH_PFC_R8A77961)
-		priv->pfc.info = &r8a77961_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A774A1
-	if (model == SH_PFC_R8A774A1)
-		priv->pfc.info = &r8a774a1_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A774B1
-	if (model == SH_PFC_R8A774B1)
-		priv->pfc.info = &r8a774b1_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A774C0
-	if (model == SH_PFC_R8A774C0)
-		priv->pfc.info = &r8a774c0_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A774E1
-	if (model == SH_PFC_R8A774E1)
-		priv->pfc.info = &r8a774e1_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A77965
-	if (model == SH_PFC_R8A77965)
-		priv->pfc.info = &r8a77965_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A77970
-	if (model == SH_PFC_R8A77970)
-		priv->pfc.info = &r8a77970_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A77980
-	if (model == SH_PFC_R8A77980)
-		priv->pfc.info = &r8a77980_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A77990
-	if (model == SH_PFC_R8A77990)
-		priv->pfc.info = &r8a77990_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A77995
-	if (model == SH_PFC_R8A77995)
-		priv->pfc.info = &r8a77995_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A779A0
-	if (model == SH_PFC_R8A779A0)
-		priv->pfc.info = &r8a779a0_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A779F0
-	if (model == SH_PFC_R8A779F0)
-		priv->pfc.info = &r8a779f0_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A779G0
-	if (model == SH_PFC_R8A779G0)
-		priv->pfc.info = &r8a779g0_pinmux_info;
-#endif
-#ifdef CONFIG_PINCTRL_PFC_R8A779H0
-	if (model == SH_PFC_R8A779H0)
-		priv->pfc.info = &r8a779h0_pinmux_info;
-#endif
+	priv->pfc.info = get_pinmux_info(model);
+	if (!priv->pfc.info)
+		dev_dbg(dev, "No pinmux info for model %d\n", model);
 
 	priv->pmx.pfc = &priv->pfc;
 	sh_pfc_init_ranges(&priv->pfc);
