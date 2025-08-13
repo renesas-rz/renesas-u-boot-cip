@@ -1013,42 +1013,46 @@
 			status = "disabled";
 		};
 
-		eth0: ethernet@15c30000 {
-			compatible = "renesas,rzv2h-eqos";
-			reg = <0x0 0x15c30000 0x0 0x10000>;
-			interrupts = <GIC_SPI 765 IRQ_TYPE_LEVEL_HIGH>;
-			clocks =  <&cpg CPG_MOD R9A09G057_GBETH0_ACLK_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH0_ACLK_CSR_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH0_CLK_TX_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH0_CLK_TX_180_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH0_CLK_RX_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH0_CLK_RX_180_I>,
-				  <&ptp_clock>;
-			clock-names = "master_bus", "slave_bus", "tx", "tx_180", "rx", "rx_180", "ptp_ref";
-			resets = <&cpg R9A09G057_GBETH0_ARESETN_I>;
-			reset-names = "eqos";
-			#address-cells = <1>;
-			#size-cells = <0>;
+		usb20phyrst: usb20phy-ctrl@15830000 {
+			compatible = "renesas,r9a09g057-usbphy-ctrl",
+				     "renesas,rzv2h-usbphy-ctrl";
+			reg = <0 0x15830000 0 0x10000>;
+			clocks = <&cpg CPG_MOD R9A09G057_USB2_PCLK_USBTST0>;
+			resets = <&cpg R9A09G057_USB2_PRESETN>;
+			power-domains = <&cpg>;
+			#reset-cells = <1>;
 			status = "disabled";
 		};
 
-		eth1: ethernet@15c40000 {
-			compatible = "renesas,rzv2h-eqos";
-			reg = <0 0x15c40000 0 0x10000>;
-			interrupts = <GIC_SPI 780 IRQ_TYPE_LEVEL_HIGH>;
-			clocks =  <&cpg CPG_MOD R9A09G057_GBETH1_ACLK_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH1_ACLK_CSR_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH1_CLK_TX_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH1_CLK_TX_180_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH1_CLK_RX_I>,
-				  <&cpg CPG_MOD R9A09G057_GBETH1_CLK_RX_180_I>,
-				  <&ptp_clock>;
-			clock-names = "master_bus", "slave_bus", "tx", "tx_180", "rx", "rx_180", "ptp_ref";
-			resets = <&cpg R9A09G057_GBETH1_ARESETN_I>;
-			reset-names = "eqos";
-			#address-cells = <1>;
-			#size-cells = <0>;
+		usb21phyrst: usb21phy-ctrl@15840000 {
+			compatible = "renesas,r9a09g057-usbphy-ctrl",
+				     "renesas,rzv2h-usbphy-ctrl";
+			reg = <0 0x15840000 0 0x10000>;
+			clocks = <&cpg CPG_MOD R9A09G057_USB2_PCLK_USBTST1>;
+			resets = <&cpg R9A09G057_USB2_PRESETN>;
+			power-domains = <&cpg>;
+			#reset-cells = <1>;
 			status = "disabled";
+		};
+
+		tsu0: thermal@11000000 {
+			compatible = "renesas,tsu-r9a09g057";
+			reg = <0 0x11000000 0 0x1000>;
+			clocks = <&cpg CPG_MOD R9A09G057_TSU0_PCLK>;
+			resets = <&cpg R9A09G057_TSU0_PRESETN>;
+			power-domains = <&cpg>;
+			tsu,channel = <0>;
+			#thermal-sensor-cells = <1>;
+		};
+
+		tsu1: thermal@14002000 {
+			compatible = "renesas,tsu-r9a09g057";
+			reg = <0 0x14002000 0 0x1000>;
+			clocks = <&cpg CPG_MOD R9A09G057_TSU1_PCLK>;
+			resets = <&cpg R9A09G057_TSU1_PRESETN>;
+			power-domains = <&cpg>;
+			tsu,channel = <1>;
+			#thermal-sensor-cells = <1>;
 		};
 
 		ohci0: usb@15800000 {
@@ -1056,15 +1060,10 @@
 			reg = <0 0x15800000 0 0x100>;
 			interrupts = <GIC_SPI 742 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H0_HCLK>;
-			power-domains = <&cpg>;
-			status = "disabled";
-                };
-
-		ehci0: usb@15800100 {
-			compatible = "generic-ehci";
-			reg = <0 0x15800100 0 0x100>;
-			interrupts = <GIC_SPI 743 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H0_HCLK>;
+			resets = <&usb20phyrst 0>,
+				 <&cpg R9A09G057_USB2_U2H0_HRESETN>;
+			phys = <&usb2_phy0 1>;
+			phy-names = "usb";
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
@@ -1074,6 +1073,24 @@
 			reg = <0 0x15810000 0 0x100>;
 			interrupts = <GIC_SPI 747 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H1_HCLK>;
+			resets = <&usb21phyrst 1>,
+				 <&cpg R9A09G057_USB2_U2H1_HRESETN>;
+			phys = <&usb2_phy1 1>;
+			phy-names = "usb";
+			power-domains = <&cpg>;
+			status = "disabled";
+		};
+
+		ehci0: usb@15800100 {
+			compatible = "generic-ehci";
+			reg = <0 0x15800100 0 0x100>;
+			interrupts = <GIC_SPI 743 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H0_HCLK>;
+			resets = <&usb20phyrst 0>,
+				 <&cpg R9A09G057_USB2_U2H0_HRESETN>;
+			phys = <&usb2_phy0 2>;
+			phy-names = "usb";
+			companion = <&ohci0>;
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
@@ -1083,44 +1100,130 @@
 			reg = <0 0x15810100 0 0x100>;
 			interrupts = <GIC_SPI 748 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H1_HCLK>;
-			power-domains = <&cpg>;
-			status = "disabled";
-		};
-
-		hsusb: usb@15820000 {
-			compatible = "renesas,usbhs-r9a07g044l",
-				     "renesas,g2l-usbhs";
-			reg = <0 0x15820000 0 0x724>;
-			interrupts = <GIC_SPI 751 IRQ_TYPE_EDGE_RISING>;
-			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2P_EXR_CPUCLK>;
-			renesas,buswait = <7>;
+			resets = <&usb21phyrst 1>,
+				 <&cpg R9A09G057_USB2_U2H1_HRESETN>;
+			phys = <&usb2_phy1 2>;
+			phy-names = "usb";
+			companion = <&ohci1>;
 			power-domains = <&cpg>;
 			status = "disabled";
 		};
 
 		usb2_phy0: usb-phy@15800200 {
 			compatible = "renesas,usb2-phy-r9a09g057",
-						 "renesas,rcar-gen3-usb2-phy";
+				     "renesas,rzv2h-usb2-phy";
 			reg = <0 0x15800200 0 0x700>;
 			interrupts = <GIC_SPI 745 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H0_HRESETN>;
+			resets = <&usb20phyrst 0>;
+			#phy-cells = <1>;
 			power-domains = <&cpg>;
-			resets = <&cpg R9A09G057_USB2_U2H0_HRESETN>;
-			#phy-cells = <0>;
 			status = "disabled";
 		};
 
-		usb2_phy1: usb-phy@15810200  {
+		usb2_phy1: usb-phy@15810200 {
 			compatible = "renesas,usb2-phy-r9a09g057",
-						 "renesas,rcar-gen3-usb2-phy";
-			reg = <0 0x15810200  0 0x700>;
+				     "renesas,rzv2h-usb2-phy";
+			reg = <0 0x15810200 0 0x700>;
 			interrupts = <GIC_SPI 750 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2H1_HCLK>;
+			resets = <&usb21phyrst 1>;
+			#phy-cells = <1>;
 			power-domains = <&cpg>;
-			resets = <&cpg R9A09G057_USB2_U2H1_HRESETN>;
-			#phy-cells = <0>;
 			status = "disabled";
 		};
+
+		hsusb: usb@15820000 {
+			compatible = "renesas,usbhs-r9a09g057",
+				     "renesas,rza2-usbhs";
+			reg = <0 0x15820000 0 0x10000>;
+			interrupts = <GIC_SPI 751 IRQ_TYPE_EDGE_RISING>,
+				     <GIC_SPI 752 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 753 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 754 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A09G057_USB2_U2P_EXR_CPUCLK>;
+			resets = <&usb20phyrst 0>,
+				 <&cpg R9A09G057_USB2_U2P_EXL_SYSRST>;
+			phys = <&usb2_phy0 3>;
+			phy-names = "usb";
+			power-domains = <&cpg>;
+			status = "disabled";
+		};
+
+		xhci0: usb@15850000 {
+			compatible = "renesas,rzv2h-xhci";
+			reg = <0 0x15850000 0 0x10000>;
+			interrupts = <GIC_SPI 759 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A09G057_USB30_ACLK>,
+				 <&cpg CPG_MOD R9A09G057_USB30_PCLK_USBTST>;
+			clock-names = "reg", "usbtst";
+			power-domains = <&cpg>;
+			resets = <&cpg R9A09G057_USB30_ARESETN>;
+			status = "disabled";
+		};
+
+		xhci1: usb@15860000 {
+			compatible = "renesas,rzv2h-xhci";
+			reg = <0 0x15860000 0 0x10000>;
+			interrupts = <GIC_SPI 764 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A09G057_USB31_ACLK>,
+			<&cpg CPG_MOD R9A09G057_USB31_PCLK_USBTST>;
+			clock-names = "reg", "usbtst";
+			power-domains = <&cpg>;
+			resets = <&cpg R9A09G057_USB31_ARESETN>;
+			status = "disabled";
+		};
+
+		eth0: ethernet@15C30000 {
+			compatible = "renesas,rzv2h-eqos",
+				     "snps,dwc-qos-ethernet-4.10";
+			reg = <0 0x15C30000 0 0x10000>;
+			interrupts = <GIC_SPI 765 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 767 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 766 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "macirq", "eth_wake_irq", "eth_lpi";
+			clocks =  <&cpg CPG_MOD R9A09G057_GBETH0_ACLK_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH0_ACLK_CSR_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH0_CLK_TX_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH0_CLK_TX_180_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH0_CLK_RX_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH0_CLK_RX_180_I>,
+				  <&ptp_clock>;
+			clock-names = "master_bus", "slave_bus", "tx", "tx_180", "rx", "rx_180", "ptp_ref";
+			resets = <&cpg R9A09G057_GBETH0_ARESETN_I>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+			snps,write-requests = <15>;
+			snps,read-requests = <15>;
+			snps,burst-map = <0x7>;
+		};
+
+		eth1: ethernet@15C40000 {
+			compatible = "renesas,rzv2h-eqos",
+				     "snps,dwc-qos-ethernet-4.10";
+			reg = <0 0x15C40000 0 0x10000>;
+			interrupts = <GIC_SPI 780 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 782 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 781 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "macirq", "eth_wake_irq", "eth_lpi";
+			clocks =  <&cpg CPG_MOD R9A09G057_GBETH1_ACLK_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH1_ACLK_CSR_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH1_CLK_TX_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH1_CLK_TX_180_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH1_CLK_RX_I>,
+				  <&cpg CPG_MOD R9A09G057_GBETH1_CLK_RX_180_I>,
+				  <&ptp_clock>;
+			clock-names = "master_bus", "slave_bus", "tx", "tx_180", "rx", "rx_180", "ptp_ref";
+			resets = <&cpg R9A09G057_GBETH1_ARESETN_I>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+			snps,write-requests = <15>;
+			snps,read-requests = <15>;
+			snps,burst-map = <0x7>;
+		};
+
 		cru0: cru0@16000000 {
 			compatible = "renesas,cru-r9a09g057";
 			reg = <0 0x16000000 0 0x400>;
