@@ -983,3 +983,63 @@
 		};
 	};
 };
+
+&rcar_sound {
+#if (!SEL_CAN01_HEADER)
+	pinctrl-0 = <&sound_clk_pins &sound_pins &spdif0_pins &spdif2_pins>;
+#else
+	pinctrl-0 = <&sound_clk_pins &sound_pins>;
+#endif
+	pinctrl-names = "default";
+
+	status = "okay";
+
+	/* audio_clkout */
+	#clock-cells = <0>;
+	clock-frequency = <11289600>;
+
+	/* Multi DAI */
+	#sound-dai-cells = <1>;
+
+	rcar_sound,dai {
+		dai0 {
+			playback = <&ssi3>;
+			capture  = <&ssi4 &src0 &dvc0>;
+		};
+
+#if (!SEL_CAN01_HEADER)
+		dai1 {
+			playback = <&spdif0>;
+			capture  = <&spdif0>;
+		};
+
+		dai2 {
+			playback = <&spdif2>;
+			capture  = <&spdif2>;
+		};
+#endif
+	};
+};
+
+&ssi4 {
+	shared-pin;
+};
+
+&pcie0 {
+	/* Map all possible DDR as inbound ranges */
+	dma-ranges = <0x42000000 0 0x40000000 0 0x40000000 0x4 0x00000000>;
+
+	status = "okay";
+};
+
+&adc {
+	status = "okay";
+};
+
+&cmtw0 {
+	status = "okay";
+};
+
+&cmtw1 {
+	status = "okay";
+};
