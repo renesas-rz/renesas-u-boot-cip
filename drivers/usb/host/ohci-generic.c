@@ -27,6 +27,7 @@ static int ohci_usb_probe(struct udevice *dev)
 	struct generic_ohci *priv = dev_get_priv(dev);
 	int err, ret;
 
+#ifndef CONFIG_R9A09G057
 	ret = clk_get_bulk(dev, &priv->clocks);
 	if (ret && ret != -ENOENT) {
 		dev_err(dev, "Failed to get clocks (ret=%d)\n", ret);
@@ -54,7 +55,7 @@ static int ohci_usb_probe(struct udevice *dev)
 	err = generic_setup_phy(dev, &priv->phy, 0);
 	if (err)
 		goto reset_err;
-
+#endif
 	err = ohci_register(dev, regs);
 	if (err)
 		goto phy_err;
@@ -65,7 +66,7 @@ phy_err:
 	ret = generic_shutdown_phy(&priv->phy);
 	if (ret)
 		dev_err(dev, "failed to shutdown usb phy\n");
-
+#ifndef CONFIG_R9A09G057
 reset_err:
 	ret = reset_release_bulk(&priv->resets);
 	if (ret)
@@ -74,7 +75,7 @@ clk_err:
 	ret = clk_release_bulk(&priv->clocks);
 	if (ret)
 		dev_err(dev, "failed to release clocks (ret=%d)\n", ret);
-
+#endif
 	return err;
 }
 
