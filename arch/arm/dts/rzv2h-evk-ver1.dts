@@ -705,17 +705,192 @@
 	status = "okay";
 };
 
+&du {
+	status = "okay";
+};
+
+&dsi0 {
+	status = "okay";
+
+	ports {
+		port@1 {
+			dsi0_out: endpoint {
+				remote-endpoint = <&adv7535_in>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+	};
+};
+
+&cru0 {
+	status = "okay";
+};
+
+&csi20 {
+	status = "okay";
+
+	ports {
+		port {
+			csi20_in: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+				remote-endpoint = <&ov5645_to_csi20>;
+			};
+		};
+	};
+};
+
+&cru1 {
+	status = "okay";
+};
+
+&csi21 {
+	status = "okay";
+
+	ports {
+		port {
+			csi21_in: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+				remote-endpoint = <&ov5645_to_csi21>;
+			};
+		};
+	};
+};
+
+&cru2 {
+	status = "okay";
+};
+
+&csi22 {
+	status = "okay";
+
+	ports {
+		port {
+			csi22_in: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+				remote-endpoint = <&ov5645_to_csi22>;
+			};
+		};
+	};
+};
+
+&cru3 {
+	status = "okay";
+};
+
+&csi23 {
+	status = "okay";
+
+	ports {
+		port {
+			csi23_in: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+				remote-endpoint = <&ov5645_to_csi23>;
+			};
+		};
+	};
+};
+
+&xhci0 {
+		pinctrl-0 = <&usb30_pins>;
+		pinctrl-names = "default";
+
+		memory-region = <&global_cma>;
+		status = "okay";
+};
+
+&xhci1 {
+		pinctrl-0 = <&usb31_pins>;
+		pinctrl-names = "default";
+
+		memory-region = <&global_cma>;
+		status = "okay";
+};
+
+&usb20phyrst {
+	status = "okay";
+};
+
+&usb21phyrst {
+	status = "okay";
+};
+
+&ohci0 {
+		memory-region = <&global_cma>;
+
+		dr_mode = "otg";
+		status = "okay";
+};
+
+&ohci1 {
+		memory-region = <&global_cma>;
+
+		status = "okay";
+};
 
 &ehci0 {
-	status = "okay";
+		memory-region = <&global_cma>;
+
+		dr_mode = "otg";
+		status = "okay";
 };
 
 &ehci1 {
-	status = "okay";
+		memory-region = <&global_cma>;
+
+		status = "okay";
 };
 
 &hsusb {
-	dr_mode = "otg";
+		dr_mode = "otg";
+		status = "okay";
+};
+
+&usb2_phy0 {
+		pinctrl-0 = <&usb20_pins>;
+		pinctrl-names = "default";
+
+		status = "okay";
+};
+
+&usb2_phy1 {
+		pinctrl-0 = <&usb21_pins>;
+		pinctrl-names = "default";
+
+		status = "okay";
+};
+
+#if (SEL_CAN01_HEADER && !SEL_SCI4_CAN01)
+&canfd {
+	pinctrl-0 = <&can0_pins &can1_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	channel0 {
+		status = "okay";
+	};
+
+	channel1 {
+		status = "okay";
+	};
+};
+#endif
+
+&rtc {
+	status = "okay";
+};
+
+&wdt1 {
+	status = "okay";
+};
+
+&spi2 {
+	pinctrl-0 = <&spi2_pins>;
+	pinctrl-names = "default";
+
 	status = "okay";
 };
 
