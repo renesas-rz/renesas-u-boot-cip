@@ -1,34 +1,82 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the RZ/V2H EVK Version 1 board
+ * Device Tree Source for the RZ/V2H EVK ver1 board
  *
- * Copyright (C) 2023 Renesas Electronics Corp.
+ * Copyright (C) 2024 Renesas Electronics Corp.
  */
 
 /dts-v1/;
-#include <dt-bindings/gpio/gpio.h>
 #include "r9a09g057.dtsi"
-#include <dt-bindings/pinctrl/rzv2h-pinctrl.h>
-#include "r9a09g057-u-boot.dtsi"
+#include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
+#include <dt-bindings/gpio/gpio.h>
+
+/*
+ * SSI-DA7212
+ *
+ * These commands are required when Playback/Capture
+ *
+ *	amixer -q cset name='Aux Switch' on
+ *	amixer -q cset name='Mixin Left Aux Left Switch' on
+ *	amixer -q cset name='Mixin Right Aux Right Switch' on
+ *	amixer -q cset name='ADC Switch' on
+ *	amixer -q cset name='Mixout Right Mixin Right Switch' off
+ *	amixer -q cset name='Mixout Left Mixin Left Switch' off
+ *	amixer -q cset name='Headphone Volume' 70%
+ *	amixer -q cset name='Headphone Switch' on
+ *	amixer -q cset name='Mixout Left DAC Left Switch' on
+ *	amixer -q cset name='Mixout Right DAC Right Switch' on
+ *	amixer -q cset name='DAC Left Source MUX' 'DAI Input Left'
+ *	amixer -q cset name='DAC Right Source MUX' 'DAI Input Right'
+ *	amixer -q sset 'Mic 1 Amp Source MUX' 'MIC_P'
+ *	amixer -q sset 'Mic 2 Amp Source MUX' 'MIC_P'
+ *	amixer -q sset 'Mixin Left Mic 1' on
+ *	amixer -q sset 'Mixin Right Mic 2' on
+ *	amixer -q sset 'Mic 1' 90% on
+ *	amixer -q sset 'Mic 2' 90% on
+ *	amixer -q sset 'Lineout' 80% on
+ *	amixer -q set "Headphone" 100% on
+ *
+ * When Capture, use this command to amplify sound
+ *	amixer set 'DVC In',0 100%
+ */
+
+/*
+ * Jumper setting
+ *
+ * Please change the jumper setting corresponding to below Macros:
+ *
+ * SEL_CAN01_HEADER:
+ *	1: CAN0/1	0: External Header Pin
+ * SEL_SCI4_HEADER:
+ *	1: SCI4		0: CAN0/1
+ */
+
+#define SEL_CAN01_HEADER	1
+#define SEL_SCI4_CAN01		0
+
+#if (!SEL_CAN01_HEADER && SEL_SCI4_CAN01)
+#error "Cannot set 1 to SEL_SCI4_CAN01 as SEL_CAN01_HEADER=0"
+#endif
 
 / {
-	model = "Renesas EVK Version 1 based on r9a09g057h4";
-	compatible = "renesas,r9a09g057h4-dev", "renesas,r9a09g057h4", "renesas,r9a09g057";
+	model = "Renesas EVK ver1 based on r9a09g057h4";
+	compatible = "renesas,r9a09g057h4-evk-ver1", "renesas,r9a09g057h4", "renesas,r9a09g057";
 
 	aliases {
 		serial0 = &scif0;
+		serial1 = &sci0;
+		serial2 = &sci4;
+		serial3 = &sci5;
 		mmc0 = &sdhi0;
 		mmc1 = &sdhi1;
-		i2c3 = &i2c3;
-		i2c6 = &i2c6;
-		i2c7 = &i2c7;
-		i2c8 = &i2c8;
-		spi0 = &xspi;
+		mmc2 = &sdhi2;
+
 		ethernet0 = &eth0;
 		ethernet1 = &eth1;
 	};
 
 	chosen {
+		bootargs = "ignore_loglevel";
 		stdout-path = "serial0:115200n8";
 	};
 
