@@ -221,6 +221,46 @@
 			status = "disabled";
 		};
 
+		adc: adc@11c00000 {
+			compatible = "renesas,r9a09g057-adc", "renesas,rzv2h-adc";
+			reg = <0 0x11C00000 0 0x400>;
+			clocks = <&cpg CPG_MOD R9A09G057_ADC_ADCLK>,
+				 <&cpg CPG_MOD R9A09G057_ADC_PCLK>;
+			clock-names = "adclk", "pclk";
+			resets =  <&cpg R9A09G057_ADC_ADRST_N>;
+			reset-names = "adrst-n";
+			power-domains = <&cpg>;
+			status = "disabled";
+
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			channel@0 {
+				reg = <0>;
+			};
+			channel@1 {
+				reg = <1>;
+			};
+			channel@2 {
+				reg = <2>;
+			};
+			channel@3 {
+				reg = <3>;
+			};
+			channel@4 {
+				reg = <4>;
+			};
+			channel@5 {
+				reg = <5>;
+			};
+			channel@6 {
+				reg = <6>;
+			};
+			channel@7 {
+				reg = <7>;
+			};
+		};
+
 		pinctrl: pinctrl@10410000 {
 			compatible = "renesas,r9a09g057-pinctrl";
 			reg = <0 0x10410000 0 0x10000>, <0 0x10400020 0 0x30>;
@@ -588,20 +628,22 @@
 			status = "disabled";
 		};
 
-		scif0: serial@11c01400 {
+		scif0: serial@1004b800 {
 			compatible = "renesas,scif-r9a09g057",
-				     "renesas,scif";
+				     "renesas,scif-r9a07g044";
 			reg = <0 0x11c01400 0 0x400>;
-			interrupts = <GIC_SPI 529 IRQ_TYPE_LEVEL_LOW>,
-				     <GIC_SPI 532 IRQ_TYPE_LEVEL_LOW>,
-				     <GIC_SPI 533 IRQ_TYPE_LEVEL_LOW>,
-				     <GIC_SPI 530 IRQ_TYPE_LEVEL_LOW>,
-				     <GIC_SPI 534 IRQ_TYPE_LEVEL_LOW>,
-				     <GIC_SPI 531 IRQ_TYPE_LEVEL_LOW>;
+			interrupts = <GIC_SPI 529 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 532 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 533 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 530 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 534 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 531 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "eri", "rxi", "txi",
 					  "bri", "dri", "tei";
 			clocks = <&cpg CPG_MOD R9A09G057_SCIF_CLK_PCK>;
 			clock-names = "fck";
+			dmas = <&dmac1 0x7F4CD0>, <&dmac1 0x7F4CCF>;
+			dma-names = "tx", "rx";
 			power-domains = <&cpg>;
 			resets = <&cpg R9A09G057_SCIF_RST_SYSTEM_N>;
 			status = "disabled";
@@ -611,8 +653,8 @@
 			compatible = "renesas,sdhi-r9a09g057",
 				     "renesas,rcar-gen3-sdhi";
 			reg = <0x0 0x15c00000 0 0x10000>;
-			interrupts = <GIC_SPI 735 IRQ_TYPE_LEVEL_LOW>,
-				     <GIC_SPI 736 IRQ_TYPE_LEVEL_LOW>;
+			interrupts = <GIC_SPI 735 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 736 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_SDHI0_IMCLK>,
 				 <&cpg CPG_MOD R9A09G057_SDHI0_CLK_HS>,
 				 <&cpg CPG_MOD R9A09G057_SDHI0_IMCLK2>,
@@ -620,6 +662,7 @@
 			clock-names = "core", "clkh", "cd", "aclk";
 			resets = <&cpg R9A09G057_SDHI0_IXRST>;
 			power-domains = <&cpg>;
+			mmc-no-pin-volt-switch;
 			status = "disabled";
 		};
 
@@ -627,8 +670,8 @@
 			compatible = "renesas,sdhi-r9a09g057",
 					"renesas,rcar-gen3-sdhi";
 			reg = <0x0 0x15c10000 0 0x10000>;
-			interrupts = <GIC_SPI 737 IRQ_TYPE_LEVEL_LOW>,
-				     <GIC_SPI 738 IRQ_TYPE_LEVEL_LOW>;
+			interrupts = <GIC_SPI 737 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 738 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_SDHI1_IMCLK>,
 				 <&cpg CPG_MOD R9A09G057_SDHI1_CLK_HS>,
 				 <&cpg CPG_MOD R9A09G057_SDHI1_IMCLK2>,
@@ -636,6 +679,7 @@
 			clock-names = "core", "clkh", "cd", "aclk";
 			resets = <&cpg R9A09G057_SDHI1_IXRST>;
 			power-domains = <&cpg>;
+			mmc-no-pin-volt-switch;
 			status = "disabled";
 		};
 
@@ -643,8 +687,8 @@
 			compatible = "renesas,sdhi-r9a09g057",
 					"renesas,rcar-gen3-sdhi";
 			reg = <0x0 0x15c20000 0 0x10000>;
-			interrupts = <GIC_SPI 739 IRQ_TYPE_LEVEL_LOW>,
-				     <GIC_SPI 740 IRQ_TYPE_LEVEL_LOW>;
+			interrupts = <GIC_SPI 739 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 740 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD R9A09G057_SDHI2_IMCLK>,
 				 <&cpg CPG_MOD R9A09G057_SDHI2_CLK_HS>,
 				 <&cpg CPG_MOD R9A09G057_SDHI2_IMCLK2>,
@@ -652,6 +696,7 @@
 			clock-names = "core", "clkh", "cd", "aclk";
 			resets = <&cpg R9A09G057_SDHI2_IXRST>;
 			power-domains = <&cpg>;
+			mmc-no-pin-volt-switch;
 			status = "disabled";
 		};
 
