@@ -134,17 +134,17 @@
 			enable-method = "psci";
 		};
 
-		cpu2: cpu@10000 {
+		cpu2: cpu@200 {
 			compatible = "arm,cortex-a55";
-			reg = <0x10000>;
+			reg = <0x200>;
 			device_type = "cpu";
 			next-level-cache = <&L3_CA55>;
 			enable-method = "psci";
 		};
 
-		cpu3: cpu@1000000 {
+		cpu3: cpu@300 {
 			compatible = "arm,cortex-a55";
-			reg = <0x1000000>;
+			reg = <0x300>;
 			device_type = "cpu";
 			next-level-cache = <&L3_CA55>;
 			enable-method = "psci";
@@ -156,6 +156,36 @@
 			cache-size = <0x100000>;
 		};
 	};
+
+	gpu_opp_table: opp-table-1 {
+		compatible = "operating-points-v2";
+
+		opp-630000000 {
+			opp-hz = /bits/ 64 <630000000>;
+			opp-microvolt = <1100000>;
+		};
+
+		opp-315000000 {
+			opp-hz = /bits/ 64 <315000000>;
+			opp-microvolt = <1100000>;
+		};
+
+		opp-158000000 {
+			opp-hz = /bits/ 64 <158000000>;
+			opp-microvolt = <1100000>;
+		};
+
+		opp-79000000 {
+			opp-hz = /bits/ 64 <79000000>;
+			opp-microvolt = <1100000>;
+		};
+
+		opp-20000000 {
+			opp-hz = /bits/ 64 <20000000>;
+			opp-microvolt = <1100000>;
+		};
+	};
+
 
 	psci {
 		compatible = "arm,psci-1.0", "arm,psci-0.2";
