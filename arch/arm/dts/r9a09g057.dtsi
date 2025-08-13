@@ -700,6 +700,121 @@
 			status = "disabled";
 		};
 
+		vspd0: vsp@16480000 {
+			compatible = "renesas,vsp2";
+			reg = <0 0x16480000 0 0x10000>;
+			interrupts = <GIC_SPI 881 IRQ_TYPE_LEVEL_HIGH>;
+			power-domains = <&cpg>;
+			renesas,fcp = <&fcpvd0>;
+		};
+
+                isu: isum@16450000 {
+                        compatible = "renesas,isum";
+                        reg = <0 0x16450000 0 0x01F4>;
+                        interrupts =    <GIC_SPI 867 IRQ_TYPE_EDGE_RISING>,
+                                        <GIC_SPI 868 IRQ_TYPE_EDGE_RISING>,
+                                        <GIC_SPI 869 IRQ_TYPE_EDGE_RISING>,
+                                        <GIC_SPI 870 IRQ_TYPE_EDGE_RISING>,
+                                        <GIC_SPI 871 IRQ_TYPE_LEVEL_HIGH>,
+                                        <GIC_SPI 872 IRQ_TYPE_LEVEL_HIGH>,
+                                        <GIC_SPI 873 IRQ_TYPE_LEVEL_HIGH>;
+                        clocks = <&cpg CPG_MOD R9A09G057_ISU_ACLK>,
+				<&cpg CPG_MOD R9A09G057_ISU_PCLK>;
+                        clock-names = "isu_aclk", "isu_pclk";
+                        resets = <&cpg R9A09G057_ISU_ARESETN>,
+				<&cpg R9A09G057_ISU_PRESETN>;
+			reset-names = "aresetn", "presetn";
+                        renesas,#ch = <0>;
+                        renesas,#rpf = <1>;
+                        renesas,#wpf = <1>;
+                        renesas,has-rs;
+                        power-domains = <&cpg>;
+                };
+
+		fcpvd0: fcp@16470000 {
+			compatible = "renesas,fcpv";
+			reg = <0 0x16470000 0 0x10000>;
+			power-domains = <&cpg>;
+		};
+
+		rtc: rtc@11c00800 {
+			compatible = "renesas,r9a09g057-rtc", "renesas,rtca-3";
+			reg = <0 0x11C00800 0 0x400>;
+			interrupts = <GIC_SPI 525 IRQ_TYPE_EDGE_RISING>,
+					<GIC_SPI 526 IRQ_TYPE_EDGE_RISING>,
+					<GIC_SPI 524 IRQ_TYPE_EDGE_RISING>;
+			interrupt-names = "periodic", "carry", "alarm";
+			clocks = <&cpg CPG_MOD R9A09G057_RTC_CLK_RTC>;
+			clock-names = "fck";
+			resets = <&cpg R9A09G057_RTC_RST_RTC>,
+				<&cpg R9A09G057_RTC_RST_RTC_V>;
+			reset-names = "rtc", "rtc_v";
+			power-domains = <&cpg>;
+			status = "disabled";
+		};
+
+		du: display@16460000 {
+			compatible = "renesas,du-rzv2h";
+			reg = <0 0x16460000 0 0x10000>;
+			interrupts = <GIC_SPI 882 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&cpg CPG_MOD R9A09G057_LCDC_CLK_A>,
+				 <&cpg CPG_MOD R9A09G057_LCDC_CLK_P>,
+				 <&cpg CPG_MOD R9A09G057_LCDC_CLK_D>;
+			clock-names = "aclk", "pclk", "dclk";
+			resets = <&cpg R9A09G057_LCDC_RESET_N>;
+			vsps = <&vspd0 0>;
+			power-domains = <&cpg>;
+			status = "disabled";
+
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				port@0 {
+					reg = <0>;
+					du_out_dsi0: endpoint {
+						remote-endpoint = <&dsi0_in>;
+					};
+				};
+			};
+		};
+
+		dsi0: dsi@16430000 {
+			compatible = "renesas,r9a09g057-mipi-dsi";
+			reg =	<0 0x16430000 0 0x10000>, /* LINK */
+				<0 0x16440000 0 0x10000>; /* DPHY */
+			clocks = <&cpg CPG_MOD R9A09G057_DSI_PLLREFCLK>,
+				 <&cpg CPG_MOD R9A09G057_DSI_ACLK>,
+				 <&cpg CPG_MOD R9A09G057_DSI_PCLK>,
+				 <&cpg CPG_MOD R9A09G057_DSI_VCLK1>,
+				 <&cpg CPG_MOD R9A09G057_DSI_LPCLK>;
+			clock-names = "pllclk", "aclk",
+				      "pclk", "vclk", "lpclk";
+			resets = <&cpg R9A09G057_DSI_ARESETN>,
+				 <&cpg R9A09G057_DSI_PRESETN>;
+			reset-names = "areset_n", "preset_n";
+			power-domains = <&cpg>;
+			status = "disabled";
+
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				port@0 {
+					reg = <0>;
+					dsi0_in: endpoint {
+						remote-endpoint = <&du_out_dsi0>;
+					};
+				};
+
+				port@1 {
+					reg = <1>;
+					dsi0_out: endpoint {
+					};
+				};
+			};
+		};
+
 		i2c0: i2c@14400400 {
 			#address-cells = <1>;
 			#size-cells = <0>;
