@@ -85,6 +85,15 @@ int usb_gadget_register_driver(struct usb_gadget_driver *driver)
 		return -EINVAL;
 	}
 
+	/*Register phy driver*/
+#if !defined(CONFIG_R9A07G044L) || !defined(CONFIG_R9A07G044C) || !defined(CONFIG_R9A07G043U) || !defined(CONFIG_R9A07G054L) || !defined(CONFIG_ARCH_RZMPU)
+	ret = usbhs_lowlevel_init(USB_DEVICE_PORT, USB_INIT_DEVICE);
+	if (ret == -ENODEV) {	/* No such device. */
+		puts("Port not available.\n");
+		return ret;
+	}
+#endif
+
 	ret = rcar_gen3_phy_usb2_probe(&phy_dev.pdev);
 	if (ret <0)
 		return ret;
@@ -147,5 +156,11 @@ int usb_gadget_handle_interrupts(int index)
 {
 	phy_dev.irq(0, phy_dev.priv);
 	usbhs_dev.irq(0, usbhs_dev.priv);
+	return 0;
+}
+
+int dm_usb_gadget_handle_interrupts(struct udevice *dev)
+{
+	usb_gadget_handle_interrupts(0);
 	return 0;
 }
