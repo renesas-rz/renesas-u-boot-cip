@@ -153,6 +153,10 @@ config PINCTRL_RZG2L
 	  Support the pinctrl functionality of the pin function controller (PFC)
 	  on the Renesas RZ/G2L SoC family.
 
+config PINCTRL_PFC_RZG2L
+	bool "Renesas RZ/G2L family pin control driver"
+	select PINCTRL_RZG2L
+	
 config PINCTRL_PFC_RZV2H
 	bool "Renesas RZ/V2H pin control driver"
 	help
