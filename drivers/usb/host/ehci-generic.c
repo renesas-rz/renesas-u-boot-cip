@@ -79,17 +79,20 @@ static int ehci_usb_probe(struct udevice *dev)
 		goto clk_err;
 	}
 
-	err = reset_get_bulk(dev, &priv->resets);
-	if (err && err != -ENOENT) {
-		dev_err(dev, "Failed to get resets (err=%d)\n", err);
-		goto clk_err;
-	}
+	#if !defined(CONFIG_TARGET_SMARC_RZG2L)
+		err = reset_get_bulk(dev, &priv->resets);
+		printf("%s:  Error = %X\n", __func__, err);
+		if (err && err != -ENOENT) {
+			dev_err(dev, "Failed to get resets (err=%d)\n", err);
+			goto clk_err;
+		}
 
-	err = reset_deassert_bulk(&priv->resets);
-	if (err) {
-		dev_err(dev, "Failed to get deassert resets (err=%d)\n", err);
-		goto reset_err;
-	}
+		err = reset_deassert_bulk(&priv->resets);
+		if (err) {
+			dev_err(dev, "Failed to get deassert resets (err=%d)\n", err);
+			goto reset_err;
+		}
+	#endif
 
 	err = ehci_enable_vbus_supply(dev);
 	if (err)
