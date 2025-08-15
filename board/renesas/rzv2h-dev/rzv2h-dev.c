@@ -20,6 +20,7 @@
 #include <i2c.h>
 #include <mmc.h>
 #include <linux/delay.h>
+#include <efi_loader.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -93,6 +94,26 @@ DECLARE_GLOBAL_DATA_PTR;
 #define USB2_PHY_OTGR			0x600
 
 #define SYS_ADC_CFG			0x10431600
+
+#if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+
+#define EFI_FIRMWARE_IMAGE_TYPE_RZV2H_GUID \
+	EFI_GUID(0x7f26b24e, 0x7cc4, 0x40a5, 0x8d, 0x3b, 0x0c, 0xbf, 0x47, 0x3f, 0x7a, 0x83)
+
+struct efi_fw_image fw_images[] = {
+	{
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZV2H_GUID,
+		.fw_name = u"RENESAS-FIP",
+		.image_index = 1,
+	},
+};
+
+struct efi_capsule_update_info update_info = {
+	.dfu_string = "sf 0:0=fip.bin raw 0x20000 0x1F0000\0",
+	.num_images = ARRAY_SIZE(fw_images),
+	.images = fw_images,
+};
+#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
 void s_init(void)
 {
