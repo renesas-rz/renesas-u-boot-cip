@@ -79,7 +79,7 @@ static int ehci_usb_probe(struct udevice *dev)
 		goto clk_err;
 	}
 
-	#if !defined(CONFIG_TARGET_SMARC_RZG2L)
+	#if !defined(CONFIG_RCAR_GEN3)
 		err = reset_get_bulk(dev, &priv->resets);
 		printf("%s:  Error = %X\n", __func__, err);
 		if (err && err != -ENOENT) {
