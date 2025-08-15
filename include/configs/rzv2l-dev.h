@@ -6,7 +6,7 @@
 #ifndef __RZV2L_DEV_H
 #define __RZV2L_DEV_H
 
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 
 #define CONFIG_REMAKE_ELF
 
