@@ -51,6 +51,7 @@
 
 #define CONFIG_SYS_MONITOR_BASE		0x00000000
 
+#define CONFIG_BOOTCOMMAND     "env default -a;run bootcmd_check;run bootimage"
 
 /* ENV setting */
 #define CFG_EXTRA_ENV_SETTINGS	\
