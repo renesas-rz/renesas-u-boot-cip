@@ -6,7 +6,7 @@
 #ifndef __SMARC_RZG2UL_H
 #define __SMARC_RZG2UL_H
 
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 
 #define CONFIG_REMAKE_ELF
 
