@@ -144,25 +144,33 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
 
-#define RENESAS_FIP_IMAGE_GUID \
-	EFI_GUID(0x880866e9, 0x84ba, 0x4793, 0xa9, 0x08, \
-		 0x33, 0xe0, 0xb9, 0x16, 0xf3, 0x98)
+#define EFI_FIRMWARE_IMAGE_TYPE_RZN2H_GUID \
+EFI_GUID(0x3c9b6d41, 0x0c26, 0x4c3d, 0x98, 0x11, 0x7f, 0x4c, 0x6a, 0xf3, 0xe9, 0xcb)
 
 struct efi_fw_image fw_images[] = {
 	{
-		.image_type_id = RENESAS_FIP_IMAGE_GUID,
-		.fw_name = u"RENESAS-FIP",
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZN2H_GUID,
+		.fw_name = u"bl2_bp_xspi0.bin",
 		.image_index = 1,
+	},
+	{
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZN2H_GUID,
+		.fw_name = u"fip.bin",
+		.image_index = 2,
 	},
 };
 
 struct efi_capsule_update_info update_info = {
-	.dfu_string = "sf 0:0=fip.bin raw 0x20000 0x1F0000\0",
+	.dfu_string =
+		/* BL2 in SPI NOR at offset 0x0, max size 0x60000 (384 KB) */
+		"sf 0:0=bl2_bp_xspi0.bin raw 0x0 0x60000;"
+		/* FIP in SPI NOR at offset 0x60000, max size 0x1F0000 (1984 KB) */
+		"fip.bin raw 0x60000 0x1F0000",
 	.num_images = ARRAY_SIZE(fw_images),
 	.images = fw_images,
 };
-#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
+#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 void s_init(void)
 {
 	/* Disable Write protect to enable writing */
