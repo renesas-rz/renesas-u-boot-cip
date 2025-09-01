@@ -460,7 +460,7 @@ static int xspi_probe(struct udevice *dev)
 
 	priv->regs = plat->regs;
 	priv->extr = plat->extr;
-#if CONFIG_IS_ENABLED(CLK)
+#if CONFIG_IS_ENABLED(CLK) && !CONFIG_IS_ENABLED(RZT2N)
 	clk_enable(&priv->clk);
 #endif
 	return 0;
@@ -473,10 +473,10 @@ static int xspi_of_to_plat(struct udevice *bus)
 	plat->regs = dev_read_addr_index(bus, 0);
 	plat->extr = dev_read_addr_index(bus, 1);
 
-#if CONFIG_IS_ENABLED(CLK)
+#if CONFIG_IS_ENABLED(CLK) && !CONFIG_IS_ENABLED(RZT2N)
 	struct xspi_priv *priv = dev_get_priv(bus);
 	int ret;
-
+john
 	ret = clk_get_by_index(bus, 0, &priv->clk);
 	if (ret < 0) {
 		printf("%s: Could not get clock for %s: %d\n",
