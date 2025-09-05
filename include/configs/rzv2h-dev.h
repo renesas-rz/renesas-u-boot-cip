@@ -75,8 +75,8 @@
 	"prodsd0bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
 	"prodsd1bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
 	"bootimage=booti 0x48080000 - 0x48000000 \0" \
-	"sd0load=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/r9a09g057h4-evk-ver1.dtb;run prodsd0bootargs \0" \
-	"sd1load=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/r9a09g057h4-evk-ver1.dtb;run prodsd1bootargs \0" \
+	"sd0load=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/r9a09g057h44-rzv2h-evk.dtb;run prodsd0bootargs \0" \
+	"sd1load=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/r9a09g057h44-rzv2h-evk.dtb;run prodsd1bootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run sd0load; fi \0"
 #endif
 
