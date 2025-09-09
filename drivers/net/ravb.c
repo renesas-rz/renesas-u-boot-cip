@@ -406,7 +406,11 @@ static int ravb_mac_init(struct ravb_priv *eth)
 static int ravb_dmac_init(struct udevice *dev)
 {
 	struct ravb_priv *eth = dev_get_priv(dev);
+	struct eth_pdata *pdata = dev_get_plat(dev);
 	int ret = 0;
+	int mode = 0;
+	unsigned int delay;
+	bool explicit_delay = false;
 
 	/* Set CONFIG mode */
 	ret = ravb_reset(dev);
@@ -798,10 +802,6 @@ static const struct ravb_data rzg3s_data = {
 static const struct udevice_id ravb_ids[] = {
 	{ .compatible = "renesas,etheravb-rcar-gen3" },
 	{ .compatible = "renesas,etheravb-rcar-gen4" },
-	{ .compatible = "renesas,etheravb-r9a07g044l" },
-	{ .compatible = "renesas,etheravb-r9a07g044c" },
-	{ .compatible = "renesas,etheravb-r9a07g054l" },
-	{ .compatible = "renesas,etheravb-r9a07g043u" },
 	{ .compatible = "renesas,etheravb-r9a07g044l",
 	  .data = (ulong)&rzg2l_data,
 	},
@@ -815,8 +815,6 @@ static const struct udevice_id ravb_ids[] = {
 	  .data = (ulong)&rzg2l_data,
 	},
 	{ .compatible = "renesas,etheravb-rzv2m" },
-	{ .compatible = "renesas,etheravb-r9a07g043f" },
-	{ .compatible = "renesas,etheravb-r9a08g045s" },
 	{ .compatible = "renesas,etheravb-r9a07g043f",
 	  .data = (ulong)&rzg2l_data,
 	},
