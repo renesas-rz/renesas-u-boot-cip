@@ -17,11 +17,14 @@
 #include <asm/arch/renesas.h>
 #include <asm/arch/rcar-mstp.h>
 #include <asm/arch/sh_sdhi.h>
+#include <asm/system.h>
+#include <asm/ptrace.h>
 #include <i2c.h>
 #include <mmc.h>
 #include <wdt.h>
 #include <rzg2l_wdt.h>
 #include <spi.h>
+#include "../rzg-common/common.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -74,6 +77,12 @@ DECLARE_GLOBAL_DATA_PTR;
 
 /* WDT */
 #define WDT_INDEX		0
+
+/* SYSC */
+#define SYS_BASE                       (0x11020000)
+#define SYS_LSI_MODE                   (SYS_BASE + 0xA00)
+#define SYS_LSI_MODE_STAT_MD_BOOT_MASK (0x7)
+#define ESD_MODE                       (0)
 
 void s_init(void)
 {
@@ -251,3 +260,28 @@ int board_late_init(void)
 
 	return 0;
 }
+
+static const char * const rzg2lc_dt_esd_mode[] = {
+	"/soc/mmc@11c00000", "vmmc-supply", "<&/regulator-vcc-sdhi0>",
+	"/soc/mmc@11c00000", "vqmmc-supply", "<&/regulator-vccq-sdhi0>",
+};
+
+int ft_verify_fdt(void *fdt)
+{
+	const char **fdt_dt = NULL;
+	int size = 0;
+	u32 boot_mode = readl(SYS_LSI_MODE);
+
+	switch (boot_mode & SYS_LSI_MODE_STAT_MD_BOOT_MASK) {
+	case ESD_MODE:
+	{
+		fdt_dt = (const char **)rzg2lc_dt_esd_mode;
+		size = ARRAY_SIZE(rzg2lc_dt_esd_mode);
+		break;
+	}
+	default:
+		return 1;
+	}
+
+	return update_fdt(fdt, fdt_dt, size);
+};
