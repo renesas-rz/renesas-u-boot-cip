@@ -382,6 +382,32 @@ pmic_failed:
 	return;
 }
 
+
+int board_late_init(void)
+{
+	struct udevice *dev;
+	const u8 pmic_i2c_bus = 8;
+	u8 reg;
+	int ret;
+
+	ret = i2c_get_chip_for_busnum(pmic_i2c_bus, 0x12, 1, &dev);
+
+	if (!ret)
+	{
+		dm_i2c_read(dev, 0x3c, &reg, 1);
+		reg &= (~0x01);
+
+		dm_i2c_write(dev, 0x3c, &reg, 1);
+
+		udelay(2);
+		reg |= (0x01);
+
+		dm_i2c_write(dev, 0x3c, &reg, 1);
+	}
+
+	return ret;
+}
+
 int board_early_init_f(void)
 {
 
