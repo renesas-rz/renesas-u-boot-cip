@@ -129,3 +129,7 @@
 	status = "okay";
 };
 
+&wdt0 {
+	status = "okay";
+	timeout-sec = <60>;
+};
