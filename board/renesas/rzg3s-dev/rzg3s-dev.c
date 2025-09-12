@@ -24,6 +24,8 @@
 #include <asm/arch/rcar-mstp.h>
 #include <asm/arch/sh_sdhi.h>
 #include <mmc.h>
+#include <rzg2l_wdt.h>
+#include <wdt.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -95,6 +97,9 @@ DECLARE_GLOBAL_DATA_PTR;
 #define HcRhDescriptorA			0x048
 #define LPSTS				0x102
 #define	AHB_BUS_CTR			0x208
+
+/* WDT */
+#define WDT_INDEX		0
 
 void s_init(void)
 {
@@ -219,4 +224,23 @@ int board_init(void)
 
 void reset_cpu(void)
 {
+#ifdef CONFIG_RENESAS_RZG2LWDT
+	struct udevice *wdt_dev;
+	if (uclass_get_device(UCLASS_WDT, WDT_INDEX, &wdt_dev) < 0) {
+		printf("failed to get wdt device. cannot reset\n");
+		return;
+	}
+	if (wdt_expire_now(wdt_dev, 0) < 0) {
+		printf("failed to expire_now wdt\n");
+	}
+#endif // CONFIG_RENESAS_RZG2LWDT
+}
+
+int board_late_init(void)
+{
+#ifdef CONFIG_RENESAS_RZG2LWDT
+	rzg2l_reinitr_wdt();
+#endif // CONFIG_RENESAS_RZG2LWDT
+
+	return 0;
 }
