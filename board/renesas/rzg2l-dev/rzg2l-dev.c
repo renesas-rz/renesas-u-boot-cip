@@ -24,6 +24,8 @@
 #include <rzg2l_wdt.h>
 #include <wdt.h>
 #include <spi.h>
+#include <spi-mem.h>
+#include <linux/mtd/spi-nor.h>
 #include "../rzg-common/common.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -163,11 +165,9 @@ static void board_usb_init(void)
 static int board_spinor_op_nvcr_setup(void)
 {
 	struct spi_slave *spi;
-	uint8_t nvcr[NVCR_LENGTH];
-	uint8_t write_enable_cmd = WRITE_ENABLE_CMD;
-	uint8_t read_cmd = NVCR_READ_CMD;
-	uint8_t write_cmd = NVCR_WRITE_CMD;
+	struct spi_nor *nor;
 	int ret;
+	u8 nvcr[2];
 
 	/* Initialize SPI */
 	spi = spi_setup_slave(0, 0, 1000000, SPI_MODE_0);
@@ -183,16 +183,16 @@ static int board_spinor_op_nvcr_setup(void)
 		return ret;
 	}
 
-	/* Read NVCR */
-	ret = spi_xfer(spi, 8, &read_cmd, NULL, SPI_XFER_BEGIN);
-	if (ret) {
-		printf("Failed to send NVCR Read command: %d\n", ret);
+	nor = dev_get_uclass_priv(spi->dev);
+	if (!nor) {
+		printf("Failed to get SPI NOR\n");
+		ret = -ENODEV;
 		goto release_bus;
 	}
 
-	ret = spi_xfer(spi, 8 * NVCR_LENGTH, NULL, nvcr, SPI_XFER_END);
+	ret = nor->read_reg(nor, NVCR_READ_CMD, nvcr, 2);
 	if (ret) {
-		printf("Failed to read NVCR: %d\n", ret);
+		printf("Failed to send NVCR Read command: %d\n", ret);
 		goto release_bus;
 	}
 
@@ -200,22 +200,18 @@ static int board_spinor_op_nvcr_setup(void)
 	nvcr[0] &= NVCR_BIT4_MASK;
 
 	/* Write enable */
-	ret = spi_xfer(spi, 8, &write_enable_cmd, NULL, SPI_XFER_BEGIN | SPI_XFER_END);
+	ret = nor->write_reg(nor, SPINOR_OP_WREN, NULL, 0);
 	if (ret) {
 		printf("Failed to send Write Enable command: %d\n", ret);
 		goto release_bus;
 	}
 
 	/* Write NVCR */
-	ret = spi_xfer(spi, 8, &write_cmd, NULL, SPI_XFER_BEGIN);
+	nor->cmd_buf[0] = nvcr[0];
+	nor->cmd_buf[1] = nvcr[1];
+	ret = nor->write_reg(nor, NVCR_WRITE_CMD, nor->cmd_buf, 2);
 	if (ret) {
 		printf("Failed to send NVCR Write command: %d\n", ret);
-		goto release_bus;
-	}
-
-	ret = spi_xfer(spi, 8 * NVCR_LENGTH, nvcr, NULL, SPI_XFER_END);
-	if (ret) {
-		printf("Failed to write NVCR: %d\n", ret);
 		goto release_bus;
 	}
 
