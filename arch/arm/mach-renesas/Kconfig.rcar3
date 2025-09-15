@@ -305,4 +305,7 @@ config MULTI_DTB_FIT_USER_DEF_ADDR
 config DM_RESET
 	default y if RCAR_GEN3
 
+config RZG2L_DISTRO_BOOT
+	bool "RZ/G2L distro boot command enable"
+
 endif
