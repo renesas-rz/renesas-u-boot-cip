@@ -21,6 +21,8 @@
     //if other platforms use the pfc-rzg2l.c, then this format is used.
     #define RZG2L_PINMUX(port, pos, func)	\
 	    (((port) * RZG2L_PINS_PER_PORT + (pos)) | ((func) << 12))
+    #define RZG2L_PORT_PINMUX(port, pos, func)	\
+	    (((port) * RZG2L_PINS_PER_PORT + (pos)) | ((func) << 12))
 #else
     #define RZG2L_PINMUX(b, p, f)	((b) * RZG2L_PINS_PER_PORT + (p) | ((f) << 16))
 #endif
