@@ -26,7 +26,11 @@ obj-$(CONFIG_CLK_R8A779H0) += r8a779h0-cpg-mssr.o
 obj-$(CONFIG_CLK_R9A06G032) += r9a06g032-clocks.o
 obj-$(CONFIG_CLK_RZG2L) += rzg2l-cpg.o
 obj-$(CONFIG_CLK_R9A07G044) += r9a07g044-cpg.o
+ifeq ($(CONFIG_RZG2L_DISTRO_BOOT),y)
+obj-$(CONFIG_CLK_R9A07G044L) += r9a07g044-cpg.o rzg2l-cpg.o
+else
 obj-$(CONFIG_CLK_R9A07G044L) += clk-rzg2l.o r9a07g044l-cpg-mssr.o
+endif
 obj-$(CONFIG_CLK_R9A07G054L) += clk-rzv2l.o r9a07g054l-cpg-mssr.o
 obj-$(CONFIG_CLK_R9A07G043U) += clk-rzg2l.o r9a07g043u-cpg-mssr.o
 obj-$(CONFIG_CLK_R9A07G043F) += clk-rzg2l.o r9a07g043f-cpg-mssr.o

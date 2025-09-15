@@ -70,8 +70,8 @@ static int rzg2l_cpg_clk_set(struct clk *clk, bool enable)
 	dev_dbg(clk->dev, "%s %s clock %u\n", enable ? "enable" : "disable",
 		is_mod_clk(clk->id) ? "module" : "core", cpg_clk_id);
 	if (!is_mod_clk(clk->id)) {
-		dev_err(clk->dev, "ID %lu is not a module clock\n", clk->id);
-		return -EINVAL;
+		dev_dbg(clk->dev, "ID %lu is not a module clock\n", clk->id);
+		return 0; 
 	}
 
 	for (i = 0; i < data->info->num_mod_clks; i++) {
