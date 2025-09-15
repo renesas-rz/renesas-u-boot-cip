@@ -67,6 +67,7 @@ static int ehci_usb_probe(struct udevice *dev)
 	int err, ret;
 
 	err = 0;
+#if !defined(CONFIG_RCAR_GEN3)
 	ret = clk_get_bulk(dev, &priv->clocks);
 	if (ret && ret != -ENOENT) {
 		dev_err(dev, "Failed to get clocks (ret=%d)\n", ret);
@@ -79,7 +80,7 @@ static int ehci_usb_probe(struct udevice *dev)
 		goto clk_err;
 	}
 
-	#if !defined(CONFIG_RCAR_GEN3)
+
 		err = reset_get_bulk(dev, &priv->resets);
 		printf("%s:  Error = %X\n", __func__, err);
 		if (err && err != -ENOENT) {
@@ -92,7 +93,7 @@ static int ehci_usb_probe(struct udevice *dev)
 			dev_err(dev, "Failed to get deassert resets (err=%d)\n", err);
 			goto reset_err;
 		}
-	#endif
+
 
 	err = ehci_enable_vbus_supply(dev);
 	if (err)
@@ -101,7 +102,7 @@ static int ehci_usb_probe(struct udevice *dev)
 	err = generic_setup_phy(dev, &priv->phy, 0);
 	if (err)
 		goto regulator_err;
-
+#endif
 	hccr = map_physmem(dev_read_addr(dev), 0x100, MAP_NOCACHE);
 	hcor = (struct ehci_hcor *)((uintptr_t)hccr +
 				    HC_LENGTH(ehci_readl(&hccr->cr_capbase)));
