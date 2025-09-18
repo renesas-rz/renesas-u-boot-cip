@@ -79,6 +79,11 @@ DECLARE_GLOBAL_DATA_PTR;
 /* WDT */
 #define WDT_INDEX		0
 
+/* ECC */
+#define DDR_MEMC_BASE		(0x11410000)
+#define ECC_ENABLE_ADDR		(0x0174)
+#define ECC_ENABLE_MASK		GENMASK(25, 24)
+
 void s_init(void)
 {
 #if CONFIG_TARGET_SMARC_RZG2UL
@@ -253,3 +258,21 @@ int board_late_init(void)
 
 	return 0;
 }
+
+#if defined(CONFIG_MULTI_DTB_FIT)
+int board_fit_config_name_match(const char *name)
+{
+	u32 ecc;
+
+	ecc = readl(DDR_MEMC_BASE + ECC_ENABLE_ADDR);
+	ecc &= ECC_ENABLE_MASK;
+
+	if (!strcmp(name, "smarc-rzg2ul-ecc") && ecc)
+		return 0;
+
+	if (!strcmp(name, "smarc-rzg2ul") && !(ecc))
+		return 0;
+
+	return -1;
+}
+#endif

@@ -958,14 +958,18 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	r8a774c0-ek874-revc-u-boot.dtb \
 	rzg2l-dev.dtb \
 	smarc-rzg2l.dtb \
+	smarc-rzg2l-ecc.dtb \
 	rzv2l-dev.dtb \
 	smarc-rzv2l.dtb \
+	smarc-rzv2l-ecc.dtb \
 	rzg2lc-dev.dtb \
 	smarc-rzg2lc.dtb \
+	smarc-rzg2lc-ecc.dtb \
 	rzg2ul-type1-dev.dtb \
 	rzg2ul-type1-ddr3l-dev.dtb \
 	rzg2ul-type2-dev.dtb \
 	smarc-rzg2ul.dtb \
+	smarc-rzg2ul-ecc.dtb \
 	rzv2h-dev.dtb \
 	rzv2h-evk-alpha.dtb \
 	rzg3e-dev.dtb \

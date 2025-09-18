@@ -87,6 +87,11 @@ DECLARE_GLOBAL_DATA_PTR;
 #define SYS_LSI_MODE_STAT_MD_BOOT_MASK	(0x7)
 #define ESD_MODE			(0)
 
+/* ECC */
+#define DDR_MEMC_BASE		(0x11410000)
+#define ECC_ENABLE_ADDR		(0x0174)
+#define ECC_ENABLE_MASK		GENMASK(25, 24)
+
 void s_init(void)
 {
 	/* SD1 power control: P39_1 = 0; P39_2 = 1; */
@@ -284,3 +289,21 @@ int ft_verify_fdt(void *fdt)
 
 	return update_fdt(fdt, fdt_dt, size);
 };
+
+#if defined(CONFIG_MULTI_DTB_FIT)
+int board_fit_config_name_match(const char *name)
+{
+	u32 ecc;
+
+	ecc = readl(DDR_MEMC_BASE + ECC_ENABLE_ADDR);
+	ecc &= ECC_ENABLE_MASK;
+
+	if (!strcmp(name, "smarc-rzg2l-ecc") && ecc)
+		return 0;
+
+	if (!strcmp(name, "smarc-rzg2l") && !(ecc))
+		return 0;
+
+	return -1;
+}
+#endif
