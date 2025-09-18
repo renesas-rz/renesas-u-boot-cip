@@ -22,10 +22,23 @@ enum RZG2L_ECC_MODE {
 	ECC_DETECT_CORRECT = 3
 };
 
-#define DENALI_CTL_93	0x174
-#define DENALI_CTL_107	0x1ac
-#define DENALI_CTL_109	0x1b4
-#define DENALI_CTL_134	0x218
+struct DDRMC_REG {
+	unsigned long offset;
+};
+
+unsigned long g2l_ddrmc_regs[] = {
+	0x174,	/* For ECC_ENABLE */
+	0x1ac,	/* For Non-ECC region 0 */
+	0x1b4,	/* For endisable Non-ECC region */
+	0x218,	/* For Checking controller busy */
+};
+
+unsigned long v2l_ddrmc_regs[] = {
+	0x18c,
+	0x1c4,
+	0x1cc,
+	0x230,
+};
 
 #define RZG2L_DDR_CTRL_BUSY		0x1
 #define RZG2L_DDR_BASE_ADDR		0x40000000
@@ -34,12 +47,23 @@ struct soc_info {
 	unsigned long soc_reg;
 	uint32_t soc_id;
 	unsigned long memc_base;
+	unsigned long *regs;
 } soc_infos[] = {
-	{.soc_reg = 0x11020A04, .soc_id = 0x841c447, .memc_base = 0x11410000}, /*  rzg2l  */
-	{.soc_reg = 0x11020A04, .soc_id = 0x8450447, .memc_base = 0x11410000}, /*  rzg2ul */
-	{.soc_reg = 0x11020A04, .soc_id = 0x8447447, .memc_base = 0x11410000}, /*  rzv2l  */
-	{.soc_reg = 0x11020A04, .soc_id = 0x8450447, .memc_base = 0x11410000}, /*  rzfive */
-	{.soc_reg = 0x11020A04, .soc_id = 0x847c447, .memc_base = 0x11410000}, /*  rzfive */
+	/*  rzg2l  */
+	{.soc_reg = 0x11020A04, .soc_id = 0x841c447, .memc_base = 0x11410000,
+		.regs = g2l_ddrmc_regs},
+	/*  rzg2ul */
+	{.soc_reg = 0x11020A04, .soc_id = 0x8450447, .memc_base = 0x11410000,
+		.regs = g2l_ddrmc_regs},
+	/*  rzv2l  */
+	{.soc_reg = 0x11020A04, .soc_id = 0x8447447, .memc_base = 0x11410000,
+		.regs = v2l_ddrmc_regs},
+	/*  rzfive */
+	{.soc_reg = 0x11020A04, .soc_id = 0x8450447, .memc_base = 0x11410000,
+		.regs = g2l_ddrmc_regs},
+	/*  rzfive */
+	{.soc_reg = 0x11020A04, .soc_id = 0x847c447, .memc_base = 0x11410000,
+		.regs = g2l_ddrmc_regs},
 };
 
 static struct soc_info* rzg2l_get_cpu_type(void)
@@ -58,7 +82,7 @@ static enum RZG2L_ECC_MODE rzg2l_ecc_mode(struct soc_info* si)
 {
 	uint32_t val;
 
-	val = readl((uint32_t *)(si->memc_base + DENALI_CTL_93));
+	val = readl((uint32_t *)(si->memc_base + si->regs[0]));
 	val = (val >> 24) & 0x3;
 
 	return val;
@@ -107,13 +131,13 @@ static int rzg2l_non_ecc_area_set(struct soc_info *si, unsigned long start_addr,
 
 	id -= 1;
 
-	non_ecc_reg = DENALI_CTL_107 + id * 4;
+	non_ecc_reg = si->regs[1] + id * 4;
 	start_addr -= RZG2L_DDR_BASE_ADDR;
 	end_addr -= RZG2L_DDR_BASE_ADDR;
 
 	/* wait ddr controller to be idle */
 	do{
-		val = readl((uint32_t *)(si->memc_base + DENALI_CTL_134));
+		val = readl((uint32_t *)(si->memc_base + si->regs[3]));
 	} while(retry-- && (val & RZG2L_DDR_CTRL_BUSY));
 	if (!retry)
 		return -1;
@@ -123,9 +147,9 @@ static int rzg2l_non_ecc_area_set(struct soc_info *si, unsigned long start_addr,
 	writel(val, (uint32_t *)(si->memc_base + non_ecc_reg));
 
 	/* enable the non_ecc area */
-	val = readl((uint32_t *)(si->memc_base + DENALI_CTL_109));
+	val = readl((uint32_t *)(si->memc_base + si->regs[2]));
 	val |= (1 << id);
-	writel(val, (uint32_t *)(si->memc_base + DENALI_CTL_109));
+	writel(val, (uint32_t *)(si->memc_base + si->regs[2]));
 
 	return 0;
 }
@@ -140,7 +164,7 @@ static int rzg2l_non_ecc_area_rm(struct soc_info *si, int id)
 
 	/* wait ddr controller to be idle */
 	do{
-		val = readl((uint32_t *)(si->memc_base + DENALI_CTL_134));
+		val = readl((uint32_t *)(si->memc_base +si->regs[3]));
 	} while(retry-- && (val & RZG2L_DDR_CTRL_BUSY));
 	if (!retry)
 		return -1;
@@ -148,9 +172,9 @@ static int rzg2l_non_ecc_area_rm(struct soc_info *si, int id)
 	id -= 1;
 
 	/* disable the non_ecc area */
-	val = readl((uint32_t *)(si->memc_base + DENALI_CTL_109));
+	val = readl((uint32_t *)(si->memc_base + si->regs[2]));
 	val &= ~(1 << id);
-	writel(val, (uint32_t *)(si->memc_base + DENALI_CTL_109));
+	writel(val, (uint32_t *)(si->memc_base + si->regs[2]));
 
 	return 0;
 }
@@ -163,12 +187,12 @@ static int rzg2l_non_ecc_area_ls(struct soc_info *si)
 	unsigned long start_addr, end_addr;
 
 	printf("Registered Non-ECC areas:\n");
-	val = readl((uint32_t *)(si->memc_base + DENALI_CTL_109));
+	val = readl((uint32_t *)(si->memc_base + si->regs[2]));
 	for (i = 0 ; i < 2 ; i++) {
 		if (!(val & (1 << i)))
 			continue;
 
-		non_ecc_reg = DENALI_CTL_107 + i * 4;
+		non_ecc_reg = si->regs[1] + i * 4;
 		start_addr = readl((uint32_t *)(si->memc_base + non_ecc_reg));
 		end_addr = (start_addr & 0xffff0000U) << 4;
 		start_addr = (start_addr & 0xffffU) << 20;
