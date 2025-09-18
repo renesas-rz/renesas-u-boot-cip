@@ -383,10 +383,8 @@ config RZG3E_DISTRO_BOOT
 	  smarc-rzg3e-distros_defconfig target.
 config TARGET_RZT2H_DISTRO_BOOT
 	bool "RZ/T2H distro boot command enable"
-	default y if TARGET_RZT2H_DEV
 
 config TARGET_RZN2H_DISTRO_BOOT
 	bool "RZ/N2H distro boot command enable"
-	default y if TARGET_RZN2H_DEV
 
 endif
