@@ -201,3 +201,7 @@ config CLK_R9A09G057
 	bool "Renesas CLK_R9A09G057 clock driver"
 	help
 	  Enable this to support the clocks on Renesas RZ/V2H SoC.
+config CLK_R9A09G056
+	bool "Renesas CLK_R9A09G056 clock driver"
+	help
+	  Enable this to support the clocks on Renesas RZ/V2N SoC.
