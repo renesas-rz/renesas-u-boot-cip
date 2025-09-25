@@ -1643,6 +1643,7 @@ static const struct udevice_id eqos_ids[] = {
 		.compatible = "renesas,rzv2n-eqos",
 		.data = (ulong)&eqos_rzv2h_config
 	},
+#endif
 	{ }
 };
 
