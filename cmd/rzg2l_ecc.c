@@ -210,7 +210,6 @@ static int rzg2l_do_ecc(struct cmd_tbl *cmdtp, int flag, int argc, char * const 
 	int id;
 	unsigned long start_addr;
 	unsigned long end_addr;
-	uint32_t arg;
 	struct soc_info *si = NULL;
 
 	if (argc < 2)

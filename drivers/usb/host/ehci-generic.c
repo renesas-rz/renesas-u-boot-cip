@@ -29,7 +29,7 @@ struct generic_ehci {
 	struct udevice *vbus_supply;
 };
 
-static int ehci_enable_vbus_supply(struct udevice *dev)
+__maybe_unused static int ehci_enable_vbus_supply(struct udevice *dev)
 {
 	struct generic_ehci *priv = dev_get_priv(dev);
 	int ret;
@@ -118,11 +118,11 @@ phy_err:
 	if (ret)
 		dev_err(dev, "failed to shutdown usb phy (ret=%d)\n", ret);
 
+#if !defined(CONFIG_RCAR_GEN3)
 regulator_err:
 	ret = ehci_disable_vbus_supply(priv);
 	if (ret)
 		dev_err(dev, "failed to disable VBUS supply (ret=%d)\n", ret);
-
 reset_err:
 	ret = reset_release_bulk(&priv->resets);
 	if (ret)
@@ -131,6 +131,7 @@ clk_err:
 	ret = clk_release_bulk(&priv->clocks);
 	if (ret)
 		dev_err(dev, "failed to release clocks (ret=%d)\n", ret);
+#endif
 
 	return err;
 }

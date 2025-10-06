@@ -29,7 +29,12 @@ cmd_objcopy = $(OBJCOPY) --gap-fill=0x00 $(OBJCOPYFLAGS) \
 spl/u-boot-spl.srec: spl/u-boot-spl FORCE
 	$(call if_changed,objcopy)
 
-srec_cat_gte_160 := ${shell expr `srec_cat -VERSION | grep ^srec_cat | sed 's/^.* //g' | cut -f1-2 -d.` \>= "1.60"}
+srec_cat_available := $(shell command -v srec_cat >/dev/null 2>&1 && echo "1" || echo "0")
+ifeq "$(srec_cat_available)" "1"
+srec_cat_gte_160 := $(shell srec_cat -VERSION | grep ^srec_cat | sed 's/^.* //g' | cut -f1-2 -d. | awk -F. '{if($$1>1 || ($$1==1 && $$2>=60)) print "1"; else print "0"}')
+else
+srec_cat_gte_160 := 0
+endif
 ifeq "$(srec_cat_gte_160)" "1"
 	srec_cat_le_cmd := "-constant-l-e"
 else

@@ -426,12 +426,12 @@ static struct mssr_mod_clk r9a07g044l_mod_clks[] = {
 				MSSR(21, (BIT(0) | BIT(1)), BIT(0))),
 };
 
-static const unsigned int r9a07g044l_crit_mod_clks[] = {
+static const unsigned int r9a07g044l_crit_mod_clks[] __maybe_unused = {
 	CLK_MODE_BASE + R9A07G044L_CLK_GIC600,
 };
 
 /* clock type, register offset1, register offset2, register offset3*/
-static const struct cpg_pll_info cpg_pll_configs[] = {
+static const struct cpg_pll_info cpg_pll_configs[] __maybe_unused = {
 	{ CLK_TYPE_PLL1, PLL146_CLK1_R(0), PLL146_CLK2_R(0), 0},
 	{ CLK_TYPE_PLL2, PLL235_CLK1_R(0), PLL235_CLK3_R(0), PLL235_CLK4_R(0)},
 	{ CLK_TYPE_PLL3, PLL235_CLK1_R(1), PLL235_CLK3_R(1), PLL235_CLK4_R(1)},

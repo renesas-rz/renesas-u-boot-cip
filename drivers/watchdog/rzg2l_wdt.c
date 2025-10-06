@@ -259,7 +259,9 @@ static int rzg2l_wdt_probe(struct udevice *watchdog_dev)
 {
 	struct rzg2l_wdt_priv *priv = dev_get_priv(watchdog_dev);
 	unsigned long pclk_rate;
+#if 0
 	int ret;
+#endif
 
 	priv->base = dev_read_addr_ptr(watchdog_dev);
 	printf("WDT:   watchdog@%p\n", priv->base);

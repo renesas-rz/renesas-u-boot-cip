@@ -31,6 +31,7 @@
 #define SEL_SDHI2_G3S	(G3S_SDHI_DSEL << 20	| 8 << 12	| 2 << 8)
 #define SEL_SPI_G3S	(G3S_SPI_SSEL << 20	| 0 << 12	| 3 << 8)
 #define SEL_OCTA_G3S	(G3S_OCTA_SSEL << 20	| 0 << 12	| 2 << 8)
+#undef SEL_PLL4
 #define SEL_PLL4	(G3S_PLL_DSEL << 20	| 6 << 12	| 1 << 8)
 
 /* For RZ/G3S */
@@ -102,9 +103,9 @@ static struct clk_div_table div_table_1_32[] = {
 };
 
 /*MUX clock tables*/
-static const char *const sel_spi[] = { ".pll3_div2_2", ".pll3_div6", ".pll6_div2" };
-static const char *const sel_sdhi[] = { ".pll2_div2", ".pll6", ".pll2_div6" };
-static const char *const sel_pll4[] = { ".osc_div1000", ".pll4" };
+static const char * sel_spi[] = { ".pll3_div2_2", ".pll3_div6", ".pll6_div2" };
+static const char * sel_sdhi[] = { ".pll2_div2", ".pll6", ".pll2_div6" };
+static const char * sel_pll4[] = { ".osc_div1000", ".pll4" };
 
 static const struct cpg_core_clk r9a08g045s_core_clks[] = {
 	/* External Clock Inputs */
@@ -321,12 +322,12 @@ static struct mssr_mod_clk r9a08g045s_mod_clks[] = {
 				MSSR(43, BIT(0), BIT(0))),
 };
 
-static const unsigned int r9a08g045s_crit_mod_clks[] = {
+static const unsigned int r9a08g045s_crit_mod_clks[] __maybe_unused = {
 	CLK_MODE_BASE + R9A08G045S_CLK_GIC600,
 };
 
 /* clock type, register offset1, register offset2, register offset3*/
-static const struct cpg_pll_info cpg_pll_configs[] = {
+static const struct cpg_pll_info cpg_pll_configs[] __maybe_unused = {
 	{ CLK_TYPE_PLL1, PLL146_CLK1_R(0), PLL146_CLK2_R(0), 0},
 	{ CLK_TYPE_PLL2, PLL235_CLK1_R(0), PLL235_CLK3_R(0), PLL235_CLK4_R(0)},
 	{ CLK_TYPE_PLL3, PLL235_CLK1_R(1), PLL235_CLK3_R(1), PLL235_CLK4_R(1)},
