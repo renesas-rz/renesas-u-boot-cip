@@ -983,6 +983,9 @@ dtb-$(CONFIG_RCAR_GEN4) += \
 dtb-$(CONFIG_TARGET_RZG2L) += \
 	r9a07g044l2-smarc.dts
 
+dtb-$(CONFIG_TARGET_SMARC_RZV2L) += \
+	r9a07g054l2-smarc.dtb
+
 ifdef CONFIG_RCAR_64
 DTC_FLAGS += -R 4 -p 0x1000
 endif
