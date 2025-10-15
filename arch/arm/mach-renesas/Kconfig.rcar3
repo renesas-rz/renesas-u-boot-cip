@@ -308,4 +308,6 @@ config DM_RESET
 config RZG2L_DISTRO_BOOT
 	bool "RZ/G2L distro boot command enable"
 
+config RZV2L_DISTRO_BOOT
+	bool "RZ/V2L distro boot command enable"
 endif
