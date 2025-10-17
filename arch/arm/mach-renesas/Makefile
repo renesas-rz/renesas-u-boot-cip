@@ -10,12 +10,17 @@ obj-$(CONFIG_DISPLAY_BOARDINFO) += board.o
 obj-$(CONFIG_TMU_TIMER) += ../../sh/lib/time.o
 obj-$(CONFIG_RCAR_GEN2) += lowlevel_init_ca15.o cpu_info-rcar.o
 obj-$(CONFIG_RCAR_64) += lowlevel_init_gen3.o
-obj-$(CONFIG_RCAR_GEN3) += cpu_info-rcar.o memmap-gen3.o
-obj-$(CONFIG_RCAR_GEN4) += cpu_info-rcar.o memmap-gen3.o
+obj-$(CONFIG_RCAR_GEN3) +=  memmap-gen3.o
+obj-$(CONFIG_RCAR_GEN4) +=  memmap-gen3.o
 obj-$(CONFIG_R9A09G011GBG) += lowlevel_init_gen3.o memmap-r9a09g011gbg.o
 obj-$(CONFIG_R9A09G055MA3GBG) += lowlevel_init_gen3.o memmap-r9a09g055ma3gbg.o
-obj-$(CONFIG_RZ_G2) += cpu_info-rzg.o
-obj-$(CONFIG_RZG2L) += cpu_info-rzg2l.o memmap-rzg2l.o
+obj-$(CONFIG_RZG2L) += memmap-rzg2l.o
+
+# RZ family CPU info (G2L, G2UL, G2LC, V2L, G3E, G3S, V2H, V2N)
+ifneq ($(CONFIG_R9A07G044L)$(CONFIG_R9A07G043U)$(CONFIG_R9A07G044C)$(CONFIG_R9A07G054L)$(CONFIG_R9A09G047)$(CONFIG_R9A08G045S)$(CONFIG_R9A09G057)$(CONFIG_R9A09G056),)
+obj-y += cpu_info-rz.o
+endif
+
 
 ifneq ($(CONFIG_R8A779A0),)
 obj-$(CONFIG_ARMV8_PSCI) += psci-r8a779a0.o
