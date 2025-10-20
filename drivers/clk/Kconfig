@@ -246,6 +246,13 @@ config CLK_ZYNQMP
 	  This clock driver adds support for clock realted settings for
 	  ZynqMP platform.
 
+config CLK_BYPASS
+	bool "Bypass verifying the clock is enabled"
+	depends on CLK
+	help
+	  Where TF-A has already configured a clock, validating 
+	  it may be bypassed by making the code conditional on this config.
+
 source "drivers/clk/analogbits/Kconfig"
 source "drivers/clk/at91/Kconfig"
 source "drivers/clk/exynos/Kconfig"

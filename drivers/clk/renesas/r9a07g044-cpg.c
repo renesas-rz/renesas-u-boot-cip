@@ -368,7 +368,7 @@ const struct rzg2l_cpg_info r9a07g044_cpg_info = {
 
 static const struct udevice_id r9a07g044_cpg_ids[] = {
 	{
-		.compatible	= "renesas,r9a07g044-cpg","renesas,r9a07g054-cpg",
+		.compatible	= "renesas,r9a07g044-cpg",
 		.data		= (unsigned long)&r9a07g044_cpg_info,
 	},
 	{ /* sentinel */ }
