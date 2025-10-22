@@ -38,3 +38,10 @@ rzg2l-smarc:
     CONFIG_FILENAME: "smarc-rzg2l_defconfig"
   extends:
     - .mpu_uboot_build_job_template
+
+rzg2l-smarc-distros:
+  variables:
+    PLAT: "g2l"
+    CONFIG_FILENAME: "smarc-rzg2l-distros_defconfig"
+  extends:
+    - .mpu_uboot_build_job_template
