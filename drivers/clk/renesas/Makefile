@@ -32,7 +32,7 @@ else
 obj-$(CONFIG_CLK_R9A07G044L) += clk-rzg2l.o r9a07g044l-cpg-mssr.o
 endif
 ifeq ($(CONFIG_RZV2L_DISTRO_BOOT),y)
-obj-$(CONFIG_CLK_R9A07G054L) += r9a07g044-cpg.o rzg2l-cpg.o
+obj-$(CONFIG_CLK_R9A07G054L) += r9a07g054-cpg.o rzv2l-cpg.o
 else
 obj-$(CONFIG_CLK_R9A07G054L) += clk-rzv2l.o r9a07g054l-cpg-mssr.o
 endif
