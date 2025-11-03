@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * RZ/G2L CPG driver
+ * RZ/V2L CPG driver
  *
  * Copyright (C) 2021-2023 Renesas Electronics Corp.
  */
