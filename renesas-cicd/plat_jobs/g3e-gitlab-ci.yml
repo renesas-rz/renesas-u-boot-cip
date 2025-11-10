@@ -22,6 +22,14 @@
 ################################################## include ############################################################
 include:
   - local: renesas-cicd/templates/common-job-templates.yml
+  - local: renesas-cicd/templates/merge-gateway-job-templates.yml
+
+################################### Preparation job for G3E merge gateway pipeline ####################################
+rzg3e-prep-for-uboot-merge-gateway-build-job:
+  variables:
+    PLAT: "g3e"
+  extends:
+    - .prep_for_uboot_merge_gateway_build_job_template
 
 ############################################ G3E smarc U-Boot build jobs #############################################
 rzg3e-smarc:

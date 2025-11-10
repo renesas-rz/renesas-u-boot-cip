@@ -21,6 +21,7 @@
 
 stages:
   - triggers
+  - prep_merge
   - mpu_uboot_build_testing
 
 variables:
@@ -32,17 +33,24 @@ workflow:
     - if: $OVERNIGHT_UBOOT_BUILD == "true" && ($CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web")
       variables:
         PIPELINE_TYPE: "overnight"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      variables:
+        PIPELINE_TYPE: "merge"
     - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "schedule"
       when: always
 
 ################################################## include ############################################################
 # Different types of pipelines
 #   1. Overnight pipeline
+#   2. Merge gateway pipeline
 #######################################################################################################################
 include:
   - local: renesas-cicd/overnight-pipeline.yml
     rules:
       - if: $OVERNIGHT_UBOOT_BUILD == "true" && ($CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web")
+  - local: renesas-cicd/merge-gateway-pipeline.yml
+    rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 trigger-upstream-jobs:
   stage: triggers

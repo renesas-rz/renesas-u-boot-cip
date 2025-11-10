@@ -22,6 +22,14 @@
 ################################################## include ############################################################
 include:
   - local: renesas-cicd/templates/common-job-templates.yml
+  - local: renesas-cicd/templates/merge-gateway-job-templates.yml
+
+################################### Preparation job for G2LC merge gateway pipeline ###################################
+rzg2lc-prep-for-uboot-merge-gateway-build-job:
+  variables:
+    PLAT: "g2lc"
+  extends:
+    - .prep_for_uboot_merge_gateway_build_job_template
 
 ############################################ G2LC smarc U-Boot build jobs #############################################
 rzg2lc-smarc:

@@ -16,25 +16,31 @@
 #######################################################################################################################
 
 #######################################################################################################################
-# Description: Yaml file containing jobs for G2UL.
+# Description: Top level yaml file for merge gateway pipelines.
 #######################################################################################################################
 
 ################################################## include ############################################################
+# 1. Including a checkpatch test to be run on the feature branch using the MR target branch as reference.
+# 2. Using the MR label to determine what platforms should be tested, and including the MPU build tests for it.
+# 3. Either individual platforms or all platforms can be tested.
+#    (except n2h and t2h where both the plats would always be tested since they use the same code base)
+#######################################################################################################################
 include:
-  - local: renesas-cicd/templates/common-job-templates.yml
-  - local: renesas-cicd/templates/merge-gateway-job-templates.yml
-
-################################### Preparation job for G2UL merge gateway pipeline ###################################
-rzg2ul-prep-for-uboot-merge-gateway-build-job:
-  variables:
-    PLAT: "g2ul"
-  extends:
-    - .prep_for_uboot_merge_gateway_build_job_template
-
-############################################ G2UL smarc U-Boot build jobs #############################################
-rzg2ul-smarc:
-  variables:
-    PLAT: "g2ul"
-    CONFIG_FILENAME: "smarc-rzg2ul_defconfig"
-  extends:
-    - .mpu_uboot_build_job_template
+  - local: renesas-cicd/plat_jobs/g3s-gitlab-ci.yml
+    rules:
+      - if: $CI_MERGE_REQUEST_LABELS =~ /g3s/ || $CI_MERGE_REQUEST_LABELS =~ /all_plat/
+  - local: renesas-cicd/plat_jobs/g3e-gitlab-ci.yml
+    rules:
+      - if: $CI_MERGE_REQUEST_LABELS =~ /g3e/ || $CI_MERGE_REQUEST_LABELS =~ /all_plat/
+  - local: renesas-cicd/plat_jobs/g2l-gitlab-ci.yml
+    rules:
+      - if: $CI_MERGE_REQUEST_LABELS =~ /g2l/ || $CI_MERGE_REQUEST_LABELS =~ /all_plat/
+  - local: renesas-cicd/plat_jobs/g2lc-gitlab-ci.yml
+    rules:
+      - if: $CI_MERGE_REQUEST_LABELS =~ /g2lc/ || $CI_MERGE_REQUEST_LABELS =~ /all_plat/
+  - local: renesas-cicd/plat_jobs/g2ul-gitlab-ci.yml
+    rules:
+      - if: $CI_MERGE_REQUEST_LABELS =~ /g2ul/ || $CI_MERGE_REQUEST_LABELS =~ /all_plat/
+  - local: renesas-cicd/plat_jobs/v2l-gitlab-ci.yml
+    rules:
+      - if: $CI_MERGE_REQUEST_LABELS =~ /v2l/ || $CI_MERGE_REQUEST_LABELS =~ /all_plat/

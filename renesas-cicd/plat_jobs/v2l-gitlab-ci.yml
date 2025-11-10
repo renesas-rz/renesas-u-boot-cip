@@ -22,6 +22,14 @@
 ################################################## include ############################################################
 include:
   - local: renesas-cicd/templates/common-job-templates.yml
+  - local: renesas-cicd/templates/merge-gateway-job-templates.yml
+
+################################### Preparation job for V2L merge gateway pipeline ####################################
+rzv2l-prep-for-uboot-merge-gateway-build-job:
+  variables:
+    PLAT: "v2l"
+  extends:
+    - .prep_for_uboot_merge_gateway_build_job_template
 
 ############################################ V2L smarc U-Boot build jobs #############################################
 rzv2l-smarc:

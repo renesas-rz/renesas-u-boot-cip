@@ -16,25 +16,28 @@
 #######################################################################################################################
 
 #######################################################################################################################
-# Description: Yaml file containing jobs for G2UL.
+# Description: Yaml file containing templates for jobs specific to the merge gateway pipelines.
 #######################################################################################################################
 
-################################################## include ############################################################
-include:
-  - local: renesas-cicd/templates/common-job-templates.yml
-  - local: renesas-cicd/templates/merge-gateway-job-templates.yml
-
-################################### Preparation job for G2UL merge gateway pipeline ###################################
-rzg2ul-prep-for-uboot-merge-gateway-build-job:
+################################# prep_for_uboot_merge_gateway_build_job_template #####################################
+# 1. Template for preparation job which runs before the build jobs in an MR pipeline.
+# 2. It locally merges the source/feature branch into the target branch
+#######################################################################################################################
+.prep_for_uboot_merge_gateway_build_job_template:
+  stage: prep_merge
   variables:
-    PLAT: "g2ul"
-  extends:
-    - .prep_for_uboot_merge_gateway_build_job_template
-
-############################################ G2UL smarc U-Boot build jobs #############################################
-rzg2ul-smarc:
-  variables:
-    PLAT: "g2ul"
-    CONFIG_FILENAME: "smarc-rzg2ul_defconfig"
-  extends:
-    - .mpu_uboot_build_job_template
+    PLAT: ""
+  interruptible: true
+  tags:
+    - "${PLAT}_${PIPELINE_TYPE}_runner"
+  rules:
+      - if: $PIPELINE_TYPE == "merge"
+  script:
+    - cd "../workspace"
+    - rm -r -f ./*
+    - git clone http://svc_sp3_ci_etcetc:CQRFZaXqJ2c7QU222dzz@global-infra-jp-main.dgn.renesas.com/products/common/bootloader/soc/u-boot-dev.git
+    - cd u-boot-dev
+    - git checkout $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git checkout $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - git merge $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git status
