@@ -31,6 +31,8 @@ void enable_caches(void)
 
 #ifdef CONFIG_DISPLAY_CPUINFO
 #if !defined(CONFIG_RZA1) && !defined(CONFIG_RZN1)
+
+#if !defined(CONFIG_RCAR_64)
 __weak const u8 *rzg_get_cpu_name(void)
 {
 	return 0;
@@ -50,7 +52,7 @@ __weak u32 renesas_get_cpu_rev_fraction(void)
 {
 	return 0;
 }
-
+#endif
 /* CPU information table */
 static const struct {
 	u16 cpu_type;
