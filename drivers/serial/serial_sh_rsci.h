@@ -453,6 +453,9 @@ SCIF_FNS(FFCLR,	  0x70, 32)
 #define CFCLR_TDREC			BIT(29)
 #define CFCLR_ORERC			BIT(24)
 
+#define CFCLR_FERC			BIT(28)
+#define CFCLR_PERC			BIT(27)
+
 #endif
 
 SCIF_FNS(DL,     0x00,  0)
