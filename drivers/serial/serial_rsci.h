@@ -73,3 +73,6 @@ RSCI_FNS(FFCLR,	  0x70)
 #define CFCLR_RDRFC			BIT(31)
 #define CFCLR_TDREC			BIT(29)
 #define CFCLR_ORERC			BIT(24)
+
+#define CFCLR_FERC			BIT(28)
+#define CFCLR_PERC			BIT(27)

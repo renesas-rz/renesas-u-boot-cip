@@ -49,7 +49,7 @@ sh_serial_setbrg_generic(struct uart_port *port, int clk, int baudrate)
 
 static void handle_error(struct uart_port *port)
 {
-	sci_out(port, CFCLR, (CFCLR_RDRFC | CFCLR_TDREC | CFCLR_ORERC));
+	sci_out(port, CFCLR, (CFCLR_RDRFC | CFCLR_TDREC | CFCLR_ORERC | CFCLR_FERC | CFCLR_PERC));
 	sci_out(port, FFCLR, FFCLR_DRC);
 }
 
