@@ -101,7 +101,7 @@ sh_serial_setbrg_generic(struct uart_port *port, int clk, int baudrate)
 static void handle_error(struct uart_port *port)
 {
 	if (port->type == PORT_RSCI) {
-		sci_out(port, CFCLR, (CFCLR_RDRFC | CFCLR_TDREC | CFCLR_ORERC));
+		sci_out(port, CFCLR, (CFCLR_RDRFC | CFCLR_TDREC | CFCLR_ORERC | CFCLR_FERC | CFCLR_PERC));
 		sci_out(port, FFCLR, FFCLR_DRC);
 	} else {
 		sci_in(port, SCxSR);
