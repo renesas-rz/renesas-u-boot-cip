@@ -16,46 +16,28 @@
 #######################################################################################################################
 
 #######################################################################################################################
-# Description: Top level GitLab CI yaml file.
+# Description: Yaml file containing templates for jobs specific to the merge gateway pipelines.
 #######################################################################################################################
 
-stages:
-  - triggers
-  - prep_merge
-  - mpu_uboot_build_testing
-
-variables:
-  PIPELINE_TYPE: "overnight"
-
-################################################## workflow ###########################################################
-workflow:
-  rules:
-    - if: $OVERNIGHT_UBOOT_BUILD == "true" && ($CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web")
-      variables:
-        PIPELINE_TYPE: "overnight"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      variables:
-        PIPELINE_TYPE: "merge"
-    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "schedule"
-      when: always
-
-################################################## include ############################################################
-# Different types of pipelines
-#   1. Overnight pipeline
-#   2. Merge gateway pipeline
+################################# prep_for_uboot_merge_gateway_build_job_template #####################################
+# 1. Template for preparation job which runs before the build jobs in an MR pipeline.
+# 2. It locally merges the source/feature branch into the target branch
 #######################################################################################################################
-include:
-  - local: renesas-cicd/overnight-pipeline.yml
-    rules:
-      - if: $OVERNIGHT_UBOOT_BUILD == "true" && ($CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web")
-  - local: renesas-cicd/merge-gateway-pipeline.yml
-    rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-
-trigger-upstream-jobs:
-  stage: triggers
-  trigger:
-    include: .gitlab-ci.yml
-    strategy: depend
+.prep_for_uboot_merge_gateway_build_job_template:
+  stage: prep_merge
+  variables:
+    PLAT: ""
+  interruptible: true
+  tags:
+    - "${PLAT}_${PIPELINE_TYPE}_runner"
   rules:
-    - if: $BUILD_UPSTREAM_JOBS == "true" && ($CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web")
+      - if: $PIPELINE_TYPE == "merge"
+  script:
+    - cd "../workspace"
+    - rm -r -f ./*
+    - git clone http://svc_sp3_ci_etcetc:CQRFZaXqJ2c7QU222dzz@global-infra-jp-main.dgn.renesas.com/products/common/bootloader/soc/u-boot-dev.git
+    - cd u-boot-dev
+    - git checkout $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git checkout $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - git merge $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git status
