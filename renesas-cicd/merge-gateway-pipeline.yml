@@ -44,3 +44,9 @@ include:
   - local: renesas-cicd/plat_jobs/v2l-gitlab-ci.yml
     rules:
       - if: $CI_MERGE_REQUEST_LABELS =~ /v2l/ || $CI_MERGE_REQUEST_LABELS =~ /all_plat/
+  - local: renesas-cicd/plat_jobs/v2h-gitlab-ci.yml
+    rules:
+      - if: $CI_MERGE_REQUEST_LABELS =~ /v2h/ || $CI_MERGE_REQUEST_LABELS =~ /all_plat/
+  - local: renesas-cicd/plat_jobs/v2n-gitlab-ci.yml
+    rules:
+      - if: $CI_MERGE_REQUEST_LABELS =~ /v2n/ || $CI_MERGE_REQUEST_LABELS =~ /all_plat/
