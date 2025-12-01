@@ -924,6 +924,7 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 	sh_sdhi_writel(host, SDHI_SD_STATUS, ~SD_STATUS_SD_PWEN & sh_sdhi_readl(host, SDHI_SD_STATUS));
 	mdelay(5);
 	sh_sdhi_writel(host, SDHI_SD_STATUS, SD_STATUS_SD_PWEN);
+        mdelay(5);
 #endif
 	sh_sdhi_initialize_common(host);
 
