@@ -360,4 +360,11 @@ config RZG3L_DISTRO_BOOT
 	  include/configs/smarc-rzg3l.h. Used by the SystemReady
 	  smarc-rzg3l-distros_defconfig target.
 
+config RZG3E_DISTRO_BOOT
+	bool "RZ/G3E distro boot command enable"
+	help
+	  Enable the EFI/EBBR distro_bootcmd environment block in
+	  include/configs/rzg3e-dev.h. Used by the SystemReady
+	  smarc-rzg3e-distros_defconfig target.
+
 endif

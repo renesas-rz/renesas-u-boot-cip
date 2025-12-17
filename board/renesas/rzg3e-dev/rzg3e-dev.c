@@ -20,8 +20,40 @@
 #include <i2c.h>
 #include <mmc.h>
 #include <dt-bindings/pinctrl/rzv2h-pinctrl.h>
+#include <efi_loader.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+
+#define EFI_FIRMWARE_IMAGE_TYPE_RZG3E_GUID \
+	EFI_GUID(0x2a3c4d5e, 0x6b7c, 0x8d9e, 0xa1, 0xb2, \
+		 0xc3, 0xd4, 0xe5, 0xf6, 0x07, 0x18)
+
+struct efi_fw_image fw_images[] = {
+	{
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZG3E_GUID,
+		.fw_name = u"bl2_bp-smarc-rzg3e.bin",
+		.image_index = 1,
+	},
+	{
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZG3E_GUID,
+		.fw_name = u"fip-smarc-rzg3e.bin",
+		.image_index = 2,
+	},
+};
+
+struct efi_capsule_update_info update_info = {
+	.dfu_string =
+		/* BL2 in SPI NOR at offset 0x0, max size 0x20000 */
+		"sf 0:0=bl2_bp-smarc-rzg3e.bin raw 0x0 0x20000;"
+		/* FIP in SPI NOR at offset 0x20000, max size 0x1F0000 */
+		"fip-smarc-rzg3e.bin raw 0x20000 0x1F0000",
+	.num_images = ARRAY_SIZE(fw_images),
+	.images = fw_images,
+};
+
+#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
 #define PFC_BASE		0x10410000
 
