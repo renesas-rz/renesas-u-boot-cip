@@ -335,4 +335,8 @@ config RZG2UL_DISTRO_BOOT
 
 config RZG2LC_DISTRO_BOOT
 	bool "RZ/G2LC distro boot command enable"
+	
+config RZV2H_DISTRO_BOOT
+	bool "RZ/V2H distro boot command enable"
+
 endif
