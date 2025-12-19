@@ -67,7 +67,7 @@
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000 \0" \
 	"bootargs=rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
-	"bootcmd=fatload mmc 1:1 0x48080000 Image; fatload mmc 1:1 0x48000000 r9a08g046l48-dev.dtb; booti 0x48080000 - 0x48000000 \0"
+	"bootcmd=fatload mmc 1:1 0x48080000 Image; fatload mmc 1:1 0x48000000 r9a08g046l48-smarc.dtb; booti 0x48080000 - 0x48000000 \0"
 
 /* For board */
 /* Ethernet RAVB */
