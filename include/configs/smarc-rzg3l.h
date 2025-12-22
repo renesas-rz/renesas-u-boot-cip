@@ -73,6 +73,8 @@
 	"sd1load=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/r9a08g046l48-smarc.dtb;run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0"
 
+#define CONFIG_BOOTCOMMAND "env default -a;run bootcmd_check;run bootimage"
+
 /* For board */
 /* Ethernet RAVB */
 #define CONFIG_BITBANGMII_MULTI
