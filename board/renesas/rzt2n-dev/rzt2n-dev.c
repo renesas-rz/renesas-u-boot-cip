@@ -327,10 +327,10 @@ void s_init(void)
 	*(volatile u64 *)PFC(20) = (*(volatile u64 *)PFC(20) & 0xFFFF0000FFFFFFFF) \
 	|(((u64)0x11<< 40) | ((u64)0x11<< 32));
 
-	/*P24_6_ETH3_GMAC1_MDC & P24_7_ETH3_GMAC1_MDIO*/
-	*(volatile u8 *)PMC(24) |= (BIT(7)|BIT(6));
-	*(volatile u64 *)PFC(24) = (*(volatile u64 *)PFC(24) & 0x0000FFFFFFFFFFFF) \
-	| ( ((u64)0x12<<56) | ((u64)0x12<< 48));
+	/*P3_2_ETH3_GMAC1_MDC & P3_3_ETH3_GMAC1_MDIO*/
+	*(volatile u8 *)PMC(3) |= (BIT(3)|BIT(2));
+	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFFFF0000FFFF) \
+	| ( ((u64)0x12<<24) | ((u64)0x12<< 16));
 
 
 	/* Release module stop for GMAC1 */
