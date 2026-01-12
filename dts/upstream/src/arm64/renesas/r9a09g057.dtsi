@@ -1099,7 +1099,7 @@
 
 		eth0: ethernet@15c30000 {
 			compatible = "renesas,r9a09g057-gbeth", "renesas,rzv2h-gbeth",
-				     "snps,dwmac-5.20";
+				     "renesas,rzv2h-eqos","snps,dwmac-5.20";
 			reg = <0 0x15c30000 0 0x10000>;
 			interrupts = <GIC_SPI 765 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 767 IRQ_TYPE_LEVEL_HIGH>,
@@ -1200,7 +1200,7 @@
 
 		eth1: ethernet@15c40000 {
 			compatible = "renesas,r9a09g057-gbeth", "renesas,rzv2h-gbeth",
-				     "snps,dwmac-5.20";
+				     "renesas,rzv2h-eqos","snps,dwmac-5.20";
 			reg = <0 0x15c40000 0 0x10000>;
 			interrupts = <GIC_SPI 780 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 782 IRQ_TYPE_LEVEL_HIGH>,
