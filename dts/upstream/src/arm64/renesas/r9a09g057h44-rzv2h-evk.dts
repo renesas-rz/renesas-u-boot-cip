@@ -180,19 +180,9 @@
 };
 
 &i2c8 {
-	pinctrl-0 = <&i2c8_pins>;
-	pinctrl-names = "default";
-	clock-frequency = <400000>;
 
 	status = "okay";
 
-	raa215300: pmic@12 {
-		compatible = "renesas,raa215300";
-		reg = <0x12>, <0x6f>;
-		reg-names = "main", "rtc";
-		clocks = <&x6>;
-		clock-names = "xin";
-	};
 };
 
 &mdio0 {
@@ -440,13 +430,6 @@
 &xspi {
 	pinctrl-0 = <&xspi_pins>;
 	pinctrl-names = "default";
-	/*
-	 * MT25QU512ABB8E12 flash chip is capable of running at 166MHz
-	 * clock frequency. Set the clock frequency to the maximum 133MHz
-	 * supported by the RZ/V2H SoC.
-	 */
-	assigned-clocks = <&cpg CPG_CORE R9A09G057_SPI_CLK_SPI>;
-	assigned-clock-rates = <133333334>;
 	status = "okay";
 
 	flash@0 {
