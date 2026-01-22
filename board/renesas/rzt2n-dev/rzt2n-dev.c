@@ -64,6 +64,8 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define MSTPCRE_ETHSS BIT(3)
 
+#define MSTPCRE_USB BIT(8)
+
 #define MSTPCRE_GMAC1 BIT(16)
 
 #define MSTPCRE_GMAC2 BIT(17)
@@ -376,11 +378,17 @@ static void board_usb_init(void)
 	*(volatile u64 *)PFC(11) = (*(volatile u64 *)PFC(11) & 0xFFFFFFFFFFFFFF00) | (0x17<< 0);
 	*(volatile u8 *)PMC(11) |= BIT(0);
 
+	/* USB Module Stop Release */
+	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_USB);
+	udelay(1);
+	for(u32 i=0;i<7;i++)
+	{
+		(void)(*(volatile u32 *)(USB2_BASE + USB2_PHYCTRL));
+	}
+
 	/* Enable Write protect to disable writing*/
 	(*(volatile u32 *)PRCRN) = PRCRN_PRKEY;
 	(*(volatile u32 *)PRCRS) = PRCRS_PRKEY;
-
-	/* Release USB module from the stopped state MSTPCRE[8]=0 is performed in TF-A */
 	
 	/* Disable interrupt */
 	*(volatile u32 *)(USB2_BASE + USB2_INT_ENABLE) = 0;
