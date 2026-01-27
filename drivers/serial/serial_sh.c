@@ -247,6 +247,7 @@ static const struct dm_serial_ops sh_serial_ops = {
 static const struct udevice_id sh_serial_id[] ={
 	{.compatible = "renesas,sci", .data = PORT_SCI},
 	{.compatible = "renesas,scif", .data = PORT_SCIF},
+	{.compatible = "renesas,scif-r9a07g043", .data = PORT_SCIFA},	
 	{.compatible = "renesas,scif-r9a07g044", .data = PORT_SCIFA},
 	{.compatible = "renesas,scif-r9a07g054", .data = PORT_SCIFA},
 	{.compatible = "renesas,scifa", .data = PORT_SCIFA},
