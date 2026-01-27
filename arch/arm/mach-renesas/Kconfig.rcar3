@@ -329,4 +329,7 @@ config RZG2L_DISTRO_BOOT
 
 config RZV2L_DISTRO_BOOT
 	bool "RZ/V2L distro boot command enable"
+
+config RZG2UL_DISTRO_BOOT
+	bool "RZ/G2UL distro boot command enable"
 endif
