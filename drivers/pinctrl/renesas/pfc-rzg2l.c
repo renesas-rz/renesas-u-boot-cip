@@ -124,7 +124,7 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 
 	for (i = 0 ; i < count; i++) {
 		cells[i] = fdt32_to_cpu(data[i]);
-#if defined(CONFIG_RZG2L_DISTRO_BOOT) || defined(CONFIG_RZV2L_DISTRO_BOOT)
+#if defined(CONFIG_RZG2L_DISTRO_BOOT) || defined(CONFIG_RZV2L_DISTRO_BOOT) || defined(CONFIG_RZG2UL_DISTRO_BOOT)
 		func = (cells[i] >> 16) & 0xf;
 		port = (cells[i] & 0xffff) / RZG2L_MAX_PINS_PER_PORT;
 		pin  = (cells[i] & 0xffff) % RZG2L_MAX_PINS_PER_PORT;
@@ -193,6 +193,7 @@ static const struct udevice_id rzg2l_pinctrl_match[] = {
 	{ .compatible = "renesas,r9a07g054-pinctrl", .data = 49 },
 	{ .compatible = "renesas,r9a07g043u-pinctrl", .data = 19 },
 	{ .compatible = "renesas,r9a07g043f-pinctrl", .data = 19 },
+	{ .compatible = "renesas,r9a07g043-pinctrl", .data = 19 },
 	{ .compatible = "renesas,r9a08g045s-pinctrl", .data = 19 }, //19 Port
 	{}
 };
