@@ -87,7 +87,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
 
 #define EFI_FIRMWARE_IMAGE_TYPE_RZG2UL_GUID\
-    EFI_GUID(0xfc5374b8, 0x2df0, 0x4a5c, 0xb6, 0xc8, 
+    EFI_GUID(0xfc5374b8, 0x2df0, 0x4a5c, 0xb6, 0xc8, \
              0xf6, 0xac, 0xf8, 0xa9, 0x37, 0x41)
 
 struct efi_fw_image fw_images[] = {
