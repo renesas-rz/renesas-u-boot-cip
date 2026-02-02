@@ -122,6 +122,10 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 		writel(PWPR_PFCWE, priv->regs + PWPR);
 	}
 
+	if (ofnode_device_is_compatible(cur_node, "renesas,r9a07g043-pinctrl")) {
+		nmax_func = 7; /* External Pins and Multiplexed Functional Pins 0-7 for RZG2UL */
+	}
+
 	for (i = 0 ; i < count; i++) {
 		cells[i] = fdt32_to_cpu(data[i]);
 #if defined(CONFIG_RZG2L_DISTRO_BOOT) || defined(CONFIG_RZV2L_DISTRO_BOOT) || defined(CONFIG_RZG2UL_DISTRO_BOOT)
