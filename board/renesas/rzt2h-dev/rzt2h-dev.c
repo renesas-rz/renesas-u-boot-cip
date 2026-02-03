@@ -179,6 +179,10 @@ void s_init(void)
 	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
 	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
 
+	/* Setting xSPI0 CS0 End Address
+	Octal Flash MX25LW51245GXDI00-T 64 MiB range */
+	*(volatile u32 *)CS0ENDAD_xSPI(0) = 0x43FFFFFF;
+
 	/* Setting xSPI1 CS0 End Address */
 	*(volatile u32 *)CS0ENDAD_xSPI(1) = 0x57FFFFFF;
 
