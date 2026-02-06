@@ -71,14 +71,14 @@ int check_rev(void)
 {
 	int ret = 0;
 
-	switch (rmobile_get_cpu_type()) {
-	case RMOBILE_CPU_TYPE_R8A7795:
+	switch (renesas_get_cpu_type()) {
+	case RENESAS_CPU_TYPE_R8A7795:
 		ret = 4;
 		break;
 
-	case RMOBILE_CPU_TYPE_R8A7796:
-		if ((rmobile_get_cpu_rev_integer() == 1) &&
-		    (rmobile_get_cpu_rev_fraction() < 3)) {
+	case RENESAS_CPU_TYPE_R8A7796:
+		if ((renesas_get_cpu_rev_integer() == 1) &&
+		    (renesas_get_cpu_rev_fraction() < 3)) {
 			ret = 2;
 		} else {
 			gpio_request(GPIO_HIHOPE_REV_BIT0, "hihope_rev_bit0");
@@ -91,7 +91,7 @@ int check_rev(void)
 		}
 		break;
 
-	case RMOBILE_CPU_TYPE_R8A77965:
+	case RENESAS_CPU_TYPE_R8A77965:
 		gpio_request(GPIO_HIHOPE_REV2_BOARD_CHECK, "hihope_rev2_check");
 		gpio_direction_input(GPIO_HIHOPE_REV2_BOARD_CHECK);
 		if (gpio_get_value(GPIO_HIHOPE_REV2_BOARD_CHECK)) {
@@ -303,8 +303,8 @@ int ft_verify_fdt(void *fdt)
 	ecc_mode = regs.regs[1];
 
 	if (use_ecc == 1) {
-		switch (rmobile_get_cpu_type()) {
-		case RMOBILE_CPU_TYPE_R8A7795:
+		switch (renesas_get_cpu_type()) {
+		case RENESAS_CPU_TYPE_R8A7795:
 			switch (ecc_mode) {
 			case 0:
 				fdt_dt = (const char **)rzg2h_dt_ecc_partial;
@@ -324,7 +324,7 @@ int ft_verify_fdt(void *fdt)
 				return 1;
 			};
 			break;
-		case RMOBILE_CPU_TYPE_R8A7796:
+		case RENESAS_CPU_TYPE_R8A7796:
 			switch (ecc_mode) {
 			case 1:
 				fdt_dt = (const char **)rzg2m_dt_ecc_full_dual;
@@ -332,7 +332,7 @@ int ft_verify_fdt(void *fdt)
 				break;
 			case 2:
 				/* ECC Single only configurate in RZ/G2M rev.3.0 */
-				if (rmobile_get_cpu_rev_integer() == 3) {
+				if (renesas_get_cpu_rev_integer() == 3) {
 					fdt_dt = (const char **)rzg2m_dt_ecc_full_single;
 					size = ARRAY_SIZE(rzg2m_dt_ecc_full_single);
 				} else {
@@ -345,7 +345,7 @@ int ft_verify_fdt(void *fdt)
 				return 1;
 			};
 			break;
-		case RMOBILE_CPU_TYPE_R8A77965:
+		case RENESAS_CPU_TYPE_R8A77965:
 			switch (ecc_mode) {
 			case 2:
 				fdt_dt = (const char **)rzg2n_dt_ecc_full_single;

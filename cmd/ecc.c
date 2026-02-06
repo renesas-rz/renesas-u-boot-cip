@@ -568,17 +568,17 @@ int do_ecc(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
 {
 	int mode_process = 0;
 
-	switch (rmobile_get_cpu_type()) {
-	case RMOBILE_CPU_TYPE_R8A7795:
+	switch (renesas_get_cpu_type()) {
+	case RENESAS_CPU_TYPE_R8A7795:
 		ecc_support = ECC_SINGLE | ECC_DUAL;
 		break;
-	case RMOBILE_CPU_TYPE_R8A7796:
+	case RENESAS_CPU_TYPE_R8A7796:
 		ecc_support = ECC_DUAL;
-		if (rmobile_get_cpu_rev_integer() == 3)
+		if (renesas_get_cpu_rev_integer() == 3)
 			ecc_support |= ECC_SINGLE;
 		break;
-	case RMOBILE_CPU_TYPE_R8A77965:
-	case RMOBILE_CPU_TYPE_R8A77990:
+	case RENESAS_CPU_TYPE_R8A77965:
+	case RENESAS_CPU_TYPE_R8A77990:
 		ecc_support = ECC_SINGLE;
 		break;
 	default:

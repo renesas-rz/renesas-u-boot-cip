@@ -66,7 +66,7 @@ int dram_init_banksize(void)
 	fdtdec_setup_memory_banksize();
 
 #if defined (CONFIG_TARGET_HIHOPE_RZG2)
-	if (rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) {
+	if (renesas_get_cpu_type() == RENESAS_CPU_TYPE_R8A7795) {
 		/* Setting SiP Service GET_ECC_MODE command*/
 		regs.regs[0] = RZG_SIP_SVC_GET_ECC_MODE;
 		smc_call(&regs);
