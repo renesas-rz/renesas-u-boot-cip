@@ -27,7 +27,7 @@ static int ohci_usb_probe(struct udevice *dev)
 	struct generic_ohci *priv = dev_get_priv(dev);
 	int err, ret;
 
-#ifndef CONFIG_R9A09G057
+	#if !defined(CONFIG_RCAR_GEN3) || defined(CONFIG_TARGET_HIHOPE_RZG2) || defined(CONFIG_TARGET_SILINUX_EK874)
 	ret = clk_get_bulk(dev, &priv->clocks);
 	if (ret && ret != -ENOENT) {
 		dev_err(dev, "Failed to get clocks (ret=%d)\n", ret);
@@ -66,7 +66,7 @@ phy_err:
 	ret = generic_shutdown_phy(&priv->phy);
 	if (ret)
 		dev_err(dev, "failed to shutdown usb phy\n");
-#ifndef CONFIG_R9A09G057
+#if !defined(CONFIG_RCAR_GEN3) || defined(CONFIG_TARGET_HIHOPE_RZG2) || defined(CONFIG_TARGET_SILINUX_EK874)
 reset_err:
 	ret = reset_release_bulk(&priv->resets);
 	if (ret)

@@ -67,7 +67,7 @@ static int ehci_usb_probe(struct udevice *dev)
 	int err, ret;
 
 	err = 0;
-#if !defined(CONFIG_RCAR_GEN3)
+#if !defined(CONFIG_RCAR_GEN3) || defined(CONFIG_TARGET_HIHOPE_RZG2) || defined(CONFIG_TARGET_SILINUX_EK874)
 	ret = clk_get_bulk(dev, &priv->clocks);
 	if (ret && ret != -ENOENT) {
 		dev_err(dev, "Failed to get clocks (ret=%d)\n", ret);
@@ -81,18 +81,18 @@ static int ehci_usb_probe(struct udevice *dev)
 	}
 
 
-		err = reset_get_bulk(dev, &priv->resets);
+	err = reset_get_bulk(dev, &priv->resets);
 		printf("%s:  Error = %X\n", __func__, err);
-		if (err && err != -ENOENT) {
-			dev_err(dev, "Failed to get resets (err=%d)\n", err);
-			goto clk_err;
-		}
+	if (err && err != -ENOENT) {
+		dev_err(dev, "Failed to get resets (err=%d)\n", err);
+		goto clk_err;
+	}
 
-		err = reset_deassert_bulk(&priv->resets);
-		if (err) {
-			dev_err(dev, "Failed to get deassert resets (err=%d)\n", err);
-			goto reset_err;
-		}
+	err = reset_deassert_bulk(&priv->resets);
+	if (err) {
+		dev_err(dev, "Failed to get deassert resets (err=%d)\n", err);
+		goto reset_err;
+	}
 
 
 	err = ehci_enable_vbus_supply(dev);
@@ -118,7 +118,7 @@ phy_err:
 	if (ret)
 		dev_err(dev, "failed to shutdown usb phy (ret=%d)\n", ret);
 
-#if !defined(CONFIG_RCAR_GEN3)
+#if !defined(CONFIG_RCAR_GEN3) || defined(CONFIG_TARGET_HIHOPE_RZG2) || defined(CONFIG_TARGET_SILINUX_EK874)
 regulator_err:
 	ret = ehci_disable_vbus_supply(priv);
 	if (ret)
