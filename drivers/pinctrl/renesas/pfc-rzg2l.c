@@ -128,7 +128,7 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 
 	for (i = 0 ; i < count; i++) {
 		cells[i] = fdt32_to_cpu(data[i]);
-#if defined(CONFIG_RZG2L_DISTRO_BOOT) || defined(CONFIG_RZV2L_DISTRO_BOOT) || defined(CONFIG_RZG2UL_DISTRO_BOOT)
+#if defined(CONFIG_RZG2L_DISTRO_BOOT) || defined(CONFIG_RZV2L_DISTRO_BOOT) || defined(CONFIG_RZG2UL_DISTRO_BOOT) || defined(CONFIG_RZG2LC_DISTRO_BOOT)
 		func = (cells[i] >> 16) & 0xf;
 		port = (cells[i] & 0xffff) / RZG2L_MAX_PINS_PER_PORT;
 		pin  = (cells[i] & 0xffff) % RZG2L_MAX_PINS_PER_PORT;
