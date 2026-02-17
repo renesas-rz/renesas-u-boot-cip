@@ -190,6 +190,7 @@ static const struct udevice_id rzg2l_pinctrl_match[] = {
 	{ .compatible = "renesas,r9a07g044-pinctrl", .data = 49 },
 	{ .compatible = "renesas,r9a07g044c-pinctrl", .data = 49 },
 	{ .compatible = "renesas,r9a07g054l-pinctrl", .data = 49 },
+	{ .compatible = "renesas,r9a07g054-pinctrl", .data = 49 },
 	{ .compatible = "renesas,r9a07g043u-pinctrl", .data = 19 },
 	{ .compatible = "renesas,r9a07g043f-pinctrl", .data = 19 },
 	{ .compatible = "renesas,r9a08g045s-pinctrl", .data = 19 }, //19 Port

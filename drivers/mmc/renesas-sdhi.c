@@ -1104,7 +1104,8 @@ static int renesas_sdhi_probe(struct udevice *dev)
 		return ret;
 	}
 
-	if (device_is_compatible(dev, "renesas,sdhi-r9a07g044"))
+	if (device_is_compatible(dev, "renesas,sdhi-r9a07g044") ||
+	    device_is_compatible(dev, "renesas,sdhi-r9a07g054"))
 		ret = rzg2l_sdhi_setup(dev);
 	else
 		ret = tmio_sd_probe(dev, priv->quirks);
