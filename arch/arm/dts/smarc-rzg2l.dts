@@ -8,7 +8,7 @@
 
 /dts-v1/;
 #include <dt-bindings/gpio/gpio.h>
-#include "r9a07g044l.dtsi"
+#include "r9a07g044.dtsi"
 #include "r9a07g044l-u-boot.dtsi"
 #include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
 
@@ -18,7 +18,7 @@
 
 	aliases {
 		serial0 = &scif0;
-		spi0 = &spibsc;
+		spi0 = &sbc;
 	};
 
 	chosen {
@@ -29,6 +29,24 @@
 		device_type = "memory";
 		/* first 128MB is reserved for secure area. */
 		reg = <0 0x48000000 0 0x78000000>;
+	};
+
+	reg_1p8v: regulator-1p8v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-1.8V";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
+	reg_3p3v: regulator-3p3v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-3.3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		regulator-always-on;
 	};
 
 };
@@ -79,9 +97,27 @@
 				<RZG2L_PINMUX(14, 3, 1)>;
 	};
 
+	sdhi0_emmc_pins: sd0emmc {
+		sd0_emmc_data {
+			pins = "SD0_DATA0", "SD0_DATA1", "SD0_DATA2", "SD0_DATA3",
+			       "SD0_DATA4", "SD0_DATA5", "SD0_DATA6", "SD0_DATA7";
+			power-source = <1800>;
+		};
+
+		sd0_emmc_ctrl {
+			pins = "SD0_CLK", "SD0_CMD";
+			power-source = <1800>;
+		};
+
+		sd0_emmc_rst {
+			pins = "SD0_RST#";
+			power-source = <1800>;
+		};
+	};
+
 };
 
-&xinclk {
+&extal_clk {
         clock-frequency = <24000000>;
 };
 
@@ -97,8 +133,16 @@
 	 * The SD0_PWR_EN pin is associated with P4_1.
 	 * A HIGH signal on SD0_PWR_EN will enable supply voltage for SD card.
 	*/
+	pinctrl-0 = <&sdhi0_emmc_pins>;
+	pinctrl-1 = <&sdhi0_emmc_pins>;
+	pinctrl-names = "default", "state_uhs";
 	bus-width = <8>;
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&reg_1p8v>;
 	status = "okay";
+	mmc-hs200-1_8v;
+	non-removable;
+	fixed-emmc-driver-type = <1>;
 	/* This is used for interface that support both eMMC and SD in board */
 	mutual-channel;
 };
@@ -149,7 +193,7 @@
 	};
 };
 
-&spibsc {
+&sbc {
 	num-cs = <1>;
 	status = "okay";
 	spi-max-frequency = <40000000>;
