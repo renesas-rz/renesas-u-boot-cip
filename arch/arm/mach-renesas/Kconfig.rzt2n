@@ -17,8 +17,12 @@ config TARGET_RZT2N_DEV
 	imply R9A07G076
 	help
 	  Enable support for the RZ/T2N evaluation board.
-
 endchoice
+
+config TARGET_RZT2N_537_PIN_DEV
+	bool "Renesas RZ/T2N DEV for 537 pin device"
+	help
+	  Enable support for the RZ/T2N evaluation board.
 
 source "board/renesas/rzt2n-dev/Kconfig"
 

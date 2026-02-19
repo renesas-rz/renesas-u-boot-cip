@@ -9,7 +9,8 @@ The commands list to build the u-boot for RZ/T2N
 
 `make clean`
 
-`make rzt2n-dev_defconfig`
+For 489 pin board: `make rzt2n-dev_defconfig`
+For 537 pin board: `make rzt2n-dev_537_pin_defconfig`
 
 `make`
 
@@ -26,27 +27,24 @@ Please refer to document "r01us0780ej0020-rzt2n(Linux_Start-up_Guide_RZT2N).pdf"
 2. The TF-A and u-boot debug serial connected to SCI1
 
 ## Features / Limitations
-1. The ethernet mode used is 0 (MODCTRL : Mode Control Register), use ETH3 (gmac1) for network booting
-2. ETH4 also enabled by default ( macro GMAC2_ETH4_ENABLE=1), use u-boot command 'setenv ethact eth1'
-to explicitly select ETH4 port
-3. For eMMC boot to work the SW7 requires the settings SW7-7: ON, SW7-8: ON
+1. SW7-8 is used both Ether 1 and eMMC control.So,these cannot be used at the same time
 
 ## TFTP / NFS
 1. This requires the TFTP and NFS server to be setup correctly.
 2. The kernel, device tree and root files to be accessible from the board ok for this remote booting to work.
 Environment setting example ( Please change the path and IP address etc as per your environment)
 
-`setenv serverip 192.168.10.3;` 
+`setenv serverip XXX.XXX.XX.X;` 
 
-`setenv ipaddr 192.168.10.7;` 
+`setenv ipaddr XXX.XXX.XX.X;` 
 
 `setenv bootfile Image;` 
 
 `setenv fdtfile r9a07g076m43-dev.dtb;`  
 
-`setenv nfsroot "/tftpboot/RZT2N/";`
+`setenv nfsroot "/YYYYYY/";`
 
-`setenv rootpath "/tftpboot/RZT2N/";`
+`setenv rootpath "/ZZZZZZZ/";`
 
 `setenv bootargs "ignore_loglevel root=/dev/nfs rw nfsroot=${serverip}:${rootpath},nfsvers=3 ip=${ipaddr}:${serverip}::255.255.255.0:t2n:eth0:off"`
 

@@ -157,11 +157,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define CS0ENDAD_xSPI(x)	(0x80293004 + (0x100 * (x)))
 
-#define DEBUG_PRINT_ETHERNET_SETTINGS       (0)
-#if DEBUG_PRINT_ETHERNET_SETTINGS == 1
-void debug_ethernet_settings(void);
-#endif
-
 #define XSPI1_FLASH_RW_ENABLE               (0)
 
 /* Needed by lowlevel_init.S*/
@@ -327,11 +322,18 @@ void s_init(void)
 	*(volatile u64 *)PFC(20) = (*(volatile u64 *)PFC(20) & 0xFFFF0000FFFFFFFF) \
 	|(((u64)0x11<< 40) | ((u64)0x11<< 32));
 
+#if !defined(CONFIG_TARGET_RZT2N_537_PIN_DEV)
+	/*P24_6_ETH3_GMAC1_MDC & P24_7_ETH3_GMAC1_MDIO*/
+	*(volatile u8 *)PMC(24) |= (BIT(7)|BIT(6));
+	*(volatile u64 *)PFC(24) = (*(volatile u64 *)PFC(24) & 0x0000FFFFFFFFFFFF) \
+	| ( ((u64)0x12<<56) | ((u64)0x12<< 48));
+
+#else 
 	/*P3_2_ETH3_GMAC1_MDC & P3_3_ETH3_GMAC1_MDIO*/
 	*(volatile u8 *)PMC(3) |= (BIT(3)|BIT(2));
 	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFFFF0000FFFF) \
 	| ( ((u64)0x12<<24) | ((u64)0x12<< 16));
-
+#endif
 
 	/* Release module stop for GMAC1 */
 	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_GMAC1);
@@ -471,92 +473,9 @@ int board_init(void)
 	ethss_link_up(4, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
 
 	board_usb_init();
-#if DEBUG_PRINT_ETHERNET_SETTINGS == 1
-	debug_ethernet_settings();
-#endif
+
 	return 0;
 }
-#if DEBUG_PRINT_ETHERNET_SETTINGS == 1
-void debug_ethernet_settings(void)
-{
-
-	printf("======================================ETH0 ==============================\n");
-	printf("ETH0 PMC19 = 0x%02x\n", *(volatile u8 *)PMC(19));
-	printf("ETH0 PFC19 = 0x%016llx\n",  *(volatile u64 *)PFC(19));
-
-	printf("ETH0 PMC20 = 0x%02x\n", *(volatile u8 *)PMC(20));
-	printf("ETH0 PFC20 = 0x%016llx\n",  *(volatile u64 *)PFC(20));
-
-	printf("======================================ETH1 ==============================\n");
-	printf("ETH1 PMC21 = 0x%02x\n", *(volatile u8 *)PMC(21));
-	printf("ETH1 PFC21 = 0x%016llx\n",  *(volatile u64 *)PFC(21));
-
-	printf("ETH1 PMC22 = 0x%02x\n", *(volatile u8 *)PMC(22));
-	printf("ETH1 PFC22 = 0x%016llx\n",  *(volatile u64 *)PFC(22));
-
-	printf("======================================ETH2 ==============================\n");
-	printf("ETH2 PMC23 = 0x%02x\n", *(volatile u8 *)PMC(23));
-	printf("ETH2 PFC23 = 0x%016llx\n",  *(volatile u64 *)PFC(23));
-
-	printf("ETH2 PMC24 = 0x%02x\n", *(volatile u8 *)PMC(24));
-	printf("ETH2 PFC24 = 0x%016llx\n",  *(volatile u64 *)PFC(24));
-
-	printf("ETH2 PMC25 = 0x%02x\n", *(volatile u8 *)PMC(25));
-	printf("ETH2 PFC25 = 0x%016llx\n",  *(volatile u64 *)PFC(25));
-
-	printf("======================================ETH3 ==============================\n");
-	printf("ETH3 PMC0 = 0x%02x\n", *(volatile u8 *)PMC(0));
-	printf("ETH3 PFC0 = 0x%016llx\n",  *(volatile u64 *)PFC(0));
-	printf("ETH3 PMC1 = 0x%02x\n", *(volatile u8 *)PMC(1));
-	printf("ETH3 PFC1 = 0x%016llx\n",  *(volatile u64 *)PFC(1));
-	printf("ETH3 PMC3 = 0x%02x\n", *(volatile u8 *)PMC(3));
-	printf("ETH3 PFC3 = 0x%016llx\n",  *(volatile u64 *)PFC(3));
-
-	printf("======================================ETH4 ==============================\n");
-	printf("ETH4 PMC1 = 0x%02x\n", *(volatile u8 *)PMC(1));
-	printf("ETH4 PFC1 = 0x%016llx\n",  *(volatile u64 *)PFC(1));
-	printf("ETH4 PMC2 = 0x%02x\n", *(volatile u8 *)PMC(2));
-	printf("ETH4 PFC3 = 0x%016llx\n",  *(volatile u64 *)PFC(2));
-	printf("ETH4 PMC3 = 0x%02x\n", *(volatile u8 *)PMC(3));
-	printf("ETH4 PFC3 = 0x%016llx\n",  *(volatile u64 *)PFC(3));
-
-
-	printf(" ============================== ETH1 GMAC1 =============================\n");
-	printf("GMAC1 PMC4 = 0x%02x\n", *(volatile u8 *)PMC(4));
-	printf("GMAC1 P4   = 0x%02x\n", *(volatile u8 *)P(4));
-	printf("GMAC1 PM4  = 0x%04x\n", *(volatile u16 *)PM(4));
-
-	printf("ETH1 PMC20 = 0x%02x\n", *(volatile u8 *)PMC(20));
-	printf("ETH1 PFC20 = 0x%016llx\n",  *(volatile u64 *)PFC(20));
-
-	printf("ETH1 PMC24 = 0x%02x\n", *(volatile u8 *)PMC(24));
-	printf("ETH1 PFC24 = 0x%016llx\n",  *(volatile u64 *)PFC(24));
-
-	printf("MSTPCRE = 0x%08x\n", *(volatile u32 *)MSTPCRE);
-	printf("MRCTLE  = 0x%08x\n", *(volatile u32 *)MRCTLE);
-	printf("SCKCR2  = 0x%08x\n", *(volatile u32 *)SCKCR2);
-
-	printf("MODCTRL  = 0x%08x\n", *(volatile u32 *)0x80110008);
-	printf("CONVCTRL0  = 0x%08x\n", *(volatile u32 *)0x80110100);
-	printf("CONVCTRL1  = 0x%08x\n", *(volatile u32 *)0x80110104);
-	printf("CONVCTRL2  = 0x%08x\n", *(volatile u32 *)0x80110108);
-	printf("CONVCTRL3  = 0x%08x\n", *(volatile u32 *)0x8011010C);
-	printf("CONVCTRL4  = 0x%08x\n", *(volatile u32 *)0x80110110);
-	printf("CONVRST    = 0x%08x\n", *(volatile u32 *)0x80110114);
-
-	printf(" ============================== CLOCK=============================\n");
-	printf("SCKCR     		= 0x%08x\n", *(volatile u32 *)0x81280000);
-	printf("SCKCR2    		= 0x%08x\n", *(volatile u32 *)0x81280004);
-	printf("SCKCR3    		= 0x%08x\n", *(volatile u32 *)0x81280008);
-	printf("SCKCR4    		= 0x%08x\n", *(volatile u32 *)0x8128000C);
-	printf("PMSEL     		= 0x%08x\n", *(volatile u32 *)0x81280010);
-	printf("PLL0MON   		= 0x%08x\n", *(volatile u32 *)0x81280020);
-	printf("PLL0EN    		= 0x%08x\n", *(volatile u32 *)0x81280030);
-	printf("PLL1MON  		= 0x%08x\n", *(volatile u32 *)0x81280040);
-	printf("PLL2MON  		= 0x%08x\n", *(volatile u32 *)0x81280090);
-	printf("PLL2EN  		= 0x%08x\n", *(volatile u32 *)0x812800A0);				
-}
-#endif
 
 void reset_cpu(void)
 {
