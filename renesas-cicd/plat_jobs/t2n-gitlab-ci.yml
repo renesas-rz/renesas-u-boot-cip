@@ -38,3 +38,9 @@ rzt2n-dev:
     CONFIG_FILENAME: "rzt2n-dev_defconfig"
   extends:
     - .mpu_uboot_build_job_template
+rzt2n-dev-537-pin:
+  variables:
+    PLAT: "t2n"
+    CONFIG_FILENAME: "rzt2n-dev_537_pin_defconfig"
+  extends:
+    - .mpu_uboot_build_job_template
