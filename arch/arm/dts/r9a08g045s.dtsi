@@ -88,6 +88,18 @@
 				(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>;
 		};
 
+		xspi: spi@10060000 {
+			compatible = "renesas,xspi-r9a08g045";
+			reg = <0 0x10060000 0 0x10000>,
+			      <0 0x20000000 0 0x10000000>;
+			clocks = <&cpg CPG_MOD R9A08G045S_CLK_SPI>;
+			resets = <&cpg R9A08G045S_CLK_SPI>;
+			power-domains = <&cpg>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+		};
+
 		i2c0: i2c@10090000 {
 			#address-cells = <1>;
 			#size-cells = <0>;

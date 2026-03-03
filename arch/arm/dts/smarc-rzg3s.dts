@@ -17,6 +17,7 @@
 
 	aliases {
 		serial0 = &scif0;
+		spi0 = &xspi;
 	};
 
 	chosen {
@@ -115,6 +116,19 @@
 
 &i2c1 {
 	status = "okay";
+};
+
+&xspi {
+	status = "okay";
+
+	flash@0 {
+		compatible = "spi-flash", "jedec,spi-nor";
+		reg = <0>;
+		m25p,fast-read;
+		spi-max-frequency = <40000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
+	};
 };
 
 &ehci0 {
