@@ -87,6 +87,12 @@ DECLARE_GLOBAL_DATA_PTR;
 #define USB2_PHY_RESET			0x000
 #define USB2_PHY_OTGR			0x600
 
+#if CONFIG_IS_ENABLED(TARGET_RZV2N_EVK1)
+	#define ETH_PMIC_RESET_REG 	(0x3C)
+#else //CONFIG_TARGET_RZV2N_EVK2
+	#define ETH_PMIC_RESET_REG 	(0x2E)
+#endif
+
 /* ADC */
 #define SYS_ADC_CFG			0x10431600
 
@@ -102,7 +108,7 @@ void s_init(void)
 	/* PA5,PA4 output */
 	*(volatile u16 *)PM_2A    = (*(volatile u32 *)PM_2A & ~(0x0f << 8)) | (0x0c << 8);
 #endif
-#if CONFIG_TARGET_RZV2N_EVK2
+#if CONFIG_IS_ENABLED(TARGET_RZV2N_EVK1) || CONFIG_IS_ENABLED(TARGET_RZV2N_EVK2)
 	/* SD1  */
 	*(volatile u8 *)PMC_2A   &= ~(0x03 << 2);/* PA3,PA2 port */
 	*(volatile u8 *)P_2A      = (*(volatile u32 *)P_2A  & ~(0x03<<2)) | (0x01 <<3); /* PA3=1,PA2=0		*/
@@ -217,7 +223,7 @@ static void board_usb_init(void)
 	(*(volatile u32 *)PFC_PFC26) |= (0xF << 4);
 #endif /* CONFIG_TARGET_RZV2N_DEV */
 
-#if CONFIG_TARGET_RZV2N_EVK2
+#if CONFIG_IS_ENABLED(TARGET_RZV2N_EVK1) || CONFIG_IS_ENABLED(TARGET_RZV2N_EVK2)
         /* Set P9_5 as Func.14 for VBUSEN */
         /* Control mode (multiplexed function) */
         (*(volatile u32 *)PFC_PMC29) |= (0x1u << 5);
@@ -232,7 +238,7 @@ static void board_usb_init(void)
         /* Function mode 14 */
         (*(volatile u32 *)PFC_PFC29) |= (0x0E << 24);
 
-#endif /* CONFIG_TARGET_RZV2N_EVK2 */
+#endif /* CONFIG_TARGET_RZV2N_EVK */
 
 	/* Enable Write protect */
 	(*(volatile u32 *)PFC_PWPR) &= ~(0x1u << 6);
@@ -252,8 +258,29 @@ static void board_usb_init(void)
 
 int board_late_init(void)
 {
-	return 0;
+	struct udevice *dev;
+	const u8 pmic_i2c_bus = 8;
+	u8 reg;
+	int ret;
+
+	ret = i2c_get_chip_for_busnum(pmic_i2c_bus, 0x12, 1, &dev);
+
+	if (!ret)
+	{
+		dm_i2c_read(dev, ETH_PMIC_RESET_REG, &reg, 1);
+		reg &= (~0x01);
+
+		dm_i2c_write(dev, ETH_PMIC_RESET_REG, &reg, 1);
+
+		udelay(2);
+		reg |= (0x01);
+
+		dm_i2c_write(dev, ETH_PMIC_RESET_REG, &reg, 1);
+	}
+
+	return ret;
 }
+
 
 int board_early_init_f(void)
 {
