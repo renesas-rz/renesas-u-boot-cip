@@ -53,6 +53,18 @@
 /* The HF/QSPI layout permits up to 1 MiB large bootloader blob */
 #define CONFIG_BOARD_SIZE_LIMIT		1048576
 
+#if defined(CONFIG_TARGET_RZT2N_537_PIN_DEV)
+/* ENV setting for 537 pin*/
+#define CFG_EXTRA_ENV_SETTINGS	\
+	"usb_pgood_delay=2000\0" \
+	"bootm_size=0x10000000\0" \
+	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
+	"prodemmcbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
+	"bootimage=booti 0xc4200000 - 0xC8000000\0" \
+	"emmcload=ext4load mmc 0:2 0xc4200000 boot/Image;ext4load mmc 0:2 0xC8000000 boot/r9a07g076m48-dev.dtb;run prodemmcbootargs \0" \
+	"sd1load=ext4load mmc 1:2 0xc4200000 boot/Image;ext4load mmc 1:2 0xC8000000 boot/r9a07g076m48-dev.dtb;run prodsdbootargs \0" \
+	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0"
+#else
 /* ENV setting */
 #define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0" \
@@ -63,6 +75,7 @@
 	"emmcload=ext4load mmc 0:2 0xc4200000 boot/Image;ext4load mmc 0:2 0xC8000000 boot/r9a07g076m43-dev.dtb;run prodemmcbootargs \0" \
 	"sd1load=ext4load mmc 1:2 0xc4200000 boot/Image;ext4load mmc 1:2 0xC8000000 boot/r9a07g076m43-dev.dtb;run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0"
+#endif
 
 #define CONFIG_BOOTCOMMAND	"env default -a;run bootcmd_check;run bootimage"
 
