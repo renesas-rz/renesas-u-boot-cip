@@ -14,7 +14,7 @@ config SYS_CONFIG_NAME
 
 endif
 
-if TARGET_RZV2N_EVK
+if TARGET_RZV2N_EVK2
 
 config SYS_SOC
 	default "renesas"

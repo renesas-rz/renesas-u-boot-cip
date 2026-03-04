@@ -253,7 +253,7 @@ config TARGET_RZV2N_DEV
 	help
           Support for Renesas RZ/V2N Dev Platform
 
-config TARGET_RZV2N_EVK
+config TARGET_RZV2N_EVK2
 	bool "RZ/V2N EVK board"
 	help
           Support for Renesas RZ/V2N Dev Platform
