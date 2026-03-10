@@ -98,18 +98,26 @@ DECLARE_GLOBAL_DATA_PTR;
 #if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
 
 #define EFI_FIRMWARE_IMAGE_TYPE_RZV2H_GUID \
-	EFI_GUID(0x7f26b24e, 0x7cc4, 0x40a5, 0x8d, 0x3b, 0x0c, 0xbf, 0x47, 0x3f, 0x7a, 0x83)
-
+    EFI_GUID(0xf94c5e89, 0x15db, 0x44d3, 0x87, 0xb0, 0x6c, 0x35, 0x42, 0x9d, 0xfa, 0x18)
 struct efi_fw_image fw_images[] = {
 	{
 		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZV2H_GUID,
-		.fw_name = u"RENESAS-FIP",
+		.fw_name = u"bl2_bp_spi.bin",
 		.image_index = 1,
+	},
+	{
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZV2H_GUID,
+		.fw_name = u"fip.bin",
+		.image_index = 2,
 	},
 };
 
 struct efi_capsule_update_info update_info = {
-	.dfu_string = "sf 0:0=fip.bin raw 0x20000 0x1F0000\0",
+	.dfu_string =
+		/* BL2 in SPI NOR at offset 0x0, max size 0x20000  */
+		"sf 0:0=bl2_bp_spi.bin raw 0x0 0x20000;"
+		/* FIP in SPI NOR at offset 0x60000, max size 0x1F0000 (1984 KB) */
+		"fip.bin raw 0x60000 0x1F0000",
 	.num_images = ARRAY_SIZE(fw_images),
 	.images = fw_images,
 };
