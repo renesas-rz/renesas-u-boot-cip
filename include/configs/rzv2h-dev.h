@@ -43,9 +43,6 @@
 /* SDHI clock freq */
 #define CONFIG_SH_SDHI_FREQ		133000000
 
-/* The HF/QSPI layout permits up to 1 MiB large bootloader blob */
-#define CONFIG_BOARD_SIZE_LIMIT		1048576
-
 /* ENV setting */
 #if defined(CONFIG_RZV2H_DISTRO_BOOT)
 #define CFG_EXTRA_ENV_SETTINGS	\
