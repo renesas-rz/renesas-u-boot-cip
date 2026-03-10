@@ -76,9 +76,15 @@ static int rzv2h_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 
 	for (i = 0 ; i < count; i++) {
 		cells[i] = fdt32_to_cpu(data[i]);
+#if defined(CONFIG_RZV2H_DISTRO_BOOT)
+		func = (cells[i] >> 16) & 0xf;
+		port = (cells[i] & 0xffff) / RZV2H_MAX_PINS_PER_PORT;
+		pin  = (cells[i] & 0xffff) % RZV2H_MAX_PINS_PER_PORT;
+#else
 		func = (cells[i] >> 12) & 0xf;
 		port = (cells[i] / RZV2H_MAX_PINS_PER_PORT) & 0x1ff;
 		pin = cells[i] % RZV2H_MAX_PINS_PER_PORT;
+#endif
 		if (func > 15 || port >= port_max || pin >= RZV2H_MAX_PINS_PER_PORT) {
 			printf("Invalid cell %i in node %s!\n",
 			       count, ofnode_get_name(dev_ofnode(config)));
