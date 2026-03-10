@@ -437,8 +437,8 @@
 		reg = <0>;
 		vcc-supply = <&reg_1p8v>;
 		m25p,fast-read;
-		spi-tx-bus-width = <4>;
-		spi-rx-bus-width = <4>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
 
 		partitions {
 			compatible = "fixed-partitions";
