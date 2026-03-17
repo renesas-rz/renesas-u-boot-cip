@@ -87,11 +87,12 @@ DECLARE_GLOBAL_DATA_PTR;
 #define USB2_PHY_RESET			0x000
 #define USB2_PHY_OTGR			0x600
 
-#if CONFIG_IS_ENABLED(TARGET_RZV2N_EVK1)
-	#define ETH_PMIC_RESET_REG 	(0x3C)
-#else //CONFIG_TARGET_RZV2N_EVK2
-	#define ETH_PMIC_RESET_REG 	(0x2E)
-#endif
+#define PMIC_LDO1_ACTIVE_REG		(0x4A)
+#define PMIC_EVK1_HA2				(0x67)
+#define PMIC_EVK2_HA7				(0x64)
+#define ETH_EVK1_PMIC_RESET_REG 	(0x3C)
+#define ETH_EVK2_PMIC_RESET_REG 	(0x2E)
+
 
 /* ADC */
 #define SYS_ADC_CFG			0x10431600
@@ -108,7 +109,7 @@ void s_init(void)
 	/* PA5,PA4 output */
 	*(volatile u16 *)PM_2A    = (*(volatile u32 *)PM_2A & ~(0x0f << 8)) | (0x0c << 8);
 #endif
-#if CONFIG_IS_ENABLED(TARGET_RZV2N_EVK1) || CONFIG_IS_ENABLED(TARGET_RZV2N_EVK2)
+#if CONFIG_IS_ENABLED(TARGET_RZV2N_EVK)
 	/* SD1  */
 	*(volatile u8 *)PMC_2A   &= ~(0x03 << 2);/* PA3,PA2 port */
 	*(volatile u8 *)P_2A      = (*(volatile u32 *)P_2A  & ~(0x03<<2)) | (0x01 <<3); /* PA3=1,PA2=0		*/
@@ -223,7 +224,7 @@ static void board_usb_init(void)
 	(*(volatile u32 *)PFC_PFC26) |= (0xF << 4);
 #endif /* CONFIG_TARGET_RZV2N_DEV */
 
-#if CONFIG_IS_ENABLED(TARGET_RZV2N_EVK1) || CONFIG_IS_ENABLED(TARGET_RZV2N_EVK2)
+#if CONFIG_IS_ENABLED(TARGET_RZV2N_EVK)
         /* Set P9_5 as Func.14 for VBUSEN */
         /* Control mode (multiplexed function) */
         (*(volatile u32 *)PFC_PMC29) |= (0x1u << 5);
@@ -262,20 +263,35 @@ int board_late_init(void)
 	const u8 pmic_i2c_bus = 8;
 	u8 reg;
 	int ret;
-
+	u32 pmic_reset_reg;
 	ret = i2c_get_chip_for_busnum(pmic_i2c_bus, 0x12, 1, &dev);
 
 	if (!ret)
 	{
-		dm_i2c_read(dev, ETH_PMIC_RESET_REG, &reg, 1);
+		dm_i2c_read(dev, PMIC_LDO1_ACTIVE_REG, &reg, 1);
+		if(reg == PMIC_EVK1_HA2)
+		{
+			printf("INFO: V2N EVK1 PMIC Reg value 0x%x\n",reg);
+			pmic_reset_reg = ETH_EVK1_PMIC_RESET_REG;
+		}
+		else if(reg == PMIC_EVK2_HA7)
+		{
+			printf("INFO: V2N EVK2 PMIC Reg value 0x%x\n",reg);
+			pmic_reset_reg = ETH_EVK2_PMIC_RESET_REG;
+		}
+		else
+		{
+			printf("ERROR: incorrect pmic register settings %x\n",reg);
+		}
+		dm_i2c_read(dev, pmic_reset_reg, &reg, 1);
 		reg &= (~0x01);
 
-		dm_i2c_write(dev, ETH_PMIC_RESET_REG, &reg, 1);
+		dm_i2c_write(dev, pmic_reset_reg, &reg, 1);
 
 		udelay(2);
 		reg |= (0x01);
 
-		dm_i2c_write(dev, ETH_PMIC_RESET_REG, &reg, 1);
+		dm_i2c_write(dev, pmic_reset_reg, &reg, 1);
 	}
 
 	return ret;
