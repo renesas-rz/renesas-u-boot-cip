@@ -32,16 +32,9 @@ rzv2n-prep-for-uboot-merge-gateway-build-job:
     - .prep_for_uboot_merge_gateway_build_job_template
 
 ############################################ V2N evk U-Boot build jobs #############################################
-rzv2n-evk1:
+rzv2n-evk:
   variables:
     PLAT: "v2n"
-    CONFIG_FILENAME: "rzv2n-evk1_defconfig"
-  extends:
-    - .mpu_uboot_build_job_template
-
-rzv2n-evk2:
-  variables:
-    PLAT: "v2n"
-    CONFIG_FILENAME: "rzv2n-evk2_defconfig"
+    CONFIG_FILENAME: "rzv2n-evk_defconfig"
   extends:
     - .mpu_uboot_build_job_template
