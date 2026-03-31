@@ -48,12 +48,6 @@
 		regulator-always-on;
 	};
 
-	/* 32.768kHz crystal */
-	x3: x3-clock {
-		compatible = "fixed-clock";
-		#clock-cells = <0>;
-		clock-frequency = <32768>;
-	};
 };
 
 &eth0 {
@@ -226,9 +220,17 @@
 	};
 };
 
-/* Override extal clock frequency for the SoM */
+/* Override clock frequencies for the SoM */
 &extal_clk {
 	clock-frequency = <24000000>;
+};
+
+&audio_extal_clk {
+	clock-frequency = <48000000>;
+};
+
+&rtxin_clk {
+	clock-frequency = <32768>;
 };
 
 /* Default: SD0 is connected to eMMC (SW_SD0_DEV_SEL = 0) */
