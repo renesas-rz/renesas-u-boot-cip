@@ -1,0 +1,136 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source for the RZ/G3S Dev board
+ *
+ * Copyright (C) 2022 Renesas Electronics
+ */
+
+/dts-v1/;
+#include <dt-bindings/gpio/gpio.h>
+#include "r9a08g046.dtsi"
+#include "r9a08g046-u-boot.dtsi"
+#include <dt-bindings/pinctrl/rzg2l-pinctrl.h>
+
+/ {
+	model = "smarc-rzg3s";
+	compatible = "renesas,r9a08g045s", "renesas,rzg3s";
+
+	aliases {
+		serial0 = &scif0;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory@48000000 {
+		device_type = "memory";
+		/* first 128MB is reserved for secure area. */
+		reg = <0 0x48000000 0 0x78000000>;
+	};
+};
+
+#if 0
+&pinctrl {
+	eth0_pins: eth0 {
+		pinmux = <RZG2L_PINMUX(1, 0, 1)>,
+				<RZG2L_PINMUX(1, 1, 1)>,
+				<RZG2L_PINMUX(1, 2, 1)>,
+				<RZG2L_PINMUX(1, 3, 1)>,
+				<RZG2L_PINMUX(1, 4, 1)>,
+				<RZG2L_PINMUX(2, 0, 1)>,
+				<RZG2L_PINMUX(3, 0, 1)>,
+				<RZG2L_PINMUX(3, 1, 1)>,
+				<RZG2L_PINMUX(3, 2, 1)>,
+				<RZG2L_PINMUX(3, 3, 1)>,
+				<RZG2L_PINMUX(4, 0, 1)>,
+				<RZG2L_PINMUX(4, 1, 1)>,
+				<RZG2L_PINMUX(4, 3, 1)>,
+				<RZG2L_PINMUX(4, 4, 1)>,
+				<RZG2L_PINMUX(4, 5, 1)>;
+	};
+
+	sdhi2_pins: sd2 {
+		pinmux = <RZG2L_PINMUX(11, 0, 8)>,	/* SD2_CLK	*/
+			 <RZG2L_PINMUX(11, 1, 8)>,	/* SD2_CMD	*/
+			 <RZG2L_PINMUX(11, 2, 8)>,	/* SD2_DATA0	*/
+			 <RZG2L_PINMUX(11, 3, 8)>,	/* SD2_DATA1	*/
+			 <RZG2L_PINMUX(12, 0, 8)>,	/* SD2_DATA2	*/
+			 <RZG2L_PINMUX(12, 1, 8)>,	/* SD2_DATA3	*/
+			 <RZG2L_PINMUX(14, 1, 7)>;	/* SD2_CD	*/
+	};
+
+	usb0_pins: usb0 {
+		pinmux = <RZG2L_PINMUX(5, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(5, 2, 1)>;	/* OVC	*/
+	};
+
+	usb1_pins: usb1 {
+		pinmux = <RZG2L_PINMUX(6, 0, 1)>,	/* VBUS	*/
+			 <RZG2L_PINMUX(5, 4, 5)>;	/* OVC */
+	};
+};
+#endif	/* 0 */
+
+&xinclk {
+	clock-frequency = <24000000>;
+};
+
+&scif0 {
+	status = "okay";
+	clock = <100000000>;
+};
+
+&sdhi0 {
+	bus-width = <8>;
+	status = "okay";
+};
+
+&sdhi1 {
+	bus-width = <4>;
+	status = "okay";
+};
+
+#if 0
+&sdhi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdhi2_pins>;
+
+	bus-width = <4>;
+	status = "okay";
+};
+
+&eth0 {
+	pinctrl-0 = <&eth0_pins>;
+	pinctrl-names = "default";
+	phy-handle = <&phy0>;
+	phy-mode = "rgmii";
+	status = "okay";
+
+	phy0: ethernet-phy@7 {
+		reg = <7>;
+	};
+};
+#endif	/* 0 */
+
+&i2c0 {
+	status = "okay";
+};
+
+&i2c1 {
+	status = "okay";
+};
+
+#if 0
+&ehci0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb0_pins>;
+	status = "okay";
+};
+
+&ehci1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb1_pins>;
+	status = "okay";
+};
+#endif	/* 0 */
