@@ -43,6 +43,7 @@ static const struct tfa_info tfa_info[] = {
 	/* G3/V2 family */
 	{ "renesas,r9a09g047", "R9A09G047", RENESAS_CPU_TYPE_R9A09G047 },   //g3e
 	{ "renesas,r9a08g045s", "R9A08G045S", RENESAS_CPU_TYPE_R9A08G045S }, //g3s
+	{ "renesas,r9a08g046", "R9A08G046", RENESAS_CPU_TYPE_R9A08G046 },   //g3l
 	{ "renesas,r9a09g057", "R9A09G057", RENESAS_CPU_TYPE_R9A09G057 },   //v2h
 	{ "renesas,r9a09g056", "R9A09G056", RENESAS_CPU_TYPE_R9A09G056 },   //v2n
 };
