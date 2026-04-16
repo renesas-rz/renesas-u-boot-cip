@@ -1,5 +1,5 @@
 #######################################################################################################################
-# Copyright [2024] Renesas Electronics Corporation and/or its licensors. All Rights Reserved.
+# Copyright [2026] Renesas Electronics Corporation and/or its licensors. All Rights Reserved.
 #
 # The contents of this file (the "contents") are proprietary and confidential to Renesas Electronics Corporation
 # and/or its licensors ("Renesas") and subject to statutory and contractual protections.
@@ -16,31 +16,17 @@
 #######################################################################################################################
 
 #######################################################################################################################
-# Description: Yaml file containing jobs for T2N.
+# Description: Top level GitLab CI yaml file.
 #######################################################################################################################
 
-################################################## include ############################################################
 include:
-  - local: renesas-cicd/templates/common-job-templates.yml
-  - local: renesas-cicd/templates/merge-gateway-job-templates.yml
-
-################################### Preparation job for T2N merge gateway pipeline ####################################
-rzt2n-prep-for-uboot-merge-gateway-build-job:
-  variables:
-    PLAT: "t2n"
-  extends:
-    - .prep_for_uboot_merge_gateway_build_job_template
-
-############################################ T2N dev U-Boot build jobs #############################################
-rzt2n-dev:
-  variables:
-    PLAT: "t2n"
-    CONFIG_FILENAME: "rzt2n-dev_defconfig"
-  extends:
-    - .mpu_uboot_build_job_template
-rzt2n-dev-537-pin:
-  variables:
-    PLAT: "t2n"
-    CONFIG_FILENAME: "rzt2n-dev_537_pin_defconfig"
-  extends:
-    - .mpu_uboot_build_job_template
+  - project: products/common/bootloader/soc/u-boot-dev-cicd
+    ref: "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}_cicd"
+    file: renesas-cicd-default.yml
+    rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - project: products/common/bootloader/soc/u-boot-dev-cicd
+    ref: $CICD_TARGET_BRANCH
+    file: renesas-cicd-default.yml
+    rules:
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event"
