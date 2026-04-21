@@ -190,122 +190,121 @@ void s_init(void)
 	/* ==========================================xSPI1 Flash =======================================*/
 
 	/* xSPI1 : XSPI1_CKP/P15_6  & xSPI : XSPI1_CS0#/P15_7 */
-	*(volatile u8 *)PMC(15) |= BIT(7) | BIT(6);
 	*(volatile u64 *)PFC(15) = (*(volatile u64 *)PFC(15) & 0x0000FFFFFFFFFFFF) \
 	| ((u64)0x20 << 56) | ((u64)0x20 << 48);
+	*(volatile u8 *)PMC(15) |= BIT(7) | BIT(6);
 
 	/* xSPI1 : XSPI1_IO0/P16_2 xSPI : XSPI1_IO1/P16_3 xSPI : XSPI1_IO2/P16_4 xSPI : XSPI1_IO3/P16_5*/
-	*(volatile u8 *)PMC(16) |= BIT(5)|BIT(4)|BIT(3)|BIT(2);
     *(volatile u64 *)PFC(16) = (*(volatile u64 *)PFC(16) & 0xFFFF00000000FFFF)
      | ((u64)0x20 << 40) | ((u64)0x20 << 32) | (0x20 << 24) | (0x20 << 16);
+	*(volatile u8 *)PMC(16) |= BIT(5)|BIT(4)|BIT(3)|BIT(2);
 
 	/* Release module reset for GMAC1 */
 	*(volatile u32 *)MRCTLA &= ~(MRCTLA_XSPI1);
 
 	/* ==========================================SDHI0 & SDHI1=======================================*/
 
-	*(volatile u8 *)PMC(4) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
     *(volatile u64 *)PFC(4) = (*(volatile u64 *)PFC(4) & 0x0000000000000000)
      | ((u64)0x2C << 56) | ((u64)0x2C << 48) | ((u64)0x2C << 40) | ((u64)0x2C << 32) | (0x2C << 24) | (0x2C << 16) | (0x2C << 8) | (0x2C << 0);
+	*(volatile u8 *)PMC(4) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
-	*(volatile u8 *)PMC(5) |= BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
     *(volatile u64 *)PFC(5) = (*(volatile u64 *)PFC(5) & 0xFFFF000000000000)
      | ((u64)0x2C << 40) | ((u64)0x2C << 32) | (0x2C << 24) | (0x2C << 16) | (0x2C << 8) | (0x2C << 0);
+	*(volatile u8 *)PMC(5) |= BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
-	*(volatile u8 *)PMC(3) |= BIT(7) | BIT(6);
 	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0x0000FFFFFFFFFFFF) \
 	| ((u64)0x2C << 56) | ((u64)0x2C << 48);
+	*(volatile u8 *)PMC(3) |= BIT(7) | BIT(6);
 
-	*(volatile u8 *)PMC(15) |= BIT(0);
 	*(volatile u64 *)PFC(15) = (*(volatile u64 *)PFC(15) & 0xFFFFFFFFFFFFFF00) \
 	|  (0x2C<< 0);
+	*(volatile u8 *)PMC(15) |= BIT(0);
 
 	/* ==================================================ETH0 =======================================*/
     /* PMC and PFC for ETH0_TXCLK,ETH0_TXD0,ETH0_TXD1,ETH0_TXD2,ETH0_TXD3,ETH0_TXEN,ETH0_RXCLK,ETH0_RXD0*/
-	*(volatile u8 *)PMC(19) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
     *(volatile u64 *)PFC(19) = (*(volatile u64 *)PFC(19) & 0x0000000000000000)
      | ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+	*(volatile u8 *)PMC(19) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
 	/* PMC and PFC for ETH0_RXD1,ETH0_RXD2,ETH0_RXD3,ETH0_RXDV,ETH012_GMAC0_MDC,ETH012_GMAC0_MDIO,ETHSW_PHYLINK0,ETH0_REFCLK*/
-	*(volatile u8 *)PMC(20) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
     *(volatile u64 *)PFC(20) = (*(volatile u64 *)PFC(20) & 0x0000000000000000) \
      | ((u64)0x02 << 56) | ((u64)0x14<< 48) | ((u64)0x11<< 40) | ((u64)0x11 << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+	*(volatile u8 *)PMC(20) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
 	/* ==================================================ETH1 =======================================*/
 
     /* PMC and PFC for ETH1_TXCLK,ETH1_TXD0,ETH1_TXD1,ETH1_TXD2,ETH1_TXD3,ETH1_TXEN,ETH1_RXCLK*/
-	*(volatile u8 *)PMC(21) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1);
 	*(volatile u64 *)PFC(21) = (*(volatile u64 *)PFC(21) & 0x00000000000000FF) \
 	| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8);
+	*(volatile u8 *)PMC(21) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1);
 
 	/* PMC and PFC for ETH1_RXD0,ETH1_RXD1,ETH1_RXD2,ETH1_RXD3,ETH1_RXDV,ETHSW_PHYLINK1,ETH1_REFCLK*/
-	*(volatile u8 *)PMC(22) |= BIT(7)| BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 	*(volatile u64 *)PFC(22) = (*(volatile u64 *)PFC(22) & 0xFF00000000000000) \
 	| ( ((u64)0x02<< 48) | ((u64)0x14<< 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0));
+	*(volatile u8 *)PMC(22) |= BIT(7)| BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
 	/* ==================================================ETH2 =======================================*/
 
     /* PMC and PFC for ETH2_TXCLK,ETH2_TXD0,ETH2_TXD1,ETH2_TXD2,ETH2_TXD3,ETH2_TXEN,ETH2_RXCLK,ETH2_RXD0*/
-	*(volatile u8 *)PMC(23) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 	*(volatile u64 *)PFC(23) = (*(volatile u64 *)PFC(23) & 0x0000000000000000) \
 	| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+	*(volatile u8 *)PMC(23) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
 	/* PMC and PFC for ETH2_RXD1,ETH2_RXD2,ETH2_RXD3,ETH2_RXDV,ETH2_REFCLK*/
-	*(volatile u8 *)PMC(24) |= BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 	*(volatile u64 *)PFC(24) = (*(volatile u64 *)PFC(24) & 0xFFFFFF0000000000) \
 	| ((u64)0x2<< 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+	*(volatile u8 *)PMC(24) |= BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
 	/* P25_0_ETHSW_PHYLINK2*/
-	*(volatile u8 *)PMC(25) |= BIT(0);
 	*(volatile u64 *)PFC(25) = (*(volatile u64 *)PFC(25) & 0xFFFFFFFFFFFFFF00) \
 	|  (0x14<< 0);
+	*(volatile u8 *)PMC(25) |= BIT(0);
 
 	/* ==================================================ETH3 =======================================*/
 
     /* PMC and PFC for ETH3_TXCLK,ETH3_TXD0,ETH3_TXD1,ETH3_TXD2,ETH3_TXD3,ETH3_TXEN,ETH3_RXCLK,ETH3_RXD0*/
-	*(volatile u8 *)PMC(0) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
-
 	*(volatile u64 *)PFC(0) = (*(volatile u64 *)PFC(0) & 0x0000000000000000) \
 	| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+	*(volatile u8 *)PMC(0) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
 	/* PMC and PFC for ETH3_RXD1,ETH3_RXD2,ETH3_RXD3,ETH3_RXDV,ETH3_REFCLK ETH3_TXER IRQ*/
-	*(volatile u8 *)PMC(1) |= BIT(5)| BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 	*(volatile u64 *)PFC(1) = (*(volatile u64 *)PFC(1) & 0xFFFF000000000000) \
 	| ((u64)0x0 << 40) |((u64)0x2 << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+	*(volatile u8 *)PMC(1) |= BIT(5)| BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
 	/* P03_5_ETH3_RXER */
-	*(volatile u8 *)PMC(3) |= BIT(5);
 	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFF00FFFFFFFFFF) \
 	| ((u64)0xf<< 40);
+	*(volatile u8 *)PMC(3) |= BIT(5);
 
 	/* ==================================================ETH4 =======================================*/
 
     /* PMC and PFC for P01_6_ETH4_TXCLK_RMII_CLKIN & P01_7_ETH4_TXD0*/
-	*(volatile u8 *)PMC(1) |=BIT(7)|BIT(6);
 	*(volatile u64 *)PFC(1) = (*(volatile u64 *)PFC(1) & 0x0000FFFFFFFFFFFF) \
 	|((u64)0xf << 56) | ((u64)0xf << 48);
+	*(volatile u8 *)PMC(1) |=BIT(7)|BIT(6);
 
 	/*P02_0_ETH4_TXD1, P02_1_ETH4_TXD2, P02_2_ETH4_TXD3, P02_3_ETH4_TXEN
 	P02_4_ETH4_RXCLK, P02_5_ETH4_RXD0, P02_6_ETH4_RXD1, P02_7_ETH4_RXD2 */
-	*(volatile u8 *)PMC(2) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 	*(volatile u64 *)PFC(2) = (*(volatile u64 *)PFC(2) & 0x0000000000000000) \
 	| ((u64)0xf << 56) | ((u64)0xf << 48) | ((u64)0xf << 40) | ((u64)0xf << 32) | (0xf << 24) | (0xf << 16) | (0xf << 8) | (0xf << 0);
+	*(volatile u8 *)PMC(2) |= BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
 
 	/*P03_0_ETH4_RXD3, P03_1_ETH4_RXDV_CRS_DV */
-	*(volatile u8 *)PMC(3) |=BIT(1)|BIT(0);
 	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFFFFFFFF0000) \
 	|(0xf << 8) | (0xf << 0);
+	*(volatile u8 *)PMC(3) |=BIT(1)|BIT(0);
 
 #if XSPI1_FLASH_RW_ENABLE == 0
 	/*P16_3_ETH4_RXER*/
-	*(volatile u8 *)PMC(16) |=BIT(3);
 	*(volatile u64 *)PFC(16) = (*(volatile u64 *)PFC(16) & 0xFFFFFFFF00FFFFFF) \
 	|(0x10 <<24);
+	*(volatile u8 *)PMC(16) |=BIT(3);
 #endif
 	/*P03_4_ETH4_REFCLK */
-	*(volatile u8 *)PMC(3) |=BIT(4);
 	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFF00FFFFFFFF) \
 	| ((u64)0x2 << 32);
+	*(volatile u8 *)PMC(3) |=BIT(4);
 
 	/* ===================================== ETH1 GMAC1 =======================================*/
 
@@ -318,21 +317,21 @@ void s_init(void)
 
 
 	/* ETH1 connect to GMAC0*/
-	*(volatile u8 *)PMC(20) |= (BIT(5)|BIT(4));
 	*(volatile u64 *)PFC(20) = (*(volatile u64 *)PFC(20) & 0xFFFF0000FFFFFFFF) \
 	|(((u64)0x11<< 40) | ((u64)0x11<< 32));
+	*(volatile u8 *)PMC(20) |= (BIT(5)|BIT(4));
 
 #if !defined(CONFIG_TARGET_RZT2N_537_PIN_DEV)
 	/*P24_6_ETH3_GMAC1_MDC & P24_7_ETH3_GMAC1_MDIO*/
-	*(volatile u8 *)PMC(24) |= (BIT(7)|BIT(6));
 	*(volatile u64 *)PFC(24) = (*(volatile u64 *)PFC(24) & 0x0000FFFFFFFFFFFF) \
 	| ( ((u64)0x12<<56) | ((u64)0x12<< 48));
+	*(volatile u8 *)PMC(24) |= (BIT(7)|BIT(6));
 
 #else 
 	/*P3_2_ETH3_GMAC1_MDC & P3_3_ETH3_GMAC1_MDIO*/
-	*(volatile u8 *)PMC(3) |= (BIT(3)|BIT(2));
 	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFFFF0000FFFF) \
 	| ( ((u64)0x12<<24) | ((u64)0x12<< 16));
+	*(volatile u8 *)PMC(3) |= (BIT(3)|BIT(2));
 #endif
 
 	/* Release module stop for GMAC1 */
