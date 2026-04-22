@@ -206,7 +206,19 @@ int board_late_init(void)
 	const u8 clock_gen_i2c_bus = 4;
 	const u8 clock_gen_addr = 0x68;
 	const u8 amp = 0x7;
-	int ret;
+	int ret, use_ecc, ecc_mode;
+	struct pt_regs regs;
+
+	/* Setting SiP Service GET_ECC_MODE command*/
+	regs.regs[0] = RZG_SIP_SVC_GET_ECC_MODE;
+	smc_call(&regs);
+	/* First result is USE ECC or not, Second result is ECC MODE*/
+	use_ecc = regs.regs[0];
+	ecc_mode = regs.regs[1];
+
+	/* Don't relocate U-Boot if enable ECC with dual or single modes */
+	if ((use_ecc == 1) && ecc_mode)
+		env_set_hex("fdt_high", ~0UL);
 
 #ifdef CONFIG_WDT_RENESAS
 	reinitr_wdt();
