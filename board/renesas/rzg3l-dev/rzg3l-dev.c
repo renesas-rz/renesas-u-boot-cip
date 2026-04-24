@@ -266,6 +266,19 @@ int board_init(void)
 	return 0;
 }
 
+#if IS_ENABLED(CONFIG_BOARD_LATE_INIT)
+int board_late_init(void)
+{
+	/*
+	 * No late-init work required for the G3L SystemReady build.
+	 * CONFIG_BOARD_LATE_INIT is enabled by smarc-rzg3l-distros_defconfig
+	 * because the EFI/distro flow expects the hook to exist; provide an
+	 * empty stub so the link succeeds.
+	 */
+	return 0;
+}
+#endif
+
 void reset_cpu(void)
 {
 }
