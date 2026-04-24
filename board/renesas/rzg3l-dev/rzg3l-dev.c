@@ -24,8 +24,45 @@
 #include <asm/arch/rcar-mstp.h>
 #include <asm/arch/sh_sdhi.h>
 #include <mmc.h>
+#include <efi_loader.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+
+/*
+ * Firmware image type GUID for the RZ/G3L SystemReady capsule update flow.
+ * Generated specifically for G3L (do NOT reuse the G3E GUID).
+ *   uuidgen: a3b6769f-5d3e-4bd3-be24-660a8d1a79b6
+ */
+#define EFI_FIRMWARE_IMAGE_TYPE_RZG3L_GUID \
+	EFI_GUID(0xa3b6769f, 0x5d3e, 0x4bd3, 0xbe, 0x24, \
+		 0x66, 0x0a, 0x8d, 0x1a, 0x79, 0xb6)
+
+struct efi_fw_image fw_images[] = {
+	{
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZG3L_GUID,
+		.fw_name = u"bl2_bp-smarc-rzg3l.bin",
+		.image_index = 1,
+	},
+	{
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZG3L_GUID,
+		.fw_name = u"fip-smarc-rzg3l.bin",
+		.image_index = 2,
+	},
+};
+
+struct efi_capsule_update_info update_info = {
+	.dfu_string =
+		/* BL2 in SPI NOR at offset 0x0, max size 0x40000 */
+		"sf 0:0=bl2_bp-smarc-rzg3l.bin raw 0x0 0x40000;"
+		/* FIP in SPI NOR at offset 0x60000, max size 0xFA0000 */
+		"fip-smarc-rzg3l.bin raw 0x60000 0xFA0000",
+	.num_images = ARRAY_SIZE(fw_images),
+	.images = fw_images,
+};
+
+#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
 #define PFC_BASE			0x11030000
 
