@@ -143,7 +143,6 @@ struct efi_capsule_update_info update_info = {
 #define PFC_PFC2F			(PFC_BASE + 0x4BC)
 
 //i2c
-#define	PFC_PMC35			(PFC_BASE + 0x235)
 #define	PFC_PFC35			(PFC_BASE + 0x4D4)
 
 #define PFC_PWPR			(PFC_BASE + 0x3000)

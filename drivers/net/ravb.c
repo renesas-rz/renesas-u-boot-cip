@@ -407,7 +407,7 @@ static int ravb_dmac_init(struct udevice *dev)
 {
 	struct ravb_priv *eth = dev_get_priv(dev);
 #if !(defined(CONFIG_R9A07G044L) || defined(CONFIG_R9A07G044C) || defined(CONFIG_R9A07G054L) || \
-	defined(CONFIG_R9A07G043U) || defined(CONFIG_RZF_DEV) || defined(CONFIG_R9A08G045S))
+	defined(CONFIG_R9A07G043U) || defined(CONFIG_RZF_DEV) || defined(CONFIG_R9A08G045S) || defined(CONFIG_R9A08G046))
 	struct eth_pdata *pdata = dev_get_plat(dev);
 	int mode = 0;
 	unsigned int delay;
