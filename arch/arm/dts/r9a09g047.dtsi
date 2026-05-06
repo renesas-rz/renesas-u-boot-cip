@@ -205,7 +205,7 @@
 			gpio-controller;
 			#gpio-cells = <2>;
 			gpio-ranges = <&pinctrl 0 0 232>;
-			renesas,port-max = <22>;
+			renesas,port-max = <29>;
 			clocks = <&cpg CPG_MOD R9A09G047_IOTOP_SHCLK>;
 			power-domains = <&cpg>;
 			resets = <&cpg R9A09G047_IOTOP_RESETN>,
