@@ -1,0 +1,13 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * RZ/G3E SMARC EVK (R9A09G047E57), U-Boot specific overrides.
+ *
+ * Copyright (C) 2024 Renesas Electronics Corp.
+ */
+
+&xspi {
+	flash@0 {
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
+	};
+};
