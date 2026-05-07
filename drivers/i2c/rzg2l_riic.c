@@ -624,7 +624,7 @@ static int riic_probe_chip(struct udevice *dev, uint addr, uint flags)
 static int riic_probe(struct udevice *dev)
 {
 	struct riic_priv *priv = dev_get_priv(dev);
-#if !(defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_R9A09G047) || defined(CONFIG_R9A08G046))
+#if !(defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_R9A09G047))
 	int ret;
 
 	writel(0x000F000F, 0x11010880);
@@ -636,7 +636,7 @@ static int riic_probe(struct udevice *dev)
 #endif
 	priv->base = dev_read_addr_ptr(dev);
 
-#if !(defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_R9A09G047) || defined(CONFIG_R9A08G046))
+#if !(defined(CONFIG_R9A09G057) || defined(CONFIG_R9A09G056) || defined(CONFIG_R9A09G047))
 	ret = clk_get_by_index(dev, 0, &priv->clk);
 	if (ret)
 		return ret;
