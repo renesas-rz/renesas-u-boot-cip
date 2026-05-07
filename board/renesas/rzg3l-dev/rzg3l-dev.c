@@ -145,6 +145,14 @@ struct efi_capsule_update_info update_info = {
 //i2c
 #define	PFC_PFC35			(PFC_BASE + 0x4D4)
 
+//i2c3 on P20/P21
+#define	PFC_PMC22			(PFC_BASE + 0x222)
+#define	PFC_PFC22			(PFC_BASE + 0x488)
+
+/* SYSC clone-channel select for I2C ch3 alternate pin group */
+#define SYSC_BASE			0x11020000
+#define SYS_IPCONT_SEL_CLONECH		(SYSC_BASE + 0x0E2C)
+
 #define PFC_PWPR			(PFC_BASE + 0x3000)
 #define PWPR_B0WI			BIT(7)	 /* Bit Write Disable */
 #define PWPR_PFCWE			BIT(6)	/* PFC Register Write Enable */
@@ -213,6 +221,19 @@ void s_init(void)
 	/* Pinmux for I2C0	*/
 	*(volatile u32 *)(PFC_PFC35) |= 0x4400;
 	*(volatile u8 *)(PFC_PMC35)  |= 0x0C;
+
+#if CONFIG_TARGET_SMARC_RZG3L
+	/* Select I2C ch3 alternate pin group P20/P21 (SYS_IPCONT_SEL_CLONECH bit[1]) */
+	*(volatile u32 *)(SYS_IPCONT_SEL_CLONECH) |= 0x2;
+
+	/* Pinmux for I2C2 on PA4/PA5 (function 4) */
+	*(volatile u32 *)(PFC_PFC2A) |= 0x00440000;
+	*(volatile u8  *)(PFC_PMC2A) |= 0x30;
+
+	/* Pinmux for I2C3 on P20/P21 (function 4) */
+	*(volatile u32 *)(PFC_PFC22) |= 0x00000044;
+	*(volatile u8  *)(PFC_PMC22) |= 0x03;
+#endif
 
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(ETH0_POC) = (*(volatile u32 *)(ETH0_POC) & 0xFFFFFFFC) | ETH_PVDD_1800;
