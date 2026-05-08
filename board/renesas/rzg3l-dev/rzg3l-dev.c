@@ -226,6 +226,10 @@ void s_init(void)
 	/* Select I2C ch3 alternate pin group P20/P21 (SYS_IPCONT_SEL_CLONECH bit[1]) */
 	*(volatile u32 *)(SYS_IPCONT_SEL_CLONECH) |= 0x2;
 
+	/* Pinmux for I2C1 on PA6/PA7 (function 4) */
+	*(volatile u32 *)(PFC_PFC2A) |= 0x44000000;
+	*(volatile u8  *)(PFC_PMC2A) |= 0xC0;
+
 	/* Pinmux for I2C2 on PA4/PA5 (function 4) */
 	*(volatile u32 *)(PFC_PFC2A) |= 0x00440000;
 	*(volatile u8  *)(PFC_PMC2A) |= 0x30;
