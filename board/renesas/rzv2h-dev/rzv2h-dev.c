@@ -387,7 +387,9 @@ int board_init(void)
 	return 0;
 }
 
+#ifndef CONFIG_RZV2H_DISTRO_BOOT
 void reset_cpu(void)
 {
 
 }
+#endif
