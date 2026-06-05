@@ -71,9 +71,9 @@ static int gen3_clk_get_parent(struct gen3_clk_priv *priv, struct clk *clk,
 			return ret;
 
 		if (core->type == CLK_TYPE_GEN3_MDSEL) {
-			shift = priv->cpg_mode & BIT(core->offset) ? 16 : 0;
+			shift = (priv->sscg ? 16 : 0);
 			parent->dev = clk->dev;
-			parent->id = core->parent >> shift;
+			parent->id = core->parent >> (priv->sscg ? 16 : 0);
 			parent->id &= 0xffff;
 			return 0;
 		}
@@ -321,8 +321,8 @@ static u64 gen3_clk_get_rate64(struct clk *clk)
 						"FIXED");
 
 	case CLK_TYPE_GEN3_MDSEL:
-		shift = priv->cpg_mode & BIT(core->offset) ? 16 : 0;
-		div = (core->div >> shift) & 0xffff;
+		shift = (priv->sscg ? 16 : 0);
+		div = (core->div >> (priv->sscg ? 16 : 0)) & 0xffff;
 		rate = gen3_clk_get_rate64(&parent) / div;
 		debug("%s[%i] PE clk: parent=%i div=%u => rate=%llu\n",
 		      __func__, __LINE__, (core->parent >> shift) & 0xffff,
@@ -521,7 +521,7 @@ static int gen3_clk_probe(struct udevice *dev)
 		return -EINVAL;
 
 	priv->cpg_mode = readl(rst_base + info->reset_modemr_offset);
-
+	priv->sscg = !(priv->cpg_mode & BIT(12));
 	pll_config = info->get_pll_config(priv->cpg_mode);
 
 	if (info->reg_layout == CLK_REG_LAYOUT_RCAR_GEN2_AND_GEN3) {
