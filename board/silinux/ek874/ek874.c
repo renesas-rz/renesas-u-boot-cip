@@ -10,7 +10,7 @@
 #include <env.h>
 #include <i2c.h>
 #include <asm/global_data.h>
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 #include <asm/io.h>
 #include <asm/system.h>
 #include <asm/ptrace.h>
@@ -40,8 +40,8 @@ char check_rev(void)
 	u32 reg;
 	int ret;
 
-	if ((rmobile_get_cpu_rev_integer() == 1) &&
-	    (rmobile_get_cpu_rev_fraction() < 1)) {
+	if ((renesas_get_cpu_rev_integer() == 1) &&
+	    (renesas_get_cpu_rev_fraction() < 1)) {
 		ret = 'B';
 	} else {
 		/* Check GPIO/Peripheral Function mode */
