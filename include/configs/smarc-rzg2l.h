@@ -40,6 +40,10 @@
 /* SDHI clock freq */
 #define CONFIG_SH_SDHI_FREQ		133000000
 
+/* DRAM: first 128MB reserved for secure area, 2GB total */
+#define DRAM_RSV_SIZE			0x08000000
+#define CFG_MAX_MEM_MAPPED		(0x80000000u - DRAM_RSV_SIZE)
+
 
 /* ENV setting */
 #if defined(CONFIG_RZG2L_DISTRO_BOOT)

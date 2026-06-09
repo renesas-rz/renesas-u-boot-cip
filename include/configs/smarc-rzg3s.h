@@ -48,7 +48,7 @@
 /* Default load address for tfpt,bootp... */
 #define CONFIG_LOADADDR			CONFIG_SYS_LOAD_ADDR
 #define CONFIG_VERY_BIG_RAM
-#define CONFIG_MAX_MEM_MAPPED		(0x40000000u - DRAM_RSV_SIZE)
+#define CFG_MAX_MEM_MAPPED		(0x40000000u - DRAM_RSV_SIZE)
 
 #define CONFIG_SYS_MONITOR_BASE		0x00000000
 //MM Defined in u-boot/kconfig & u-boot/boot/kconfig, overriden/configured in rzg3s_defconfig and variants
