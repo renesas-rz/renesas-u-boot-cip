@@ -10,6 +10,11 @@
 #include <asm/io.h>
 #include <env.h>
 #include <linux/ctype.h>
+#include <linux/arm-smccc.h>
+
+#define SMC_PRODUCT_ID 0x82000012
+
+static const char *get_t2n_product_string(unsigned long val);
 
 #ifdef CONFIG_ARCH_CPU_INIT
 int arch_cpu_init(void)
@@ -97,6 +102,30 @@ static const u8 *get_cpu_name(int idx)
 }
 #endif
 
+#ifdef CONFIG_R9A07G076
+static const char *get_t2n_product_string(unsigned long val) {
+    switch (val) {
+    case 0x00005000: return "R9A07G076M48GBG";
+    case 0x00005001: return "R9A07G076M47GBG";
+    case 0x00005002: return "R9A07G076M45GBG";
+    case 0x00005003: return "R9A07G076M43GBG";
+    case 0x00005004: return "R9A07G076M37GBG";
+    case 0x00005005: return "R9A07G076M35GBG";
+    case 0x00005006: return "R9A07G076M30GBG";
+
+    case 0x00005100: return "R9A07G076M48GBA";
+    case 0x00005101: return "R9A07G076M47GBA";
+    case 0x00005102: return "R9A07G076M45GBA";
+    case 0x00005103: return "R9A07G076M43GBA";
+    case 0x00005104: return "R9A07G076M37GBA";
+    case 0x00005105: return "R9A07G076M35GBA";
+    case 0x00005106: return "R9A07G076M30GBA";
+
+    default: return "";
+    }
+}
+#endif
+
 #ifdef CONFIG_ARCH_MISC_INIT
 int arch_misc_init(void)
 {
@@ -128,7 +157,11 @@ int print_cpuinfo(void)
 	printf("CPU: Renesas Electronics RZ/T2H\n");
 #else
 #ifdef CONFIG_R9A07G076
-	printf("CPU: Renesas Electronics RZ/T2N\n");
+	struct arm_smccc_res res;
+
+	arm_smccc_smc(SMC_PRODUCT_ID, 0, 0, 0, 0, 0, 0, 0, &res);
+
+	printf("CPU: Renesas Electronics RZ/T2N %s\n",get_t2n_product_string(res.a0));
 #else
 	int i = renesas_cpuinfo_idx();
 
