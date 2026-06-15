@@ -96,7 +96,7 @@
 };
 
 &rpc {
-	compatible = "renesas,rcar-gen3-rpc";
+	compatible = "renesas,rcar-gen3-rpc-if";
 	num-cs = <1>;
 	spi-max-frequency = <40000000>;
 	#address-cells = <1>;
