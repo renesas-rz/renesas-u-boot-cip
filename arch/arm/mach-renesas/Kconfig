@@ -134,7 +134,5 @@ source "arch/arm/mach-renesas/Kconfig.64"
 source "arch/arm/mach-renesas/Kconfig.rza1"
 source "arch/arm/mach-renesas/Kconfig.rzn1"
 source "arch/arm/mach-renesas/Kconfig.rzg2l"
-source "arch/arm/mach-renesas/Kconfig.rzt2h"
-source "arch/arm/mach-renesas/Kconfig.rzn2h"
 
 endif

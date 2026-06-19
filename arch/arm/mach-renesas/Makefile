@@ -21,7 +21,7 @@ obj-$(CONFIG_RCAR_GEN4) +=  memmap-gen3.o
 obj-$(CONFIG_R9A09G011GBG) += lowlevel_init_gen3.o memmap-r9a09g011gbg.o
 obj-$(CONFIG_R9A09G055MA3GBG) += lowlevel_init_gen3.o memmap-r9a09g055ma3gbg.o
 obj-$(CONFIG_RZG2L) += memmap-rzg2l.o
-
+endif
 # RZ family CPU info (G2L, G2UL, G2LC, V2L, G3E, G3S, V2H, V2N)
 ifneq ($(CONFIG_R9A07G044L)$(CONFIG_R9A07G043U)$(CONFIG_R9A07G044C)$(CONFIG_R9A07G054L)$(CONFIG_R9A09G047)$(CONFIG_R9A08G045S)$(CONFIG_R9A08G046)$(CONFIG_R9A09G057)$(CONFIG_R9A09G056),)
 obj-y += cpu_info-rz.o
