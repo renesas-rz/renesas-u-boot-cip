@@ -473,7 +473,7 @@ static int xspi_of_to_plat(struct udevice *bus)
 	plat->regs = dev_read_addr_index(bus, 0);
 	plat->extr = dev_read_addr_index(bus, 1);
 
-#if CONFIG_IS_ENABLED(CLK) && !defined(CONFIG_R9A09G057)
+#if CONFIG_IS_ENABLED(CLK) && !defined(CONFIG_R9A09G057) && !defined(CONFIG_R9A09G077) && !defined(CONFIG_R9A09G087)
 	struct xspi_priv *priv = dev_get_priv(bus);
 	int ret;
 
