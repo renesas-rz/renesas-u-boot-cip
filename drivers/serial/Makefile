@@ -36,7 +36,11 @@ obj-$(CONFIG_SANDBOX_SERIAL) += sandbox.o
 ifneq ($(or $(CONFIG_R9A08G045S),$(CONFIG_R9A08G046)),)
   obj-$(CONFIG_SCIF_CONSOLE) += serial_sh_g3s.o
 else
-obj-$(CONFIG_SCIF_CONSOLE) += serial_sh.o
+  ifdef CONFIG_SERIAL_SH_RSCI
+    obj-$(CONFIG_SCIF_CONSOLE) += serial_sh_rsci.o
+  else
+    obj-$(CONFIG_SCIF_CONSOLE) += serial_sh.o
+  endif
 endif
 
 obj-$(CONFIG_SEMIHOSTING_SERIAL) += serial_semihosting.o
