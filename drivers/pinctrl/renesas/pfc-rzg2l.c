@@ -162,19 +162,21 @@ const struct pinctrl_ops rzg2l_pinctrl_ops  = {
 	.set_state = rzg2l_pinctrl_set_state,
 };
 
-static int rzg2l_pinctrl_probe(struct udevice *dev)
+static int rzg2l_pinctrl_bind(struct udevice *dev)
 {
-	struct rzg2l_pinctrl_priv *priv = dev_get_plat(dev);
 	ofnode node;
 
-	priv->dev = dev;
-
-	priv->regs = dev_read_addr_ptr(dev);
-	if (!priv->regs) {
-		dev_err(dev, "can't get address\n");
-		return -EINVAL;
-	}
-
+	/*
+	 * The GPIO banks are described as gpio-controller subnodes of the pin
+	 * controller and have no compatible of their own, so they are bound
+	 * here explicitly. Do this at .bind (DT-scan) time rather than from
+	 * .probe: the pin controller is only probed lazily, when a consumer
+	 * applies a "default" pinctrl state. On boards that have no such
+	 * consumer (e.g. smarc-rzg3l, where no node carries a pinctrl-0) the
+	 * pin controller would never probe, leaving the GPIO banks unbound and
+	 * "gpio status -a" empty. Binding at scan time decouples GPIO
+	 * availability from the pinctrl probe ordering.
+	 */
 	dev_for_each_subnode(node, dev) {
 		struct udevice *gpiodev;
 
@@ -184,6 +186,21 @@ static int rzg2l_pinctrl_probe(struct udevice *dev)
 		device_bind_driver_to_node(dev, "rzg2l-gpio",
 					   ofnode_get_name(node),
 					   node, &gpiodev);
+	}
+
+	return 0;
+}
+
+static int rzg2l_pinctrl_probe(struct udevice *dev)
+{
+	struct rzg2l_pinctrl_priv *priv = dev_get_plat(dev);
+
+	priv->dev = dev;
+
+	priv->regs = dev_read_addr_ptr(dev);
+	if (!priv->regs) {
+		dev_err(dev, "can't get address\n");
+		return -EINVAL;
 	}
 
 	return 0;
@@ -206,6 +223,7 @@ U_BOOT_DRIVER(rzg2l_pinctrl) = {
 	.name		= "rzg2l_pinctrl",
 	.id		= UCLASS_PINCTRL,
 	.of_match	= rzg2l_pinctrl_match,
+	.bind		= rzg2l_pinctrl_bind,
 	.probe		= rzg2l_pinctrl_probe,
 	.plat_auto	= sizeof(struct rzg2l_pinctrl_priv),
 	.ops		= &rzg2l_pinctrl_ops,

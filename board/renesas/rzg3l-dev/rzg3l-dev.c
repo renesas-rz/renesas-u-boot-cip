@@ -25,6 +25,8 @@
 #include <asm/arch/sh_sdhi.h>
 #include <mmc.h>
 #include <efi_loader.h>
+#include <linux/delay.h>
+#include <i2c.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -290,18 +292,30 @@ int board_init(void)
 	return 0;
 }
 
-#if IS_ENABLED(CONFIG_BOARD_LATE_INIT)
 int board_late_init(void)
 {
-	/*
-	 * No late-init work required for the G3L SystemReady build.
-	 * CONFIG_BOARD_LATE_INIT is enabled by smarc-rzg3l-distros_defconfig
-	 * because the EFI/distro flow expects the hook to exist; provide an
-	 * empty stub so the link succeeds.
-	 */
-	return 0;
+	struct udevice *dev;
+	const u8 pmic_i2c_bus = 0;
+	int ret;
+
+	ret = i2c_get_chip_for_busnum(pmic_i2c_bus, 0x12, 1, &dev);
+	if (!ret)
+	{
+		/* Config MPIO1 func to Output from I2C output */
+		dm_i2c_reg_clrset(dev, 0x8B, 0x7, 0x7);
+
+		/* Assert and deassert MPIO1 line to reset PHY */
+		dm_i2c_reg_clrset(dev, 0x7f, 0x2, 0x0);
+		udelay(2);
+		dm_i2c_reg_clrset(dev, 0x7f, 0x0, 0x2);
+
+		/* Config MPIO1 func to Reset output */
+		dm_i2c_reg_clrset(dev, 0x8B, 0x7, 0x5);
+		dm_i2c_reg_clrset(dev, 0x7f, 0x2, 0x0);
+	}
+
+	return ret;
 }
-#endif
 
 void reset_cpu(void)
 {
