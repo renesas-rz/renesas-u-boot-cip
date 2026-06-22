@@ -17,6 +17,10 @@ config RCAR_64
 	#imply OF_UPSTREAM
 	imply SUPPORT_EMMC_RPMB if MMC
 
+choice
+	prompt "Target Renesas SoC select"
+	default RCAR_32
+
 config RCAR_GEN3
 	bool "Renesas ARM SoCs R-Car Gen3 (64bit)"
 	select RCAR_64
@@ -32,13 +36,6 @@ config RCAR_GEN3
 	imply SPL_TINY_MEMSET
 	imply SPL_USE_TINY_PRINTF
 	imply SPL_YMODEM_SUPPORT
-
-config SERIAL_SH_RSCI
-	bool "Renesas serial driver for RSCI port"
-
-choice
-	prompt "Target Renesas SoC select"
-	default RCAR_32
 
 config RCAR_32
 	bool "Renesas ARM SoCs R-Car Gen1/Gen2 (32bit)"
@@ -95,34 +92,6 @@ config RZG2L
 	  SoC). Support for additional SoCs in this family (RZ/G2LC, RZ/G2UL,
 	  RZ/V2L & RZ/Five) is not yet available.
 
-
-config RZT2H
-	prompt "Renesas RZ/T2H Family ARM SoCs"
-	select RCAR_64
-	select RCAR_GEN3
-	select SUPPORT_SPL
-	select PINCTRL_PFC
-	select SERIAL_SH_RSCI
-	imply SH_SDHI
-	imply SCIF_CONSOLE
-	imply SYS_MALLOC_F
-
-	help
-	  Enable support for the Renesas RZ/T2H family of SoCs.
-
-config RZN2H
-	prompt "Renesas RZ/N2H Family ARM SoCs"
-	select RCAR_64
-	select RCAR_GEN3
-	select SUPPORT_SPL
-	select PINCTRL_PFC
-	select SERIAL_SH_RSCI
-	imply SH_SDHI
-	imply SCIF_CONSOLE
-	imply SYS_MALLOC_F
-
-	help
-	  Enable support for the Renesas RZ/N2H family of SoCs.
 
 endchoice
 

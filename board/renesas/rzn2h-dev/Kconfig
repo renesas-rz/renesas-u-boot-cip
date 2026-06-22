@@ -12,4 +12,7 @@ config SYS_VENDOR
 config SYS_CONFIG_NAME
 	default "rzn2h-dev"
 
+config SERIAL_SH_RSCI
+	bool "Renesas serial driver for RSCI port"
+
 endif

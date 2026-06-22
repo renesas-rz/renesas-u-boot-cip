@@ -337,6 +337,7 @@ source "board/renesas/rzg3e-dev/Kconfig"
 source "board/renesas/rzg3s-dev/Kconfig"
 source "board/renesas/rzg3l-dev/Kconfig"
 source "board/renesas/rzt2h-dev/Kconfig"
+source "board/renesas/rzn2h-dev/Kconfig"
 
 config MULTI_DTB_FIT_UNCOMPRESS_SZ
 	default 0x80000 if TARGET_BEACON_RZG2M
