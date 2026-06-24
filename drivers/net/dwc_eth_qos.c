@@ -581,7 +581,7 @@ static int eqos_set_tx_clk_speed_tegra186(struct udevice *dev)
 static int eqos_adjust_link(struct udevice *dev)
 {
 	struct eqos_priv *eqos = dev_get_priv(dev);
-	int ret;
+	int ret, port;
 	bool en_calibration;
 
 	debug("%s(dev=%p):\n", __func__, dev);
@@ -616,6 +616,15 @@ static int eqos_adjust_link(struct udevice *dev)
 		pr_err("eqos_set_*mii_speed*() failed: %d\n", ret);
 		return ret;
 	}
+
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_RZT2H)
+	/* U-Boot only supports
+	 * a single PHY attached to it. Since we have no idea which port
+	 * the PHY is actually being used with, we update all ports.*/
+	for (port = 0; port < 4; port++) {
+	        ethss_link_up(port, eqos->phy->interface, eqos->phy->speed, eqos->phy->duplex);
+	}
+#endif
 
 	if (en_calibration) {
 		ret = eqos->config->ops->eqos_calibrate_pads(dev);
