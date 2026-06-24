@@ -33,7 +33,7 @@
 /* ENV setting */
 
 #if defined(CONFIG_TARGET_SILINUX_EK874)
-#define CONFIG_EXTRA_ENV_SETTINGS	\
+#define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0" \
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
@@ -44,7 +44,7 @@
 	"bootcmd_check=if mmc dev 0; then run sdload; else run emmcload; fi \0" \
 	"dtb_check=if test ${board_rev} = E;then setenv dtb_name r8a774c0-ek874.dtb;else setenv dtb_name r8a774c0-ek874-revc.dtb;fi \0"
 #elif defined(CONFIG_TARGET_HIHOPE_RZG2)
-#define CONFIG_EXTRA_ENV_SETTINGS	\
+#define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0" \
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
@@ -58,7 +58,7 @@
 	"g2n_dtb_check=if test ${soc_id} = r8a774b1;then if test ${board_rev} = 2;then setenv dtb_name r8a774b1-hihope-rzg2n-rev2-ex.dtb;else setenv dtb_name r8a774b1-hihope-rzg2n-ex.dtb;fi;fi \0" \
 	"g2h_dtb_check=if test ${soc_id} = r8a774e1;then setenv dtb_name r8a774e1-hihope-rzg2h-ex.dtb;fi \0"
 #else
-#define CONFIG_EXTRA_ENV_SETTINGS	\
+#define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0"
 #endif
