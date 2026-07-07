@@ -482,8 +482,21 @@ static int eqos_set_tx_clk_speed_rzv2h(struct udevice *dev)
 
 static int eqos_probe_resources_rzv2h(struct udevice *dev)
 {
-	/* Board init */
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_RZT2H)
+	int ret;
+	struct clk gmac_clk;
+	ret = clk_get_by_index(dev, 0, &gmac_clk);
+	if (ret) {
+		debug("failed to get clock, ret=%d\n", ret);
+		return ret;
+	}
 
+	ret = clk_enable(&gmac_clk);
+	if (ret) {
+		debug("failed to enable clock, ret=%d\n", ret);
+		return ret;
+	}
+#endif
 	return 0;
 }
 
@@ -1419,7 +1432,31 @@ static int eqos_remove_resources_tegra186(struct udevice *dev)
 	debug("%s: OK\n", __func__);
 	return 0;
 }
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_RZT2H)
+int rzt2h_board_init(void)
+{
+	int ret;
 
+	/* ETHSS: Mode Control 0x6, GMAC1 on port ETH3, GMAC2 on port ETH2 */
+	ethss_init_hw(0x6);
+
+	/* ETHSS: GMAC1 RGMII_ID mode on port ETH3 */
+	ret = ethss_config(3, PHY_INTERFACE_MODE_RGMII_ID);
+	if (ret < 0)
+		return ret;
+	/* Set up speed for Converters for GMAC1 */
+	ethss_link_up(3, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
+
+	/* ETHSS: GMAC2 MII mode on port ETH2 */
+	ret = ethss_config(2, PHY_INTERFACE_MODE_RGMII_ID);
+	if (ret < 0)
+		return ret;
+	/* Set up speed for Converters for GMAC2 */
+	ethss_link_up(2, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
+
+	return 0;
+}
+#endif
 static int eqos_probe(struct udevice *dev)
 {
 	struct eqos_priv *eqos = dev_get_priv(dev);
@@ -1441,7 +1478,15 @@ static int eqos_probe(struct udevice *dev)
 	eqos->tegra186_regs = (void *)(eqos->regs + EQOS_TEGRA186_REGS_BASE);
 
 	eqos->max_speed = dev_read_u32_default(dev, "max-speed", 0);
-
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_RZT2H)
+	ret = gpio_request_by_name(dev, "phy-reset-gpios", 0,
+				   &eqos->phy_reset_gpio,
+				   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
+	if (ret) {
+		pr_err("gpio_request_by_name(phy reset) failed: %d\n", ret);
+		goto err_free_reset_eqos;
+	}
+#endif
 	ret = eqos_probe_resources_core(dev);
 	if (ret < 0) {
 		pr_err("eqos_probe_resources_core() failed: %d\n", ret);
@@ -1459,7 +1504,9 @@ static int eqos_probe(struct udevice *dev)
 		pr_err("eqos_start_clks() failed: %d\n", ret);
 		goto err_remove_resources_tegra;
 	}
-
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_RZT2H)
+	rzt2h_board_init();
+#endif
 #ifdef CONFIG_DM_ETH_PHY
 	eqos->mii = eth_phy_get_mdio_bus(dev);
 #endif
@@ -1497,7 +1544,10 @@ err_remove_resources_tegra:
 	eqos->config->ops->eqos_remove_resources(dev);
 err_remove_resources_core:
 	eqos_remove_resources_core(dev);
-
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_RZT2H)
+err_free_reset_eqos:
+	reset_free(&eqos->reset_ctl);
+#endif
 	debug("%s: returns %d\n", __func__, ret);
 	return ret;
 }
