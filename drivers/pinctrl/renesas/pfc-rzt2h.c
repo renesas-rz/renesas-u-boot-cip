@@ -14,6 +14,8 @@
 #include <linux/err.h>
 #include <fdt_support.h>
 #include <dm/device_compat.h>
+#include <dm/device.h>
+#include <asm/gpio.h>
 
 #define P(n)	(0x000 + 0x001 * (n))	/* Port Register */
 #define PM(n)	(0x200 + 0x002 * (n))	/* Port Mode Register */
@@ -40,6 +42,11 @@ DECLARE_GLOBAL_DATA_PTR;
 
 struct rzt2h_pinctrl_priv {
 	void __iomem	*regs, *regs1;
+};
+
+struct rzt2h_gpio_priv {
+	void __iomem	*regs, *regs1;
+	int		bank;
 };
 
 void rzt2h_pinctrl_writeb(struct rzt2h_pinctrl_priv *priv, u8 port, u8 val, u16 offset)
@@ -247,7 +254,6 @@ const struct pinctrl_ops rzt2h_pinctrl_ops  = {
 static int rzt2h_pinctrl_probe(struct udevice *dev)
 {
 	struct rzt2h_pinctrl_priv *priv = dev_get_plat(dev);
-	ofnode pin_node;
 	struct fdt_resource res, res1;
 	void *fdt = (void *)gd->fdt_blob;
 	int node = dev_of_offset(dev);
@@ -269,15 +275,27 @@ static int rzt2h_pinctrl_probe(struct udevice *dev)
 	}
 	priv->regs1 = ioremap(res1.start, fdt_resource_size(&res1));
 
-	dev_for_each_subnode(pin_node, dev) {
-		struct udevice *gpiodev;
+    if (!priv->regs1) {
+        printf("pinctrl: ioremap failed for safety\n");
+        return -ENODEV;
+    }
+	return 0;
+}
 
-		if (!ofnode_read_bool(pin_node, "gpio-controller"))
-			continue;
+static int rzt2h_pinctrl_bind(struct udevice *dev)
+{
+	struct udevice *gpiodev;
+	int ret;
 
-		device_bind_driver_to_node(dev, "rzt2h-gpio",
-					   ofnode_get_name(pin_node),
-					   pin_node, &gpiodev);
+	if (!dev_read_bool(dev, "gpio-controller"))
+		return 0;
+
+	ret = device_bind_driver_to_node(dev, "rzt2h-gpio",
+					  "gpio-bank0",
+					  dev_ofnode(dev), &gpiodev);
+	if (ret) {
+		printf("gpio bind failed: %d\n", ret);
+		return ret;
 	}
 
 	return 0;
@@ -294,6 +312,7 @@ U_BOOT_DRIVER(rzt2h_pinctrl) = {
 	.id		= UCLASS_PINCTRL,
 	.of_match	= rzt2h_pinctrl_match,
 	.probe		= rzt2h_pinctrl_probe,
+	.bind		= rzt2h_pinctrl_bind,
 	.plat_auto	= sizeof(struct rzt2h_pinctrl_priv),
 	.ops		= &rzt2h_pinctrl_ops,
 };
