@@ -56,6 +56,8 @@
 #define RENESAS_CPU_TYPE_R9A09G056	0x0867d447 //V2N
 #define RENESAS_CPU_TYPE_R9A08G046	0x87d9447 //G3L
 
+#define RENESAS_CPU_TYPE_RZN2H     0x4000
+#define RENESAS_CPU_TYPE_RZT2H     0x3000
 
 #ifndef __ASSEMBLY__
 #include <asm/types.h>

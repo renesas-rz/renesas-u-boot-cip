@@ -8,6 +8,7 @@
 #include <asm/cache.h>
 #include <init.h>
 #include <asm/io.h>
+#include <asm/arch/renesas.h>
 #include <env.h>
 #include <linux/ctype.h>
 
@@ -98,31 +99,32 @@ static const u8 *get_cpu_name(int idx)
 #ifdef CONFIG_ARCH_MISC_INIT
 int arch_misc_init(void)
 {
-#ifdef CONFIG_R9A09G077
-	env_set("platform", "r9a09g077");
-#elif CONFIG_R9A09G087
-	env_set("platform", "r9a09g087");
-#else
-	int i, idx = renesas_cpuinfo_idx();
-	const u8 *cpu_name = get_cpu_name(idx);
-	char cpu[10] = { 0 };
-
-	for (i = 0; i < sizeof(cpu); i++)
-		cpu[i] = tolower(cpu_name[i]);
-
-	env_set("platform", cpu);
-#endif
+	const u32 cpu_type = renesas_get_cpu_type();
+	if (cpu_type == RENESAS_CPU_TYPE_RZT2H) {
+		env_set("platform", "r9a09g077");
+	}
+	else if (cpu_type == RENESAS_CPU_TYPE_RZN2H) {
+		env_set("platform", "r9a09g087");
+	}
+	else {
+		env_set("platform", "unknown");
+	}
 	return 0;
 }
 #endif
 
 int print_cpuinfo(void)
 {
-#ifdef CONFIG_R9A09G077
-	printf("CPU: Renesas Electronics RZ/T2H\n");
-#elif CONFIG_R9A09G087
-	printf("CPU: Renesas Electronics RZ/N2H\n");
-#endif
+	const u32 cpu_type = renesas_get_cpu_type();
+	if (cpu_type == RENESAS_CPU_TYPE_RZT2H) {
+		printf("CPU: Renesas Electronics RZ/T2H\n");
+	}
+	else if (cpu_type == RENESAS_CPU_TYPE_RZN2H) {
+		printf("CPU: Renesas Electronics RZ/N2H\n");
+	}
+	else {
+		printf("CPU: Renesas Electronics RZ\n");
+	}
 	return 0;
 }
 #elif defined(CONFIG_RZA1)
