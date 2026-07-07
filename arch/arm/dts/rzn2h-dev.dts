@@ -323,6 +323,9 @@
 				 <RZT2H_PORT_PINMUX(12, 1, 0x29)>, /* SD0_CMD */
 				 <RZT2H_PORT_PINMUX(22, 5, 0x29)>; /* SD0_CD  */
 		};
+		sd0_pwr_a {
+			pinmux = <RZT2H_PORT_PINMUX(2, 5, 0x29)>; /* SD0_PWEN_A */
+		};
 	};
 
 	sdhi1_pins: sd1 {
@@ -337,6 +340,9 @@
 			pinmux = <RZT2H_PORT_PINMUX(16, 5, 0x29)>, /* SD1_CLK */
 				 <RZT2H_PORT_PINMUX(16, 6, 0x29)>, /* SD1_CMD */
 				 <RZT2H_PORT_PINMUX(17, 4, 0x29)>; /* SD1_CD  */
+		};
+		sd1_pwr_a {
+			pinmux = <RZT2H_PORT_PINMUX(8, 5, 0x29)>; /* SD1_PWEN_A */
 		};
 	};
 #else
@@ -710,6 +716,8 @@
 #if (!SEL_SDHI_CANFD)
 #if (SEL_SD0)
 &sdhi0 {
+	pinctrl-0 = <&sdhi0_pins>;
+	pinctrl-names = "default";
 	vmmc-supply = <&reg_3p3v>;
 	vqmmc-supply = <&reg_1p8v>;
 	bus-width = <8>;
@@ -863,7 +871,7 @@
 	status = "okay";
 	phy-reset-gpios = <&pinctrl RZT2H_GPIO(3, 2) GPIO_ACTIVE_HIGH>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&mdio1_pins>;
+	pinctrl-0 = <&mdio1_pins>,<&eth2_pins>,<&pins_refclk>;
 	enable-time-based-scheduling;
 	snps,force_thresh_dma_mode;
 	snps,tx_threshold = <128>;
@@ -893,7 +901,7 @@
 	status = "okay";
 	phy-reset-gpios = <&pinctrl RZT2H_GPIO(3, 1) GPIO_ACTIVE_HIGH>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&mdio2_pins>;
+	pinctrl-0 = <&mdio2_pins>,<&eth3_pins>;
 	enable-time-based-scheduling;
 	snps,force_thresh_dma_mode;
 	snps,tx_threshold = <128>;
@@ -1126,6 +1134,8 @@
 
 &ehci {
 	memory-region = <&global_cma>;
+	pinctrl-0 = <&usb_pins>;
+	pinctrl-names = "default";
 	dr_mode = "host";
 	status = "okay";
 };

@@ -343,6 +343,9 @@
 				 <RZT2H_PORT_PINMUX(12, 1, 0x29)>, /* SD0_CMD */
 				 <RZT2H_PORT_PINMUX(22, 5, 0x29)>; /* SD0_CD  */
 		};
+		sd0_pwr_a {
+			pinmux = <RZT2H_PORT_PINMUX(2, 5, 0x29)>; /* SD0_PWEN_A */
+		};
 	};
 
 	sdhi1_pins: sd1 {
@@ -357,6 +360,9 @@
 			pinmux = <RZT2H_PORT_PINMUX(16, 5, 0x29)>, /* SD1_CLK */
 				 <RZT2H_PORT_PINMUX(16, 6, 0x29)>, /* SD1_CMD */
 				 <RZT2H_PORT_PINMUX(17, 4, 0x29)>; /* SD1_CD  */
+		};
+		sd1_pwr_a {
+			pinmux = <RZT2H_PORT_PINMUX(8, 5, 0x29)>; /* SD1_PWEN_A */
 		};
 	};
 
@@ -803,7 +809,7 @@
 	status = "okay";
 	phy-reset-gpios = <&pinctrl RZT2H_GPIO(32, 3) GPIO_ACTIVE_HIGH>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&mdio1_pins>;
+	pinctrl-0 = <&mdio1_pins>,<&eth2_pins>,<&pins_refclk>;
 	enable-time-based-scheduling;
 	snps,force_thresh_dma_mode;
 	snps,tx_threshold = <128>;
@@ -833,7 +839,7 @@
 	status = "okay";
 	phy-reset-gpios = <&pinctrl RZT2H_GPIO(17, 5) GPIO_ACTIVE_HIGH>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&mdio2_pins>;
+	pinctrl-0 = <&mdio2_pins>,<&eth3_pins>;
 	enable-time-based-scheduling;
 	snps,force_thresh_dma_mode;
 	snps,tx_threshold = <128>;
@@ -1070,6 +1076,8 @@
 
 &ehci {
 	memory-region = <&global_cma>;
+	pinctrl-0 = <&usb_pins>;
+	pinctrl-names = "default";
 	dr_mode = "otg";
 	status = "okay";
 };
@@ -1082,7 +1090,6 @@
 &usb2_phy {
 	pinctrl-0 = <&usb_pins>;
 	pinctrl-names = "default";
-
 	status = "okay";
 };
 
