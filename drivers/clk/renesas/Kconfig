@@ -207,7 +207,7 @@ config CLK_R9A09G056
 	  Enable this to support the clocks on Renesas RZ/V2N SoC.
 config CLK_R9A09G077
 	bool "RZ/T2H (CLK_R9A09G077) clock support"
-    depends on RZT2H
+    default y if R9A09G077
 
 config CLK_R9A09G087
 	bool "RZ/N2H (CLK_R9A09G087) clock support"

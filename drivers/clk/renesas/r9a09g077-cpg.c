@@ -8,33 +8,112 @@
 #include <linux/err.h>
 #include <dt-bindings/clock/r9a09g077-cpg.h>  // Define R9A09G077_USB_CLK, etc
 
+#include <common.h>   // for printf
+
 struct r9a09g077_clk_priv {
-	void __iomem *base;
+    void __iomem *base;
 };
 
-static int r9a09g077_clk_of_xlate(struct clk *clk, struct ofnode_phandle_args *args)
-{
-	// Expect 2 cells: <CPG_MOD ID>
-	if (args->args_count != 2)
-		return -EINVAL;
+#define MSTPCRM			0x80280330
+#define MSTPCRM_SDHI0		BIT(12)
+#define MSTPCRM_SDHI1		BIT(13)
 
-	clk->id = args->args[1];  // args[0] is typically CPG_MOD
-	return 0;
+#define SCKCR			0x80280000
+#define PHYSEL			BIT(21)
+
+#define MSTPCRE			0x80280310
+#define MSTPCRE_GMAC1		BIT(16)
+#define MSTPCRE_GMAC2		BIT(17)
+#define MSTPCRE_ETHSS		BIT(3)
+#define MSTPCRE_USB			BIT(8)
+
+#define MRCTLE			0x80280250
+#define MRCTLE_GMAC1_PCLKH	BIT(16)
+#define MRCTLE_GMAC1_PCLKM	BIT(17)
+#define MRCTLE_GMAC2_PCLKH	BIT(18)
+#define MRCTLE_GMAC2_PCLKM	BIT(19)
+#define MRCTLE_ETHSS		BIT(5)
+#define MRCTLE_MII_CONV		BIT(6)
+
+#define PRCRN			0x80294200
+#define PRCRN_PRKEY		(0xa5 << 8)
+#define PRCRN_WR_EN		0xF
+#define PRCRS                   0x81296000
+#define PRCRS_PRKEY             (0xa5 << 8)
+#define PRCRS_WR_EN             0xF
+
+static int r9a09g077_clk_of_xlate(struct clk *clk,
+                  struct ofnode_phandle_args *args)
+{
+    // Expect 2 cells: <CPG_MOD ID>
+    if (args->args_count != 2) {
+        printf("CLK: ERROR invalid args_count=%d (expected 2)\n",
+               args->args_count);
+        return -EINVAL;
+    }
+
+    clk->id = args->args[1];  // args[0] = type, args[1] = ID
+
+    return 0;
 }
 
 static int r9a09g077_clk_enable(struct clk *clk)
 {
-	// Stub: Assume clock is always enabled
-	return 0;
+    /* Disable Write protect to enable writing */
+    *(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
+    *(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
+	switch(clk->id)
+    {
+        case R9A09G077_SDHI0_CLK:
+            *(volatile u32 *)MSTPCRM &= ~(MSTPCRM_SDHI0);
+            break;
+        case R9A09G077_SDHI1_CLK:
+            *(volatile u32 *)MSTPCRM &= ~(MSTPCRM_SDHI1);
+            break;
+        case R9A09G077_GMAC1_CLK:
+
+            /* GMAC CLK */
+            /* Release module stop for GMAC1 */
+            *(volatile u32 *)MSTPCRE &= ~(MSTPCRE_GMAC1);
+
+            /* Choose PLL1 for ETH_REFCLK */
+            *(volatile u32 *)SCKCR &= ~(PHYSEL);
+
+            /* Release module reset for GMAC1 */
+            *(volatile u32 *)MRCTLE &= ~(MRCTLE_GMAC1_PCLKH | MRCTLE_GMAC1_PCLKM);
+
+            /* GMAC2 CLK */
+            /* Release module stop for GMAC2 */
+            *(volatile u32 *)MSTPCRE &= ~(MSTPCRE_GMAC2);
+
+            /* Release module reset for GMAC2 */
+            *(volatile u32 *)MRCTLE &= ~(MRCTLE_GMAC2_PCLKH | MRCTLE_GMAC2_PCLKM);
+
+            /* ETH SS CLK */
+            /* Release module stop for ETH_SS */
+            *(volatile u32 *)MSTPCRE &= ~(MSTPCRE_ETHSS);
+
+            /* Release module reset for ETH_SS, MII_CONV  */
+            *(volatile u32 *)MRCTLE &= ~(MRCTLE_ETHSS | MRCTLE_MII_CONV);
+            break;
+    }
+    /* Enable Write protect to disable writing */
+    *(volatile u32 *)PRCRN = PRCRN_PRKEY;
+    *(volatile u32 *)PRCRS = PRCRS_PRKEY;
+    return 0;
 }
 
 static int r9a09g077_clk_probe(struct udevice *dev)
 {
-	struct r9a09g077_clk_priv *priv = dev_get_priv(dev);
-	priv->base = dev_read_addr_ptr(dev);
+    struct r9a09g077_clk_priv *priv = dev_get_priv(dev);
 
-	dev_dbg(dev, "R9A09G077 CPG clock driver probed\n");
-	return 0;
+    priv->base = dev_read_addr_ptr(dev);
+
+    if (!priv->base) {
+        printf("CLK: ERROR base address is NULL\n");
+        return -EINVAL;
+    }
+    return 0;
 }
 
 static const struct clk_ops r9a09g077_clk_ops = {
