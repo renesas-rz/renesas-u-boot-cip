@@ -54,9 +54,9 @@
 #if defined(CONFIG_TARGET_RZT2H_DISTRO_BOOT)
 #define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0" \
-	"fdt_addr_r=0xC5F00000\0" \
+	"fdt_addr_r=0xc8200000\0" \
 	"fdtfile="CONFIG_DEFAULT_FDT_FILE"\0" \
-	"kernel_addr_r=0xc4200000\0" \
+	"kernel_addr_r=0xc8280000\0" \
 	"boot_efi_binary=efi/boot/bootaa64.efi\0" \
 	"scan_for_usb_dev=" \
 		"usb start; " \
@@ -116,9 +116,9 @@
 	"bootcmd=soc_id=${platform};env default -a; run t2h_dtb_check; run n2h_dtb_check; run bootcmd_check; run bootimage\0" \
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
 	"prodemmcbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
-	"bootimage=booti 0xc4200000 - 0xC5F00000\0" \
-	"emmcload=ext4load mmc 0:2 0xc4200000 boot/Image;ext4load mmc 0:2 0xC5F00000 boot/${dtb_name};run prodemmcbootargs \0" \
-	"sd1load=ext4load mmc 1:2 0xc4200000 boot/Image;ext4load mmc 1:2 0xC5F00000 boot/${dtb_name};run prodsdbootargs \0" \
+	"bootimage=booti 0xc8280000 - 0xc8200000\0" \
+	"emmcload=ext4load mmc 0:2 0xc8280000 boot/Image;ext4load mmc 0:2 0xc8200000 boot/${dtb_name};run prodemmcbootargs \0" \
+	"sd1load=ext4load mmc 1:2 0xc8280000 boot/Image;ext4load mmc 1:2 0xc8200000 boot/${dtb_name};run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0" \
 	"dfu_alt_info=sf 0:0=fip.bin raw 0x60000 0x1F0000 \0" \
 	"dfu_bufsiz=0x1F0000\0" \
