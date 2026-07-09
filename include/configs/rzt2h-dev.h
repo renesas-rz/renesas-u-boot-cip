@@ -108,20 +108,22 @@
 	"bootcmd=run distro_bootcmd\0"
 
 #else
-#define CONFIG_BOOTCOMMAND     "env default -a;run bootcmd_check;run bootimage"
 
 /* ENV setting */
 #define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0" \
+	"bootcmd=soc_id=${platform};env default -a; run t2h_dtb_check; run n2h_dtb_check; run bootcmd_check; run bootimage\0" \
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
 	"prodemmcbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
 	"bootimage=booti 0xc4200000 - 0xC5F00000\0" \
-	"emmcload=ext4load mmc 0:2 0xc4200000 boot/Image;ext4load mmc 0:2 0xC5F00000 boot/r9a09g077m44-dev.dtb;run prodemmcbootargs \0" \
-	"sd1load=ext4load mmc 1:2 0xc4200000 boot/Image;ext4load mmc 1:2 0xC5F00000 boot/r9a09g077m44-dev.dtb;run prodsdbootargs \0" \
+	"emmcload=ext4load mmc 0:2 0xc4200000 boot/Image;ext4load mmc 0:2 0xC5F00000 boot/${dtb_name};run prodemmcbootargs \0" \
+	"sd1load=ext4load mmc 1:2 0xc4200000 boot/Image;ext4load mmc 1:2 0xC5F00000 boot/${dtb_name};run prodsdbootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0" \
 	"dfu_alt_info=sf 0:0=fip.bin raw 0x60000 0x1F0000 \0" \
-	"dfu_bufsiz=0x1F0000\0"
+	"dfu_bufsiz=0x1F0000\0" \
+	"t2h_dtb_check=if test ${soc_id} = r9a09g077;then setenv dtb_name r9a09g077m44-dev.dtb;fi \0" \
+	"n2h_dtb_check=if test ${soc_id} = r9a09g087;then setenv dtb_name r9a09g087m44-dev.dtb;fi \0"
 
 #endif /* CONFIG_TARGET_RZT2H_DISTRO_BOOT */
 /* For board */
