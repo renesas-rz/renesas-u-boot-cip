@@ -36,7 +36,8 @@
 #define PRCRS_WR_EN             0xF
 
 #define RZT2H_MAX_PINS_PER_PORT		8
-
+#define RZT2H_NUM_PORTS      		36
+#define RZT2H_NUM_PINS       		(RZT2H_NUM_PORTS * RZT2H_MAX_PINS_PER_PORT)
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -247,8 +248,74 @@ static int rzt2h_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 	rv1 = rzt2h_subnode_pinctrl_set_state(dev,config);
 	return (rv | rv1);
 }
+
+static int rzt2h_get_pins_count(struct udevice *dev)
+{
+    return RZT2H_NUM_PINS;
+}
+static const char *rzt2h_get_pin_name(struct udevice *dev,
+                                      unsigned int selector)
+{
+    static char pin_names[RZT2H_NUM_PINS][8];
+    static bool initialized;
+    unsigned int port, pin, i;
+
+    if (!initialized) {
+        for (i = 0; i < RZT2H_NUM_PINS; i++) {
+            port = i / RZT2H_MAX_PINS_PER_PORT;
+            pin  = i % RZT2H_MAX_PINS_PER_PORT;
+
+            snprintf(pin_names[i],
+                     sizeof(pin_names[i]),
+                     "P%02u_%u",
+                     port,
+                     pin);
+        }
+
+        initialized = true;
+    }
+
+    if (selector >= RZT2H_NUM_PINS)
+        return "(invalid pin)";
+
+    return pin_names[selector];
+}
+
+static int rzt2h_get_pin_muxing(struct udevice *dev,
+                unsigned int selector,
+                char *buf, int size)
+{
+    u32 port, pin;
+    u8 pmc_state;
+    u64 pfc_state;
+	struct rzt2h_pinctrl_priv *priv = dev_get_plat(dev);
+
+    if (selector >= RZT2H_NUM_PINS)
+        return -EINVAL;
+
+    port = selector / RZT2H_MAX_PINS_PER_PORT;
+    pin = selector % RZT2H_MAX_PINS_PER_PORT;
+
+    pmc_state = rzt2h_pinctrl_readb(priv, port, PMC(port)) & BIT(pin);
+
+    if (pmc_state) {
+        pfc_state = (rzt2h_pinctrl_readq(priv, port, PFC(port)) >>
+                 (pin * 8)) & 0xFF;
+
+        snprintf(buf, size, "Function 0x%02llx",
+             pfc_state);
+    } else {
+        snprintf(buf, size, "GPIO");
+    }
+
+    return 0;
+}
+
 const struct pinctrl_ops rzt2h_pinctrl_ops  = {
 	.set_state = rzt2h_pinctrl_set_state,
+	.get_pins_count		= rzt2h_get_pins_count,
+	.get_pin_name		= rzt2h_get_pin_name,
+	.get_pin_muxing	= rzt2h_get_pin_muxing,
 };
 
 static int rzt2h_pinctrl_probe(struct udevice *dev)
