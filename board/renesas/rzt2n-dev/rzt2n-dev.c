@@ -27,7 +27,6 @@
 #include <i2c.h>
 #include <mmc.h>
 #include <linux/delay.h>
-#include <linux/arm-smccc.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -160,15 +159,9 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define XSPI1_FLASH_RW_ENABLE               (0)
 
-#define SMC_PRODUCT_ID 0x82000012
-
 /* Needed by lowlevel_init.S*/
 void s_init(void)
 {
-	struct arm_smccc_res res;
-
-	arm_smccc_smc(SMC_PRODUCT_ID, 0, 0, 0, 0, 0, 0, 0, &res);
-
 	/* Disable Write protect to enable writing */
 	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
 	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
@@ -328,20 +321,19 @@ void s_init(void)
 	|(((u64)0x11<< 40) | ((u64)0x11<< 32));
 	*(volatile u8 *)PMC(20) |= (BIT(5)|BIT(4));
 
-	if((res.a0 & 0xFF00) != 0x5000)
-	{
-		/*P24_6_ETH3_GMAC1_MDC & P24_7_ETH3_GMAC1_MDIO*/
-		*(volatile u64 *)PFC(24) = (*(volatile u64 *)PFC(24) & 0x0000FFFFFFFFFFFF) \
-		| ( ((u64)0x12<<56) | ((u64)0x12<< 48));
-		*(volatile u8 *)PMC(24) |= (BIT(7)|BIT(6));
-	}
-	else
-	{
-		/*P3_2_ETH3_GMAC1_MDC & P3_3_ETH3_GMAC1_MDIO*/
-		*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFFFF0000FFFF) \
-		| ( ((u64)0x12<<24) | ((u64)0x12<< 16));
-		*(volatile u8 *)PMC(3) |= (BIT(3)|BIT(2));
-	}
+#if !defined(CONFIG_TARGET_RZT2N_537_PIN_DEV)
+	/*P24_6_ETH3_GMAC1_MDC & P24_7_ETH3_GMAC1_MDIO*/
+	*(volatile u64 *)PFC(24) = (*(volatile u64 *)PFC(24) & 0x0000FFFFFFFFFFFF) \
+	| ( ((u64)0x12<<56) | ((u64)0x12<< 48));
+	*(volatile u8 *)PMC(24) |= (BIT(7)|BIT(6));
+
+#else 
+	/*P3_2_ETH3_GMAC1_MDC & P3_3_ETH3_GMAC1_MDIO*/
+	*(volatile u64 *)PFC(3) = (*(volatile u64 *)PFC(3) & 0xFFFFFFFF0000FFFF) \
+	| ( ((u64)0x12<<24) | ((u64)0x12<< 16));
+	*(volatile u8 *)PMC(3) |= (BIT(3)|BIT(2));
+#endif
+
 	/* Release module stop for GMAC1 */
 	*(volatile u32 *)MSTPCRE &= ~(MSTPCRE_GMAC1);
 
