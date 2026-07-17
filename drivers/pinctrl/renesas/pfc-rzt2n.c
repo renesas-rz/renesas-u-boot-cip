@@ -14,6 +14,8 @@
 #include <linux/err.h>
 #include <fdt_support.h>
 #include <dm/device_compat.h>
+#include <dm/device.h>
+#include <asm/gpio.h>
 
 #define P(n)	(0x000 + 0x001 * (n))	/* Port Register */
 #define PM(n)	(0x200 + 0x002 * (n))	/* Port Mode Register */
@@ -29,11 +31,18 @@
 #define RZT2N_MAX_PINS_PER_PORT		8
 
 #define T2N_SAFETY_IO_PORTS_MAX     7
+#define RZT2N_NUM_PORTS      		36
+#define RZT2N_NUM_PINS       		(RZT2N_NUM_PORTS * RZT2N_MAX_PINS_PER_PORT)
 
 DECLARE_GLOBAL_DATA_PTR;
 
 struct rzt2n_pinctrl_priv {
 	void __iomem	*regs, *regs1;
+};
+
+struct rzt2n_gpio_priv {
+	void __iomem	*regs, *regs1;
+	int		bank;
 };
 
 void rzt2n_pinctrl_writeb(struct rzt2n_pinctrl_priv *priv, u8 port, u8 val, u16 offset)
@@ -91,7 +100,7 @@ static u64 rzt2n_pinctrl_readq(struct rzt2n_pinctrl_priv *priv, u8 port, u16 off
 static void rzt2n_pinctrl_set_function(struct rzt2n_pinctrl_priv *priv,
 				       u16 port, u8 pin, u8 func)
 {
-	u32 reg64;
+	u64 reg64;
 	u8 reg8;
 
 	/* Set GPIO or Func in PMC, then set Func in PFC */
@@ -100,7 +109,7 @@ static void rzt2n_pinctrl_set_function(struct rzt2n_pinctrl_priv *priv,
 	rzt2n_pinctrl_writeb(priv, port, reg8, PMC(port));
 
 	reg64 = rzt2n_pinctrl_readq(priv, port, PFC(port));
-	reg64 = (reg64 & ~(0x3F << (pin * 8))) | (func << (pin * 8));
+	reg64 = (reg64 & ~(0x3FULL  << ((u64)pin * 8))) | (((u64)(func & 0x3F))<< ((u64)pin * 8)); 
 	rzt2n_pinctrl_writeq(priv, port, reg64, PFC(port));
 
 }
@@ -130,11 +139,12 @@ static int rzt2n_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 
 	for (i = 0 ; i < count; i++) {
 		cells[i] = fdt32_to_cpu(data[i]);
-		func = (cells[i] >> 12) & 0xf;
+		func = (cells[i] >> 16) & 0x3f;
 		port = (cells[i] / RZT2N_MAX_PINS_PER_PORT) & 0x1ff;
 		pin = cells[i] % RZT2N_MAX_PINS_PER_PORT;
+		debug("node func %x port %d pin %d \n",func,port,pin);
 		if (func > 64 || port >= port_max || pin >= RZT2N_MAX_PINS_PER_PORT) {
-			printf("Invalid cell %i in node %s!\n",
+			debug("Invalid cell %i in node %s!\n",
 			       count, ofnode_get_name(dev_ofnode(config)));
 			continue;
 		}
@@ -145,14 +155,78 @@ static int rzt2n_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 	return 0;
 }
 
+static int rzt2n_get_pins_count(struct udevice *dev)
+{
+    return RZT2N_NUM_PINS;
+}
+static const char *rzt2n_get_pin_name(struct udevice *dev,
+                                      unsigned int selector)
+{
+    static char pin_names[RZT2N_NUM_PINS][8];
+    static bool initialized;
+    unsigned int port, pin, i;
+
+    if (!initialized) {
+        for (i = 0; i < RZT2N_NUM_PINS; i++) {
+            port = i / RZT2N_MAX_PINS_PER_PORT;
+            pin  = i % RZT2N_MAX_PINS_PER_PORT;
+
+            snprintf(pin_names[i],
+                     sizeof(pin_names[i]),
+                     "P%02u_%u",
+                     port,
+                     pin);
+        }
+
+        initialized = true;
+    }
+
+    if (selector >= RZT2N_NUM_PINS)
+        return "(invalid pin)";
+
+    return pin_names[selector];
+}
+
+static int rzt2n_get_pin_muxing(struct udevice *dev,
+                unsigned int selector,
+                char *buf, int size)
+{
+    u32 port, pin;
+    u8 pmc_state;
+    u64 pfc_state;
+	struct rzt2n_pinctrl_priv *priv = dev_get_plat(dev);
+
+    if (selector >= RZT2N_NUM_PINS)
+        return -EINVAL;
+
+    port = selector / RZT2N_MAX_PINS_PER_PORT;
+    pin = selector % RZT2N_MAX_PINS_PER_PORT;
+
+    pmc_state = rzt2n_pinctrl_readb(priv, port, PMC(port)) & BIT(pin);
+
+    if (pmc_state) {
+        pfc_state = (rzt2n_pinctrl_readq(priv, port, PFC(port)) >>
+                 (pin * 8)) & 0xFF;
+
+        snprintf(buf, size, "Function 0x%02llx",
+             pfc_state);
+    } else {
+        snprintf(buf, size, "GPIO");
+    }
+
+    return 0;
+}
+
 const struct pinctrl_ops rzt2n_pinctrl_ops  = {
 	.set_state = rzt2n_pinctrl_set_state,
+	.get_pins_count		= rzt2n_get_pins_count,
+	.get_pin_name		= rzt2n_get_pin_name,
+	.get_pin_muxing	= rzt2n_get_pin_muxing,
 };
 
 static int rzt2n_pinctrl_probe(struct udevice *dev)
 {
 	struct rzt2n_pinctrl_priv *priv = dev_get_plat(dev);
-	ofnode pin_node;
 	struct fdt_resource res, res1;
 	void *fdt = (void *)gd->fdt_blob;
 	int node = dev_of_offset(dev);
@@ -161,7 +235,7 @@ static int rzt2n_pinctrl_probe(struct udevice *dev)
 	ret = fdt_get_named_resource(fdt, node, "reg", "reg-names",
 					"port08_25", &res);
 	if (ret < 0) {
-		printf("pinctrl: resource port13_35 not found\n");
+		printf("pinctrl: resource port08_25 not found\n");
 		return ret;
 	}
 	priv->regs = ioremap(res.start, fdt_resource_size(&res));
@@ -174,15 +248,27 @@ static int rzt2n_pinctrl_probe(struct udevice *dev)
 	}
 	priv->regs1 = ioremap(res1.start, fdt_resource_size(&res1));
 
-	dev_for_each_subnode(pin_node, dev) {
-		struct udevice *gpiodev;
+    if (!priv->regs1) {
+        printf("pinctrl: ioremap failed for safety\n");
+        return -ENODEV;
+    }
+	return 0;
+}
 
-		if (!ofnode_read_bool(pin_node, "gpio-controller"))
-			continue;
+static int rzt2n_pinctrl_bind(struct udevice *dev)
+{
+	struct udevice *gpiodev;
+	int ret;
 
-		device_bind_driver_to_node(dev, "rzt2n-gpio",
-					   ofnode_get_name(pin_node),
-					   pin_node, &gpiodev);
+	if (!dev_read_bool(dev, "gpio-controller"))
+		return 0;
+
+	ret = device_bind_driver_to_node(dev, "rzt2n-gpio",
+					  "gpio-bank0",
+					  dev_ofnode(dev), &gpiodev);
+	if (ret) {
+		printf("gpio bind failed: %d\n", ret);
+		return ret;
 	}
 
 	return 0;
@@ -198,6 +284,7 @@ U_BOOT_DRIVER(rzt2n_pinctrl) = {
 	.id		= UCLASS_PINCTRL,
 	.of_match	= rzt2n_pinctrl_match,
 	.probe		= rzt2n_pinctrl_probe,
+	.bind		= rzt2n_pinctrl_bind,
 	.plat_auto	= sizeof(struct rzt2n_pinctrl_priv),
 	.ops		= &rzt2n_pinctrl_ops,
 };

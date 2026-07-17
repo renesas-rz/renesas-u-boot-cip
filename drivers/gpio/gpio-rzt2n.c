@@ -100,11 +100,13 @@ static u16 rzt2n_gpio_writew(struct rzt2n_gpio_priv *priv, u8 bank, u16 val, u16
 static int rzt2n_gpio_get_value(struct udevice *dev, unsigned int offset)
 {
 	struct rzt2n_gpio_priv *priv = dev_get_priv(dev);
-	const u8 bit = BIT(offset);
+	priv->bank = offset / RZT2N_MAX_GPIO_PER_BANK;
+	const u8 pin  = offset % RZT2N_MAX_GPIO_PER_BANK;
+	const u8 bit = BIT(pin);
 	u16 reg16;
 
 	reg16 = rzt2n_gpio_readw(priv, priv->bank, PM(priv->bank));
-	reg16 = (reg16 >> offset * 2) & PM_MASK;
+	reg16 = (reg16 >> (pin * 2)) & PM_MASK;
 
 	if (reg16 == PM_INPUT || reg16 == PM_OUTPUT_INPUT)
 		return !!(rzt2n_gpio_readb(priv, priv->bank, PIN(priv->bank)) & bit);
@@ -118,8 +120,9 @@ static int rzt2n_gpio_set_value(struct udevice *dev, unsigned int offset,
 				int value)
 {
 	struct rzt2n_gpio_priv *priv = dev_get_priv(dev);
-	const u8 bit = BIT(offset);
-
+	priv->bank = offset / RZT2N_MAX_GPIO_PER_BANK;
+	u8 pin  = offset % RZT2N_MAX_GPIO_PER_BANK;
+	const u8 bit = BIT(pin);
 	if (priv->bank > T2N_SAFETY_IO_PORTS_MAX) {
 		if (value)
 			setbits_8(priv->regs + P(priv->bank), bit);
@@ -138,18 +141,19 @@ static void rzt2n_gpio_set_direction(struct rzt2n_gpio_priv *priv,
 				     unsigned int offset, bool output)
 {
 	u16 reg16;
-
+	priv->bank = offset / RZT2N_MAX_GPIO_PER_BANK;
+	u8 pin  = offset % RZT2N_MAX_GPIO_PER_BANK;
+	const u8 bit = BIT(pin);
 	/* Select GPIO mode in PMC Register */
-	rzt2n_gpio_clrbits_8_security(priv, priv->bank, PMC(priv->bank), BIT(offset));
+	rzt2n_gpio_clrbits_8_security(priv, priv->bank, PMC(priv->bank), bit);
 
 	reg16 = rzt2n_gpio_readw(priv, priv->bank, PM(priv->bank));
-	reg16 = reg16 & ~(PM_MASK << (offset * 2));
-
+	reg16 = reg16 & ~(PM_MASK << (pin * 2));
 	if (output)
-		rzt2n_gpio_writew(priv, priv->bank, reg16 | (PM_OUTPUT << (offset * 2)),
+		rzt2n_gpio_writew(priv, priv->bank, reg16 | (PM_OUTPUT << (pin * 2)),
 					PM(priv->bank));
 	else
-		rzt2n_gpio_writew(priv, priv->bank, reg16 | (PM_INPUT << (offset * 2)),
+		rzt2n_gpio_writew(priv, priv->bank, reg16 | (PM_INPUT << (pin * 2)),
 					PM(priv->bank));
 }
 
@@ -177,13 +181,14 @@ static int rzt2n_gpio_direction_output(struct udevice *dev, unsigned int offset,
 static int rzt2n_gpio_get_function(struct udevice *dev, unsigned int offset)
 {
 	struct rzt2n_gpio_priv *priv = dev_get_priv(dev);
-	const u8 bit = BIT(offset);
-
+	priv->bank = offset / RZT2N_MAX_GPIO_PER_BANK;
+	const u8 pin  = offset % RZT2N_MAX_GPIO_PER_BANK;
+	const u8 bit = BIT(pin);
 	if (!(rzt2n_gpio_readb(priv, priv->bank, PMC(priv->bank)) & bit)) {
 		u16 reg16;
 
 		reg16 = rzt2n_gpio_readw(priv, priv->bank, PM(priv->bank));
-		reg16 = (reg16 >> offset * 2) & PM_MASK;
+		reg16 = (reg16 >> (pin * 2)) & PM_MASK;
 		if (reg16 == PM_OUTPUT || reg16 == PM_OUTPUT_INPUT)
 			return GPIOF_OUTPUT;
 		else if (reg16 == PM_INPUT)

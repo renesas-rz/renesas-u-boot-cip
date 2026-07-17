@@ -9,10 +9,12 @@
 #define RZT2N_PINS_PER_PORT	8
 
 /*
- * Store the pin index from its port and position number in bits[11-0].
- * And store its peripheral function mode identifier in 3 bits [14-12]
+ * Create the pin index from its bank and position numbers and store in
+ * the upper 16 bits the alternate function identifier
  */
-#define RZT2N_PINMUX(port, pos, func)	\
-	(((port) * RZT2N_PINS_PER_PORT + (pos)) | ((func) << 12))
+#define RZT2_PORT_PINMUX(b, p, f)	((b) * RZT2N_PINS_PER_PORT + (p) | ((f) << 16))
+
+/* Convert a port and pin label to its global pin index */
+ #define RZT2_GPIO(port, pin)	((port) * RZT2N_PINS_PER_PORT + (pin))
 
 #endif /* __DT_BINDINGS_RZT2N_PINCTRL_H */
