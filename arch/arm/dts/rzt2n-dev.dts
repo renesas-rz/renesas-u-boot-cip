@@ -34,9 +34,10 @@
 		stdout-path = "serial0:115200n8";
 	};
 
-	memory@C4000000 {
+	memory@c8000000 {
 		device_type = "memory";
-		reg = <0x0 0xC4000000 0x0 0x3C000000>;
+		/* first 128MiB is reserved for secure area. */
+		reg = <0x0 0xc8000000 0x0 0x38000000>;
 	};
 
 	memory@240000000 {
