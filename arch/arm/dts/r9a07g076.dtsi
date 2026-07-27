@@ -229,6 +229,8 @@
 			      <0 0x40000000 0 0x10000000>;
 			reg-names = "regs", "dirmap";
 			resets = <&cpg R9A07G076_xSPI0_RST>;
+			clocks = <&cpg CPG_MOD R9A07G076_xSPI0_CLK>;
+			clock-names = "xspi0_clk";
 			power-domains = <&cpg>;
 			#address-cells = <1>;
 			#size-cells = <0>;
