@@ -28,6 +28,13 @@
 #define SLPSR		0x1F00
 #define SLPSR_SL	0x0
 
+#define PRCRN			0x80294200
+#define PRCRN_PRKEY		(0xa5 << 8)
+#define PRCRN_WR_EN		0xF
+#define PRCRS                   0x81296000
+#define PRCRS_PRKEY             (0xa5 << 8)
+#define PRCRS_WR_EN             0xF
+
 #define RZT2N_MAX_PINS_PER_PORT		8
 
 #define T2N_SAFETY_IO_PORTS_MAX     7
@@ -47,38 +54,61 @@ struct rzt2n_gpio_priv {
 
 void rzt2n_pinctrl_writeb(struct rzt2n_pinctrl_priv *priv, u8 port, u8 val, u16 offset)
 {
+	/* Disable Write protect to enable writing */
+	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
+	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
 	if (port > T2N_SAFETY_IO_PORTS_MAX) {
-		void __iomem *PRCRN = ioremap(0x80294200, 0x100);
-		iowrite32(0x0000A504, PRCRN + 0x0);
+
+		debug("writeb port %d addr %p value %x \n", port,priv->regs + offset,val);
 		writeb(val, priv->regs + offset);
-		iowrite32(0x0000A500, PRCRN + 0x0);
-		iounmap(PRCRN);
+
 	} else
+	{
+		debug("writeb port %d addr %p value %d \n", port,priv->regs1 + offset,val);
 		writeb(val, priv->regs1 + offset);
+	}
+	/* Enable Write protect to disable writing */
+	*(volatile u32 *)PRCRN = PRCRN_PRKEY;
+	*(volatile u32 *)PRCRS = PRCRS_PRKEY;
 }
 
 void rzt2n_pinctrl_writew(struct rzt2n_pinctrl_priv *priv, u8 port, u16 val, u16 offset)
 {
+	/* Disable Write protect to enable writing */
+	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
+	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
 	if (port > T2N_SAFETY_IO_PORTS_MAX) {
-		void __iomem *PRCRN = ioremap(0x80294200, 0x100);
-		iowrite32(0x0000A504, PRCRN + 0x0);
+
+		debug("writew port %d addr %p value %x \n", port,priv->regs + offset,val);
 		writew(val, priv->regs + offset);
-		iowrite32(0x0000A500, PRCRN + 0x0);
-		iounmap(PRCRN);
 	} else
+	{
+		debug("writew port %d addr %p value %x \n", port,priv->regs1 + offset,val);
 		writew(val, priv->regs1 + offset);
+	}
+	/* Enable Write protect to disable writing */
+	*(volatile u32 *)PRCRN = PRCRN_PRKEY;
+	*(volatile u32 *)PRCRS = PRCRS_PRKEY;
 }
 
 void rzt2n_pinctrl_writeq(struct rzt2n_pinctrl_priv *priv, u8 port, u64 val, u16 offset)
 {
+	/* Disable Write protect to enable writing */
+	*(volatile u32 *)PRCRN = PRCRN_PRKEY | PRCRN_WR_EN;
+	*(volatile u32 *)PRCRS = PRCRS_PRKEY | PRCRS_WR_EN;
 	if (port > T2N_SAFETY_IO_PORTS_MAX) {
-		void __iomem *PRCRN = ioremap(0x80294200, 0x100);
-		iowrite32(0x0000A504, PRCRN + 0x0);
+
+		debug("writeq port %d addr %p value %llx \n", port,priv->regs + offset,val);
 		writeq(val, priv->regs + offset);
-		iowrite32(0x0000A500, PRCRN + 0x0);
-		iounmap(PRCRN);
+
 	} else
+	{
+		debug("writeq port %d addr %p value %llx \n", port,priv->regs1 + offset,val);
 		writeq(val, priv->regs1 + offset);
+	}
+	/* Enable Write protect to disable writing */
+	*(volatile u32 *)PRCRN = PRCRN_PRKEY;
+	*(volatile u32 *)PRCRS = PRCRS_PRKEY;
 }
 
 static u8 rzt2n_pinctrl_readb(struct rzt2n_pinctrl_priv *priv, u8 port, u16 offset)
@@ -114,7 +144,7 @@ static void rzt2n_pinctrl_set_function(struct rzt2n_pinctrl_priv *priv,
 
 }
 
-static int rzt2n_pinctrl_set_state(struct udevice *dev, struct udevice *config)
+static int rzt2n_node_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 {
 	struct rzt2n_pinctrl_priv *priv = dev_get_plat(dev);
 	u16 port;
@@ -153,6 +183,62 @@ static int rzt2n_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 	}
 
 	return 0;
+}
+static int rzt2n_subnode_pinctrl_set_state(struct udevice *dev, struct udevice *config)
+{
+	struct rzt2n_pinctrl_priv *priv = dev_get_plat(dev);
+	u16 port;
+	u16 port_max = (u16)dev_get_driver_data(dev);
+	u8 pin, func;
+	int i, count,rv;
+	u32 cells[port_max * RZT2N_MAX_PINS_PER_PORT];
+	ofnode node = dev_ofnode(config);
+	ofnode subnode;
+	ofnode_for_each_subnode(subnode, node) {
+		count = ofnode_read_size(subnode, "pinmux");
+		if (count < 0)
+		{
+			printf("ofnode_read_size return size %d\n", count);
+			return count;
+		}
+		count = count / sizeof(cells[0]);
+		debug("No of pinmux entries= %d\n", count);
+
+		if (count > port_max * RZT2N_MAX_PINS_PER_PORT) {
+			debug("%s: unsupported pins array count %d\n",
+		      __func__, count);
+		return -EINVAL;
+		}
+		rv = ofnode_read_u32_array(subnode, "pinmux", cells, count);
+		if (rv < 0)
+		{
+			printf("ofnode_read_u32_array return size %d\n", rv);
+			return rv;
+		}
+		for (i = 0 ; i < count; i++) {
+			func = (cells[i] >> 16) & 0x3f;
+			port = (cells[i] / RZT2N_MAX_PINS_PER_PORT) & 0x1ff;
+			pin = cells[i] % RZT2N_MAX_PINS_PER_PORT;
+			debug("subnode func %x port %d pin %d \n",func,port,pin);
+			if (func > 64 || port >= port_max || pin >= RZT2N_MAX_PINS_PER_PORT) {
+				printf("Invalid cell %i in node %s!\n",
+			       count, ofnode_get_name(dev_ofnode(config)));
+				continue;
+			}
+			rzt2n_pinctrl_set_function(priv, port, pin, func);
+	}
+
+	}
+	debug("set state subnode complete \n");
+	return 0;
+}
+
+static int rzt2n_pinctrl_set_state(struct udevice *dev, struct udevice *config)
+{
+	int rv,rv1;
+	rv = rzt2n_node_pinctrl_set_state(dev,config);
+	rv1 = rzt2n_subnode_pinctrl_set_state(dev,config);
+	return (rv | rv1);
 }
 
 static int rzt2n_get_pins_count(struct udevice *dev)
