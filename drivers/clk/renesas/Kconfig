@@ -171,3 +171,7 @@ config CLK_RZG2L
 config CLK_R9A07G044
 	bool "RZ/G2L (R9A07G044L) clock support"
 	depends on CLK_RZG2L
+
+config CLK_R9A07G076
+	bool "RZ/T2N clock support"
+	depends on ARCH_RMOBILE || R9A07G076
