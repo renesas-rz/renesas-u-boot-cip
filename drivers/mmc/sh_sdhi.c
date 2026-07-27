@@ -30,6 +30,7 @@
 #endif
 #include <asm/arch/sh_sdhi.h>
 #include <asm/global_data.h>
+#include <asm/gpio.h>
 #include <clk.h>
 #include <fdtdec.h>
 
@@ -865,7 +866,10 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 	struct mmc_uclass_priv *upriv = dev_get_uclass_priv(dev);
 	const u32 quirks = dev_get_driver_data(dev);
 	fdt_addr_t base;
-#if !((defined CONFIG_R9A09G077) || (defined CONFIG_R9A07G076))
+	struct gpio_desc sdhi_pwen;
+	struct gpio_desc sdhi_iovs;
+	const int seq = dev_seq(dev);
+#if !(defined CONFIG_R9A09G077)
 	struct clk sh_sdhi_clk;
 	int ret;
 #endif
@@ -877,7 +881,7 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 	if (!host->addr)
 		return -ENOMEM;
 
-#if !((defined CONFIG_R9A09G077) || (defined CONFIG_R9A07G076))
+#if !(defined CONFIG_R9A07G077)
 	ret = clk_get_by_index(dev, 0, &sh_sdhi_clk);
 	if (ret) {
 		debug("failed to get clock, ret=%d\n", ret);
@@ -890,6 +894,22 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 		return ret;
 	}
 #endif
+	if(seq ==0) {
+		ret = gpio_request_by_name(dev, "sdhi_gpio_pwen-gpios", 0,
+					&sdhi_pwen,
+					GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
+		if (ret) {
+			pr_err("gpio_request_by_name(sdhi_gpio_pwen-gpios) failed: %d\n", ret);
+			return ret;
+		}
+		ret = gpio_request_by_name(dev, "sdhi_gpio_iovs-gpios", 0,
+					&sdhi_iovs,
+					GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
+		if (ret) {
+			pr_err("gpio_request_by_name(sdhi_gpio_iovs-gpios) failed: %d\n", ret);
+			return ret;
+		}
+	}
 	host->quirks = quirks;
 
 	if (host->quirks & SH_SDHI_QUIRK_64BIT_BUF)

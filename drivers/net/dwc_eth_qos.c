@@ -1589,6 +1589,31 @@ static int eqos_probe_resources_renesas_rz(struct udevice *dev)
 
 	eqos->max_speed = dev_read_u32_default(dev, "max-speed", 0);
 
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_RZT2N)
+	const int seq = dev_seq(dev);
+	ret = gpio_request_by_name(dev, "phy-reset-gpios", 0,
+				   &eqos->phy_reset_gpio,
+				   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
+	if (ret) {
+		pr_err("gpio_request_by_name(phy reset) failed: %d\n", ret);
+		return ret;
+	}
+
+	struct clk gmac_clk;
+	ret = clk_get_by_index(dev, 0, &gmac_clk);
+	if (ret) {
+		debug("failed to get clock, ret=%d\n", ret);
+		return ret;
+	}
+
+	ret = clk_enable(&gmac_clk);
+	if (ret) {
+		debug("failed to enable clock, ret=%d\n", ret);
+		return ret;
+	}
+
+	ethss_init_hw(seq);
+#endif
 	debug("%s: returns %d\n", __func__, ret);
 
 	return ret;

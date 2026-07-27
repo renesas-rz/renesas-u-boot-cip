@@ -152,7 +152,8 @@ void ethss_link_up(int port, phy_interface_t interface,
 void ethss_init_hw(u32 cfg_mode)
 {
 	int port;
-
+	int ret;
+	if(cfg_mode == 1) {
 	/* Unlock write access to accessory registers (cf datasheet). If this
 	 * is going to be used in conjunction with the Cortex-M3, this sequence
 	 * will have to be moved in register write
@@ -174,4 +175,21 @@ void ethss_init_hw(u32 cfg_mode)
 		ethss_reg_writel(ETHSS_SWCTRL, 0x0);
 		ethss_reg_writel(ETHSS_SWDUPC, 0x0);
 	}
+	ret = ethss_config(3, PHY_INTERFACE_MODE_RGMII_ID);
+	if (ret < 0)
+	{
+		printf("ETH3 port Init FAILED \n");
+		return;
+	}
+	ethss_link_up(3, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
+
+	ret = ethss_config(4, PHY_INTERFACE_MODE_RGMII_ID);
+	if (ret < 0)
+	{
+		printf("ETH4 port Init FAILED \n");
+		return;
+	}
+	ethss_link_up(4, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
+	}
+
 }
