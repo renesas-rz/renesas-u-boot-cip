@@ -50,6 +50,10 @@ struct r9a07g076_clk_priv {
 #define SCKCR2			0x81280004
 #define SCKCR2_CA55SCLK		BIT(12)
 
+#define MSTPCRB 0x80280304
+#define MSTPCRB00_IIC_UNIT0		BIT(0)
+#define MSTPCRB01_IIC_UNIT1		BIT(1)
+
 static int r9a07g076_clk_of_xlate(struct clk *clk,
                   struct ofnode_phandle_args *args)
 {
@@ -116,6 +120,12 @@ static int r9a07g076_clk_enable(struct clk *clk)
         case R9A07G076_xSPI0_CLK:
             /* Release module reset for XSPI0 */
             *(volatile u32 *)MRCTLA &= ~(MRCTLA_XSPI1);
+            break;
+        case R9A07G076_IIC0_CLK:
+            *(volatile u32 *)MSTPCRB &= ~(MSTPCRB00_IIC_UNIT0);
+            break;
+        case R9A07G076_IIC1_CLK:
+            *(volatile u32 *)MSTPCRB &= ~(MSTPCRB01_IIC_UNIT1);
             break;
         default:
             break;
