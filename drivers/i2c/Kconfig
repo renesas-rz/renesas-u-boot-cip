@@ -531,6 +531,12 @@ config SYS_I2C_RZ_RIIC
 	  Support for the I2C controller (RIIC) on the Renesas RZ/G2L SoC
 	  family.
 
+config SYS_I2C_RZT2N_RIIC
+	bool "Renesas RZ/T2N RIIC driver"
+	depends on DM_I2C
+	help
+	  Support for Renesas RZ/T2N RIIC controller.
+
 config SYS_I2C_SANDBOX
 	bool "Sandbox I2C driver"
 	depends on SANDBOX && DM_I2C
