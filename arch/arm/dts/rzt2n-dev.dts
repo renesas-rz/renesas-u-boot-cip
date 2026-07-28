@@ -27,6 +27,8 @@
 		mmc1 = &sdhi1;
 		ethernet0 = &gmac1;
 		ethernet1 = &gmac2;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
 	};
 
 	chosen {
@@ -234,6 +236,17 @@
 			 	<RZT2_PORT_PINMUX(16, 4, 0x20)>, /* XSPI1_IO2 */
 			 	<RZT2_PORT_PINMUX(16, 5, 0x20)>; /* XSPI1_IO3 */
 	};
+
+	i2c0_pins: i2c0 {
+		pinmux = <RZT2_PORT_PINMUX(15, 4, 0x1C)>, /* IIC : IIC_SCL0/P15_4 */
+			 <RZT2_PORT_PINMUX(15, 5, 0x1C)>; /* IIC : IIC_SDA0/P15_5 */
+	};
+
+
+	i2c1_pins: i2c1 {
+		pinmux = <RZT2_PORT_PINMUX(17, 0, 0x1C)>, /* IIC : IIC_SCL1/P17_0 */
+			 <RZT2_PORT_PINMUX(17, 1, 0x1C)>; /* IIC : IIC_SDA1/P17_1 */
+	};
 };
 
 &sci1 {
@@ -324,3 +337,17 @@
 &ehci {
 	status = "okay";
 };
+
+&i2c0 {
+	pinctrl-0 = <&i2c0_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&i2c1 {
+	pinctrl-0 = <&i2c1_pins>;
+	pinctrl-names = "default";
+
+	status = "okay";
+};
+
