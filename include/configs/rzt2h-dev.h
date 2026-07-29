@@ -122,8 +122,8 @@
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run emmcload; fi \0" \
 	"dfu_alt_info=sf 0:0=fip.bin raw 0x60000 0x1F0000 \0" \
 	"dfu_bufsiz=0x1F0000\0" \
-	"t2h_dtb_check=if test ${soc_id} = r9a09g077;then setenv dtb_name r9a09g077m44-dev.dtb;fi \0" \
-	"n2h_dtb_check=if test ${soc_id} = r9a09g087;then setenv dtb_name r9a09g087m44-dev.dtb;fi \0"
+	"t2h_dtb_check=if test ${soc_id} = r9a09g077;then setenv dtb_name r9a09g077m44-rzt2h-evk.dtb;fi \0" \
+	"n2h_dtb_check=if test ${soc_id} = r9a09g087;then setenv dtb_name r9a09g087m44-rzn2h-evk.dtb;fi \0"
 
 #endif /* CONFIG_TARGET_RZT2H_DISTRO_BOOT */
 /* For board */
