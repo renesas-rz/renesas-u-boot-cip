@@ -24,8 +24,44 @@
 #include <asm/arch/rcar-mstp.h>
 #include <asm/arch/sh_sdhi.h>
 #include <mmc.h>
+#include <efi_loader.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+
+/*
+ * Firmware image type GUID for RZ/G3S capsule updates. Generated specifically
+ * for RZ/G3S; must NOT be reused for any other Renesas SoC.
+ */
+#define EFI_FIRMWARE_IMAGE_TYPE_RZG3S_GUID \
+	EFI_GUID(0x80df2f4b, 0xc4be, 0x4433, 0xbe, 0xb0, \
+		 0xfe, 0x9f, 0x88, 0xf6, 0x02, 0x29)
+
+struct efi_fw_image fw_images[] = {
+	{
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZG3S_GUID,
+		.fw_name = u"bl2_bp-smarc-rzg3s.bin",
+		.image_index = 1,
+	},
+	{
+		.image_type_id = EFI_FIRMWARE_IMAGE_TYPE_RZG3S_GUID,
+		.fw_name = u"fip-smarc-rzg3s.bin",
+		.image_index = 2,
+	},
+};
+
+struct efi_capsule_update_info update_info = {
+	.dfu_string =
+		/* BL2 in SPI NOR at offset 0x0, max size 0x20000 */
+		"sf 0:0=bl2_bp-smarc-rzg3s.bin raw 0x0 0x20000;"
+		/* FIP in SPI NOR at offset 0x20000, max size 0x1F0000 */
+		"fip-smarc-rzg3s.bin raw 0x20000 0x1F0000",
+	.num_images = ARRAY_SIZE(fw_images),
+	.images = fw_images,
+};
+
+#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
 #define PFC_BASE			0x11030000
 

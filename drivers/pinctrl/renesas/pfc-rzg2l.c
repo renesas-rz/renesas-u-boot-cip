@@ -86,24 +86,18 @@ static void rzg2l_pinctrl_set_function(struct rzg2l_pinctrl_priv *priv,
 
 }
 
-static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
+static int rzg2l_pinctrl_set_pinmux(struct rzg2l_pinctrl_priv *priv, ofnode node,
+				    u16 port_max, u8 nmin_func, u8 nmax_func)
 {
-	struct rzg2l_pinctrl_priv *priv = dev_get_plat(dev);
-	ofnode cur_node  = dev_ofnode(dev);
+	u32 cells[port_max * RZG2L_MAX_PINS_PER_PORT];
+	const u32 *data;
 	u16 port;
-	u16 port_max = (u16)dev_get_driver_data(dev);
 	u8 pin, func;
 	int i, count;
-	const u32 *data;
-	u32 cells[port_max * RZG2L_MAX_PINS_PER_PORT];
-	u8 nmax_func = 5;
-	u8 nmin_func = 0;
 
-	data = dev_read_prop(config, "pinmux", &count);
-	if (count < 0) {
-		debug("%s: bad array size %d\n", __func__, count);
-		return -EINVAL;
-	}
+	data = ofnode_read_prop(node, "pinmux", &count);
+	if (!data)
+		return 0;
 
 	count /= sizeof(u32);
 	if (count > port_max * RZG2L_MAX_PINS_PER_PORT) {
@@ -112,7 +106,47 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 		return -EINVAL;
 	}
 
-	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
+	for (i = 0 ; i < count; i++) {
+		cells[i] = fdt32_to_cpu(data[i]);
+#if defined(CONFIG_RZG2L_DISTRO_BOOT) || defined(CONFIG_RZV2L_DISTRO_BOOT) || \
+	defined(CONFIG_RZG2UL_DISTRO_BOOT) || defined(CONFIG_RZG2LC_DISTRO_BOOT) || \
+	defined(CONFIG_RZG3S_DISTRO_BOOT)
+		func = (cells[i] >> 16) & 0xf;
+		port = (cells[i] & 0xffff) / RZG2L_MAX_PINS_PER_PORT;
+		pin  = (cells[i] & 0xffff) % RZG2L_MAX_PINS_PER_PORT;
+#else
+		func = (cells[i] >> 12) & 0xf;
+		port = (cells[i] / RZG2L_MAX_PINS_PER_PORT) & 0x1ff;
+		pin = cells[i] % RZG2L_MAX_PINS_PER_PORT;
+#endif
+
+		if (func > nmax_func || func < nmin_func || port >= port_max ||
+				pin >= RZG2L_MAX_PINS_PER_PORT) {
+			printf("Invalid cell %i in node %s!\n",
+			       i, ofnode_get_name(node));
+			continue;
+		}
+
+		rzg2l_pinctrl_set_function(priv, port, pin, func);
+	}
+
+	return 0;
+}
+
+static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
+{
+	struct rzg2l_pinctrl_priv *priv = dev_get_plat(dev);
+	ofnode cur_node  = dev_ofnode(dev);
+	ofnode config_node = dev_ofnode(config);
+	ofnode subnode;
+	u16 port_max = (u16)dev_get_driver_data(dev);
+	u8 nmax_func = 5;
+	u8 nmin_func = 0;
+	bool is_g3s;
+	int len;
+
+	is_g3s = ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl");
+	if (is_g3s) {
 		writel(0, priv->regs + PWPR_G3S);
 		writel(PWPR_PFCWE, priv->regs + PWPR_G3S);
 		nmax_func = 8;
@@ -126,35 +160,23 @@ static int rzg2l_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 		nmax_func = 7; /* External Pins and Multiplexed Functional Pins 0-7 for RZG2UL */
 	}
 
-	for (i = 0 ; i < count; i++) {
-		cells[i] = fdt32_to_cpu(data[i]);
-#if defined(CONFIG_RZG2L_DISTRO_BOOT) || defined(CONFIG_RZV2L_DISTRO_BOOT) || defined(CONFIG_RZG2UL_DISTRO_BOOT) || defined(CONFIG_RZG2LC_DISTRO_BOOT)
-		func = (cells[i] >> 16) & 0xf;
-		port = (cells[i] & 0xffff) / RZG2L_MAX_PINS_PER_PORT;
-		pin  = (cells[i] & 0xffff) % RZG2L_MAX_PINS_PER_PORT;
-#else
-		func = (cells[i] >> 12) & 0xf;
-		port = (cells[i] / RZG2L_MAX_PINS_PER_PORT) & 0x1ff;
-		pin = cells[i] % RZG2L_MAX_PINS_PER_PORT;
-#endif
-
-		if (func > nmax_func || func < nmin_func || port >= port_max ||
-				pin >= RZG2L_MAX_PINS_PER_PORT) {
-			printf("Invalid cell %i in node %s!\n",
-			       count, ofnode_get_name(dev_ofnode(config)));
-			continue;
-		}
-
-		rzg2l_pinctrl_set_function(priv, port, pin, func);
+	if (ofnode_read_prop(config_node, "pinmux", &len)) {
+		rzg2l_pinctrl_set_pinmux(priv, config_node, port_max,
+					 nmin_func, nmax_func);
+	} else {
+		ofnode_for_each_subnode(subnode, config_node)
+			rzg2l_pinctrl_set_pinmux(priv, subnode, port_max,
+						 nmin_func, nmax_func);
 	}
 
-	if (ofnode_device_is_compatible(cur_node, "renesas,r9a08g045s-pinctrl")) {
+	if (is_g3s) {
 		writel(0, priv->regs + PWPR_G3S);
 		writel(PWPR_B0WI, priv->regs + PWPR_G3S);
 	} else {
 		writel(0, priv->regs + PWPR);
 		writel(PWPR_B0WI, priv->regs + PWPR);
 	}
+
 	return 0;
 }
 

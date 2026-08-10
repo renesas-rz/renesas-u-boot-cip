@@ -878,15 +878,18 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 
 #if !(defined(CONFIG_R9A09G047) || defined(CONFIG_R9A09G057) || defined(CONFIG_R9A07G054L) || defined(CONFIG_R9A09G056) || defined(CONFIG_R9A07G043U))
 	ret = clk_get_by_index(dev, 0, &sh_sdhi_clk);
-	if (ret) {
+
+	if (ret && ret != -ENOSYS) {
 		debug("failed to get clock, ret=%d\n", ret);
 		return ret;
 	}
 
-	ret = clk_enable(&sh_sdhi_clk);
-	if (ret) {
-		debug("failed to enable clock, ret=%d\n", ret);
-		return ret;
+	if (!ret) {
+		ret = clk_enable(&sh_sdhi_clk);
+		if (ret) {
+			debug("failed to enable clock, ret=%d\n", ret);
+			return ret;
+		}
 	}
 #endif
 
@@ -954,6 +957,7 @@ static const struct udevice_id sh_sdhi_sd_match[] = {
 	{ .compatible = "renesas,sdhi-r9a09g056", .data = SH_SDHI_QUIRK_64BIT_BUF },
 	{ .compatible = "renesas,sdhi-r9a09g057", .data = SH_SDHI_QUIRK_64BIT_BUF },
 	{ .compatible = "renesas,sdhi-r9a08g045s", .data = SH_SDHI_QUIRK_64BIT_BUF },
+	{ .compatible = "renesas,sdhi-r9a08g045", .data = SH_SDHI_QUIRK_64BIT_BUF },
 	{ .compatible = "renesas,sdhi-r9a09g077", .data = SH_SDHI_QUIRK_64BIT_BUF },
 	{ .compatible = "renesas,sdhi-r9a09g087", .data = SH_SDHI_QUIRK_64BIT_BUF },
 	{ /* sentinel */ }

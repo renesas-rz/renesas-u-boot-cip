@@ -978,6 +978,7 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	r9a09g047e57-smarc.dtb \
 	rzg3s-dev.dtb \
 	smarc-rzg3s.dtb \
+	r9a08g045s33-smarc.dtb \
 	rzv2n-dev.dtb \
 	rzv2n-evk.dtb \
 	rzg3l-dev.dtb \

@@ -589,7 +589,8 @@ static int ravb_probe(struct udevice *dev)
 	eth->iobase = iobase;
 
 	ret = clk_get_bulk(dev, &eth->clks);
-	if (ret < 0)
+
+	if (ret < 0 && ret != -ENOSYS)
 		goto err_mdio_alloc;
 
 	ret = dev_read_phandle_with_args(dev, "phy-handle", NULL, 0, 0, &phandle_args);
@@ -625,8 +626,8 @@ static int ravb_probe(struct udevice *dev)
 #if !(defined(CONFIG_RZ_V2M))
 	/* Bring up PHY */
 	ret = clk_enable_bulk(&eth->clks);
-	if (ret)
-		goto err_mdio_register;
+	if (ret && ret != -ENOSYS)
+		goto err_mdio_reset;
 #endif
 
 	ret = ravb_reset(dev);
@@ -641,6 +642,7 @@ static int ravb_probe(struct udevice *dev)
 
 err_mdio_reset:
 	clk_release_bulk(&eth->clks);
+	mdio_unregister(mdiodev);
 err_mdio_register:
 	mdio_free(mdiodev);
 err_mdio_alloc:
@@ -831,6 +833,9 @@ static const struct udevice_id ravb_ids[] = {
 	  .data = (ulong)&rzg2l_data,
 	},
 	{ .compatible = "renesas,etheravb-r9a08g045s",
+	  .data = (ulong)&rzg3s_data,
+	},
+	{ .compatible = "renesas,r9a08g045-gbeth",
 	  .data = (ulong)&rzg3s_data,
 	},
 	{ }

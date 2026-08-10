@@ -382,6 +382,14 @@ config RZG3E_DISTRO_BOOT
 	  Enable the EFI/EBBR distro_bootcmd environment block in
 	  include/configs/rzg3e-dev.h. Used by the SystemReady
 	  smarc-rzg3e-distros_defconfig target.
+
+config RZG3S_DISTRO_BOOT
+	bool "RZ/G3S distro boot command enable"
+	help
+	  Enable the EFI/EBBR distro_bootcmd environment block in
+	  include/configs/smarc-rzg3s.h. Used by the SystemReady
+	  smarc-rzg3s-distros_defconfig target.
+
 config TARGET_RZT2H_DISTRO_BOOT
 	bool "RZ/T2H distro boot command enable"
 
