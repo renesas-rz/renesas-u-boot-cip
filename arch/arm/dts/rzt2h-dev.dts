@@ -127,9 +127,8 @@
 #endif
 		i2c1 = &i2c1;
 		i2c2 = &i2c2;
-		eth0 = &gmac1;
-		eth1 = &gmac2;
-		eth2 = &gmac0;
+		ethernet2 = &gmac2;
+		ethernet3 = &gmac1;
 	};
 
 	chosen {
@@ -809,6 +808,7 @@
 	pcs-handle = <&mii_conv3>;
 	status = "okay";
 	phy-reset-gpios = <&pinctrl RZT2H_GPIO(32, 3) GPIO_ACTIVE_HIGH>;
+	local-mac-address = [00 00 00 00 00 00];
 	pinctrl-names = "default";
 	pinctrl-0 = <&mdio1_pins>,<&eth2_pins>,<&pins_refclk>;
 	enable-time-based-scheduling;
@@ -839,6 +839,7 @@
 	pcs-handle = <&mii_conv2>;
 	status = "okay";
 	phy-reset-gpios = <&pinctrl RZT2H_GPIO(17, 5) GPIO_ACTIVE_HIGH>;
+	local-mac-address = [00 00 00 00 00 00];
 	pinctrl-names = "default";
 	pinctrl-0 = <&mdio2_pins>,<&eth3_pins>;
 	enable-time-based-scheduling;
