@@ -308,6 +308,11 @@ int board_fit_config_name_match(const char *name)
 	if (!strcmp(name, "smarc-rzg2ul") && !(ecc))
 		return 0;
 
+	if (!strcmp(name, "r9a07g043u11-smarc-ecc") && ecc)
+		return 0;
+
+	if (!strcmp(name, "r9a07g043u11-smarc") && !(ecc))
+		return 0;
 	return -1;
 }
 #endif
