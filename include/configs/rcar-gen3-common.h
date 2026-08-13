@@ -50,9 +50,9 @@
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
 	"prodemmcbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
 	"bootimage=unzip 0x4A080000 0x48080000; booti 0x48080000 - 0x48000000 \0" \
-	"emmcload=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/${dtb_name};run prodemmcbootargs \0" \
-	"sdload=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/${dtb_name};run prodsdbootargs \0" \
-	"bootcmd_check=if mmc dev 0; then run sdload; else run emmcload; fi \0" \
+	"emmcload=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/${dtb_name};run prodemmcbootargs \0" \
+	"sdload=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/${dtb_name};run prodsdbootargs \0" \
+	"bootcmd_check=if test -e mmc 1:2 boot/Image; then run sdload; else run emmcload; fi \0" \
 	"g2m_v1_dtb_check=if test ${soc_id} = r8a774a1;then if test ${board_rev} = 2;then setenv dtb_name r8a774a1-hihope-rzg2m-rev2-ex.dtb;else setenv dtb_name r8a774a1-hihope-rzg2m-ex.dtb;fi;fi \0" \
 	"g2m_v3_dtb_check=if test ${soc_id} = r8a774a3;then setenv dtb_name r8a774a3-hihope-rzg2m-ex.dtb;fi\0" \
 	"g2n_dtb_check=if test ${soc_id} = r8a774b1;then if test ${board_rev} = 2;then setenv dtb_name r8a774b1-hihope-rzg2n-rev2-ex.dtb;else setenv dtb_name r8a774b1-hihope-rzg2n-ex.dtb;fi;fi \0" \
