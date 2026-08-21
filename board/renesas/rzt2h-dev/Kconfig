@@ -15,4 +15,8 @@ config SYS_CONFIG_NAME
 config SERIAL_SH_RSCI
 	bool "Renesas serial driver for RSCI port"
 
+config CMD_PLATFORM
+    bool "Enable platform read command"
+    default y
+
 endif

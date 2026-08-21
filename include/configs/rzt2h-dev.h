@@ -113,7 +113,7 @@
 #define CFG_EXTRA_ENV_SETTINGS	\
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0" \
-	"bootcmd=soc_id=${platform};env default -a; run t2h_dtb_check; run n2h_dtb_check; run bootcmd_check; run bootimage\0" \
+	"bootcmd=env default -a; rz_platform; soc_id=${platform}; run t2h_dtb_check; run n2h_dtb_check; run bootcmd_check; run bootimage\0" \
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
 	"prodemmcbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
 	"bootimage=booti 0xc8280000 - 0xc8200000\0" \
