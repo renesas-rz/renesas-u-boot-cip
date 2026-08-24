@@ -103,21 +103,15 @@ const struct pinctrl_ops rzv2h_pinctrl_ops  = {
 	.set_state = rzv2h_pinctrl_set_state,
 };
 
-static int rzv2h_pinctrl_probe(struct udevice *dev)
+static int rzv2h_pinctrl_bind(struct udevice *dev)
 {
-	struct rzv2h_pinctrl_priv *priv = dev_get_plat(dev);
 	ofnode node;
 
-	priv->regs = dev_read_addr_ptr(dev);
-	if (!priv->regs) {
-		dev_err(dev, "can't get address\n");
-		return -EINVAL;
-	}
-
-	/* Read port_max from DT, fallback to driver data if not present */
-	priv->port_max = dev_read_u32_default(dev, "renesas,port-max",
-					      (u32)dev_get_driver_data(dev));
-
+	/*
+	 * The GPIO banks are described as gpio-controller subnodes of the pin
+	 * controller and have no compatible of their own, so they are bound
+	 * here explicitly. Do this at .bind (DT-scan) time rather than from .probe.
+	 */
 	dev_for_each_subnode(node, dev) {
 		struct udevice *gpiodev;
 
@@ -132,6 +126,23 @@ static int rzv2h_pinctrl_probe(struct udevice *dev)
 	return 0;
 }
 
+static int rzv2h_pinctrl_probe(struct udevice *dev)
+{
+	struct rzv2h_pinctrl_priv *priv = dev_get_plat(dev);
+
+	priv->regs = dev_read_addr_ptr(dev);
+	if (!priv->regs) {
+		dev_err(dev, "can't get address\n");
+		return -EINVAL;
+	}
+
+	/* Read port_max from DT, fallback to driver data if not present */
+	priv->port_max = dev_read_u32_default(dev, "renesas,port-max",
+					      (u32)dev_get_driver_data(dev));
+
+	return 0;
+}
+
 static const struct udevice_id rzv2h_pinctrl_match[] = {
 	{ .compatible = "renesas,r9a09g047-pinctrl", .data = 12 },
 	{ .compatible = "renesas,r9a09g057-pinctrl", .data = 12 },
@@ -142,6 +153,7 @@ U_BOOT_DRIVER(rzv2h_pinctrl) = {
 	.name		= "rzv2h_pinctrl",
 	.id		= UCLASS_PINCTRL,
 	.of_match	= rzv2h_pinctrl_match,
+	.bind		= rzv2h_pinctrl_bind,
 	.probe		= rzv2h_pinctrl_probe,
 	.plat_auto	= sizeof(struct rzv2h_pinctrl_priv),
 	.ops		= &rzv2h_pinctrl_ops,
