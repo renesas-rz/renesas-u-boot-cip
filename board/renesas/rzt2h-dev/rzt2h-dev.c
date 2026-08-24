@@ -275,8 +275,6 @@ int adxctl_init(void)
 
 int board_init(void)
 {
-
-
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_TEXT_BASE + 0x50000;
 	adxctl_init();
@@ -289,11 +287,17 @@ int board_init(void)
 int board_fit_config_name_match(const char *name)
 {
 	const u32 cpu_type = renesas_get_cpu_type();
-    if (cpu_type == RENESAS_CPU_TYPE_RZT2H && (strcmp(name, "rzt2h-dev") == 0))
-        return 0;
-    else if (cpu_type == RENESAS_CPU_TYPE_RZN2H && (strcmp(name, "rzn2h-dev") == 0))
-        return 0;   // N2H
-
+#if (defined CONFIG_PLAT_ECC_ENABLE)
+	if (cpu_type == RENESAS_CPU_TYPE_RZT2H && (strcmp(name, "rzt2h-dev-ecc") == 0))
+		return 0;
+	else if (cpu_type == RENESAS_CPU_TYPE_RZN2H && (strcmp(name, "rzn2h-dev-ecc") == 0))
+		return 0;   // N2H
+#else
+	if (cpu_type == RENESAS_CPU_TYPE_RZT2H && (strcmp(name, "rzt2h-dev") == 0))
+		return 0;
+	else if (cpu_type == RENESAS_CPU_TYPE_RZN2H && (strcmp(name, "rzn2h-dev") == 0))
+		return 0;   // N2H
+#endif
     return -1;
 }
 
