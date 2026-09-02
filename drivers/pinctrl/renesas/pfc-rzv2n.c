@@ -18,7 +18,7 @@
 #define PM(n)	(0x0100 + 0x40 + (n) * 2) /* Port Mode Register */
 #define PMC(n)	(0x0200 + 0x20 + (n))	  /* Port Mode Control Register */
 #define PFC(n)	(0x0400 + 0x80 + (n) * 4) /* Port Function Control Register */
-#define PIN(n)	(0x0800 + 0x10 + (n))	  /* Port Input Register */
+#define PIN(n)	(0x0800 + 0x20 + (n))	  /* Port Input Register */
 #define PWPR	(0x3C04)		  /* Port Write Protection Register */
 
 #define PWPR_REGWE_A	BIT(6)		  /* Bit Write Disable */

@@ -18,7 +18,7 @@
 #define PM(n)	(0x0100 + 0x40 + (n) * 2) /* Port Mode Register */
 #define PMC(n)	(0x0200 + 0x20 + (n))	  /* Port Mode Control Register */
 #define PFC(n)	(0x0400 + 0x80 + (n) * 4) /* Port Function Control Register */
-#define PIN(n)	(0x0800 + 0x10 + (n))	  /* Port Input Register */
+#define PIN(n)	(0x0800 + 0x20 + (n))	  /* Port Input Register */
 
 #define PM_INPUT			0x1 /* Input Mode */
 #define PM_OUTPUT			0x2 /* Output Mode (disable Input) */
