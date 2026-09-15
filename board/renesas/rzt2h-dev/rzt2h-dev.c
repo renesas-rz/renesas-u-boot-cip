@@ -26,6 +26,7 @@
 #include <linux/arm-smccc.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <linux/bitfield.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -131,6 +132,12 @@ DECLARE_GLOBAL_DATA_PTR;
 #define MODCTRL			0x8
 
 #define CS0ENDAD_xSPI(x)	(0x80293004 + (0x100 * (x)))
+
+/* ECC */
+#define DDR_MEMC_BASE		(0x80300000)
+#define ECC_ENABLE_ADDR		(0x039C)
+#define ECC_ENABLE_MASK		GENMASK(25, 24)
+#define ECC_EN_REG_BIT_POS	(24)
 
 #if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
 
@@ -275,29 +282,38 @@ int adxctl_init(void)
 
 int board_init(void)
 {
+	u32 reg, ecc;
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_TEXT_BASE + 0x50000;
 	adxctl_init();
 
 	board_usb_init();
-
+	reg = readl(DDR_MEMC_BASE + ECC_ENABLE_ADDR);
+	ecc = FIELD_GET(ECC_ENABLE_MASK, reg);
+	if (ecc) {
+		printf("INFO: DDR ECC Enabled %x\n", ecc);
+	} else {
+		printf("INFO: DDR ECC Disabled %x\n", ecc);
+	}
 	return 0;
 }
 
 int board_fit_config_name_match(const char *name)
 {
 	const u32 cpu_type = renesas_get_cpu_type();
-#if (defined CONFIG_PLAT_ECC_ENABLE)
-	if (cpu_type == RENESAS_CPU_TYPE_RZT2H && (strcmp(name, "rzt2h-dev-ecc") == 0))
+	u32 ecc;
+	ecc = readl(DDR_MEMC_BASE + ECC_ENABLE_ADDR);
+	ecc &= ECC_ENABLE_MASK;
+
+	if (cpu_type == RENESAS_CPU_TYPE_RZT2H && (strcmp(name, "rzt2h-dev-ecc") == 0) && ecc)
 		return 0;
-	else if (cpu_type == RENESAS_CPU_TYPE_RZN2H && (strcmp(name, "rzn2h-dev-ecc") == 0))
+	else if (cpu_type == RENESAS_CPU_TYPE_RZN2H && (strcmp(name, "rzn2h-dev-ecc") == 0) && ecc)
 		return 0;   // N2H
-#else
-	if (cpu_type == RENESAS_CPU_TYPE_RZT2H && (strcmp(name, "rzt2h-dev") == 0))
+	else if (cpu_type == RENESAS_CPU_TYPE_RZT2H && (strcmp(name, "rzt2h-dev") == 0) && !(ecc))
 		return 0;
-	else if (cpu_type == RENESAS_CPU_TYPE_RZN2H && (strcmp(name, "rzn2h-dev") == 0))
+	else if (cpu_type == RENESAS_CPU_TYPE_RZN2H && (strcmp(name, "rzn2h-dev") == 0) && !(ecc))
 		return 0;   // N2H
-#endif
+
     return -1;
 }
 

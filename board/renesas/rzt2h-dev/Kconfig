@@ -19,7 +19,4 @@ config CMD_PLATFORM
     bool "Enable platform read command"
     default y
 
-config PLAT_ECC_ENABLE
-    bool "Enable DDR ECC checking"
-
 endif
