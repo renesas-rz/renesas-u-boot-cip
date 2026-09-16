@@ -205,8 +205,21 @@ static void boot_prep_linux(struct bootm_headers *images)
 	char *commandline = env_get("bootargs");
 
 #ifdef CONFIG_WDT
-	strcat(commandline, " wdt_overflow=");
-	strcat(commandline, simple_itoa(watchdog_overflow));
+	 /* Add wdt_overflow information to bootargs to send to kernel */
+	char newbuf[CONFIG_SYS_CBSIZE];
+	int ret = 0;
+
+	if (commandline != NULL)
+		ret = snprintf(newbuf, sizeof(newbuf), "%s wdt_overflow=%d",
+			commandline, watchdog_overflow);
+	else
+		ret = snprintf(newbuf, sizeof(newbuf), "wdt_overflow=%d",
+			watchdog_overflow);
+
+	if (ret > 0  && ret < sizeof(newbuf)) {
+		env_set("bootargs", newbuf);
+		commandline = env_get("bootargs");    /* reread for later use */
+	}
 #endif
 
 	if (CONFIG_IS_ENABLED(OF_LIBFDT) && IS_ENABLED(CONFIG_LMB) && images->ft_len) {
