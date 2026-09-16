@@ -27,6 +27,7 @@
 #include <i2c.h>
 #include <mmc.h>
 #include <linux/delay.h>
+#include <linux/bitfield.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -155,6 +156,11 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define XSPI1_FLASH_RW_ENABLE               (0)
 
+/* ECC */
+#define DDR_MEMC_BASE		(0x80300000)
+#define ECC_ENABLE_ADDR		(0x0370)
+#define ECC_ENABLE_MASK		GENMASK(25, 24)
+
 /* Needed by lowlevel_init.S*/
 void s_init(void)
 {
@@ -247,6 +253,7 @@ int adxctl_init(void)
 /* Needed by common/board_f */
 int board_init(void)
 {
+	u32 reg, ecc;
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_TEXT_BASE + 0x50000;
 
@@ -254,7 +261,24 @@ int board_init(void)
 
 	board_usb_init();
 
+	reg = readl(DDR_MEMC_BASE + ECC_ENABLE_ADDR);
+	ecc = FIELD_GET(ECC_ENABLE_MASK, reg);
+	printf("INFO: DDR ECC %s\n", ecc ? "Enabled" : "Disabled");
 	return 0;
+}
+
+int board_fit_config_name_match(const char *name)
+{
+	u32 reg, ecc;
+
+	reg = readl(DDR_MEMC_BASE + ECC_ENABLE_ADDR);
+	ecc = FIELD_GET(ECC_ENABLE_MASK, reg);
+
+	if (!strcmp(name, "rzt2n-dev-ecc") && ecc)
+		return 0;
+	if (!strcmp(name, "rzt2n-dev") && !(ecc))
+		return 0;
+	return -1;
 }
 
 void reset_cpu(void)
