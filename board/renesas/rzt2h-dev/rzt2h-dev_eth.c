@@ -173,4 +173,9 @@ void ethss_init_hw(u32 cfg_mode)
 		ethss_reg_writel(ETHSS_SWCTRL, 0x0);
 		ethss_reg_writel(ETHSS_SWDUPC, 0x0);
 	}
+
+	/* Clear PRCMD to lock write access and return the Ethernet
+	* protection command sequence to the idle state.
+	*/
+	ethss_reg_writel(ETHSS_PRCMD, 0);
 }
