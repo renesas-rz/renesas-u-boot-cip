@@ -87,11 +87,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define USB2_PHY_RESET			0x000
 #define USB2_PHY_OTGR			0x600
 
+#define PMIC_BUCK5_ENABLE_REG	 	(0x3C)
 #define PMIC_LDO1_ACTIVE_REG		(0x4A)
 #define PMIC_EVK1_HA2				(0x67)
 #define PMIC_EVK2_HA7				(0x64)
-#define ETH_EVK1_PMIC_RESET_REG 	(0x3C)
-#define ETH_EVK2_PMIC_RESET_REG 	(0x2E)
 
 
 /* ADC */
@@ -269,29 +268,43 @@ int board_late_init(void)
 	if (!ret)
 	{
 		dm_i2c_read(dev, PMIC_LDO1_ACTIVE_REG, &reg, 1);
-		if(reg == PMIC_EVK1_HA2)
+		if (reg == PMIC_EVK1_HA2)
 		{
 			printf("INFO: V2N EVK1 PMIC Reg value 0x%x\n",reg);
-			pmic_reset_reg = ETH_EVK1_PMIC_RESET_REG;
+			/* RZ/V2N EVK1 reset ETH PHY by BUCK5 */
+			pmic_reset_reg = PMIC_BUCK5_ENABLE_REG;
+
+			dm_i2c_read(dev, pmic_reset_reg, &reg, 1);
+			reg &= (~0x01);
+
+			dm_i2c_write(dev, pmic_reset_reg, &reg, 1);
+
+			udelay(2);
+			reg |= (0x01);
+
+			dm_i2c_write(dev, pmic_reset_reg, &reg, 1);
+
 		}
-		else if(reg == PMIC_EVK2_HA7)
+		else if (reg == PMIC_EVK2_HA7)
 		{
 			printf("INFO: V2N EVK2 PMIC Reg value 0x%x\n",reg);
-			pmic_reset_reg = ETH_EVK2_PMIC_RESET_REG;
+			/* RZ/V2N EVK2 reset ETH PHY by LDO1 */
+			pmic_reset_reg = PMIC_LDO1_ACTIVE_REG;
+
+			dm_i2c_read(dev, pmic_reset_reg, &reg, 1);
+			reg &= (~0x40);
+
+			dm_i2c_write(dev, pmic_reset_reg, &reg, 1);
+
+			udelay(2);
+			reg |= 0x40;
+
+			dm_i2c_write(dev, pmic_reset_reg, &reg, 1);
 		}
 		else
 		{
 			printf("ERROR: incorrect pmic register settings %x\n",reg);
 		}
-		dm_i2c_read(dev, pmic_reset_reg, &reg, 1);
-		reg &= (~0x01);
-
-		dm_i2c_write(dev, pmic_reset_reg, &reg, 1);
-
-		udelay(2);
-		reg |= (0x01);
-
-		dm_i2c_write(dev, pmic_reset_reg, &reg, 1);
 	}
 
 	return ret;
