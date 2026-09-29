@@ -121,12 +121,16 @@
 	"prodsd0bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
 	"prodsd1bootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \
 	"bootimage=booti 0x48080000 - 0x48000000 \0" \
-	"sd0load=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/r9a09g057h44-rzv2h-evk.dtb;run prodsd0bootargs \0" \
+	"sd0load=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/${fdtfile};run prodsd0bootargs \0" \
 	"sd1load=ext4load mmc 1:2 0x48080000 boot/Image;ext4load mmc 1:2 0x48000000 boot/r9a09g057h44-rzv2h-evk.dtb;run prodsd1bootargs \0" \
 	"bootcmd_check=if mmc dev 1; then run sd1load; else run sd0load; fi \0"
 #endif
 
+#if defined(CONFIG_TARGET_RZV2H_DEV) || defined(CONFIG_TARGET_RZV2H_EVK_ALPHA) || defined(CONFIG_RZV2H_DISTRO_BOOT)
 #define CONFIG_BOOTCOMMAND	"env default -a;run bootcmd_check;run bootimage"
+#else
+#define CONFIG_BOOTCOMMAND	"env default -a;detect_boot_mode;run bootcmd_check;run bootimage"
+#endif
 
 #endif
 
