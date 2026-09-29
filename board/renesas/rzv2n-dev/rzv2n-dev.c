@@ -25,6 +25,8 @@
 #include <i2c.h>
 #include <mmc.h>
 #include <linux/delay.h>
+#include <command.h>
+#include <env.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -95,6 +97,14 @@ DECLARE_GLOBAL_DATA_PTR;
 
 /* ADC */
 #define SYS_ADC_CFG			0x10431600
+
+/* SYS */
+#define SYS_BASE			0x10430000
+#define SYS_LSI_MODE			(SYS_BASE + 0x300)
+#define SYS_LSI_MODE_STAT_MD_BOOT_MASK	0x7
+#define SYS_LSI_MODE_BOOT_ESD		0x4
+#define SYS_LSI_MODE_BOOT_EMMC		0x5
+#define SYS_LSI_MODE_BOOT_SPI		0x6
 
 void s_init(void)
 {
@@ -329,3 +339,98 @@ int board_init(void)
 void reset_cpu(void)
 {
 }
+
+#if CONFIG_TARGET_RZV2N_EVK
+#define RZV2N_EVK_SD_DTB \
+	"r9a09g056n48-rzv2n-evk-cn15-sd.dtb"
+
+#define RZV2N_EVK_EMMC_DTB \
+	"r9a09g056n48-rzv2n-evk-cn15-emmc.dtb"
+
+static int detect_mmc0_type(void)
+{
+	struct mmc *mmc;
+	int ret = 0;
+
+	mmc = find_mmc_device(0);
+	if (!mmc) {
+		printf("MMC0: device not found\n");
+		return CMD_RET_FAILURE;
+	}
+
+	ret = mmc_init(mmc);
+	if (ret) {
+		printf("MMC0: initialization failed (%d)\n", ret);
+		return CMD_RET_FAILURE;
+	}
+
+	if (IS_SD(mmc)) {
+		printf("MMC0 type: SD\n");
+
+		ret = env_set("fdtfile", RZV2N_EVK_SD_DTB);
+	} else if (IS_MMC(mmc)) {
+		printf("MMC0 type: eMMC\n");
+
+		ret = env_set("fdtfile", RZV2N_EVK_EMMC_DTB);
+	} else {
+		printf("MMC0: unknown device type\n");
+		return CMD_RET_FAILURE;
+	}
+
+	if (ret) {
+		printf("Failed to set fdtfile\n");
+		return CMD_RET_FAILURE;
+	}
+
+	return CMD_RET_SUCCESS;
+}
+
+static int do_detect_boot_mode(struct cmd_tbl *cmdtp, int flag,
+				int argc, char *const argv[])
+{
+	u32 boot_mode;
+	int ret = 0;
+
+	boot_mode = readl(SYS_LSI_MODE);
+
+	printf("SYS_LSI_MODE: 0x%08x\n", boot_mode);
+
+	switch (boot_mode & SYS_LSI_MODE_STAT_MD_BOOT_MASK) {
+	case SYS_LSI_MODE_BOOT_ESD:
+		printf("Boot mode: eSD\n");
+
+		ret = env_set("fdtfile", RZV2N_EVK_SD_DTB);
+		break;
+
+	case SYS_LSI_MODE_BOOT_EMMC:
+		printf("Boot mode: eMMC\n");
+
+		ret = env_set("fdtfile", RZV2N_EVK_EMMC_DTB);
+		break;
+
+	case SYS_LSI_MODE_BOOT_SPI:
+		printf("Boot mode: SPI\n");
+		printf("Detecting MMC0 type for DTB selection...\n");
+
+		return detect_mmc0_type();
+
+	default:
+		printf("Unsupported boot mode: 0x%x\n",
+		       boot_mode & SYS_LSI_MODE_STAT_MD_BOOT_MASK);
+		return CMD_RET_FAILURE;
+	}
+
+	if (ret) {
+		printf("Failed to set fdtfile\n");
+		return CMD_RET_FAILURE;
+	}
+
+	return CMD_RET_SUCCESS;
+}
+
+U_BOOT_CMD(
+	detect_boot_mode, 1, 0, do_detect_boot_mode,
+	"detect RZ/V2N boot mode and select DTB",
+	""
+);
+#endif
