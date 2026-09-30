@@ -6,4 +6,4 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 
-obj-y	:= hihope-rzg2.o ../../renesas/rcar-common/common.o ../../renesas/rzg-common/update_fdt.o
+obj-y	:= hihope-rzg2.o ../../renesas/rcar-common/common.o ../../renesas/rzg-common/update_fdt.o ../../renesas/rzg-common/detect-hw-cmd.o
