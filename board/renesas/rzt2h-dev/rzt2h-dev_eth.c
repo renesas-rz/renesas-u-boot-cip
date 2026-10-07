@@ -54,6 +54,26 @@ static u32 ethss_reg_readl(int offset)
 	return readl((uintptr_t)(ETH_SUBSYSTEM_REG_BASE + offset));
 }
 
+static void ethss_unlock_regs(void)
+{
+	/* Unlock write access to accessory registers (cf datasheet). If this
+	 * is going to be used in conjunction with the Cortex-M3, this sequence
+	 * will have to be moved in register write
+	 */
+	ethss_reg_writel(ETHSS_PRCMD, 0x00A5);
+	ethss_reg_writel(ETHSS_PRCMD, 0x0001);
+	ethss_reg_writel(ETHSS_PRCMD, 0xFFFE);
+	ethss_reg_writel(ETHSS_PRCMD, 0x0001);
+}
+
+static void ethss_lock_regs(void)
+{
+	/* Clear PRCMD to lock write access and return the Ethernet
+	* protection command sequence to the idle state.
+	*/
+	ethss_reg_writel(ETHSS_PRCMD, 0);
+}
+
 static void ethss_reg_rmw(int offset, u32 mask, u32 val)
 {
 	u32 reg;
@@ -78,6 +98,7 @@ int ethss_config(int port, phy_interface_t interface)
 {
 	u32 speed, conv_mode, val, mask;
 
+	ethss_unlock_regs();
 	switch (interface) {
 	case PHY_INTERFACE_MODE_RMII:
 		conv_mode = CONV_MODE_RMII;
@@ -98,6 +119,7 @@ int ethss_config(int port, phy_interface_t interface)
 		speed = CONV_MODE_10MBPS;
 		break;
 	default:
+		ethss_lock_regs();
 		return -EOPNOTSUPP;
 	}
 
@@ -114,6 +136,7 @@ int ethss_config(int port, phy_interface_t interface)
 	ethss_reg_rmw(ETHSS_CONVCTRL(port), mask, val);
 	ethss_converter_enable(port, 1);
 
+	ethss_lock_regs();
 	return 0;
 }
 
@@ -121,6 +144,8 @@ void ethss_link_up(int port, phy_interface_t interface,
 		   int speed, int duplex)
 {
 	u32 conv_speed = 0, val = 0;
+
+	ethss_unlock_regs();
 
 	if (duplex == DUPLEX_FULL)
 		val |= ETHSS_CONVCTRL_FULLD;
@@ -138,6 +163,7 @@ void ethss_link_up(int port, phy_interface_t interface,
 			conv_speed = CONV_MODE_10MBPS;
 			break;
 		default:
+			ethss_lock_regs();
 			return;
 		}
 	}
@@ -146,20 +172,14 @@ void ethss_link_up(int port, phy_interface_t interface,
 
 	ethss_reg_rmw(ETHSS_CONVCTRL(port),
 		      (ETHSS_CONVCTRL_CONV_SPEED | ETHSS_CONVCTRL_FULLD), val);
+	ethss_lock_regs();
 }
 
 void ethss_init_hw(u32 cfg_mode)
 {
 	int port;
 
-	/* Unlock write access to accessory registers (cf datasheet). If this
-	 * is going to be used in conjunction with the Cortex-M3, this sequence
-	 * will have to be moved in register write
-	 */
-	ethss_reg_writel(ETHSS_PRCMD, 0x00A5);
-	ethss_reg_writel(ETHSS_PRCMD, 0x0001);
-	ethss_reg_writel(ETHSS_PRCMD, 0xFFFE);
-	ethss_reg_writel(ETHSS_PRCMD, 0x0001);
+	ethss_unlock_regs();
 
 	ethss_reg_writel(ETHSS_MODCTRL,
 			 FIELD_PREP(ETHSS_MODCTRL_SW_MODE, cfg_mode));
@@ -173,9 +193,5 @@ void ethss_init_hw(u32 cfg_mode)
 		ethss_reg_writel(ETHSS_SWCTRL, 0x0);
 		ethss_reg_writel(ETHSS_SWDUPC, 0x0);
 	}
-
-	/* Clear PRCMD to lock write access and return the Ethernet
-	* protection command sequence to the idle state.
-	*/
-	ethss_reg_writel(ETHSS_PRCMD, 0);
+	ethss_lock_regs();
 }
