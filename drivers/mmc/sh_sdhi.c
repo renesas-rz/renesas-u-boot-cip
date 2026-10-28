@@ -924,6 +924,8 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 	}
 
 #if ((defined CONFIG_R9A09G077) || (defined CONFIG_R9A09G087))
+	sh_sdhi_writew(host, SDHI_CLK_CTRL,
+		       ~CLK_ENABLE & sh_sdhi_readw(host, SDHI_CLK_CTRL));
 	sh_sdhi_writel(host, SDHI_SD_STATUS, ~SD_STATUS_SD_PWEN & sh_sdhi_readl(host, SDHI_SD_STATUS));
 	mdelay(5);
 	sh_sdhi_writel(host, SDHI_SD_STATUS, SD_STATUS_SD_PWEN);
