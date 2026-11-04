@@ -62,6 +62,7 @@
 
 #if defined(CONFIG_TARGET_SILINUX_EK874)
 #define CONFIG_EXTRA_ENV_SETTINGS	\
+	"fdt_high=ffffffffffffffff\0" \
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0" \
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2 \0" \
@@ -72,6 +73,7 @@
 	"bootcmd_check=if mmc dev 0; then run sdload; else run emmcload; fi \0"
 #elif defined(CONFIG_TARGET_HIHOPE_RZG2)
 #define CONFIG_EXTRA_ENV_SETTINGS	\
+	"fdt_high=ffffffffffffffff\0" \
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0" \
 	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk1p2 \0" \

@@ -250,6 +250,9 @@ static int do_detect_hw(struct cmd_tbl *cmdtp, int flag,
 	if (ret)
 		return CMD_RET_FAILURE;
 
+	/* Set FDT relocation policy*/
+	env_set_hex("fdt_high", ~0UL);
+
 	printf("detect_hw: soc_id=%s board_rev=%s dtb_name=%s\n",
 		env_get("soc_id"),
 		env_get("board_rev"),
